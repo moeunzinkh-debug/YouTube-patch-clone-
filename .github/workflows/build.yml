@@ -1,0 +1,150 @@
+name: Build YouTube patch
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - arena/febd3d83-youtube-patch-clone
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: youtube-patch-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build YouTube patch.mpp
+    # Keep the preinstalled Android SDK stable during ubuntu-latest migrations.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # GitHub's Ubuntu 24.04 image already includes Android command-line tools
+      # and accepted SDK licenses. Do not bootstrap another SDK via setup-android.
+      - name: Prepare runner Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk_root="${ANDROID_HOME:?The runner must provide ANDROID_HOME}"
+          sdkmanager="$sdk_root/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -x "$sdkmanager" ]]; then
+            echo "::error::Android SDK command-line tools are missing: $sdkmanager"
+            exit 1
+          fi
+          echo "ANDROID_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          echo "$sdk_root/platform-tools" >> "$GITHUB_PATH"
+          echo "$sdk_root/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          # Avoid network downloads when the required packages are preinstalled.
+          packages=()
+          [[ -f "$sdk_root/platforms/android-36/android.jar" ]] || packages+=('platforms;android-36')
+          [[ -x "$sdk_root/build-tools/36.0.0/aapt2" ]] || packages+=('build-tools;36.0.0')
+          if (( ${#packages[@]} )); then
+            "$sdkmanager" --sdk_root="$sdk_root" "${packages[@]}"
+          fi
+          test -f "$sdk_root/platforms/android-36/android.jar"
+          test -x "$sdk_root/build-tools/36.0.0/aapt2"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Test TTS response handling
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          mkdir -p build
+          set +e
+          ./gradlew :tts-tests:test --no-daemon --stacktrace 2>&1 | tee build/tts-tests.log
+          result=${PIPESTATUS[0]}
+          set -e
+          if (( result != 0 )); then
+            python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          def report(message):
+              message = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::error title=TTS regression tests::{message}')
+
+          log = Path('build/tts-tests.log').read_text()
+          start = log.find('* What went wrong:')
+          if start >= 0:
+              report(log[start:start + 5000].split('* Try:')[0])
+          for path in Path('tts-tests/build/test-results').rglob('TEST-*.xml'):
+              for failure in ET.parse(path).iter('failure'):
+                  report((failure.get('message', '') + '\n' + (failure.text or ''))[:5000])
+          PY
+          fi
+          exit "$result"
+
+      - name: Build Android patch bundle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :patches:buildAndroid --no-daemon --stacktrace
+
+      - name: Verify and prepare YouTube patch.mpp
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          bundles=(patches/build/libs/*.mpp)
+          primary_bundles=()
+          for bundle in "${bundles[@]}"; do
+            case "$bundle" in
+              *-sources.mpp|*-javadoc.mpp) continue ;;
+            esac
+            primary_bundles+=("$bundle")
+          done
+          if [[ ${#primary_bundles[@]} -ne 1 ]]; then
+            echo "::error::Expected exactly one compiled .mpp bundle; found ${#primary_bundles[@]}."
+            exit 1
+          fi
+          mkdir -p build/artifacts
+          cp "${primary_bundles[0]}" 'build/artifacts/YouTube patch.mpp'
+          python3 - <<'PY'
+          from zipfile import ZipFile
+
+          with ZipFile('build/artifacts/YouTube patch.mpp') as bundle:
+              if bundle.testzip() is not None:
+                  raise SystemExit('Patch bundle contains a corrupt ZIP entry')
+              if 'classes.dex' not in bundle.namelist():
+                  raise SystemExit('Patch bundle is missing classes.dex; Android build is required')
+          PY
+
+      - name: Upload YouTube patch
+        uses: actions/upload-artifact@v6
+        with:
+          name: YouTube-patch
+          path: build/artifacts/YouTube patch.mpp
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Write download instructions
+        shell: bash
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ## YouTube patch.mpp
+          Build completed. Download **YouTube-patch** from this run's **Artifacts** section
+          and extract the ZIP to obtain **YouTube patch.mpp**.
+
+          ទាញយក **YouTube-patch** ពីផ្នែក **Artifacts** រួចពន្លាឯកសារ ZIP
+          ដើម្បីទទួលបាន **YouTube patch.mpp**។ នេះជា patch bundle មិនមែនជា APK ទេ។
+          EOF

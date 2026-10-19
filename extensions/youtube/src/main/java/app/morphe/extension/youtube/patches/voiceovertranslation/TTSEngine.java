@@ -134,7 +134,7 @@ final class TTSEngine {
                     }
                 });
             } catch (Exception ex) {
-                VoiceOverTranslationPatch.logError(() -> "Edge TTS speak failed", ex);
+                VoiceOverTranslationPatch.logError(() -> "TTS speak failed", ex);
                 Utils.runOnMainThread(() -> {
                     if (id == playbackId) {
                         speaking = false;
@@ -195,8 +195,9 @@ final class TTSEngine {
 
     /** Synthesizes {@code text} via Edge TTS at natural speed. Must be called off the main thread. */
     byte[] prefetch(String text, String voice, String lang) throws Exception {
+        Utils.verifyOffMainThread();
         if (KhmerTtsClient.supports(lang)) {
-            return KhmerTtsClient.synthesize(text);
+            return KhmerTtsClient.synthesize(text, voice);
         }
         return synthesizeEdge(text, voice, lang);
     }

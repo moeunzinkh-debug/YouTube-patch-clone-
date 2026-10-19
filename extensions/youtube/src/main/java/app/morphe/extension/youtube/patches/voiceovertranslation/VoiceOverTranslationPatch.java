@@ -696,7 +696,7 @@ public class VoiceOverTranslationPatch {
                 data = ttsEngine.prefetch(seg.text, voice, lang);
             } catch (Exception ex) {
                 logError(() -> "On-demand synthesis failed for segment " + index, ex);
-                Utils.runOnMainThread(VoiceOverTranslationPatch::triggerNextSegmentCheck);
+                Utils.runOnMainThread(() -> finishFailedSynthesis(playbackId));
                 return;
             }
             if (data.length > 0) {
@@ -714,11 +714,22 @@ public class VoiceOverTranslationPatch {
                     ttsEngine.play(finalData, volume, playbackRateNow, playbackPitchNow,
                             startTimeMsSnapshot, playbackId,
                             VoiceOverTranslationPatch::triggerNextSegmentCheck);
-                } else {
-                    triggerNextSegmentCheck();
+                } else if (playbackId == ttsEngine.getPlaybackId()) {
+                    finishFailedSynthesis(playbackId);
                 }
             });
         });
+    }
+
+    /** A failed request must not leave isSpeaking() true and block every later segment. */
+    private static void finishFailedSynthesis(long playbackId) {
+        Utils.verifyOnMainThread();
+        // A delayed failure from a previous video/seek must not interrupt new playback.
+        if (playbackId != ttsEngine.getPlaybackId()) return;
+        ttsEngine.clearBusy(playbackId);
+        ttsEndVideoTimeMs = 0;
+        PlayerVolumePatch.clearDuckMultiplier();
+        triggerNextSegmentCheck();
     }
 
     private static void triggerNextSegmentCheck() {
@@ -986,7 +997,9 @@ public class VoiceOverTranslationPatch {
      */
     private static String resolveVoice(String lang) {
         // Khmer always uses the configured server. Do not fall back to Edge or Android TTS.
-        if (KhmerTtsClient.supports(lang)) return KhmerTtsClient.VOICE_ID;
+        if (KhmerTtsClient.supports(lang)) {
+            return KhmerTtsClient.resolveVoiceId(Settings.VOT_TTS_VOICE_TYPE.get());
+        }
         return Settings.VOT_USE_NATIVE_TTS.get()
                 ? TTS_ENGINE_SYSTEM
                 : VoiceCatalog.resolve(lang, Settings.VOT_TTS_VOICE_TYPE.get());

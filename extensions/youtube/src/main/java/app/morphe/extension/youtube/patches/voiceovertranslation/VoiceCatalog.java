@@ -508,7 +508,7 @@ final class VoiceCatalog {
      */
     @Nullable
     static String resolve(String lang, @Nullable String preferredVoiceId) {
-        if (KhmerTtsClient.supports(lang)) return KhmerTtsClient.VOICE_ID;
+        if (KhmerTtsClient.supports(lang)) return KhmerTtsClient.resolveVoiceId(preferredVoiceId);
         lang = getIso639(lang);
 
         List<Voice> voices = VOICES_BY_LANG.get(lang);
