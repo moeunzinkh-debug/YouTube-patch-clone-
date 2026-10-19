@@ -29,3 +29,36 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 This is an **unofficial, filtered derivative** of Morphe patches, based on upstream release **v1.47.0**, commit [`e5464395441e916b643af4e2175c4e253e6df487`](https://github.com/MorpheApp/morphe-patches/commit/e5464395441e916b643af4e2175c4e253e6df487) (2026-10-11). It is not affiliated with or endorsed by MorpheApp, Google, or YouTube.
 
 The upstream project's GPLv3 license and additional notice are preserved in [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). See [`UPSTREAM.md`](UPSTREAM.md) for the exact source revision and filtering details.
+
+## Build `YouTube patch.mpp` តាម GitHub Actions
+
+Workflow ស្ថិតនៅ [`.github/workflows/build.yml`](.github/workflows/build.yml)។ វាប្រើ Java 21,
+Android SDK 36 និង Gradle wrapper របស់គម្រោង ដើម្បីដំណើរការ
+`./gradlew :patches:buildAndroid --no-daemon --stacktrace`។ Task នេះបង្កើត patch bundle
+សម្រាប់ Android ដែលមាន `classes.dex` មិនមែនគ្រាន់តែប្ដូរឈ្មោះឯកសារ JAR ទេ។
+
+### របៀប build និងទាញយក
+
+1. Push កូដដែលមាន workflow នេះទៅ GitHub។ វានឹង build ដោយស្វ័យប្រវត្តិពេល push ទៅ
+   `main` ឬ `arena/febd3d83-youtube-patch-clone` និងពេលបើក pull request ទៅ `main`។
+2. សម្រាប់ការចាប់ផ្ដើមដោយដៃ៖ ពេល workflow មាននៅលើ default branch រួច ចូលផ្ទាំង
+   **Actions → Build YouTube patch → Run workflow** រួចជ្រើស branch និងចុច **Run workflow**។
+3. រង់ចាំ job **Build YouTube patch.mpp** បញ្ចប់ដោយជោគជ័យ។
+4. ចូល workflow run នោះ រួចទាញយក **YouTube-patch** នៅផ្នែក **Artifacts**។
+5. ពន្លាឯកសារ ZIP ដែលបានទាញយក នោះអ្នកនឹងបាន **`YouTube patch.mpp`**។
+   Artifact ត្រូវបានរក្សាទុករយៈពេល 14 ថ្ងៃ។
+
+> **សំខាន់៖** `.mpp` ជា Morphe patch bundle សម្រាប់ប្រើជាមួយកម្មវិធី patch ដែលគាំទ្រ
+> មិនមែនជា YouTube APK ដែលអាចដំឡើងផ្ទាល់ទេ។
+
+### បើ build បរាជ័យ
+
+- បើជួប `401`, `403` ឬបញ្ហាទាញយក Morphe dependencies ពី GitHub Packages សូមពិនិត្យ
+  log របស់ step **Build Android patch bundle**។ Workflow ប្រើ `GITHUB_TOKEN`
+  ដែល GitHub បង្កើតដោយស្វ័យប្រវត្តិ និង permission `packages: read`។ Package ខាង upstream
+  ក៏ត្រូវអនុញ្ញាតឱ្យ repository នេះអានផងដែរ; permission ក្នុង workflow តែឯងមិនអាចផ្ដល់
+  សិទ្ធិទៅ package ដែលបានរឹតបន្តឹងបានទេ។ កុំដាក់ token ឬពាក្យសម្ងាត់ក្នុង source code។
+- បើរក dependency ឬ Gradle version មិនឃើញ សូមផ្ទៀងផ្ទាត់ version ក្នុង
+  `gradle/libs.versions.toml`, `settings.gradle.kts` និង
+  `gradle/wrapper/gradle-wrapper.properties` ជាមួយ upstream មុនប្ដូរ។
+- Workflow នឹងមិន upload artifact ទេ ប្រសិនបើ build បរាជ័យ ឬ bundle មិនមាន `classes.dex`។

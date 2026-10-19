@@ -1,0 +1,100 @@
+name: Build YouTube patch
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - arena/febd3d83-youtube-patch-clone
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: youtube-patch-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build YouTube patch.mpp
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform 36
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Build Android patch bundle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :patches:buildAndroid --no-daemon --stacktrace
+
+      - name: Verify and prepare YouTube patch.mpp
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          bundles=(patches/build/libs/*.mpp)
+          primary_bundles=()
+          for bundle in "${bundles[@]}"; do
+            case "$bundle" in
+              *-sources.mpp|*-javadoc.mpp) continue ;;
+            esac
+            primary_bundles+=("$bundle")
+          done
+          if [[ ${#primary_bundles[@]} -ne 1 ]]; then
+            echo "::error::Expected exactly one compiled .mpp bundle; found ${#primary_bundles[@]}."
+            exit 1
+          fi
+          mkdir -p build/artifacts
+          cp "${primary_bundles[0]}" 'build/artifacts/YouTube patch.mpp'
+          python3 - <<'PY'
+          from zipfile import ZipFile
+
+          with ZipFile('build/artifacts/YouTube patch.mpp') as bundle:
+              if bundle.testzip() is not None:
+                  raise SystemExit('Patch bundle contains a corrupt ZIP entry')
+              if 'classes.dex' not in bundle.namelist():
+                  raise SystemExit('Patch bundle is missing classes.dex; Android build is required')
+          PY
+
+      - name: Upload YouTube patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: YouTube-patch
+          path: build/artifacts/YouTube patch.mpp
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Write download instructions
+        shell: bash
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ## YouTube patch.mpp
+          Build completed. Download **YouTube-patch** from this run's **Artifacts** section
+          and extract the ZIP to obtain **YouTube patch.mpp**.
+
+          ទាញយក **YouTube-patch** ពីផ្នែក **Artifacts** រួចពន្លាឯកសារ ZIP
+          ដើម្បីទទួលបាន **YouTube patch.mpp**។ នេះជា patch bundle មិនមែនជា APK ទេ។
+          EOF
