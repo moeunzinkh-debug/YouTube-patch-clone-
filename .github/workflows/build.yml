@@ -68,7 +68,32 @@ jobs:
       - name: Test TTS response handling
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew :extensions:youtube:testReleaseUnitTest --no-daemon --stacktrace
+        shell: bash
+        run: |
+          mkdir -p build
+          set +e
+          ./gradlew :extensions:youtube:testReleaseUnitTest --no-daemon --stacktrace 2>&1 | tee build/tts-tests.log
+          result=${PIPESTATUS[0]}
+          set -e
+          if (( result != 0 )); then
+            python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          def report(message):
+              message = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print(f'::error title=TTS regression tests::{message}')
+
+          log = Path('build/tts-tests.log').read_text()
+          start = log.find('* What went wrong:')
+          if start >= 0:
+              report(log[start:start + 5000].split('* Try:')[0])
+          for path in Path('extensions/youtube/build/test-results').rglob('TEST-*.xml'):
+              for failure in ET.parse(path).iter('failure'):
+                  report((failure.get('message', '') + '\n' + (failure.text or ''))[:5000])
+          PY
+          fi
+          exit "$result"
 
       - name: Build Android patch bundle
         env:
