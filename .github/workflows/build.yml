@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p build
           set +e
-          ./gradlew :extensions:youtube:testReleaseUnitTest --no-daemon --stacktrace 2>&1 | tee build/tts-tests.log
+          ./gradlew :tts-tests:test --no-daemon --stacktrace 2>&1 | tee build/tts-tests.log
           result=${PIPESTATUS[0]}
           set -e
           if (( result != 0 )); then
@@ -88,7 +88,7 @@ jobs:
           start = log.find('* What went wrong:')
           if start >= 0:
               report(log[start:start + 5000].split('* Try:')[0])
-          for path in Path('extensions/youtube/build/test-results').rglob('TEST-*.xml'):
+          for path in Path('tts-tests/build/test-results').rglob('TEST-*.xml'):
               for failure in ET.parse(path).iter('failure'):
                   report((failure.get('message', '') + '\n' + (failure.text or ''))[:5000])
           PY

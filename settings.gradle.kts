@@ -34,6 +34,7 @@ settings {
 }
 
 include(":patches:stub")
+include(":tts-tests")
 
 // Include morphe-patcher as composite builds if they exist locally
 mapOf(

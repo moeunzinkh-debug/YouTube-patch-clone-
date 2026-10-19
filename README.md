@@ -13,7 +13,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - Common patch and build support needed by YouTube: `patches/.../all`, `patches/.../shared`, `patches/.../util`, and the `extensions/all`, `extensions/shared`, and `extensions/shared-youtube` modules.
 - YouTube, shared-YouTube, shared, and SponsorBlock resources/translations required by those patches.
 - `patches-list.json`, filtered to 102 entries: 97 targeting YouTube and 5 generic entries without an app-specific target.
-- Khmer voice-over synthesis routed directly to the configured Takumi FastAPI Space; its route is discovered from FastAPI's `/openapi.json` at runtime.
+- Khmer voice-over synthesis routed directly to Takumi's `POST /api/process-multi` using the multipart contract verified in MST-DUBBERS (Piseth and Sreymom voices); no OpenAPI discovery is required.
 - Separate voice-over speed and pitch controls (0.5×–2×). The original YouTube player already has its own speed/pitch controls.
 
 `shared-youtube` is kept because YouTube uses it. Some helper code in that module is reusable by YouTube Music too, but **no separate YouTube Music patch module or patch package is included**. The YouTube app also has a patch that changes its own YouTube Music buttons; that remains part of the YouTube patch set.
@@ -103,12 +103,34 @@ to a broken APK. The collision check and all bundled license notices remain enab
 - A synthesis failure or empty response now releases the playback busy flag and restores
   original video volume; later segments are no longer blocked indefinitely. Stale failures
   after a seek/video change cannot cancel the new playback session.
-- Audio URL responses have a bounded follow-up depth, including across HTTP downloads.
-  Repeated/self-referencing URLs fail rather than keeping a synthesis request alive forever.
-- These changes do not prove the external service is online or its OpenAPI schema is
-  compatible. If speech still fails, provide the runtime Voice-over error log (not just
+- The Khmer client expects audio bytes directly, rejects empty/text responses, bounds
+  response size, and does not follow redirects or guess other endpoints.
+- These changes do not prove the external service is online. If speech still fails, provide the runtime Voice-over error log (not just
   the patching log), selected target language, and whether the voice test succeeds.
 
 Run local JVM regression tests with Java 21 and the Android SDK configured:
-`./gradlew :extensions:youtube:testReleaseUnitTest`.
-The tests use synthetic FastAPI JSON and a local HTTP server, not the live TTS service.
+`./gradlew :tts-tests:test`.
+The standalone JVM test module compiles the actual production HTTP client and exercises
+its multipart request and response handling with a local HTTP server, not the live TTS service.
+
+
+### Khmer TTS request contract
+
+The integration follows [MST-DUBBERS `EdgeTtsClient.kt`](https://github.com/moeunzinkh-debug/MST-DUBBERS-/blob/42ae8de6cd37b5214974592bbc798c4474b94fc4/app/src/main/java/com/example/data/api/EdgeTtsClient.kt):
+
+```text
+POST https://takumi0002-tts-kh.hf.space/api/process-multi
+Content-Type: multipart/form-data; boundary=<generated boundary>
+
+data=[{"text":"សួស្តី","voiceName":"piseth","speed":1.0,"pitch":0}]
+autoSpeed=false
+```
+
+- ជ្រើសភាសា Khmer ក្នុង Voice-over រួចជ្រើស **Piseth** ឬ **Sreymom** នៅបញ្ជីសំឡេង។
+  ប៊ូតុងសាកសំឡេង ការអាន captions និង prefetch ប្រើ server និង voice ដែលបានជ្រើសដូចគ្នា។
+- `voiceName` ជា `piseth` ឬ `sreymom` មិនមែនជា Edge voice ID ពេញទេ។
+- Server បង្កើតសំឡេងនៅ speed `1.0` និង pitch `0`; ការកំណត់ speed/pitch របស់អ្នក
+  ត្រូវបានអនុវត្តពេលចាក់សំឡេង ដើម្បីកុំឱ្យបង្កើនល្បឿនពីរដង។
+- ចម្លើយដែលរំពឹងទុកគឺ audio bytes ដោយផ្ទាល់។ HTTP errors ឬ JSON/HTML មិនត្រូវបានចាក់ជាសំឡេងទេ។
+- គ្មានការហៅ `/openapi.json` និងគ្មានការប្ដូរទៅ Edge/Android/Gemini ដោយស្វ័យប្រវត្តិ
+  សម្រាប់ភាសាខ្មែរទេ។ Server នៅតែត្រូវមានអ៊ីនធឺណិត និងដំណើរការបាន។

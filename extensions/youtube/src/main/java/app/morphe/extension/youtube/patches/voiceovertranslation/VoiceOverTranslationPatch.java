@@ -997,7 +997,9 @@ public class VoiceOverTranslationPatch {
      */
     private static String resolveVoice(String lang) {
         // Khmer always uses the configured server. Do not fall back to Edge or Android TTS.
-        if (KhmerTtsClient.supports(lang)) return KhmerTtsClient.VOICE_ID;
+        if (KhmerTtsClient.supports(lang)) {
+            return KhmerTtsClient.resolveVoiceId(Settings.VOT_TTS_VOICE_TYPE.get());
+        }
         return Settings.VOT_USE_NATIVE_TTS.get()
                 ? TTS_ENGINE_SYSTEM
                 : VoiceCatalog.resolve(lang, Settings.VOT_TTS_VOICE_TYPE.get());

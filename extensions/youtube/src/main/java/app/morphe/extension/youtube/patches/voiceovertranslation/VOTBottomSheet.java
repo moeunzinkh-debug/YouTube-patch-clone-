@@ -217,7 +217,9 @@ public final class VOTBottomSheet {
         String lang = VoiceOverTranslationPatch.resolveTargetLang();
 
         if (VoiceOverTranslationPatch.usesKhmerServer(lang)) {
-            valueView.setText(str("morphe_vot_tts_takumi_kh"));
+            String selected = KhmerTtsClient.resolveVoiceId(Settings.VOT_TTS_VOICE_TYPE.get());
+            valueView.setText(str("morphe_vot_tts_takumi_kh") + " · "
+                    + (KhmerTtsClient.SREYMOM_VOICE_ID.equals(selected) ? "Sreymom" : "Piseth"));
             row.setAlpha(1f);
             row.setClickable(true);
             return;
@@ -356,7 +358,7 @@ public final class VOTBottomSheet {
         final boolean useKhmerServer = VoiceOverTranslationPatch.usesKhmerServer(lang);
         String voiceId = Settings.VOT_TTS_VOICE_TYPE.get();
         String selectedValue = useKhmerServer
-                ? KhmerTtsClient.VOICE_ID
+                ? KhmerTtsClient.resolveVoiceId(voiceId)
                 : Settings.VOT_USE_NATIVE_TTS.get()
                     ? TTS_ENGINE_SYSTEM
                     : VoiceCatalog.resolve(lang, voiceId);
@@ -380,8 +382,11 @@ public final class VOTBottomSheet {
         final int rippleColor = Color.argb(60, Color.red(fg), Color.green(fg), Color.blue(fg));
 
         if (useKhmerServer) {
-            addVoiceRow(context, listLayout, KhmerTtsClient.VOICE_ID,
-                    str("morphe_vot_tts_takumi_kh"), false,
+            addVoiceRow(context, listLayout, KhmerTtsClient.PISETH_VOICE_ID,
+                    "Piseth · " + str("morphe_vot_voice_gender_male"), false,
+                    selectedValue, fg, rippleColor, speakerRes, pickerDialog);
+            addVoiceRow(context, listLayout, KhmerTtsClient.SREYMOM_VOICE_ID,
+                    "Sreymom · " + str("morphe_vot_voice_gender_female"), false,
                     selectedValue, fg, rippleColor, speakerRes, pickerDialog);
         } else {
             int maleCount = 0;
