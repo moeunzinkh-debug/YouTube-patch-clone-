@@ -21,26 +21,46 @@ concurrency:
 jobs:
   build:
     name: Build YouTube patch.mpp
-    runs-on: ubuntu-latest
+    # Keep the preinstalled Android SDK stable during ubuntu-latest migrations.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android platform 36
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      # GitHub's Ubuntu 24.04 image already includes Android command-line tools
+      # and accepted SDK licenses. Do not bootstrap another SDK via setup-android.
+      - name: Prepare runner Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk_root="${ANDROID_HOME:?The runner must provide ANDROID_HOME}"
+          sdkmanager="$sdk_root/cmdline-tools/latest/bin/sdkmanager"
+          if [[ ! -x "$sdkmanager" ]]; then
+            echo "::error::Android SDK command-line tools are missing: $sdkmanager"
+            exit 1
+          fi
+          echo "ANDROID_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          echo "$sdk_root/platform-tools" >> "$GITHUB_PATH"
+          echo "$sdk_root/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          # Avoid network downloads when the required packages are preinstalled.
+          packages=()
+          [[ -f "$sdk_root/platforms/android-36/android.jar" ]] || packages+=('platforms;android-36')
+          [[ -x "$sdk_root/build-tools/36.0.0/aapt2" ]] || packages+=('build-tools;36.0.0')
+          if (( ${#packages[@]} )); then
+            "$sdkmanager" --sdk_root="$sdk_root" "${packages[@]}"
+          fi
+          test -f "$sdk_root/platforms/android-36/android.jar"
+          test -x "$sdk_root/build-tools/36.0.0/aapt2"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
@@ -80,7 +100,7 @@ jobs:
           PY
 
       - name: Upload YouTube patch
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: YouTube-patch
           path: build/artifacts/YouTube patch.mpp

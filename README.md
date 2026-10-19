@@ -33,7 +33,7 @@ The upstream project's GPLv3 license and additional notice are preserved in [`LI
 ## Build `YouTube patch.mpp` តាម GitHub Actions
 
 Workflow ស្ថិតនៅ [`.github/workflows/build.yml`](.github/workflows/build.yml)។ វាប្រើ Java 21,
-Android SDK 36 និង Gradle wrapper របស់គម្រោង ដើម្បីដំណើរការ
+Android SDK 36 ដែលមានស្រាប់លើ runner `ubuntu-24.04` និង Gradle wrapper របស់គម្រោង ដើម្បីដំណើរការ
 `./gradlew :patches:buildAndroid --no-daemon --stacktrace`។ Task នេះបង្កើត patch bundle
 សម្រាប់ Android ដែលមាន `classes.dex` មិនមែនគ្រាន់តែប្ដូរឈ្មោះឯកសារ JAR ទេ។
 
