@@ -92,7 +92,6 @@ final class KhmerTtsClient {
             }
 
             String contentType = connection.getContentType();
-            if (isAudioContentType(contentType)) return response;
             return extractAudio(response, contentType, 0);
         } finally {
             if (connection != null) connection.disconnect();
@@ -331,7 +330,7 @@ final class KhmerTtsClient {
         }
 
         if (text.startsWith("https://") || text.startsWith("http://") || text.startsWith("/")) {
-            return downloadAudio(resolveAudioUrl(text));
+            return downloadAudio(resolveAudioUrl(text), depth + 1);
         }
         throw new IOException("The TTS endpoint response was not audio or a recognized audio URL/base64 field");
     }
@@ -366,12 +365,13 @@ final class KhmerTtsClient {
     }
 
     private static byte[] extractAudioValue(String value, int depth) throws Exception {
+        if (depth > 4) throw new IOException("Too many nested TTS audio responses");
         String text = value.trim();
         if (text.startsWith("data:audio/") && text.contains(";base64,")) {
             return decodeBase64(text.substring(text.indexOf(",") + 1));
         }
         if (text.startsWith("https://") || text.startsWith("http://") || text.startsWith("/")) {
-            return downloadAudio(resolveAudioUrl(text));
+            return downloadAudio(resolveAudioUrl(text), depth + 1);
         }
         if (text.length() > 128 && text.matches("[A-Za-z0-9+/=_-]+")) {
             try {
@@ -397,7 +397,8 @@ final class KhmerTtsClient {
         return new URL(new URL(BASE_URL + "/"), value.startsWith("/") ? value.substring(1) : value).toString();
     }
 
-    private static byte[] downloadAudio(String url) throws Exception {
+    private static byte[] downloadAudio(String url, int depth) throws Exception {
+        if (depth > 4) throw new IOException("Too many nested TTS audio responses");
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();
@@ -410,8 +411,7 @@ final class KhmerTtsClient {
             byte[] bytes = stream == null ? new byte[0] : readAll(stream, MAX_AUDIO_BYTES);
             if (status < 200 || status >= 300) throw new IOException("Audio download returned HTTP " + status);
             String contentType = connection.getContentType();
-            if (isAudioContentType(contentType)) return bytes;
-            return extractAudio(bytes, contentType, 1);
+            return extractAudio(bytes, contentType, depth);
         } finally {
             if (connection != null) connection.disconnect();
         }

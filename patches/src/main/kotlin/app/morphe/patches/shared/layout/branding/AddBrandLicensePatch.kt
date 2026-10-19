@@ -15,11 +15,6 @@ internal val addLicensePatch = rawResourcePatch {
             "MORPHE_LICENSE.TXT",
             "MORPHE_LICENSE_NOTICE.TXT"
         ).forEach { sourceFileName ->
-            val inputFileStream = inputStreamFromBundledResource(
-                "license",
-                sourceFileName
-            )!!
-
             val targetFile = get(sourceFileName, false).toPath()
 
             // Check if target file exists and give a more informative error
@@ -29,14 +24,22 @@ internal val addLicensePatch = rawResourcePatch {
                     "\n\n\n" +
                             "!!!\n" +
                             "!!!\n" +
-                            "!!! Provided APK is already modified with Morphe patches\n" +
-                            "!!! (File already exists in target app: $sourceFileName)\n" +
+                            "!!! Morphe branding/license file already exists in the target APK\n" +
+                            "!!! (File: $sourceFileName)\n" +
+                            "!!! The input APK may already be patched, or overlapping patch sources\n" +
+                            "!!! may have written this file during the current patching session.\n" +
+                            "!!! Start a new session with an original, unmodified APK.\n" +
+                            "!!! Select patches from ONE source only: either Morphe Patches\n" +
+                            "!!! or YouTube Patch Clone, not both. The clone includes shared patches.\n" +
+                            "!!! Do not delete this marker or overwrite it to force re-patching.\n" +
                             "!!!\n" +
                             "!!!\n\n"
                 )
             }
 
-            Files.copy(inputFileStream, targetFile)
+            inputStreamFromBundledResource("license", sourceFileName)!!.use { inputFileStream ->
+                Files.copy(inputFileStream, targetFile)
+            }
         }
     }
 }

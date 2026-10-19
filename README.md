@@ -62,3 +62,53 @@ Android SDK 36 ដែលមានស្រាប់លើ runner `ubuntu-24.04` 
   `gradle/libs.versions.toml`, `settings.gradle.kts` និង
   `gradle/wrapper/gradle-wrapper.properties` ជាមួយ upstream មុនប្ដូរ។
 - Workflow នឹងមិន upload artifact ទេ ប្រសិនបើ build បរាជ័យ ឬ bundle មិនមាន `classes.dex`។
+
+### Manager error: `MORPHE_BRANDING.TXT` already exists
+
+This is a branding/license dependency failure, not evidence that **Feed video actions**
+itself is broken. The marker can already be present in a previously patched input APK,
+or an overlapping patch source can have written it in the current session. A log listing
+both sources is a reason to check the selected patches, but does not by itself prove
+that both sources executed.
+
+**Recovery / របៀបដោះស្រាយ៖**
+
+1. ចាប់ផ្ដើម patching session ថ្មី។ ជ្រើសឯកសារ YouTube APK ដើម ដែលមិនទាន់បាន patch
+   (`com.google.android.youtube`) មិនមែន APK output ពីការធ្វើ patch មុន ឬ APK ដែលបានដកពី
+   កម្មវិធី Morphe ដែលបានដំឡើងរួចទេ។
+2. សម្រាប់ Khmer TTS សូមជ្រើស patches ពី **YouTube Patch Clone (unofficial Morphe subset)**
+   តែមួយប៉ុណ្ណោះ។ ដោះជម្រើស patches ពី **Morphe Patches** ដើម សម្រាប់ session នេះ។
+   Clone មាន YouTube patches និង shared dependencies ចាំបាច់រួចហើយ មិនមែនជា add-on
+   សម្រាប់ដាក់ពីលើ source ដើមទេ។ ចំនួន patches ដែលបានជ្រើសមិនអាចបញ្ជាក់ថាគ្មានការត្រួតគ្នាទេ។
+3. បើមិនអាចបែងចែក source ក្នុងការជ្រើស patches បាន សូមបិទ source ដែលមិនប្រើជាបណ្ដោះអាសន្ន
+   រួចជ្រើស patches ឡើងវិញ។ កុំលុបទិន្នន័យ Manager ឬលុបកម្មវិធី YouTube ដើម្បីដោះស្រាយ error នេះ។
+4. YouTube **21.20.405** មានក្នុងបញ្ជី compatibility របស់ clone ហើយ Android 10 (API 29)
+   ខ្ពស់ជាង minimum API 28 សម្រាប់ version នេះ។ ប៉ុន្តែ log នេះមិនទាន់បញ្ជាក់ថា patches
+   ផ្សេងៗនឹងដំណើរការជាមួយ Manager/Patcher dev versions ដែលបានប្រើទេ។
+5. បើនៅតែបរាជ័យ សូមផ្ញើ log ថ្មី បញ្ជាក់ថាបានប្រើ APK ដើម និងជ្រើស source តែមួយ
+   រួមជាមួយ versions របស់ Manager, Patcher និង patch bundle។
+
+Do **not** delete `MORPHE_BRANDING.TXT`, skip the license dependency, or force overwriting
+license files. That does not undo earlier bytecode/resource modifications and can lead
+to a broken APK. The collision check and all bundled license notices remain enabled.
+
+### Voice-over / Khmer TTS troubleshooting
+
+- Khmer (`km` / `km-KH`) uses the configured Takumi HTTPS service, not the phone's
+  Android TTS engine. An installed Android voice cannot repair a server-side failure.
+- Select Khmer as the Voice-over caption/target language, enable Voice-over for the
+  current video, and check that translation volume is above zero. Try the voice test
+  button separately from a video: a successful test with silent video narration points
+  toward captions/translation/scheduling rather than synthesis alone.
+- A synthesis failure or empty response now releases the playback busy flag and restores
+  original video volume; later segments are no longer blocked indefinitely. Stale failures
+  after a seek/video change cannot cancel the new playback session.
+- Audio URL responses have a bounded follow-up depth, including across HTTP downloads.
+  Repeated/self-referencing URLs fail rather than keeping a synthesis request alive forever.
+- These changes do not prove the external service is online or its OpenAPI schema is
+  compatible. If speech still fails, provide the runtime Voice-over error log (not just
+  the patching log), selected target language, and whether the voice test succeeds.
+
+Run local JVM regression tests with Java 21 and the Android SDK configured:
+`./gradlew :extensions:youtube:testReleaseUnitTest`.
+The tests use synthetic FastAPI JSON and a local HTTP server, not the live TTS service.

@@ -14,6 +14,10 @@ dependencies {
 
     implementation(libs.collections4)
     implementation(libs.protobuf.javalite)
+
+    testImplementation("junit:junit:4.13.2")
+    // Android's org.json implementation is a stub in local JVM unit tests.
+    testImplementation("org.json:json:20240303")
 }
 
 configure<ApplicationExtension> {
