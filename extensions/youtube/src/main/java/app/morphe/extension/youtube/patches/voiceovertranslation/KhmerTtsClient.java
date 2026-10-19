@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Locale;
 
 import app.morphe.extension.shared.Utils;
@@ -136,6 +137,14 @@ final class KhmerTtsClient {
         }
     }
 
+    /** Android's JSONObject exposes keys(), not the JSON-java keySet() API. */
+    private static List<String> jsonKeys(JSONObject object) {
+        List<String> keys = new ArrayList<>();
+        Iterator<String> iterator = object.keys();
+        while (iterator.hasNext()) keys.add(iterator.next());
+        return keys;
+    }
+
     private static Endpoint discoverEndpoint(JSONObject openApi) throws JSONException {
         JSONObject paths = openApi.optJSONObject("paths");
         if (paths == null) return null;
@@ -143,7 +152,7 @@ final class KhmerTtsClient {
         Endpoint best = null;
         int bestScore = Integer.MIN_VALUE;
         String[] methods = {"post", "get", "put"};
-        for (String path : paths.keySet()) {
+        for (String path : jsonKeys(paths)) {
             if (path.contains("{")) continue; // Path parameters need API-specific values.
             JSONObject pathItem = paths.optJSONObject(path);
             if (pathItem == null) continue;
@@ -241,7 +250,7 @@ final class KhmerTtsClient {
         if ("string".equals(schema.optString("type"))) return "__raw_string__";
         JSONObject properties = schema.optJSONObject("properties");
         if (properties == null) return null;
-        for (String name : properties.keySet()) {
+        for (String name : jsonKeys(properties)) {
             if (isTextField(name)) return name;
         }
         return null;
@@ -281,11 +290,11 @@ final class KhmerTtsClient {
     private static boolean responseLooksLikeAudio(JSONObject operation) {
         JSONObject responses = operation.optJSONObject("responses");
         if (responses == null) return false;
-        for (String status : responses.keySet()) {
+        for (String status : jsonKeys(responses)) {
             JSONObject response = responses.optJSONObject(status);
             JSONObject content = response == null ? null : response.optJSONObject("content");
             if (content == null) continue;
-            for (String type : content.keySet()) {
+            for (String type : jsonKeys(content)) {
                 if (isAudioContentType(type)) return true;
             }
         }
@@ -463,7 +472,7 @@ final class KhmerTtsClient {
             JSONObject properties = bodySchema.optJSONObject("properties");
             if (properties == null) return null;
             JSONObject values = new JSONObject();
-            for (String name : properties.keySet()) {
+            for (String name : jsonKeys(properties)) {
                 JSONObject property = properties.optJSONObject(name);
                 Object value = valueForField(name, property, isRequired(name), text);
                 if (value != null) values.put(name, value);
@@ -474,7 +483,7 @@ final class KhmerTtsClient {
             }
             if (requestContentType.equals("application/x-www-form-urlencoded")) {
                 List<String> fields = new ArrayList<>();
-                for (String name : values.keySet()) {
+                for (String name : jsonKeys(values)) {
                     fields.add(encode(name) + "=" + encode(String.valueOf(values.get(name))));
                 }
                 return String.join("&", fields).getBytes(StandardCharsets.UTF_8);
@@ -484,7 +493,7 @@ final class KhmerTtsClient {
                 // text-only form used by TTS, a deterministic boundary is sufficient.
                 String boundary = MULTIPART_BOUNDARY;
                 StringBuilder form = new StringBuilder();
-                for (String name : values.keySet()) {
+                for (String name : jsonKeys(values)) {
                     form.append("--").append(boundary).append("\r\n")
                             .append("Content-Disposition: form-data; name=\"").append(name).append("\"\r\n\r\n")
                             .append(values.get(name)).append("\r\n");
