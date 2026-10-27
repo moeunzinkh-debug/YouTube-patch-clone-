@@ -277,3 +277,9 @@ This fork is synced to the **YouTube-only source of upstream v1.48.0** (bundle r
 ## Gemini / MicroG RE patches (separate source)
 
 The Gemini patch tags above document **13 cloned patches** from [ryuya0124/gemini-microg-patches](https://github.com/ryuya0124/gemini-microg-patches) `v0.1.1`, vendored under [`extras/gemini-microg-patches/`](extras/gemini-microg-patches/README.md). They add **Gemini + microG RE (`app.revanced.android.gms` 7.0.0) support**, including Samsung Secure Folder, for Google App `17.54.18.ve.arm64` and Gemini `1.0.958859967`. **They are reference source only — not compiled into `patch.mpp`.** Add the upstream repo as a separate Manager source, using the specific upstream-required combination with the official `Clone app` patch, not the YouTube patch set. Proposed Git tag names (not published): `gemini-v0.1.1`, `gemini-1.0.958859967`, `google-17.54.18.ve.arm64`, `microg-re-7.0.0`. Full guide: [`docs/gemini-microg-patches.md`](docs/gemini-microg-patches.md).
+
+## Automatic Gemini version recommendations
+
+[Google / Gemini / MicroG RE version catalog](docs/gemini-versions.md) — checked every six hours by GitHub Actions once the workflow is on the default branch.
+Requested targets: **Google 17.6.59.ve.arm64**, **Gemini 1.0.995038376**, **MicroG RE 7.3.0**.
+These targets are **unverified**, not supported-version declarations. Recommendations stay pinned to reviewed source profiles; upstream discovery never silently enables unsupported APKs. The compiled YouTube bundle is unchanged.

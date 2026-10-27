@@ -1,0 +1,5 @@
+{
+  "google": {"name": "Google App", "package": "com.google.android.googlequicksearchbox", "requested": "17.6.59.ve.arm64"},
+  "gemini": {"name": "Gemini", "package": "com.google.android.apps.bard", "requested": "1.0.995038376"},
+  "microg": {"name": "MicroG RE", "package": "app.revanced.android.gms", "requested": "7.3.0"}
+}

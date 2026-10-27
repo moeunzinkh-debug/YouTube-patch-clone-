@@ -1,0 +1,38 @@
+name: Update Gemini version recommendations
+on:
+  schedule:
+    - cron: '37 */6 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/gemini-version-advisor/**'
+      - 'extras/gemini-microg-patches/**'
+      - '.github/workflows/update-gemini-versions.yml'
+permissions:
+  contents: write
+concurrency:
+  group: gemini-versions-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test recommendation safety
+        run: python3 -m unittest discover -s tools/gemini-version-advisor/tests -v
+      - name: Discover upstream profiles and update recommendations
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/gemini-version-advisor/update.py
+      - name: Save generated metadata only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/gemini-version-advisor/versions.json docs/gemini-versions.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: refresh Gemini version recommendations'
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
