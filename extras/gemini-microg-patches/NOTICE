@@ -1,0 +1,20 @@
+Gemini / MicroG RE patches
+Copyright 2026 ryuya0124 and contributors
+https://github.com/ryuya0124/gemini-microg-patches
+
+Vendored from tag v0.1.1 (commit cef25d12c71c33f555b52d8330c1ca886bf59ccc).
+
+The upstream repository contains no LICENSE file. Licence terms for this code are
+therefore NOT established by this repository. It is included as unmodified source
+for reference only and is excluded from the compiled `patch.mpp` bundle.
+
+This repository's own code is licensed under GNU GPL v3 with additional notice;
+see LICENSE and NOTICE in the repository root. That licence does not extend to the
+third-party sources in this directory.
+
+The upstream project itself states that it uses:
+  - Morphe Desktop      https://github.com/MorpheApp/morphe-desktop
+  - Morphe patches      https://github.com/MorpheApp/morphe-patches
+  - microG              https://github.com/microg/GmsCore
+
+No Google APKs, signing keys or device logs from upstream are included here.
