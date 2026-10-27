@@ -22,7 +22,14 @@ jobs:
           gh release download Gemini --repo "$GITHUB_REPOSITORY" --pattern base.apk --dir "$RUNNER_TEMP/gemini"
           echo "bfa9b10060a1c0e8a1c3f2b01cd513f74a53b364ab9bdb1bca02ae103de3f7e5  $RUNNER_TEMP/gemini/base.apk" | sha256sum -c -
           pip install androguard==4.1.3
-          python tools/gemini-apk/inspect.py "$RUNNER_TEMP/gemini/base.apk"
+          set -o pipefail
+          python tools/gemini-apk/inspect.py "$RUNNER_TEMP/gemini/base.apk" 2>&1 | tee "$RUNNER_TEMP/inspection.log"
+      - name: Report inspection error
+        if: failure()
+        run: |
+          if test -f "$RUNNER_TEMP/inspection.log"; then
+            tail -15 "$RUNNER_TEMP/inspection.log" | while IFS= read -r line; do echo "::error::$line"; done
+          fi
       - name: Save inspection report only
         run: |
           git config user.name 'github-actions[bot]'
