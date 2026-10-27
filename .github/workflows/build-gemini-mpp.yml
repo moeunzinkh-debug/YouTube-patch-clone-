@@ -7,6 +7,7 @@ on:
       - '.github/workflows/build-gemini-mpp.yml'
       - 'tools/gemini-apk/overlay/**'
       - 'tools/gemini-apk/prepare_build.py'
+      - 'tools/gemini-apk/verify_patched.py'
 permissions:
   contents: write
 concurrency:
@@ -48,6 +49,10 @@ jobs:
           cd .gemini-build/build
           set -o pipefail
           java -Xmx2g -jar ../tools/morphe-desktop.jar patch "$RUNNER_TEMP/gemini/base.apk" -p release/gemini-microg-patches-0.1.2.mpp --unsigned -o "$RUNNER_TEMP/gemini/patched.apk" -r ../../bundles/gemini/patch-result.json 2>&1 | tee "$RUNNER_TEMP/gemini-patch.log"
+      - name: Verify patched DEX and manifest
+        run: |
+          pip install androguard==4.1.3
+          python3 tools/gemini-apk/verify_patched.py "$RUNNER_TEMP/gemini/patched.apk"
       - name: Report patch failure
         if: failure()
         run: |
@@ -78,7 +83,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f bundles/gemini/gemini-target.mpp bundles/gemini/gemini-target.mpp.sha256 bundles/gemini/patch-list.txt bundles/gemini/patch-result.json
+          git add -f bundles/gemini/gemini-target.mpp bundles/gemini/gemini-target.mpp.sha256 bundles/gemini/patch-list.txt bundles/gemini/patch-result.json bundles/gemini/validation.json
           if ! git diff --cached --quiet; then
             git commit -m 'build: standalone Gemini reference bundle (not target verified)'
             git push origin HEAD:"${GITHUB_REF_NAME}"
