@@ -11,11 +11,13 @@ Current tags:
 
 | Tag | Type | Notes |
 | --- | --- | --- |
-| [`v1.47.0`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.47.0) | annotated + GitHub Release | Compiled `patch.mpp` (JAR + extension DEX), SHA-256 checksum and `patches-bundle.json`. |
+| [`v1.48.0`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.0) | annotated + GitHub Release | Current bundle: 1,898-source v1.48.0 YouTube sync with 9 new patches, `patch.mpp` (JAR + 4 extension DEX), SHA-256 and `patches-bundle.json`. |
+| [`v1.47.0`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.47.0) | annotated + GitHub Release | Previous bundle (Patcher 1.14.0), `patch.mpp`, SHA-256 and `patches-bundle.json`. |
 | [`youtube-21.20.405`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.20.405) | annotated | Recommended **stable** YouTube target, min Android 9 / SDK 28. |
-| [`youtube-21.40.161`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.40.161) | annotated | Newest **experimental** YouTube target, min Android 10 / SDK 29. |
+| [`youtube-21.42.241`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.42.241) | annotated | Newest **experimental** YouTube target in v1.48.0, min Android 10 / SDK 29. |
+| [`youtube-21.40.161`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.40.161) | annotated | Previous experimental target (v1.47.0). |
 
-All tags point at the same source revision — they are labels, not separate builds. See the [tag list](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tags) and the badges in [README.md](../README.md).
+The `youtube-*` tags are labels at the revision that supports that target, not separate builds; `v1.48.0` points at the current bundle revision. See the [tag list](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tags) and the badges in [README.md](../README.md).
 
 ## What a release contains
 
@@ -25,14 +27,14 @@ All tags point at the same source revision — they are labels, not separate bui
 | `patch.mpp.sha256` | SHA-256 of the bundle. Verify with `sha256sum -c patch.mpp.sha256`. |
 | `patches-bundle.json` | Morphe Manager source descriptor (`version`, `download_url`, `created_at`, `description`). The copy in the repository root is the one Manager reads from the default branch; the release copy is generated for the tag. |
 
-The bundle declares `Version: 1.47.0` and `Patcher-Version: 1.14.0` in `META-INF/MANIFEST.MF`. See [building-mpp.md](building-mpp.md) for how it is built and verified.
+The current bundle declares `Version: 1.48.0` and `Patcher-Version: 2.0.0` (v1.47.0 used Patcher 1.14.0) in `META-INF/MANIFEST.MF`. See [building-mpp.md](building-mpp.md) for how it is built and verified.
 
 ## Supported YouTube versions in this release
 
-Nine targets from `patches-list.json`:
+Eight targets from `patches-list.json` v1.48.0:
 
 - **Stable:** `21.20.405` (SDK 28), `21.16.256` (SDK 28), `20.51.39` (SDK 28), `20.21.37` (SDK 26)
-- **Experimental:** `21.40.161` (SDK 29), `21.39.522` (SDK 29), `21.38.130` (SDK 29), `21.28.208` (SDK 29), `21.23.492` (SDK 28)
+- **Experimental:** `21.42.241` (SDK 29), `21.41.525` (SDK 29), `21.28.208` (SDK 29), `21.23.492` (SDK 28)
 
 Use the [version advisor](../tools/version-advisor/README.md) to choose a version/APK variant for a specific phone, or read [youtube-versions.md](youtube-versions.md) for the catalog diff against upstream.
 
@@ -43,7 +45,7 @@ Use the [version advisor](../tools/version-advisor/README.md) to choose a versio
 3. Tag and push:
 
 ```bash
-git tag -a v1.48.0 -m "YouTube patch bundle v1.48.0"
+git tag -a v1.49.0 -m "YouTube patch bundle v1.49.0"
 git push origin v1.48.0
 ```
 
@@ -69,7 +71,7 @@ git push origin youtube-21.42.241
   "description": "...",
   "download_url": "https://github.com/<owner>/<repo>/releases/download/<tag>/patch.mpp",
   "signature_download_url": "",
-  "version": "1.47.0"
+  "version": "1.48.0"
 }
 ```
 

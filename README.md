@@ -6,11 +6,11 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 >
 > កំណត់សម្គាល់៖ យកតែផ្នែក YouTube ប៉ុណ្ណោះ។ ឯកសារ shared ដែលចាំបាច់សម្រាប់ YouTube នៅតែមាន ប៉ុន្តែមិនបានដាក់ patch set របស់ YouTube Music ឬ Reddit ទេ។
 
-[![Release](https://img.shields.io/badge/release-v1.47.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.47.0)
-[![patch.mpp](https://img.shields.io/badge/patch.mpp-8.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.47.0/patch.mpp)
+[![Release](https://img.shields.io/badge/release-v1.48.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.0)
+[![patch.mpp](https://img.shields.io/badge/patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.0/patch.mpp)
 [![YouTube stable](https://img.shields.io/badge/YouTube%20stable-21.20.405-14835b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.20.405)
-[![YouTube latest](https://img.shields.io/badge/YouTube%20latest-21.40.161-a8650b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.40.161)
-[![Upstream](https://img.shields.io/badge/upstream-v1.47.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.47.0)
+[![YouTube latest](https://img.shields.io/badge/YouTube%20latest-21.42.241-a8650b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.42.241)
+[![Upstream](https://img.shields.io/badge/upstream-v1.48.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.48.0)
 [![License](https://img.shields.io/badge/license-GPLv3-blue)](LICENSE)
 
 [![Build patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/build-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/build-mpp.yml)
@@ -24,7 +24,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 ### YouTube Patches
 
-និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ ១០២ patches ដែលបានកត់ត្រាក្នុង [`patches-list.json`](patches-list.json) v1.47.0 (៩៧ កំណត់គោលដៅ `com.google.android.youtube` + ៥ shared/generic)។
+និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 110 patches ពី [`patches-list.json`](patches-list.json) v1.48.0 (105 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
 
 **ឧទាហរណ៍ / Highlights**
 
@@ -36,6 +36,21 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 ទាំងនេះត្រូវគ្នាជាមួយ `Hide ads`, `Remove background playback restrictions`, `Hide Shorts components` និង `Theme`។ ក្រៅពីនោះនៅមាន SponsorBlock, Return YouTube Dislike, DeArrow, Picture-in-Picture, Playback speed, Video quality, Loop video, Swipe controls, Seekbar, Downloads, Save to Watch later, Copy/share links, Spoof app version/signature, GmsCore support និង **Voice over translation** (Khmer TTS) ជាដើម។
 
 បើកក្រុមខាងក្រោមដើម្បីមើលគ្រប់ patch / Expand a group to see every patch name:
+
+<details>
+<summary>✨ ថ្មីពី v1.48.0 / New in v1.48.0 • 9</summary>
+
+- `Ask flyout menu`
+- `Custom font`
+- `Feed card layout`
+- `Feed video actions`
+- `Feed view count`
+- `Force animations`
+- `Series tracking`
+- `Skip live Shorts`
+- `Video delay`
+
+</details>
 
 <details>
 <summary>🚫 ពាណិជ្ជកម្ម & ការរំខាន / Ads & distractions • 20</summary>
@@ -64,7 +79,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 </details>
 
 <details>
-<summary>▶️ ការចាក់វីដេអូ / Playback & video • 21</summary>
+<summary>▶️ ការចាក់វីដេអូ / Playback & video • 22</summary>
 
 - `Captions`
 - `Double tap to seek`
@@ -85,6 +100,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - `Reload video`
 - `Remember live stream playback position`
 - `Remove background playback restrictions`
+- `Seekbar`
 - `Skip silence`
 - `Video quality`
 
@@ -102,7 +118,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 </details>
 
 <details>
-<summary>🎨 រូបរាង & អេក្រង់ / Theme, layout & player UI • 16</summary>
+<summary>🎨 រូបរាង & អេក្រង់ / Theme, layout & player UI • 14</summary>
 
 - `Ambient mode`
 - `App refresh rate`
@@ -111,11 +127,9 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - `Change start page`
 - `Custom branding`
 - `Custom player overlay opacity`
-- `Force system font`
 - `Navigation bar`
 - `Override YouTube Music buttons`
 - `Player icon style`
-- `Seekbar`
 - `Settings menu filter`
 - `Swipe controls`
 - `Theme`
@@ -126,17 +140,17 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 <details>
 <summary>⚙️ បិទ/បើកមុខងារ / Behaviour toggles • 15</summary>
 
-- `Disable DRC audio`
-- `Disable Play Store updates`
-- `Disable QUIC protocol`
 - `Disable auto feed refresh`
 - `Disable continue watching prompt`
 - `Disable double tap actions`
+- `Disable DRC audio`
 - `Disable fullscreen gestures`
 - `Disable haptic feedback`
 - `Disable layout updates`
+- `Disable Play Store updates`
 - `Disable player popup panels`
 - `Disable playlist autoplay`
+- `Disable QUIC protocol`
 - `Disable rolling number animations`
 - `Disable scrolling speed limit`
 - `Disable sign in to TV popup`
@@ -181,3 +195,11 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 </details>
 
+> ចំណាំ៖ ក្រុម «ថ្មីពី v1.48.0» គឺជា patches ដែលបានបន្ថែមពី upstream v1.48.0។ ស្លាក `youtube-*` មិនបន្ថែម patch ថ្មីទេ — ការបន្ថែមកំណែ YouTube ថ្មីត្រូវការ sync កូដ patch ពី upstream មុន។
+
+</details>
+<!-- PATCH-LIST:END -->
+
+## Upstream sync / ការធ្វើបច្ចុប្បន្នភាពពី upstream
+
+This fork is synced to the **YouTube-only source of upstream v1.48.0** and includes the **9 new YouTube patches** (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay) — see the «New in v1.48.0» group above. Those 9 are the net new features; to compile them the shared YouTube patch/extension sources had to be aligned with v1.48.0 (morphe-patcher 2.0.0), while our Khmer TTS package, Khmer strings, YouTube-only resource checker and fork metadata were preserved. **No YouTube Music or Reddit patches are included.** See [`docs/upstream-sync.md`](docs/upstream-sync.md) for the full comparison, the v1.49.0-dev.7 additions and the supported YouTube versions.

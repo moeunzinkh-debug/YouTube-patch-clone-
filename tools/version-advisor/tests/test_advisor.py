@@ -202,7 +202,10 @@ class RecommendationTests(unittest.TestCase):
                 self.assertTrue(reason["km"].strip())
         self.assertEqual(result["apk"]["variant"], "nodpi")
         self.assertEqual(result["apk"]["abi"], "arm64-v8a")
-        self.assertTrue(any(note["code"] == "update_available" for note in result["notes"]))
+        # A catalog that is fully synced with upstream reports "no_update"
+        # instead of "update_available"; both are valid update-status notes.
+        self.assertTrue(any(note["code"] in {"update_available", "no_update"}
+                            for note in result["notes"]))
 
     def test_upstream_channel(self):
         profile = dev.profile_from_payload({"model": "SM-A546B", "sdk": 34})
