@@ -23,3 +23,6 @@ p = root / 'scripts/package-mpp.py'
 s = p.read_text().replace("'Name': 'Gemini microG patches'", "'Name': 'Gemini microG patches (local Gemini 345 port)'")
 s = s.replace("'Author': 'ryuya0124'", "'Author': 'ryuya0124; local Gemini profile by YouTube-patch-clone contributors'")
 p.write_text(s)
+p = root / 'scripts/kotlin/VerifyMpp.kt'
+s = p.read_text().replace('== "Gemini microG patches"', '== "Gemini microG patches (local Gemini 345 port)"')
+p.write_text(s)

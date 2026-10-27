@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [arena/b0221262-youtube-patch-clone]
-    paths: ['tools/gemini-apk/**', '.github/workflows/inspect-gemini-apk.yml']
+    paths: ['tools/gemini-apk/analyze_apk.py', '.github/workflows/inspect-gemini-apk.yml']
 permissions:
   contents: write
 jobs:
