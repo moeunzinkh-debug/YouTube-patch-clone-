@@ -23,7 +23,7 @@ jobs:
           echo "bfa9b10060a1c0e8a1c3f2b01cd513f74a53b364ab9bdb1bca02ae103de3f7e5  $RUNNER_TEMP/gemini/base.apk" | sha256sum -c -
           pip install androguard==4.1.3
           set -o pipefail
-          python tools/gemini-apk/inspect.py "$RUNNER_TEMP/gemini/base.apk" 2>&1 | tee "$RUNNER_TEMP/inspection.log"
+          python tools/gemini-apk/analyze_apk.py "$RUNNER_TEMP/gemini/base.apk" 2>&1 | tee "$RUNNER_TEMP/inspection.log"
       - name: Report inspection error
         if: failure()
         run: |
