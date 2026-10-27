@@ -38,9 +38,9 @@ def main() -> None:
 
         manifest = archive.read("META-INF/MANIFEST.MF").decode("utf-8", "replace")
         for field in ("Version:", "Patcher-Version:", "Name:"):
-            present = field in manifest
-            value = manifest.split(field, 1)[1].splitlines()[0].strip() if present else ""
-            check(present, f"MANIFEST.MF declares {field} {value}".strip())
+            line = next((item.strip() for item in manifest.splitlines() if item.startswith(field)), None)
+            value = line.split(":", 1)[1].strip() if line else ""
+            check(line is not None, f"MANIFEST.MF declares {field} {value}".strip())
 
         classes = [n for n in names if n.endswith(".class")]
         youtube = [n for n in classes if n.startswith("app/morphe/patches/youtube/")]
