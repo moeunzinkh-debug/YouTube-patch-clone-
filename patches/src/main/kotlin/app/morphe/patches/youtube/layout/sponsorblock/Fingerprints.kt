@@ -3,7 +3,7 @@ package app.morphe.patches.youtube.layout.sponsorblock
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.InstructionLocation.MatchAfterImmediately
 import app.morphe.patcher.InstructionLocation.MatchAfterWithin
-import app.morphe.patches.shared.misc.compat.MatchBeforeImmediately
+import app.morphe.patcher.InstructionLocation.MatchBeforeImmediately
 import app.morphe.patcher.checkCast
 import app.morphe.patcher.fieldAccess
 import app.morphe.patcher.methodCall
