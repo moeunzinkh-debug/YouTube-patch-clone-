@@ -31,6 +31,174 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 `shared-youtube` is kept because YouTube uses it. Some helper code in that module is reusable by YouTube Music too, but **no separate YouTube Music patch module or patch package is included**. The YouTube app also has a patch that changes its own YouTube Music buttons; that remains part of the YouTube patch set.
 
+<!-- PATCH-LIST:START -->
+<details>
+<summary>📦 YouTube • 105 patches</summary>
+
+### YouTube Patches
+
+និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ ១០២ patches ដែលបានកត់ត្រាក្នុង [`patches-list.json`](patches-list.json) v1.47.0 (៩៧ កំណត់គោលដៅ `com.google.android.youtube` + ៥ shared/generic)។
+
+**ឧទាហរណ៍ / Highlights**
+
+- Remove Ads
+- Background Playback
+- Hide Shorts
+- Custom Theme
+
+ទាំងនេះត្រូវគ្នាជាមួយ `Hide ads`, `Remove background playback restrictions`, `Hide Shorts components` និង `Theme`។ ក្រៅពីនោះនៅមាន SponsorBlock, Return YouTube Dislike, DeArrow, Picture-in-Picture, Playback speed, Video quality, Loop video, Swipe controls, Seekbar, Downloads, Save to Watch later, Copy/share links, Spoof app version/signature, GmsCore support និង **Voice over translation** (Khmer TTS) ជាដើម។
+
+បើកក្រុមខាងក្រោមដើម្បីមើលគ្រប់ patch / Expand a group to see every patch name:
+
+<details>
+<summary>🚫 ពាណិជ្ជកម្ម & ការរំខាន / Ads & distractions • 20</summary>
+
+- `AI channel filter`
+- `Channel whitelist`
+- `DeArrow`
+- `Hide ads`
+- `Hide autoplay preview`
+- `Hide end screen cards`
+- `Hide end screen suggested video`
+- `Hide info cards`
+- `Hide layout components`
+- `Hide player flyout menu components`
+- `Hide player overlay buttons`
+- `Hide related video overlay`
+- `Hide related videos`
+- `Hide status bar`
+- `Hide timestamp`
+- `Hide video action buttons`
+- `Remove viewer discretion dialog`
+- `Restore original titles`
+- `Return YouTube Dislike`
+- `SponsorBlock`
+
+</details>
+
+<details>
+<summary>▶️ ការចាក់វីដេអូ / Playback & video • 21</summary>
+
+- `Captions`
+- `Double tap to seek`
+- `Exit fullscreen mode`
+- `Force fullscreen landscape`
+- `Force original audio`
+- `Fullscreen video scale`
+- `Loop video`
+- `Media notification controls`
+- `Miniplayer`
+- `Mute button`
+- `Open videos fullscreen`
+- `Picture-in-picture button`
+- `Play all`
+- `Playback buffer`
+- `Playback in feeds`
+- `Playback speed`
+- `Reload video`
+- `Remember live stream playback position`
+- `Remove background playback restrictions`
+- `Skip silence`
+- `Video quality`
+
+</details>
+
+<details>
+<summary>📱 Shorts • 5</summary>
+
+- `Disable Shorts resuming on startup`
+- `Hide Shorts components`
+- `Open Shorts in regular player`
+- `Shorts autoplay`
+- `Shorts icon style`
+
+</details>
+
+<details>
+<summary>🎨 រូបរាង & អេក្រង់ / Theme, layout & player UI • 16</summary>
+
+- `Ambient mode`
+- `App refresh rate`
+- `Change form factor`
+- `Change header`
+- `Change start page`
+- `Custom branding`
+- `Custom player overlay opacity`
+- `Force system font`
+- `Navigation bar`
+- `Override YouTube Music buttons`
+- `Player icon style`
+- `Seekbar`
+- `Settings menu filter`
+- `Swipe controls`
+- `Theme`
+- `Wide search bar`
+
+</details>
+
+<details>
+<summary>⚙️ បិទ/បើកមុខងារ / Behaviour toggles • 15</summary>
+
+- `Disable DRC audio`
+- `Disable Play Store updates`
+- `Disable QUIC protocol`
+- `Disable auto feed refresh`
+- `Disable continue watching prompt`
+- `Disable double tap actions`
+- `Disable fullscreen gestures`
+- `Disable haptic feedback`
+- `Disable layout updates`
+- `Disable player popup panels`
+- `Disable playlist autoplay`
+- `Disable rolling number animations`
+- `Disable scrolling speed limit`
+- `Disable sign in to TV popup`
+- `Disable video codecs`
+
+</details>
+
+<details>
+<summary>🌐 បណ្តាញ & គណនី / Network, spoofing & account • 13</summary>
+
+- `Bypass image region restrictions`
+- `Bypass link redirects`
+- `Change installer source`
+- `Check watch history domain name resolution`
+- `Enable debugging`
+- `GmsCore support`
+- `Network proxy`
+- `Override certificate pinning`
+- `PoToken provider`
+- `Spoof app version`
+- `Spoof device dimensions`
+- `Spoof signature`
+- `Spoof video streams`
+
+</details>
+
+<details>
+<summary>🧰 ចែករំលែក & ឧបករណ៍ / Sharing & tools • 12</summary>
+
+- `Add to queue`
+- `Channel search`
+- `Clone app`
+- `Copy text`
+- `Copy video link`
+- `Downloads`
+- `Open channel of live avatar`
+- `Open links externally`
+- `Open system share sheet`
+- `Sanitize sharing links`
+- `Save to Watch later`
+- `Voice over translation`
+
+</details>
+
+> ចំណាំ៖ ស្លាក `youtube-*` មិនបន្ថែម patch ថ្មីទេ — ការបន្ថែមកំណែ YouTube ថ្មីត្រូវការ sync កូដ patch ពី upstream មុន។
+
+</details>
+<!-- PATCH-LIST:END -->
+
 ## Automatic version updates & phone-model analysis / ការធ្វើបច្ចុប្បន្នភាពដោយស្វ័យប្រវត្តិ
 
 **English.** `tools/version-advisor` keeps the supported YouTube version list current without manual edits. It reads this repo's `patches-list.json`, checks the newest upstream Morphe bundle through the GitHub API (ETag-cached), and writes [`data/supported-versions.json`](tools/version-advisor/data/supported-versions.json) plus [`docs/youtube-versions.md`](docs/youtube-versions.md). A GitHub Action runs every 6 hours, and the web server also refreshes itself in the background. It then analyses a phone (Android SDK level, CPU ABI, screen density, RAM) — detected from the browser, ADB, or a 69-model database — and explains which version is suitable, distinguishing the newest *experimental* build from the recommended *stable* one, including which APK variant (`nodpi`, ABI, density) to download.
