@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
                     val ref = (instructions[it] as? ReferenceInstruction)?.reference?.toString().orEmpty()
                     anchors.any { a -> ref.contains(a) }
                 }
-                if (hits.isEmpty() && !(cls.type.endsWith("/robin/main/MainActivity;") && method.name == "onCreate")) continue
+                if (hits.isEmpty() && cls.type !in listOf("Ldgtr;", "Ldgtn;", "Lcdij;") && !(cls.type.endsWith("/robin/main/MainActivity;") && method.name == "onCreate")) continue
                 matches++
                 println("\n${entry.name} $id registers=${impl.registerCount} hits=${hits.size}")
                 var offset = 0
