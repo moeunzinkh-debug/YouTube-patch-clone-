@@ -6,6 +6,17 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 >
 > កំណត់សម្គាល់៖ យកតែផ្នែក YouTube ប៉ុណ្ណោះ។ ឯកសារ shared ដែលចាំបាច់សម្រាប់ YouTube នៅតែមាន ប៉ុន្តែមិនបានដាក់ patch set របស់ YouTube Music ឬ Reddit ទេ។
 
+[![Release](https://img.shields.io/badge/release-v1.47.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.47.0)
+[![patch.mpp](https://img.shields.io/badge/patch.mpp-8.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.47.0/patch.mpp)
+[![YouTube stable](https://img.shields.io/badge/YouTube%20stable-21.20.405-14835b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.20.405)
+[![YouTube latest](https://img.shields.io/badge/YouTube%20latest-21.40.161-a8650b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.40.161)
+[![Upstream](https://img.shields.io/badge/upstream-v1.47.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.47.0)
+[![License](https://img.shields.io/badge/license-GPLv3-blue)](LICENSE)
+
+[![Build patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/build-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/build-mpp.yml)
+[![Verify patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml)
+[![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
+
 ## What's included
 
 - YouTube patch implementations under `patches/src/main/kotlin/app/morphe/patches/youtube/`.
@@ -16,6 +27,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - Khmer voice-over synthesis routed directly to the configured Takumi FastAPI Space; its route is discovered from FastAPI's `/openapi.json` at runtime.
 - Separate voice-over speed and pitch controls (0.5×–2×). The original YouTube player already has its own speed/pitch controls.
 - **Automatic YouTube version updates + phone-model analysis** in [`tools/version-advisor/`](tools/version-advisor/README.md): a catalog that refreshes itself from the upstream patch bundle (GitHub Action + server background refresh) and a bilingual (English/ខ្មែរ) advisor that recommends the YouTube version and APK variant that fit a user's phone. Current data: [`docs/youtube-versions.md`](docs/youtube-versions.md).
+- **Release tags + Manager descriptor**: [`patches-bundle.json`](patches-bundle.json), annotated `v1.47.0` / `youtube-*` tags, release badges above, and an automated [release workflow](.github/workflows/release-mpp.yml). See [docs/releases.md](docs/releases.md).
 
 `shared-youtube` is kept because YouTube uses it. Some helper code in that module is reusable by YouTube Music too, but **no separate YouTube Music patch module or patch package is included**. The YouTube app also has a patch that changes its own YouTube Music buttons; that remains part of the YouTube patch set.
 
@@ -45,6 +57,28 @@ cp "$(ls patches/build/libs/patches-*.mpp | head -1)" patch.mpp
 ```
 
 See [docs/building-mpp.md](docs/building-mpp.md) for prerequisites, tokens, CI usage and troubleshooting.
+
+## Release tags / ស្លាកចេញផ្សាយ
+
+All tags: [github.com/moeunzinkh-debug/YouTube-patch-clone-/tags](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tags). Full policy: [docs/releases.md](docs/releases.md).
+
+| Tag | ប្រភេទ / Type | អត្ថន័យ / Meaning |
+| --- | --- | --- |
+| [`v1.47.0`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.47.0) | annotated + **GitHub Release** | Compiled `patch.mpp` bundle (version from `gradle.properties`), plus `patch.mpp.sha256` and [`patches-bundle.json`](patches-bundle.json). |
+| [`youtube-21.20.405`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.20.405) | annotated | Recommended **stable** YouTube target — min Android 9 / SDK 28. |
+| [`youtube-21.40.161`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.40.161) | annotated | Newest **experimental** YouTube target — min Android 10 / SDK 29. |
+
+**Naming / ឈ្មោះស្លាក៖** `v<major.minor.patch>` = patch-bundle release (pushing it creates the GitHub Release automatically via [`release-mpp.yml`](.github/workflows/release-mpp.yml)); `youtube-<version>` = marker for a supported YouTube target. All three tags point to the same source revision — only `v1.47.0` carries release assets.
+
+**Supported YouTube targets (9):** `21.40.161`, `21.39.522`, `21.38.130`, `21.28.208`, `21.23.492` (experimental), `21.20.405`, `21.16.256`, `20.51.39`, `20.21.37` (stable). See [docs/youtube-versions.md](docs/youtube-versions.md) and use the [version advisor](tools/version-advisor/README.md) to match a phone.
+
+```bash
+sha256sum -c patch.mpp.sha256                       # verify the downloaded bundle
+git tag -a v1.48.0 -m "YouTube patch bundle v1.48.0"
+git push origin v1.48.0                             # CI publishes the release
+```
+
+> `patches-bundle.json` is the Morphe Manager source descriptor. Add this repo with `https://morphe.software/add-source?github=moeunzinkh-debug/YouTube-patch-clone-`, or import `patch.mpp` directly in Morphe Desktop. A `youtube-*` tag alone does not make a new YouTube version patchable — the Kotlin patch sources must be synced from upstream first.
 
 ## What's excluded
 
