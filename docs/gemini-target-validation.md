@@ -51,3 +51,17 @@ See `../bundles/gemini/validation.json` and `patch-result.json`.
 This supersedes the earlier missing-input/build-blocked status for Gemini only.
 Google/MicroG target validation and device login/chat tests remain pending.
 Download/use `../bundles/gemini/gemini-target.mpp`, not the legacy reference build.
+
+## Google companion local port — 0.1.3
+
+The exact uploaded Google `17.6.59.ve.arm64` / code `301698282` now has a
+locally implemented profile based on DEX discovery. CI run 40521064648 applied
+all eight default Google patches and official Clone app, then rebuilt the APK.
+No patches failed. The cloned package and MicroG RE 7.3 extended-access permission
+were checked in the output manifest. Gemini's two patch/rebuild and static output
+checks also passed again. See `bundles/gemini/README.md` for the current workflow.
+
+This supersedes earlier statements that Google has no implemented target profile.
+MicroG APK metadata/declarations were inspected, not device/runtime tested.
+Density split integration, consistent signing, installation and account/chat
+runtime checks remain outstanding. No end-to-end success is claimed.

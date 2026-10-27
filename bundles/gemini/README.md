@@ -1,38 +1,63 @@
-# Standalone Gemini bundle
+# Gemini + Google standalone bundle — local 0.1.3
 
-## Local Gemini launcher port — 0.1.2
+Use **`bundle.mpp`** (identical to `gemini-target.mpp`) for:
 
-`gemini-target.mpp` adds an exact profile for **Gemini 1.0.995038376,
-version code 345**, based on the user's original APK:
+| Component | Exact inspected input | Validation |
+| --- | --- | --- |
+| Gemini launcher | 1.0.995038376 / code 345 | Both patches, rebuild, output DEX and manifest passed |
+| Google App | 17.6.59.ve.arm64 / code 301698282 | Eight default custom patches + official Clone app and rebuild passed; output manifest checked |
+| MicroG RE | 7.3.0-dev.2 / code 255070302 | APK inspected; app.revanced.android.gms package and EXTENDED_ACCESS declaration confirmed |
 
-SHA-256: `bfa9b10060a1c0e8a1c3f2b01cd513f74a53b364ab9bdb1bca02ae103de3f7e5`.
+MicroG is installed separately, not patched by this bundle. No login/chat/device
+runtime validation is claimed. CI does not prove that missing split resources
+are present or that an APK installs/launches on a phone.
 
-The profile requires exactly **four** Google package string replacements.
-Unsupported versions still fail closed. The isolated build applies the two
-compatible Gemini patches to the real input and verifies the patched DEX and
-manifest. See `validation.json` and `patch-result.json` after a successful build.
-These are build/static checks, not device runtime verification.
+## Manager / patching
 
-Use **gemini-target.mpp**, not the older **gemini-reference.mpp**, for this APK.
-Refresh/remove the old Manager source so the selected source shows version 0.1.2.
-Select Gemini Redirect to Cloned Google App and Gemini Standalone Support.
+1. Import `bundle.mpp`; ensure the source version is **0.1.3**, not 0.1.1/0.1.2.
+2. For Gemini's original base APK, use the two default Gemini patches.
+3. For Google's original base APK, use the eight default Google patches plus
+   official **Clone app** (tested with upstream's pinned official Morphe 1.41.0
+   bundle). Set `updatePermissions=true` and `updateProviders=true`; leave
+   Clone app's package name at its default. Expected output package:
+   `com.google.android.googlequicksearchbox.morphe`.
+4. Leave the three account workaround patches disabled. They were not ported,
+   are not runtime verified, and must not be enabled for this target.
+5. The Google input requires a density split (`base__density`). Obtain the split
+   from the exact same original app bundle. Adapt its package for the clone and
+   sign it with the **same key** as the patched base before installing together.
+   Removing manifest split requirements cannot recreate missing resources.
+6. Install the user's MicroG RE 7.3.0-dev.2 ARM64 build separately, complete its
+   account setup, then test the Google clone and Gemini. Signing/install and
+   device runtime behavior still need verification. Do not uninstall existing
+   apps or accounts without backing up data and checking signing compatibility.
 
-This launcher port does not implement or verify Google 17.6.59.ve.arm64 or
-MicroG RE 7.3.0. Login/replies on the Huawei device still require runtime testing
-and a correctly patched/cloned companion Google app. The upstream documented
-Clone app prerequisite and consistent signing across base/splits still apply.
-Do not assume removing split requirements restores resources absent from base.
+Do not use a full YouTube bundle as a replacement for the official Clone app
+prerequisite. YouTube source/configuration/root `patch.mpp` are not part of this
+workstream and have not been modified.
 
-## Legacy reference artifact
+## Compatibility implementation
 
-`gemini-reference.mpp` is the unchanged upstream v0.1.1 build, with the older
-Google 17.54.18.ve.arm64 / Gemini 1.0.958859967 / MicroG RE 7.0.0 profiles.
-It does not support Gemini code 345.
+Exact source profiles are in `tools/gemini-apk/overlay/` and are applied to a fresh
+pinned upstream checkout. Original vendored files remain unchanged. Google hooks
+were resolved from actual DEX evidence (`docs/google-target-hooks.txt`), not by
+renaming obfuscated classes blindly. The MicroG permission is changed only for
+Google 17.6.59; legacy profiles retain their original permission.
 
-## Provenance and isolation
+The historical patch name `GmsCore Bytecode Redirect (MicroG RE 7.0.0)` is retained
+from upstream. For the new Google profile the target package is still
+`app.revanced.android.gms`, with the new fully qualified extended-access permission.
+This label is not evidence of runtime compatibility with either MicroG version.
 
-Upstream source is pinned to `cef25d12c71c33f555b52d8330c1ca886bf59ccc`.
-Local overlays live in `tools/gemini-apk/`; the vendored snapshot is unchanged.
-Upstream declares no license: preserve attribution and resolve permission before
-redistribution. No public release is created by the workflow.
-YouTube code, manifests, recommendations and root `patch.mpp` are untouched.
+## Evidence and artifacts
+
+- `patch-result.json`: Gemini execution/rebuild results.
+- `validation.json`: Gemini output DEX (four redirects) and manifest validation.
+- `google-patch-result.json`: all nine selected Google patches passed.
+- `google-validation.json`: Google clone manifest/package/permission checks.
+- `bundle.mpp.sha256`: checksum for the new compiled JVM + Android DEX bundle.
+- `gemini-reference.mpp`: legacy unmodified v0.1.1; **do not use for these inputs**.
+
+This is a local version 0.1.3, not an upstream release. No upstream release URL or
+public download descriptor is published. Source attribution is retained; upstream
+has no declared license, so resolve permission before redistribution.
