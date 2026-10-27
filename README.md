@@ -33,6 +33,19 @@ python3 tools/version-advisor/run.py serve --host 0.0.0.0 --port 8000
 
 The tool updates the **catalog**, not the Kotlin patch sources; adding a genuinely new target still needs a reviewed upstream source sync. See the [tool README](tools/version-advisor/README.md) for the full architecture and API.
 
+## Build `patch.mpp`
+
+`patch.mpp` at the repository root is the compiled **Morphe Patch Package** (JAR + extension DEX) built from these sources by `./gradlew :patches:buildAndroid`. It is what Morphe Desktop/Manager imports to patch an original YouTube APK — it is not an APK itself. Its SHA-256 is in `patch.mpp.sha256`.
+
+Because compilation needs JDK 21, Android SDK 36 and the Morphe GitHub Packages plugin, the build runs in [`.github/workflows/build-mpp.yml`](.github/workflows/build-mpp.yml) and publishes the bundle back to the branch. Locally:
+
+```bash
+./gradlew :patches:buildAndroid --no-daemon
+cp "$(ls patches/build/libs/patches-*.mpp | head -1)" patch.mpp
+```
+
+See [docs/building-mpp.md](docs/building-mpp.md) for prerequisites, tokens, CI usage and troubleshooting.
+
 ## What's excluded
 
 - The YouTube Music extension and patch package (`extensions/music/` and `patches/.../music/`).

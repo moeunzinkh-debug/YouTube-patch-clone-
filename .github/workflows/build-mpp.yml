@@ -22,7 +22,7 @@ on:
       - '.github/workflows/build-mpp.yml'
 
 permissions:
-  contents: read
+  contents: write
   packages: read
 
 concurrency:
@@ -88,3 +88,21 @@ jobs:
             patch.mpp.sha256
           if-no-files-found: error
           retention-days: 30
+
+      # The Arena sandbox cannot reach the Actions artifact host, so also put
+      # the compiled bundle on the branch itself. It is fetched with a normal
+      # git pull. patch.mpp is not in the push path filter, so this commit
+      # cannot re-trigger this workflow.
+      - name: Publish bundle to this branch
+        if: success()
+        run: |
+          set -e
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f patch.mpp patch.mpp.sha256
+          if git diff --cached --quiet; then
+            echo 'Bundle unchanged, nothing to commit.'
+          else
+            git commit -m 'build: publish compiled patch.mpp bundle [skip ci]'
+            git push
+          fi
