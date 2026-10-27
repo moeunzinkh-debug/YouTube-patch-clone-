@@ -181,3 +181,9 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 </details>
 
+</details>
+<!-- PATCH-LIST:END -->
+
+## Upstream sync / ការធ្វើបច្ចុប្បន្នភាពពី upstream
+
+This fork is based on v1.47.0. See [`docs/upstream-sync.md`](docs/upstream-sync.md) for what [MorpheApp/morphe-patches](https://github.com/MorpheApp/morphe-patches) added in **v1.48.0** (9 new YouTube patches incl. Ask flyout menu, Custom font, Feed card layout, Series tracking, Video delay…) and **v1.49.0-dev.7** (+2), the new YouTube versions, the Patcher 2.0 migration, and the plan to port them while keeping only YouTube patches and our Khmer TTS.
