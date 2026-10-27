@@ -44,6 +44,22 @@ Why CI? The Arena sandbox has no JDK or Android SDK and cannot reach the Gradle/
 
 Experimental targets are newer but may crash on some devices; the advisor recommends a stable target by default.
 
+## Verify the bundle
+
+```bash
+sha256sum -c patch.mpp.sha256
+python3 - <<'PY'
+import zipfile
+with zipfile.ZipFile("patch.mpp") as z:
+    names = z.namelist()
+    print("entries:", len(names))
+    print(z.read("META-INF/MANIFEST.MF").decode())
+    print("extension DEX:", [n for n in names if n.endswith(".mpe")])
+PY
+```
+
+The built bundle contains 2,897 entries: 1,219 compiled `.class` patch files (698 under `app/morphe/patches/youtube/`, 229 shared, none from the excluded Music/Reddit sets), three extension DEX files (`extensions/youtube.mpe`, `extensions/shared-youtube.mpe`, `extensions/shared.mpe`), patch resources/translations, and a `META-INF/MANIFEST.MF` declaring `Version: 1.47.0` and `Patcher-Version: 1.14.0`. `extensions/youtube.mpe` contains the Khmer voice-over client, confirming the local TTS change was compiled into the bundle.
+
 ## Troubleshooting
 
 - **`JSONObject.keySet()` compile errors in `KhmerTtsClient.java`** — Android's `org.json.JSONObject` exposes `keys()` but not `keySet()`. The file now uses a small `keySet(JSONObject)` helper that returns `() -> object.keys()`.
