@@ -1,0 +1,34 @@
+name: Inspect uploaded Gemini APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/b0221262-youtube-patch-clone]
+    paths: ['tools/gemini-apk/**', '.github/workflows/inspect-gemini-apk.yml']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download user-supplied input and inspect
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download Gemini --repo "$GITHUB_REPOSITORY" --pattern base.apk --dir "$RUNNER_TEMP/gemini"
+          echo "bfa9b10060a1c0e8a1c3f2b01cd513f74a53b364ab9bdb1bca02ae103de3f7e5  $RUNNER_TEMP/gemini/base.apk" | sha256sum -c -
+          pip install androguard==4.1.3
+          python tools/gemini-apk/inspect.py "$RUNNER_TEMP/gemini/base.apk"
+      - name: Save inspection report only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/gemini-apk-inspection.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs: record uploaded Gemini APK inspection'
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
