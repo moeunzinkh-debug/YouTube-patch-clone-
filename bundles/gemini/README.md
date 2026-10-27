@@ -61,3 +61,21 @@ This label is not evidence of runtime compatibility with either MicroG version.
 This is a local version 0.1.3, not an upstream release. No upstream release URL or
 public download descriptor is published. Source attribution is retained; upstream
 has no declared license, so resolve permission before redistribution.
+
+## Build workflow repair (current status)
+
+The workflow now runs on `main` and `arena/**` when build inputs change, and can
+also be dispatched manually. Concurrent branch updates are fetched/rebased before
+retrying publication; conflicts are never overwritten with a force push.
+
+The uploaded `Gemini/base.apk` and `Google/base.apk` release inputs are currently
+unavailable. Compilation still runs, but real-APK tests are explicitly marked
+`not-run-inputs-missing` in `build-status.json`. The artifact contains that status
+alongside the bundle and checksum, not historical APK reports presented as a new
+validation. Existing patch-result/validation files retain earlier historical
+results; consult their associated run and the current `build-status.json`.
+
+To require a full fresh APK test, restore both exact release assets and manually
+run the workflow with `require_apk_tests=true`. Missing inputs then fail clearly;
+a failed patch/rebuild or output verification also fails the build. No missing
+input is treated as a successful APK test. Device/runtime tests remain separate.
