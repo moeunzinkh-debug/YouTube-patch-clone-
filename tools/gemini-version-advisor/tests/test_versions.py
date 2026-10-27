@@ -14,7 +14,10 @@ class Recommendations(unittest.TestCase):
         self.assertFalse(data['compiled_gemini_support'])
         self.assertEqual([a['requested_status'] for a in data['apps']], ['unverified'] * 3)
         self.assertEqual([a['recommended_for_reference'] for a in data['apps']],
-                         ['17.54.18.ve.arm64', '1.0.958859967', '7.0.0'])
+                         [None, None, None])
+        self.assertEqual([a['active_target'] for a in data['apps']],
+                         ['17.6.59.ve.arm64', '1.0.995038376', '7.3.0'])
+        self.assertEqual(data['project'], 'gemini-microg')
 
     def test_upstream_discovery_does_not_promote(self):
         remote = {'commit': 'test', 'profile_versions': {'gemini': ['1.0.995038376']}}

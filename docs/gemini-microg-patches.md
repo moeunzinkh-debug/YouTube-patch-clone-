@@ -153,3 +153,11 @@ PY
 [Google / Gemini / MicroG RE version catalog](gemini-versions.md) — checked every six hours by GitHub Actions once the workflow is on the default branch.
 Requested targets: **Google 17.6.59.ve.arm64**, **Gemini 1.0.995038376**, **MicroG RE 7.3.0**.
 These targets are **unverified**, not supported-version declarations. Recommendations stay pinned to reviewed source profiles; upstream discovery never silently enables unsupported APKs. The compiled YouTube bundle is unchanged.
+
+## Active Gemini-only development targets
+
+The current workstream targets **Google 17.6.59.ve.arm64**,
+**Gemini 1.0.995038376**, and **MicroG RE 7.3.0** exclusively.
+The older "verified targets" above describe upstream's legacy snapshot, not
+these targets. They are not fallback recommendations for this workstream.
+See [target verification gates and project separation](gemini-target-validation.md).

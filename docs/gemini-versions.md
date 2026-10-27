@@ -1,15 +1,16 @@
 # Gemini / Google / MicroG RE version recommendations
 
-> Reference-source recommendations only; the local `patch.mpp` is YouTube-only.
+> Gemini-only project targets. No shared YouTube compatibility or release configuration.
 > កំណែគោលដៅមិនមែនជាកំណែដែលបានផ្ទៀងផ្ទាត់ទេ។
 
-| App | Requested target | Pinned-source recommendation | Target status |
+| App | Active patch target | Verified recommendation | Target status |
 | --- | --- | --- | --- |
-| Google App | `17.6.59.ve.arm64` | `17.54.18.ve.arm64` | unverified |
-| Gemini | `1.0.995038376` | `1.0.958859967` | unverified |
-| MicroG RE | `7.3.0` | `7.0.0` | unverified |
+| Google App | `17.6.59.ve.arm64` | `pending APK and runtime verification` | unverified |
+| Gemini | `1.0.995038376` | `pending APK and runtime verification` | unverified |
+| MicroG RE | `7.3.0` | `pending APK and runtime verification` | unverified |
 
-Recommendations are tied to source snapshot `v0.1.1`.
+The active targets are user-pinned and are never replaced with older upstream versions.
+Legacy source snapshot `v0.1.1` is reference material, not verification of these targets.
 Do not combine independently discovered versions as a verified working set.
 New upstream profile filenames are discovery metadata, not compatibility proof.
 MicroG release numbers are not auto-promoted: this snapshot declares only its pinned version.

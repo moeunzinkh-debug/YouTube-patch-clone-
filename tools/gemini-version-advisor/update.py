@@ -60,23 +60,25 @@ def build(remote=None):
             profiles = [match.group(1)]
         supported = target['requested'] in profiles
         rows.append(dict(target, id=key, source_profile_versions=profiles,
-                         recommended_for_reference=target['requested'] if supported else (profiles[0] if len(profiles) == 1 else None),
+                         active_target=target['requested'],
+                         recommended_for_reference=None,
                          requested_status='in-pinned-source' if supported else 'unverified',
                          upstream_profile_versions=(remote or {}).get('profile_versions', {}).get(key, [])))
-    return {'schema_version': 1, 'source_tag': source['upstream_tag'],
+    return {'schema_version': 2, 'project': 'gemini-microg', 'target_policy': 'user-pinned', 'source_tag': source['upstream_tag'],
             'source_commit': source['upstream_commit'], 'compiled_gemini_support': False,
             'upstream_discovery': remote, 'apps': rows}
 
 
 def markdown(data):
     lines = ['# Gemini / Google / MicroG RE version recommendations', '',
-             '> Reference-source recommendations only; the local `patch.mpp` is YouTube-only.',
+             '> Gemini-only project targets. No shared YouTube compatibility or release configuration.',
              '> កំណែគោលដៅមិនមែនជាកំណែដែលបានផ្ទៀងផ្ទាត់ទេ។', '',
-             '| App | Requested target | Pinned-source recommendation | Target status |',
+             '| App | Active patch target | Verified recommendation | Target status |',
              '| --- | --- | --- | --- |']
     for app in data['apps']:
-        lines.append(f"| {app['name']} | `{app['requested']}` | `{app['recommended_for_reference'] or 'manual review required'}` | {app['requested_status']} |")
-    lines += ['', 'Recommendations are tied to source snapshot `' + data['source_tag'] + '`.',
+        lines.append(f"| {app['name']} | `{app['requested']}` | `{app['recommended_for_reference'] or 'pending APK and runtime verification'}` | {app['requested_status']} |")
+    lines += ['', 'The active targets are user-pinned and are never replaced with older upstream versions.',
+              'Legacy source snapshot `' + data['source_tag'] + '` is reference material, not verification of these targets.',
               'Do not combine independently discovered versions as a verified working set.',
               'New upstream profile filenames are discovery metadata, not compatibility proof.',
               'MicroG release numbers are not auto-promoted: this snapshot declares only its pinned version.', '',
