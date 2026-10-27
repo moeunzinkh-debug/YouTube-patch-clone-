@@ -25,9 +25,11 @@ This directory is **reference/vendored source only**:
   `patches-bundle.json` here is a copy of the upstream descriptor for reference;
   Morphe Manager reads the one on the *upstream default branch*, not this copy.
 
-> Do **not** select patches from this source and from `YouTube Patch Clone`
-> (or Morphe Patches) in the same patching session — see the
-> `MORPHE_BRANDING.TXT` note in [`docs/gemini-microg-patches.md`](../../docs/gemini-microg-patches.md).
+> Do not apply the YouTube patch set to Google/Gemini. Upstream requires its
+> Gemini patches plus the official `Clone app` patch — follow that specific
+> combination, not two overlapping complete patch sets. Android Manager's full
+> workflow is not verified upstream. See the [guide](../../docs/gemini-microg-patches.md).
+
 
 ## Supported targets (exact, verified by the upstream author)
 

@@ -135,8 +135,8 @@ def main() -> None:
     lines += [
         "> ចំណាំ៖ ស្លាក `gemini-*`, `google-*` និង `microg-re-*` ជា tags សម្រាប់សម្គាល់ "
         "កំណែដែលបានផ្ទៀងផ្ទាត់ (verified targets) — វាមិនបន្ថែម patch ថ្មីទេ។ "
-        "កុំជ្រើស patches ពីប្រភពនេះ និងពី `YouTube Patch Clone` ក្នុង session តែមួយ "
-        "(នាំឱ្យមាន `MORPHE_BRANDING.TXT` collision)។",
+        "Do not apply YouTube patches to Google/Gemini. Upstream requires its Gemini patches "
+        "plus the official `Clone app` patch; follow that specific combination, not two overlapping full patch sets.",
         "",
         "</details>",
         END,

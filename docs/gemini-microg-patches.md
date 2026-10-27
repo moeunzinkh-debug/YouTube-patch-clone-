@@ -101,10 +101,14 @@ Existing `v1.48.1` / `youtube-*` tags still describe the **YouTube** bundle.
    **same key** as any existing installation.
 5. Select the official Morphe patches **1.41.0** `Clone app` patch with options
    `updatePermissions=true` and `updateProviders=true` (Expert mode).
-6. ⚠️ **Use one patch source per session.** Selecting patches from this Gemini
-   source *and* from `YouTube Patch Clone` / `Morphe Patches` in the same session
-   makes two `addLicensePatch` dependencies run, and the second one aborts with
-   `MORPHE_BRANDING.TXT already exists` (see [`releases.md`](releases.md)).
+6. Do **not** select the YouTube patch set for Google/Gemini. Upstream explicitly
+   requires its custom Gemini patches **plus** the official `Clone app` patch;
+   follow that specific combination, not two overlapping full patch sets.
+   This is different from applying both full YouTube sources, which produced
+   the `MORPHE_BRANDING.TXT` collision in the earlier YouTube session.
+   End-to-end Android Manager use is not verified by upstream; its local build
+   scripts handle the Google split and same-key signing workflow.
+
 
 Samsung note: ADB cannot launch an Activity inside Secure Folder
 (`am start --user 150` is refused); open Gemini manually there after installing.

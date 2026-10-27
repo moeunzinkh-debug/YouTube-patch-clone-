@@ -265,7 +265,7 @@ Cloned from [ryuya0124/gemini-microg-patches](https://github.com/ryuya0124/gemin
 
 </details>
 
-> ចំណាំ៖ ស្លាក `gemini-*`, `google-*` និង `microg-re-*` ជា tags សម្រាប់សម្គាល់ កំណែដែលបានផ្ទៀងផ្ទាត់ (verified targets) — វាមិនបន្ថែម patch ថ្មីទេ។ កុំជ្រើស patches ពីប្រភពនេះ និងពី `YouTube Patch Clone` ក្នុង session តែមួយ (នាំឱ្យមាន `MORPHE_BRANDING.TXT` collision)។
+> ចំណាំ៖ ស្លាក `gemini-*`, `google-*` និង `microg-re-*` ជា tags សម្រាប់សម្គាល់ កំណែដែលបានផ្ទៀងផ្ទាត់ (verified targets) — វាមិនបន្ថែម patch ថ្មីទេ។ Do not apply YouTube patches to Google/Gemini. Upstream requires its Gemini patches plus the official `Clone app` patch; follow that specific combination, not two overlapping full patch sets.
 
 </details>
 <!-- GEMINI-PATCH-LIST:END -->
@@ -276,4 +276,4 @@ This fork is synced to the **YouTube-only source of upstream v1.48.0** (bundle r
 
 ## Gemini / MicroG RE patches (separate source)
 
-The Gemini patch tags above document **13 cloned patches** from [ryuya0124/gemini-microg-patches](https://github.com/ryuya0124/gemini-microg-patches) `v0.1.1`, vendored under [`extras/gemini-microg-patches/`](extras/gemini-microg-patches/README.md). They add **Gemini + microG RE (`app.revanced.android.gms` 7.0.0) support**, including Samsung Secure Folder, for Google App `17.54.18.ve.arm64` and Gemini `1.0.958859967`. **They are reference source only — not compiled into `patch.mpp`.** Add the upstream repo as a separate Manager source, and never mix patch sources in one session. Tags: `gemini-v0.1.1`, `gemini-1.0.958859967`, `google-17.54.18.ve.arm64`, `microg-re-7.0.0`. Full guide: [`docs/gemini-microg-patches.md`](docs/gemini-microg-patches.md).
+The Gemini patch tags above document **13 cloned patches** from [ryuya0124/gemini-microg-patches](https://github.com/ryuya0124/gemini-microg-patches) `v0.1.1`, vendored under [`extras/gemini-microg-patches/`](extras/gemini-microg-patches/README.md). They add **Gemini + microG RE (`app.revanced.android.gms` 7.0.0) support**, including Samsung Secure Folder, for Google App `17.54.18.ve.arm64` and Gemini `1.0.958859967`. **They are reference source only — not compiled into `patch.mpp`.** Add the upstream repo as a separate Manager source, using the specific upstream-required combination with the official `Clone app` patch, not the YouTube patch set. Tags: `gemini-v0.1.1`, `gemini-1.0.958859967`, `google-17.54.18.ve.arm64`, `microg-re-7.0.0`. Full guide: [`docs/gemini-microg-patches.md`](docs/gemini-microg-patches.md).
