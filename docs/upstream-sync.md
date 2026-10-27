@@ -108,6 +108,8 @@ The **9 new YouTube patches** were added. Their Kotlin/Java sources are version-
 
 The compiled `patch.mpp` is rebuilt by `.github/workflows/build-mpp.yml` and declares `Patcher-Version: 2.0.0`, so users need a Manager/Patcher that supports 2.0.
 
+**Follow-up fix (v1.48.1):** see the "Why Manager recommended `21.20.405` for us" section above — `21.23.492` was promoted to stable so Manager recommends the same version as upstream. The bundle was rebuilt (SHA-256 `8ca2c9d49aa25ace1195b08e6d9789c0ae34eb0f2f1f6dea75bfc87b4537c1c3`) and released as `v1.48.1`.
+
 **Not done deliberately:** the v1.49.0-dev.7 patches (`Download post images`, `Search comments`), the YouTube `21.43.523` target, upstream's Edge TTS rewrite of the voice-over client, and the Music/Reddit patch sets. `tools/generate-patch-catalog.py` regenerates the README `<details>` catalogue from the manifest; the version advisor catalog/docs were regenerated too (21 unit tests pass).
 
 ## Sources

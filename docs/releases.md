@@ -11,7 +11,7 @@ Current tags:
 
 | Tag | Type | Notes |
 | --- | --- | --- |
-| [`v1.48.1`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.1) | annotated + GitHub Release | **Current bundle.** Same v1.48.0 patch sources, but `21.23.492` is now a stable target so Manager recommends it (matching upstream). |
+| [`v1.48.1`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.1) | annotated + GitHub Release | **Current bundle** (10,282,455 bytes, SHA-256 `8ca2c9d49aa25ace1195b08e6d9789c0ae34eb0f2f1f6dea75bfc87b4537c1c3`). Same v1.48.0 patch sources, but `21.23.492` is now a stable target so Manager recommends it (matching upstream). |
 | [`v1.48.0`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.0) | annotated + GitHub Release | Previous bundle: 1,898-source v1.48.0 YouTube sync with 9 new patches, `patch.mpp` (JAR + 4 extension DEX), SHA-256 and `patches-bundle.json`. |
 | [`v1.47.0`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.47.0) | annotated + GitHub Release | Previous bundle (Patcher 1.14.0), `patch.mpp`, SHA-256 and `patches-bundle.json`. |
 | [`youtube-21.23.492`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.23.492) | annotated | **Recommended** stable YouTube target, min Android 9 / SDK 28. |
