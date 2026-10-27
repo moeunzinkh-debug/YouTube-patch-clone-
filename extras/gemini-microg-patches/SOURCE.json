@@ -1,0 +1,105 @@
+{
+  "upstream": "https://github.com/ryuya0124/gemini-microg-patches",
+  "upstream_tag": "v0.1.1",
+  "upstream_commit": "cef25d12c71c33f555b52d8330c1ca886bf59ccc",
+  "upstream_bundle_version": "0.1.1",
+  "description": "Gemini login and Samsung Secure Folder support with microG (MicroG RE / app.revanced.android.gms 7.0.0)",
+  "vendored_files": 19,
+  "files": [
+    {
+      "path": "config/reference/gms-constants.json",
+      "bytes": 13242,
+      "sha256": "c5406164de86ae05edb26e58e916f5048cfea55239226e10ce39fd60707e3e64"
+    },
+    {
+      "path": "docs/releases/v0.1.1.md",
+      "bytes": 1572,
+      "sha256": "ce0ea8d0ad327f084c27eb56292c41fc617cc7b0a37f3be3dc5b919000aef47f"
+    },
+    {
+      "path": "docs/versions/README.md",
+      "bytes": 3651,
+      "sha256": "4c249de9695a3c33a9f74037bfb9b22830438f54f8352b5d573ca08b60b51afa"
+    },
+    {
+      "path": "docs/versions/com.google.android.apps.bard/1.0.958859967.json",
+      "bytes": 1653,
+      "sha256": "3380746cf572bc5416f3cb9f3630490be8016a3e12b8b435cb9ec4fdd16a1459"
+    },
+    {
+      "path": "docs/versions/com.google.android.googlequicksearchbox/17.54.18.ve.arm64.json",
+      "bytes": 8330,
+      "sha256": "2e4a6e8b5cfb7003483ddec17d2c2df536dcd275bc6b7d5239be836401f9f974"
+    },
+    {
+      "path": "patches-bundle.json",
+      "bytes": 360,
+      "sha256": "e612f852de469272cec2d235567e77ef86d268aabb762cff574791696704b139"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/account/AccountSyncPatches.kt",
+      "bytes": 13124,
+      "sha256": "5a036fed6c00028cd9f5bb8b08e6a492b9cc2ebaf44addfa4d1f9f3f16cc71d6"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/common/VersionHookRegistry.kt",
+      "bytes": 4221,
+      "sha256": "12a685e75b982b7485c94c4050f29fc5db82ad9965676107dfadbd9c08cb888a"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/common/versions/Gemini_1_0_958859967.kt",
+      "bytes": 1159,
+      "sha256": "2a4ed5586e05aa228e7e1c7e5677183e53ad1b7abc91e3fcc29705a14d2522fa"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/common/versions/Google_17_54_18.kt",
+      "bytes": 6392,
+      "sha256": "9ba121f034f307257d4c4a9cceb49224312d47e5a45d07e6fd28343c4ef3e85b"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/gemini/GeminiTargetPackagePatch.kt",
+      "bytes": 6587,
+      "sha256": "d15a5d8e39d38a6514d39d8dee97ca1c5b37f696214a1d30685bcd386a080d64"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/microg/GmsConstants.kt",
+      "bytes": 15695,
+      "sha256": "dd0cfccd5d407c0ba5d1259e2f266a1e7c74ffce39c7cacfec25787efcd01636"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/microg/GmsCoreSupportPatch.kt",
+      "bytes": 20796,
+      "sha256": "9481dff5f7ae2dcc45eae0654e0bbc20c4c1cf4436c859493cae6c2bf388526a"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/microg/MicrogRuntimePermissionsPatch.kt",
+      "bytes": 4005,
+      "sha256": "62e4b4999180ff740dd8ce8300afeafa4c17831bee0f42668d2b66c5600750e2"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/workprofile/Fingerprints.kt",
+      "bytes": 854,
+      "sha256": "5681d500a1caa631439ba209540f7267272d0002b7cc27dfed3346ae7a426aac"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/workprofile/GoogleAppCloneFixPatch.kt",
+      "bytes": 3287,
+      "sha256": "a739d0552ea0a907b5e1cee1081cc541c8a7673016fb398b28999c1407ea9ed9"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/workprofile/ProcessNameSanitizePatch.kt",
+      "bytes": 9000,
+      "sha256": "698f4e3385a3cc172c54603648c8e21afe617a67e6327f3e7e745095aa13f992"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/workprofile/WorkProfileBypassPatch.kt",
+      "bytes": 6636,
+      "sha256": "621caa8a038cd3589e28dbca5d6c33c7eaadee6f8211dbf7ca28d7f38e004a4a"
+    },
+    {
+      "path": "src/main/kotlin/app/morphe/patches/google/workprofile/WorkProfileEligibilityPatch.kt",
+      "bytes": 2852,
+      "sha256": "bfcfbefc6967d2568ef5296ddb2b848d6be42964f777386cc978d4643eca1d9d"
+    }
+  ]
+}

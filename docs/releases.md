@@ -19,6 +19,8 @@ Current tags:
 | [`youtube-21.42.241`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.42.241) | annotated | Newest **experimental** YouTube target in v1.48.0, min Android 10 / SDK 29. |
 | [`youtube-21.40.161`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.40.161) | annotated | Previous experimental target (v1.47.0). |
 
+The proposed `gemini-*` / `google-*` / `microg-re-*` tag names (not published) label the **separate vendored Gemini / MicroG RE patch source** (see [gemini-microg-patches.md](gemini-microg-patches.md)): `gemini-v0.1.1` is the upstream v0.1.1 snapshot, `gemini-1.0.958859967` and `google-17.54.18.ve.arm64` are verified app targets, and `microg-re-7.0.0` is the verified microG RE version. They are **not** YouTube bundle releases and carry no `.mpp` asset.
+
 The `youtube-*` tags are labels at the revision that supports that target, not separate builds; `v1.48.0` points at the current bundle revision. See the [tag list](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tags) and the badges in [README.md](../README.md).
 
 ## What a release contains

@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "project": "gemini-microg",
+  "target_policy": "user-pinned",
+  "source_tag": "v0.1.1",
+  "source_commit": "cef25d12c71c33f555b52d8330c1ca886bf59ccc",
+  "compiled_gemini_support": false,
+  "upstream_discovery": {
+    "commit": "d1c8a2008901634ece533e53d6b1caa66226ac18",
+    "profile_versions": {
+      "google": [
+        "17.54.18.ve.arm64"
+      ],
+      "gemini": [
+        "1.0.958859967"
+      ],
+      "microg": []
+    }
+  },
+  "apps": [
+    {
+      "name": "Google App",
+      "package": "com.google.android.googlequicksearchbox",
+      "requested": "17.6.59.ve.arm64",
+      "id": "google",
+      "source_profile_versions": [
+        "17.54.18.ve.arm64"
+      ],
+      "active_target": "17.6.59.ve.arm64",
+      "recommended_for_reference": null,
+      "requested_status": "unverified",
+      "upstream_profile_versions": [
+        "17.54.18.ve.arm64"
+      ]
+    },
+    {
+      "name": "Gemini",
+      "package": "com.google.android.apps.bard",
+      "requested": "1.0.995038376",
+      "id": "gemini",
+      "source_profile_versions": [
+        "1.0.958859967"
+      ],
+      "active_target": "1.0.995038376",
+      "recommended_for_reference": null,
+      "requested_status": "unverified",
+      "upstream_profile_versions": [
+        "1.0.958859967"
+      ]
+    },
+    {
+      "name": "MicroG RE",
+      "package": "app.revanced.android.gms",
+      "requested": "7.3.0",
+      "id": "microg",
+      "source_profile_versions": [
+        "7.0.0"
+      ],
+      "active_target": "7.3.0",
+      "recommended_for_reference": null,
+      "requested_status": "unverified",
+      "upstream_profile_versions": []
+    }
+  ]
+}

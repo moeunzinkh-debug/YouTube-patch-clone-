@@ -1,0 +1,36 @@
+name: Verify Gemini vendor snapshot
+
+on:
+  push:
+    paths:
+      - 'extras/gemini-microg-patches/**'
+      - 'tools/generate-gemini-catalog.py'
+      - 'tools/verify-gemini-vendor.py'
+      - '.github/workflows/verify-gemini-vendor.yml'
+  pull_request:
+    paths:
+      - 'extras/gemini-microg-patches/**'
+      - 'tools/generate-gemini-catalog.py'
+      - 'tools/verify-gemini-vendor.py'
+      - '.github/workflows/verify-gemini-vendor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Validate cloned Gemini / MicroG RE patches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify snapshot integrity, README tags and bundle isolation
+        run: python3 tools/verify-gemini-vendor.py
+
+      - name: Confirm README catalog is regenerable
+        run: |
+          cp README.md /tmp/README.before.md
+          python3 tools/generate-gemini-catalog.py
+          diff -u /tmp/README.before.md README.md
