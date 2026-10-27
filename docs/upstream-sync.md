@@ -76,16 +76,24 @@ Our local customisations touch 14 files plus the extra `KhmerTtsClient.java`. A 
 
 Upstream also rewrote `TTSCache.java` and `TTSEngine.java` (disk sample cache → in-memory preview cache), so the Khmer TTS port needs hands-on review even where text merges cleanly.
 
-## Integration plan (when approved)
+## ✅ Implemented: additive port of the 9 new patches
 
-1. Re-create the YouTube-only file set from upstream v1.48.0, excluding `music/`, `reddit/` and their resources.
-2. Three-way merge the 14 local customisations; resolve the 5 conflicts and re-check the Khmer TTS API against the rewritten upstream TTS classes.
-3. Regenerate the filtered `patches-list.json` (105 YouTube + 5 generic), bump `gradle.properties` to `1.48.0`, sync `gradle/libs.versions.toml`, `settings.gradle.kts`, `patches/build.gradle.kts` and `gradle-wrapper.properties`.
-4. Merge new upstream strings into `values/youtube/strings.xml`, keeping the Khmer `values-km-rKH/youtube/strings.xml` additions.
-5. Rebuild `patch.mpp` with `.github/workflows/build-mpp.yml` (CI only — this sandbox has no JDK/Android SDK), verify with `.github/scripts/verify-mpp.py`, refresh `patch.mpp.sha256`, docs and `patches-bundle.json`.
-6. Update README tags/badges and cut a `v1.48.0` release.
+Per the decision, **only the 9 new YouTube patches were added** — existing patches were not re-done. Because those 9 patches depend on new shared upstream code, the port also brings in their dependency closure, but as an additive/three-way-merged change rather than a v1.48.0 re-sync:
 
-**Decision needed:** stable **v1.48.0** (recommended) vs pre-release **v1.49.0-dev.7**, and whether to do the full source sync + CI rebuild now or only keep this report/catalog first.
+| Change | Count |
+| --- | --- |
+| New Kotlin patch/helper files | 25 (+1 Patcher compatibility shim) |
+| New extension Java classes | 83 |
+| New resource files (seriestracker, videodelaybutton, romanisationbutton) | 16 |
+| Existing Kotlin/Java/resource files three-way merged (base v1.47.0 / ours / theirs v1.48.0) | 81 — **0 conflicts** |
+| Music/Reddit files added | **0** |
+
+- `patches-list.json`: 110 entries (105 YouTube + 5 generic). `Force system font` was replaced by `Custom font`; the 9 new entries were copied from the v1.48.0 manifest with only the YouTube `compatiblePackages` entry kept.
+- Our Khmer TTS package (`voiceovertranslation/*` including `KhmerTtsClient.java`) was **left untouched**; upstream's Edge TTS rewrite was not taken.
+- `gradle.properties` stays `1.47.0` and `gradle/libs.versions.toml` stays on morphe-patcher **1.14.0**. The new patches themselves use no Patcher 2.0 APIs; the two `InstructionLocation` variants used by merged fingerprint files are backported in `patches/src/main/kotlin/app/morphe/patches/shared/misc/compat/InstructionLocations.kt`.
+- `tools/generate-patch-catalog.py` regenerates the README `<details>` catalogue from the manifest (110 names, all accounted for).
+
+**Still outstanding / not done deliberately:** the full Patcher 2.0 migration, the v1.49.0-dev.7 patches (`Download post images`, `Search comments`), the new YouTube targets (`21.42.241`, `21.41.525`, `21.43.523`), and a `v1.48.0` release. `patch.mpp` is rebuilt from these sources by `.github/workflows/build-mpp.yml`; see the CI run linked in the pull request.
 
 ## Sources
 
