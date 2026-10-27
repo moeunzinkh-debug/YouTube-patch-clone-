@@ -70,8 +70,8 @@ python3 tools/generate-patch-catalog.py     # YouTube catalog (unchanged)
 
 ## Tags / ស្លាក
 
-New annotated tags point at the revision that vendors the snapshot. They are
-**labels**, not separate builds:
+The following are **proposed tag names**, not published Git tags or release
+assets. The README HTML `<details>` / `<summary>` tags are implemented:
 
 | Tag | Meaning |
 | --- | --- |
