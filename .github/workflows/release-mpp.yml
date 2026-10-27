@@ -1,0 +1,102 @@
+name: Release patch.mpp
+
+# Pushing a v* tag publishes the compiled bundle as a GitHub Release.
+# The tag must already exist (create it locally and push it), which keeps the
+# source revision, gradle.properties version and release asset in sync.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to release (e.g. v1.47.0)'
+        required: true
+        default: 'v1.47.0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-patch-mpp-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish patch.mpp release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag and version
+        id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            tag="$INPUT_TAG"
+          else
+            tag="$REF_NAME"
+          fi
+          version="${tag#v}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Releasing $tag (bundle version $version)"
+
+      - name: Verify the compiled bundle
+        run: python3 .github/scripts/verify-mpp.py
+
+      - name: Generate patches-bundle.json for this tag
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/release
+          python3 - <<'PY'
+          import datetime
+          import json
+          import os
+
+          tag = os.environ["TAG"]
+          version = os.environ["VERSION"]
+          repo = os.environ["REPOSITORY"]
+          payload = {
+              "created_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "description": f"Unofficial YouTube-only Morphe patch bundle v{version}. See docs/youtube-versions.md for supported YouTube targets.",
+              "download_url": f"https://github.com/{repo}/releases/download/{tag}/patch.mpp",
+              "signature_download_url": "",
+              "version": version,
+          }
+          with open("build/release/patches-bundle.json", "w", encoding="utf-8") as handle:
+              json.dump(payload, handle, indent=2)
+              handle.write("\n")
+          print(json.dumps(payload, indent=2))
+          PY
+
+      - name: Create or update the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          assets=(patch.mpp patch.mpp.sha256 build/release/patches-bundle.json)
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists; replacing assets."
+            gh release upload "$TAG" "${assets[@]}" --clobber
+          else
+            echo "Creating release $TAG."
+            gh release create "$TAG" "${assets[@]}" \
+              --verify-tag \
+              --title "YouTube patches $TAG" \
+              --generate-notes \
+              --latest
+          fi
+          gh release view "$TAG" --json tagName,name,isLatest,url,assets --jq '{tag:.tagName,title:.name,latest:.isLatest,url,assets:[.assets[].name]}'
