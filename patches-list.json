@@ -1,6 +1,6 @@
 {
-  "NOTE": "YouTube-only subset derived from the upstream Morphe patches v1.47.0 manifest, with 9 new YouTube patches backported from upstream v1.48.0 (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay). Includes entries compatible with com.google.android.youtube and generic entries without app-specific targets; Music and Reddit targets are excluded. 'Custom font' replaces 'Force system font'.",
-  "version": "1.47.0",
+  "NOTE": "YouTube-only subset of the upstream Morphe patches v1.48.0 manifest. Includes entries compatible with com.google.android.youtube and generic entries without app-specific targets; Music and Reddit targets are excluded. Compared with v1.47.0 this adds 9 new YouTube patches (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay); 'Custom font' replaces 'Force system font'.",
+  "version": "1.48.0",
   "patches": [
     {
       "name": "Add to queue",
@@ -18,23 +18,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -103,23 +97,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -174,7 +162,7 @@
     },
     {
       "name": "Ambient mode",
-      "description": "Adds options to bypass power saving restrictions for Ambient mode and disable it entirely or in fullscreen.",
+      "description": "Forces Ambient mode on and adds options to bypass power saving restrictions for Ambient mode and disable it entirely or in fullscreen.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -188,23 +176,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -273,23 +255,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -361,21 +337,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -444,23 +413,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -529,23 +492,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -600,7 +557,7 @@
     },
     {
       "name": "Captions",
-      "description": "Adds an option to disable captions from being automatically enabled or to set caption cookies.",
+      "description": "Adds options to disable captions from being automatically enabled, select a preferred caption language, add more auto-translate languages, and show captions in picture-in-picture.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -614,23 +571,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -699,23 +650,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -784,23 +729,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -868,7 +807,7 @@
       "description": "Spoofs the installer source so the app appears to be installed from an app store.",
       "default": false,
       "category": null,
-      "compatiblePackages": null,
+      "compatiblePackages": [],
       "options": [
         {
           "key": "packageInstallerName",
@@ -903,23 +842,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -988,23 +921,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1073,23 +1000,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1158,23 +1079,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1232,7 +1147,7 @@
       "description": "Changes the app package name to allow installing the same app multiple times. By default \".morphe\" is appended to the package name. Each cloned install must use a unique package name. Cloning does not work with all apps and using this patch may cause app crashes or other unexpected behavior.",
       "default": false,
       "category": null,
-      "compatiblePackages": null,
+      "compatiblePackages": [],
       "options": [
         {
           "key": "packageName",
@@ -1281,23 +1196,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1366,23 +1275,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1451,23 +1354,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1576,21 +1473,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1659,23 +1549,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1744,23 +1628,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1829,23 +1707,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1914,23 +1786,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -1999,23 +1865,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2084,23 +1944,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2169,23 +2023,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2254,23 +2102,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2339,23 +2181,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2413,7 +2249,7 @@
       "description": "Disables Play Store updates by setting the version code to the maximum allowed. This patch may cause unexpected issues with some apps and does not work if the app is installed by root mounting",
       "default": false,
       "category": null,
-      "compatiblePackages": null,
+      "compatiblePackages": [],
       "options": []
     },
     {
@@ -2432,23 +2268,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2517,23 +2347,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2602,23 +2426,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2687,23 +2505,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2772,23 +2584,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2857,23 +2663,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -2942,23 +2742,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3013,7 +2807,7 @@
     },
     {
       "name": "Disable video codecs",
-      "description": "Adds options to disable or force HDR, and to disable VP9 codecs.",
+      "description": "Adds options to disable or force HDR, and to disable VP9 or AV1 codecs.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -3027,23 +2821,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3112,23 +2900,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3183,7 +2965,7 @@
     },
     {
       "name": "Downloads",
-      "description": "Adds support to download videos with an external downloader app using the in-app download button or a video player action button.",
+      "description": "Adds support to download videos with an external downloader app using the in-app download button or a video player action button, and adds an option to download videos in-app.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -3197,23 +2979,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3282,23 +3058,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3367,23 +3137,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3455,21 +3219,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3541,21 +3298,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3627,21 +3377,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3713,21 +3456,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3796,23 +3532,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3881,23 +3611,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -3966,23 +3690,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4051,23 +3769,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4136,23 +3848,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4221,23 +3927,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4306,23 +4006,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4391,23 +4085,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4476,23 +4164,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4561,23 +4243,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4646,23 +4322,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4731,23 +4401,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4816,23 +4480,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4901,23 +4559,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -4986,23 +4638,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5090,23 +4736,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5175,23 +4815,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5260,23 +4894,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5345,23 +4973,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5430,23 +5052,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5515,23 +5131,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5600,23 +5210,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5685,23 +5289,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5789,23 +5387,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5874,23 +5466,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -5959,23 +5545,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6044,23 +5624,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6129,23 +5703,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6214,23 +5782,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6288,7 +5850,7 @@
       "description": "Overrides certificate pinning, allowing to inspect traffic via a proxy.",
       "default": false,
       "category": null,
-      "compatiblePackages": null,
+      "compatiblePackages": [],
       "options": []
     },
     {
@@ -6307,23 +5869,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6392,23 +5948,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6477,23 +6027,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6562,23 +6106,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6647,23 +6185,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6732,23 +6264,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6817,23 +6343,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6912,23 +6432,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -6997,23 +6511,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7082,23 +6590,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7167,23 +6669,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7252,23 +6748,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7337,23 +6827,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7408,7 +6892,7 @@
     },
     {
       "name": "Return YouTube Dislike",
-      "description": "Adds an option to show the dislike count of videos with Return YouTube Dislike.",
+      "description": "Adds an option to show the dislike count of videos with Return YouTube Dislike, and the like count and like ratio on the thumbnails of feed videos.",
       "default": true,
       "category": null,
       "compatiblePackages": [
@@ -7422,23 +6906,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7507,23 +6985,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7592,23 +7064,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7677,23 +7143,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7765,21 +7225,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7848,23 +7301,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -7933,23 +7380,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8018,23 +7459,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8116,21 +7551,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8199,23 +7627,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8284,23 +7706,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8369,23 +7785,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8454,23 +7864,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8528,7 +7932,7 @@
       "description": "Spoofs the package signature of the original APK.",
       "default": false,
       "category": null,
-      "compatiblePackages": null,
+      "compatiblePackages": [],
       "options": []
     },
     {
@@ -8547,23 +7951,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8632,23 +8030,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8717,23 +8109,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8854,21 +8240,14 @@
           "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -8937,23 +8316,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -9022,23 +8395,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
@@ -9107,23 +8474,17 @@
             "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
             "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
           ],
+          "formFactor": "MOBILE",
           "targets": [
             {
-              "version": "21.40.161",
+              "version": "21.42.241",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,
               "description": null
             },
             {
-              "version": "21.39.522",
-              "versionCodes": null,
-              "isExperimental": true,
-              "minSdk": 29,
-              "description": null
-            },
-            {
-              "version": "21.38.130",
+              "version": "21.41.525",
               "versionCodes": null,
               "isExperimental": true,
               "minSdk": 29,

@@ -1,30 +1,23 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-27T09:32:48Z",
+  "generatedAt": "2026-10-27T10:01:15Z",
   "generator": "youtube-version-advisor/1.0.0",
   "youtubePackage": "com.google.android.youtube",
   "local": {
     "label": "This repository (checked-in patch sources)",
     "source": "patches-list.json",
-    "patchVersion": "1.47.0",
+    "patchVersion": "1.48.0",
     "patchCount": 110,
     "versions": [
       {
-        "version": "21.40.161",
+        "version": "21.42.241",
         "minSdk": 29,
         "experimental": true,
         "patchCount": 105,
         "androidMin": "10"
       },
       {
-        "version": "21.39.522",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 105,
-        "androidMin": "10"
-      },
-      {
-        "version": "21.38.130",
+        "version": "21.41.525",
         "minSdk": 29,
         "experimental": true,
         "patchCount": 105,
@@ -73,7 +66,7 @@
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-10-27T09:32:48Z"
+    "checkedAt": "2026-10-27T10:01:15Z"
   },
   "upstream": {
     "label": "Upstream Morphe patch bundle (latest)",
@@ -138,7 +131,7 @@
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-10-27T09:32:48Z",
+    "checkedAt": "2026-10-27T10:01:15Z",
     "commitSha": "a5662d30d37e09d3c7dac04cfd1915d573cc0c3d",
     "url": "https://github.com/MorpheApp/morphe-patches/blob/main/patches-list.json",
     "etag": "\"a5662d30d37e09d3c7dac04cfd1915d573cc0c3d\"",
@@ -152,45 +145,8 @@
     }
   },
   "changes": {
-    "added": [
-      {
-        "version": "21.42.241",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 105,
-        "androidMin": "10"
-      },
-      {
-        "version": "21.41.525",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 105,
-        "androidMin": "10"
-      }
-    ],
-    "removed": [
-      {
-        "version": "21.40.161",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 105,
-        "androidMin": "10"
-      },
-      {
-        "version": "21.39.522",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 105,
-        "androidMin": "10"
-      },
-      {
-        "version": "21.38.130",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 105,
-        "androidMin": "10"
-      }
-    ],
+    "added": [],
+    "removed": [],
     "modified": []
   }
 }

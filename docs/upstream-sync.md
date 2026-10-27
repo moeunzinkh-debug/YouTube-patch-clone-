@@ -76,24 +76,22 @@ Our local customisations touch 14 files plus the extra `KhmerTtsClient.java`. A 
 
 Upstream also rewrote `TTSCache.java` and `TTSEngine.java` (disk sample cache → in-memory preview cache), so the Khmer TTS port needs hands-on review even where text merges cleanly.
 
-## ✅ Implemented: additive port of the 9 new patches
+## ✅ Implemented: YouTube-only sync that adds the 9 new patches
 
-Per the decision, **only the 9 new YouTube patches were added** — existing patches were not re-done. Because those 9 patches depend on new shared upstream code, the port also brings in their dependency closure, but as an additive/three-way-merged change rather than a v1.48.0 re-sync:
+The **9 new YouTube patches** were added. Their Kotlin/Java sources are version-locked to upstream v1.48.0 shared code, so a purely additive file copy did **not** compile: CI runs `40481673934`, `40483664233` and `40484525293` failed one dependency layer at a time (`interfaces`/`isStatic` fingerprint parameters, `listDecodableFiles`, new `morphe-patches-library` APIs, generated protobuf classes…). The fix was to align the **whole YouTube-only source tree** with v1.48.0, which makes every file come from the same upstream revision:
 
-| Change | Count |
+| Item | Result |
 | --- | --- |
-| New Kotlin patch/helper files | 25 (+1 Patcher compatibility shim) |
-| New extension Java classes | 83 |
-| New resource files (seriestracker, videodelaybutton, romanisationbutton) | 16 |
-| Existing Kotlin/Java/resource files three-way merged (base v1.47.0 / ours / theirs v1.48.0) | 81 — **0 conflicts** |
-| Music/Reddit files added | **0** |
+| YouTube patch Kotlin sources, extension Java/proto/resources | aligned with upstream v1.48.0 (1,898 files considered; 389 updated, 6 added, 5 deleted, **0 merge conflicts**) |
+| Music / Reddit patch or extension files | **0** added |
+| Net new patches visible to users | exactly the **9** from v1.48.0 (`Force system font` → `Custom font`) |
+| Build | `gradle/libs.versions.toml`, `settings.gradle.kts`, `patches/build.gradle.kts` moved to morphe-patcher **2.0.0** / patches-library **2.0.0** (Java 17 toolchain, foojay resolver) |
+| `gradle.properties` / `patches-list.json` | `version = 1.48.0`; manifest 110 entries (105 YouTube + 5 generic) |
+| Local customisations preserved | Khmer TTS `voiceovertranslation/*` incl. `KhmerTtsClient.java`, Khmer/default YouTube strings, YouTube-only `AddResourcesPatch`/`CheckStringResources`, fork metadata, `Settings.java` Khmer speed/pitch entries |
 
-- `patches-list.json`: 110 entries (105 YouTube + 5 generic). `Force system font` was replaced by `Custom font`; the 9 new entries were copied from the v1.48.0 manifest with only the YouTube `compatiblePackages` entry kept.
-- Our Khmer TTS package (`voiceovertranslation/*` including `KhmerTtsClient.java`) was **left untouched**; upstream's Edge TTS rewrite was not taken.
-- `gradle.properties` stays `1.47.0` and `gradle/libs.versions.toml` stays on morphe-patcher **1.14.0**. The new patches themselves use no Patcher 2.0 APIs; the two `InstructionLocation` variants used by merged fingerprint files are backported in `patches/src/main/kotlin/app/morphe/patches/shared/misc/compat/InstructionLocations.kt`.
-- `tools/generate-patch-catalog.py` regenerates the README `<details>` catalogue from the manifest (110 names, all accounted for).
+The compiled `patch.mpp` is rebuilt by `.github/workflows/build-mpp.yml` and declares `Patcher-Version: 2.0.0`, so users need a Manager/Patcher that supports 2.0.
 
-**Still outstanding / not done deliberately:** the full Patcher 2.0 migration, the v1.49.0-dev.7 patches (`Download post images`, `Search comments`), the new YouTube targets (`21.42.241`, `21.41.525`, `21.43.523`), and a `v1.48.0` release. `patch.mpp` is rebuilt from these sources by `.github/workflows/build-mpp.yml`; see the CI run linked in the pull request.
+**Not done deliberately:** the v1.49.0-dev.7 patches (`Download post images`, `Search comments`), the YouTube `21.43.523` target, upstream's Edge TTS rewrite of the voice-over client, and the Music/Reddit patch sets. `tools/generate-patch-catalog.py` regenerates the README `<details>` catalogue from the manifest; the version advisor catalog/docs were regenerated too (21 unit tests pass).
 
 ## Sources
 
