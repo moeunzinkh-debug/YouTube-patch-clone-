@@ -1,0 +1,13 @@
+{
+  "package": "com.google.android.apps.bard",
+  "version": "1.0.995038376",
+  "version_code": "345",
+  "dex_redirects": {
+    "original": 0,
+    "redirected": 4
+  },
+  "manifest_checks": "passed",
+  "patch_execution": "passed",
+  "device_runtime_tested": false,
+  "google_microg_new_targets_verified": false
+}
