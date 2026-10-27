@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>YouTube Version Advisor — អ្នកណែនាំកំណែ YouTube</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true"><span class="play"></span></span>
+        <div>
+          <h1 data-i18n="appTitle">YouTube Version Advisor</h1>
+          <p data-i18n="appSubtitle">កំណែថ្មីៗដោយស្វ័យប្រវត្តិ · វិភាគតាមម៉ូដែលទូរសព្ទ</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="en" class="lang-btn">EN</button>
+          <button type="button" data-lang="km" class="lang-btn active">ខ្មែរ</button>
+        </div>
+        <div id="syncPill" class="sync-pill" title="">
+          <span class="dot"></span><span id="syncText" data-i18n="checking">កំពុងពិនិត្យ…</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="notice" id="updateNotice" hidden>
+      <div class="notice-icon">↻</div>
+      <div>
+        <strong id="updateNoticeTitle" data-i18n="updateTitle">មានកំណែថ្មីនៅ upstream</strong>
+        <p id="updateNoticeBody"></p>
+      </div>
+      <button id="noticeRefresh" class="btn btn-ghost" type="button" data-i18n="refreshNow">ធ្វើបច្ចុប្បន្នភាពឥឡូវ</button>
+    </section>
+
+    <div class="grid">
+      <section class="card input-card">
+        <div class="card-head">
+          <div>
+            <h2 data-i18n="phoneTitle">ព័ត៌មានទូរសព្ទ</h2>
+            <p class="muted" data-i18n="phoneSubtitle">រកឃើញដោយស្វ័យប្រវត្តិ ឬជ្រើសម៉ូដែលដោយដៃ</p>
+          </div>
+          <button id="detectBtn" class="btn btn-detect" type="button"><span class="spark">⌖</span> <span data-i18n="detectBtn">រកឃើញស្វ័យប្រវត្តិ</span></button>
+        </div>
+
+        <div id="detectBanner" class="detect-banner" hidden></div>
+
+        <label class="field">
+          <span data-i18n="modelLabel">ម៉ូដែលទូរសព្ទ / model code</span>
+          <input id="modelInput" type="text" autocomplete="off" data-i18n-placeholder="modelPlaceholder" placeholder="Galaxy A54 5G, SM-A546B, Redmi Note 12…" />
+          <div id="suggestions" class="suggestions" hidden></div>
+          <small class="hint" id="selectedDevice"></small>
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span data-i18n="androidLabel">កំណែ Android</span>
+            <select id="androidInput">
+              <option value="">—</option>
+              <option>8.0</option><option>8.1</option><option>9</option><option>10</option>
+              <option>11</option><option>12</option><option>12L</option><option>13</option>
+              <option>14</option><option>15</option><option>16</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>SDK / API</span>
+            <input id="sdkInput" type="number" min="21" max="40" placeholder="33" />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            <span>CPU ABI</span>
+            <select id="abiInput">
+              <option value="">—</option>
+              <option value="arm64-v8a">arm64-v8a (64-bit)</option>
+              <option value="armeabi-v7a">armeabi-v7a (32-bit)</option>
+              <option value="x86_64">x86_64</option>
+              <option value="x86">x86</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="densityLabel">ដង់ស៊ីតេអេក្រង់</span>
+            <select id="densityInput">
+              <option value="">—</option>
+              <option>ldpi</option><option>mdpi</option><option>hdpi</option>
+              <option>xhdpi</option><option>xxhdpi</option><option>xxxhdpi</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            <span>RAM (GB)</span>
+            <input id="ramInput" type="number" min="0.5" max="32" step="0.5" placeholder="4" />
+          </label>
+          <label class="field">
+            <span data-i18n="channelLabel">ប្រភពកំណែ</span>
+            <select id="channelInput">
+              <option value="local" data-i18n="channelLocal">Repository នេះ (មានសុវត្ថិភាព)</option>
+              <option value="upstream" data-i18n="channelUpstream">Upstream ចុងក្រោយ</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="input-actions">
+          <button id="analyzeBtn" class="btn btn-primary" type="button" data-i18n="analyzeBtn">វិភាគឥឡូវ</button>
+          <button id="refreshBtn" class="btn btn-ghost" type="button">↻ <span data-i18n="refreshBtn">ពិនិត្យកំណែថ្មី</span></button>
+        </div>
+        <p class="disclaimer" data-i18n="privacy">ព័ត៌មានឧបករណ៍ត្រូវបានវិភាគនៅលើម៉ាស៊ីនមេខ្លួនឯង (local) ហើយមិនត្រូវបានផ្ញើទៅ Google ទេ។ លទ្ធផលជាការប៉ាន់ស្មាន សូមពិនិត្យកំណែ Android ពិតប្រាកដ។</p>
+      </section>
+
+      <section class="card result-card" id="resultCard">
+        <div class="card-head">
+          <div>
+            <h2 data-i18n="resultTitle">លទ្ធផលវិភាគ</h2>
+            <p class="muted" id="resultSubtitle" data-i18n="resultSubtitle">កំណែដែលសាកសមបំផុតសម្រាប់ទូរសព្ទរបស់អ្នក</p>
+          </div>
+          <span class="chip chip-soft" id="channelBadge">v1.47.0</span>
+        </div>
+        <div id="resultBody" class="result-body"><div class="skeleton"></div></div>
+      </section>
+    </div>
+
+    <section class="card table-card">
+      <div class="card-head">
+        <div>
+          <h2 data-i18n="allVersionsTitle">កំណែដែលគាំទ្រទាំងអស់</h2>
+          <p class="muted" data-i18n="allVersionsSubtitle">ប្រៀបធៀបគ្រប់កំណែជាមួយ SDK របស់ឧបករណ៍អ្នក</p>
+        </div>
+        <span id="compatibleCount" class="chip chip-soft"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-i18n="colVersion">YouTube</th>
+              <th data-i18n="colStatus">ស្ថានភាព</th>
+              <th data-i18n="colMin">Android អប្បបរមា</th>
+              <th data-i18n="colSdk">SDK</th>
+              <th data-i18n="colMatch">ឆបគ្នា</th>
+              <th data-i18n="colScore">ពិន្ទុ</th>
+            </tr>
+          </thead>
+          <tbody id="optionsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card catalog-card">
+      <div class="card-head">
+        <div>
+          <h2 data-i18n="catalogTitle">បញ្ជីកំណែដែលបានធ្វើបច្ចុប្បន្នភាពដោយស្វ័យប្រវត្តិ</h2>
+          <p class="muted" data-i18n="catalogSubtitle">ទាញចេញពី patches-list.json របស់ repository និង upstream Morphe patch bundle តាម GitHub API</p>
+        </div>
+        <button id="catalogRefresh" class="btn btn-ghost" type="button">↻ <span data-i18n="checkUpstream">ពិនិត្យ upstream</span></button>
+      </div>
+      <div class="catalog-grid">
+        <div class="catalog-col">
+          <h3 data-i18n="localChannel">Repository នេះ</h3>
+          <p class="muted" id="localMeta"></p>
+          <ul id="localList" class="version-list"></ul>
+        </div>
+        <div class="catalog-col">
+          <h3 data-i18n="upstreamChannel">Upstream ចុងក្រោយ</h3>
+          <p class="muted" id="upstreamMeta"></p>
+          <ul id="upstreamList" class="version-list"></ul>
+        </div>
+        <div class="catalog-col">
+          <h3 data-i18n="changesTitle">អ្វីដែលផ្លាស់ប្តូរ</h3>
+          <p class="muted" id="changesMeta"></p>
+          <ul id="changesList" class="version-list"></ul>
+        </div>
+      </div>
+      <p class="disclaimer" data-i18n="catalogNote">ចំណាំ៖ ឧបករណ៍នេះធ្វើបច្ចុប្បន្នភាព «បញ្ជីកំណែ» ប៉ុណ្ណោះ។ ការបន្ថែមកំណែថ្មីទៅក្នុង patch ពិតប្រាកដ ត្រូវការ synchronize កូដ Kotlin ពី upstream ជាមុនសិន។</p>
+    </section>
+
+    <footer class="footer">
+      <span data-i18n="footerLine">គម្រោងឯករាជ្យ មិនពាក់ព័ន្ធនឹង Google, YouTube ឬ MorpheApp ទេ។</span>
+      <span id="footerVersion"></span>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
