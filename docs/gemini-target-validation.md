@@ -40,3 +40,14 @@ not rewritten to `17.60.59` or `17.54.18`.
 
 Current result: target configuration and metadata checks completed;
 APK, patch-build and device verification are blocked on the missing inputs.
+
+## Gemini launcher port completed — 2026-10-27
+
+The user-uploaded Gemini APK `1.0.995038376` / code `345` was inspected
+and patched successfully with the local `0.1.2` bundle. Both Gemini patches and
+APK rebuild passed; the output has four redirected references, no remaining
+original Google package constants, and the expected manifest changes.
+See `../bundles/gemini/validation.json` and `patch-result.json`.
+This supersedes the earlier missing-input/build-blocked status for Gemini only.
+Google/MicroG target validation and device login/chat tests remain pending.
+Download/use `../bundles/gemini/gemini-target.mpp`, not the legacy reference build.
