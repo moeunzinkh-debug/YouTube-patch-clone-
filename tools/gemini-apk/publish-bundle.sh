@@ -7,7 +7,8 @@ git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 git add -f bundles/gemini/gemini-target.mpp bundles/gemini/gemini-target.mpp.sha256 \
   bundles/gemini/patch-list.txt bundles/gemini/patch-result.json \
   bundles/gemini/validation.json bundles/gemini/google-patch-result.json \
-  bundles/gemini/google-validation.json bundles/gemini/bundle.mpp bundles/gemini/bundle.mpp.sha256
+  bundles/gemini/google-validation.json bundles/gemini/bundle.mpp bundles/gemini/bundle.mpp.sha256 \
+  bundles/gemini/build-status.json
 if git diff --cached --quiet; then
   echo 'Verified Gemini bundle unchanged; nothing to publish.'
   exit 0
