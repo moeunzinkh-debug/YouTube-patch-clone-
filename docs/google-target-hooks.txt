@@ -1543,6 +1543,34 @@ index=210 codeUnit=406 NEW_INSTANCE v9 Ljava/lang/IllegalArgumentException;
 index=211 codeUnit=408 INVOKE_DIRECT v9 Ljava/lang/IllegalArgumentException;-><init>()V
 index=212 codeUnit=411 THROW v9 
 
+classes.dex Lcdij;-><init>(Landroid/content/Context;)V registers=2 hits=0
+index=0 codeUnit=0 INVOKE_DIRECT v0 Ljava/lang/Object;-><init>()V
+index=1 codeUnit=3 INVOKE_VIRTUAL v1 Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+index=2 codeUnit=6 MOVE_RESULT_OBJECT v1 
+index=3 codeUnit=7 IPUT_OBJECT v1,v0 Lcdij;->a:Landroid/content/Context;
+index=4 codeUnit=9 RETURN_VOID  
+
+classes.dex Lcdij;->a(Landroid/content/Context;)Lcdij; registers=3 hits=0
+index=0 codeUnit=0 IF_EQZ v2  targetCodeUnit=26
+index=1 codeUnit=2 CONST_CLASS v0 Lcdij;
+index=2 codeUnit=4 MONITOR_ENTER v0 
+index=3 codeUnit=5 SGET_OBJECT v1 Lcdij;->b:Lcdij;
+index=4 codeUnit=7 IF_NEZ v1  targetCodeUnit=19
+index=5 codeUnit=9 INVOKE_STATIC v2 Lcdic;->a(Landroid/content/Context;)V
+index=6 codeUnit=12 NEW_INSTANCE v1 Lcdij;
+index=7 codeUnit=14 INVOKE_DIRECT v1, v2 Lcdij;-><init>(Landroid/content/Context;)V
+index=8 codeUnit=17 SPUT_OBJECT v1 Lcdij;->b:Lcdij;
+index=9 codeUnit=19 MONITOR_EXIT v0 
+index=10 codeUnit=20 SGET_OBJECT v2 Lcdij;->b:Lcdij;
+index=11 codeUnit=22 RETURN_OBJECT v2 
+index=12 codeUnit=23 MOVE_EXCEPTION v2 
+index=13 codeUnit=24 MONITOR_EXIT v0 
+index=14 codeUnit=25 THROW v2 
+index=15 codeUnit=26 NEW_INSTANCE v2 Ljava/lang/NullPointerException;
+index=16 codeUnit=28 CONST_STRING v0 null reference
+index=17 codeUnit=30 INVOKE_DIRECT v2, v0 Ljava/lang/NullPointerException;-><init>(Ljava/lang/String;)V
+index=18 codeUnit=33 THROW v2 
+
 classes.dex Lcdij;->d(Landroid/content/pm/PackageInfo;Z)Z registers=10 hits=1
 index=0 codeUnit=0 CONST_4 v0  literal=0
 index=1 codeUnit=1 IF_NEZ v8  targetCodeUnit=4
@@ -1647,6 +1675,273 @@ index=99 codeUnit=186 MOVE_RESULT_OBJECT v8
 index=100 codeUnit=187 IF_EQZ v8  targetCodeUnit=190
 index=101 codeUnit=189 RETURN v1 
 index=102 codeUnit=190 RETURN v0 
+
+classes.dex Lcdij;->e(Landroid/content/pm/PackageInfo;[Lcdps;)Lcdps; registers=5 hits=0
+index=0 codeUnit=0 IGET_OBJECT v0,v3 Landroid/content/pm/PackageInfo;->signatures:[Landroid/content/pm/Signature;
+index=1 codeUnit=2 CONST_4 v1  literal=0
+index=2 codeUnit=3 IF_NEZ v0  targetCodeUnit=6
+index=3 codeUnit=5 GOTO   targetCodeUnit=51
+index=4 codeUnit=6 IGET_OBJECT v0,v3 Landroid/content/pm/PackageInfo;->signatures:[Landroid/content/pm/Signature;
+index=5 codeUnit=8 ARRAY_LENGTH v0,v0 
+index=6 codeUnit=9 CONST_4 v2  literal=1
+index=7 codeUnit=10 IF_EQ v0,v2  targetCodeUnit=20
+index=8 codeUnit=12 CONST_STRING v3 GoogleSignatureVerifier
+index=9 codeUnit=14 CONST_STRING v4 Package has more than one signature.
+index=10 codeUnit=16 INVOKE_STATIC v3, v4 Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+index=11 codeUnit=19 RETURN_OBJECT v1 
+index=12 codeUnit=20 NEW_INSTANCE v0 Lcdhz;
+index=13 codeUnit=22 IGET_OBJECT v3,v3 Landroid/content/pm/PackageInfo;->signatures:[Landroid/content/pm/Signature;
+index=14 codeUnit=24 CONST_4 v2  literal=0
+index=15 codeUnit=25 AGET_OBJECT v3,v3,v2 
+index=16 codeUnit=27 INVOKE_VIRTUAL v3 Landroid/content/pm/Signature;->toByteArray()[B
+index=17 codeUnit=30 MOVE_RESULT_OBJECT v3 
+index=18 codeUnit=31 INVOKE_DIRECT v0, v3 Lcdhz;-><init>([B)V
+index=19 codeUnit=34 ARRAY_LENGTH v3,v4 
+index=20 codeUnit=35 IF_GE v2,v3  targetCodeUnit=51
+index=21 codeUnit=37 AGET_OBJECT v3,v4,v2 
+index=22 codeUnit=39 INVOKE_VIRTUAL v3, v0 Lcdps;->equals(Ljava/lang/Object;)Z
+index=23 codeUnit=42 MOVE_RESULT v3 
+index=24 codeUnit=43 IF_EQZ v3  targetCodeUnit=48
+index=25 codeUnit=45 AGET_OBJECT v3,v4,v2 
+index=26 codeUnit=47 RETURN_OBJECT v3 
+index=27 codeUnit=48 ADD_INT_LIT8 v2,v2  literal=1
+index=28 codeUnit=50 GOTO   targetCodeUnit=34
+index=29 codeUnit=51 RETURN_OBJECT v1 
+
+classes.dex Lcdij;->f(Ljava/lang/String;)Lcdif; registers=18 hits=0
+index=0 codeUnit=0 MOVE_OBJECT_FROM16 v1,v16 
+index=1 codeUnit=2 MOVE_OBJECT_FROM16 v3,v17 
+index=2 codeUnit=4 CONST_STRING v10 Failed to get Google certificates from remote
+index=3 codeUnit=6 CONST_STRING v11 GoogleCertificates
+index=4 codeUnit=8 CONST_STRING v2 null pkg
+index=5 codeUnit=10 CONST_4 v12  literal=0
+index=6 codeUnit=11 CONST_4 v13  literal=0
+index=7 codeUnit=12 IF_NEZ v3  targetCodeUnit=20
+index=8 codeUnit=14 NEW_INSTANCE v0 Lcdif;
+index=9 codeUnit=16 INVOKE_DIRECT v0, v13, v2, v12 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=10 codeUnit=19 RETURN_OBJECT v0 
+index=11 codeUnit=20 IGET_OBJECT v0,v1 Lcdij;->e:Ljava/lang/String;
+index=12 codeUnit=22 INVOKE_VIRTUAL v3, v0 Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+index=13 codeUnit=25 MOVE_RESULT v0 
+index=14 codeUnit=26 IF_EQZ v0  targetCodeUnit=31
+index=15 codeUnit=28 SGET_OBJECT v0 Lcdif;->a:Lcdif;
+index=16 codeUnit=30 RETURN_OBJECT v0 
+index=17 codeUnit=31 SGET_OBJECT v0 Lcdic;->a:Landroid/content/Context;
+index=18 codeUnit=33 INVOKE_STATIC  Landroid/os/StrictMode;->allowThreadDiskReads()Landroid/os/StrictMode$ThreadPolicy;
+index=19 codeUnit=36 MOVE_RESULT_OBJECT v4 
+index=20 codeUnit=37 CONST_4 v14  literal=1
+index=21 codeUnit=38 INVOKE_STATIC  Lcdic;->b()V
+index=22 codeUnit=41 SGET_OBJECT v0 Lcdic;->d:Lcdpw;
+index=23 codeUnit=43 INVOKE_VIRTUAL v0 Lrrh;->obtainAndWriteInterfaceToken()Landroid/os/Parcel;
+index=24 codeUnit=46 MOVE_RESULT_OBJECT v5 
+index=25 codeUnit=47 CONST_4 v6  literal=7
+index=26 codeUnit=48 INVOKE_VIRTUAL v0, v6, v5 Lrrh;->transactAndReadException(ILandroid/os/Parcel;)Landroid/os/Parcel;
+index=27 codeUnit=51 MOVE_RESULT_OBJECT v0 
+index=28 codeUnit=52 SGET_OBJECT v5 Lrrj;->a:Ljava/lang/ClassLoader;
+index=29 codeUnit=54 INVOKE_VIRTUAL v0 Landroid/os/Parcel;->readInt()I
+index=30 codeUnit=57 MOVE_RESULT v5 
+index=31 codeUnit=58 INVOKE_VIRTUAL v0 Landroid/os/Parcel;->recycle()V
+index=32 codeUnit=61 INVOKE_STATIC v4 Landroid/os/StrictMode;->setThreadPolicy(Landroid/os/StrictMode$ThreadPolicy;)V
+index=33 codeUnit=64 IF_EQZ v5  targetCodeUnit=265
+index=34 codeUnit=66 IGET_OBJECT v0,v1 Lcdij;->a:Landroid/content/Context;
+index=35 codeUnit=68 INVOKE_STATIC v0 Lcdii;->e(Landroid/content/Context;)Z
+index=36 codeUnit=71 MOVE_RESULT v4 
+index=37 codeUnit=72 INVOKE_STATIC v4 Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+index=38 codeUnit=75 MOVE_RESULT_OBJECT v0 
+index=39 codeUnit=76 INVOKE_STATIC v14 Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+index=40 codeUnit=79 MOVE_RESULT_OBJECT v2 
+index=41 codeUnit=80 INVOKE_VIRTUAL v0 Ljava/lang/Object;->getClass()Ljava/lang/Class;
+index=42 codeUnit=83 INVOKE_VIRTUAL v2 Ljava/lang/Object;->getClass()Ljava/lang/Class;
+index=43 codeUnit=86 INVOKE_STATIC  Landroid/os/StrictMode;->allowThreadDiskReads()Landroid/os/StrictMode$ThreadPolicy;
+index=44 codeUnit=89 MOVE_RESULT_OBJECT v15 
+index=45 codeUnit=90 SGET_OBJECT v0 Lcdic;->a:Landroid/content/Context;
+index=46 codeUnit=92 CONST_STRING v2 null reference
+index=47 codeUnit=94 IF_EQZ v0  targetCodeUnit=242
+index=48 codeUnit=96 INVOKE_STATIC  Lcdic;->b()V
+index=49 codeUnit=99 SGET_OBJECT v0 Lcdic;->a:Landroid/content/Context;
+index=50 codeUnit=101 IF_EQZ v0  targetCodeUnit=207
+index=51 codeUnit=103 NEW_INSTANCE v2 Lcom/google/android/gms/common/GoogleCertificatesLookupQuery;
+index=52 codeUnit=105 NEW_INSTANCE v6 Lcdwb;
+index=53 codeUnit=107 INVOKE_DIRECT v6, v0 Lcdwb;-><init>(Ljava/lang/Object;)V
+index=54 codeUnit=110 CONST_4 v8  literal=1
+index=55 codeUnit=111 CONST_4 v9  literal=0
+index=56 codeUnit=112 CONST_4 v5  literal=0
+index=57 codeUnit=113 CONST_4 v7  literal=0
+index=58 codeUnit=114 INVOKE_DIRECT_RANGE v2 count=8 Lcom/google/android/gms/common/GoogleCertificatesLookupQuery;-><init>(Ljava/lang/String;ZZLandroid/os/IBinder;ZZZ)V
+index=59 codeUnit=117 SGET_OBJECT v0 Lcdic;->d:Lcdpw;
+index=60 codeUnit=119 INVOKE_VIRTUAL v0 Lrrh;->obtainAndWriteInterfaceToken()Landroid/os/Parcel;
+index=61 codeUnit=122 MOVE_RESULT_OBJECT v4 
+index=62 codeUnit=123 INVOKE_STATIC v4, v2 Lrrj;->d(Landroid/os/Parcel;Landroid/os/Parcelable;)V
+index=63 codeUnit=126 CONST_4 v2  literal=6
+index=64 codeUnit=127 INVOKE_VIRTUAL v0, v2, v4 Lrrh;->transactAndReadException(ILandroid/os/Parcel;)Landroid/os/Parcel;
+index=65 codeUnit=130 MOVE_RESULT_OBJECT v0 
+index=66 codeUnit=131 SGET_OBJECT v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->CREATOR:Landroid/os/Parcelable$Creator;
+index=67 codeUnit=133 INVOKE_STATIC v0, v2 Lrrj;->a(Landroid/os/Parcel;Landroid/os/Parcelable$Creator;)Landroid/os/Parcelable;
+index=68 codeUnit=136 MOVE_RESULT_OBJECT v2 
+index=69 codeUnit=137 CHECK_CAST v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;
+index=70 codeUnit=139 INVOKE_VIRTUAL v0 Landroid/os/Parcel;->recycle()V
+index=71 codeUnit=142 IGET_BOOLEAN v0,v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->a:Z
+index=72 codeUnit=144 IF_EQZ v0  targetCodeUnit=159
+index=73 codeUnit=146 IGET v0,v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->d:I
+index=74 codeUnit=148 INVOKE_STATIC v0 Lcdil;->c(I)I
+index=75 codeUnit=151 IGET_WIDE v4,v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->e:J
+index=76 codeUnit=153 NEW_INSTANCE v0 Lcdif;
+index=77 codeUnit=155 INVOKE_DIRECT v0, v14, v12, v12 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=78 codeUnit=158 GOTO   targetCodeUnit=237
+index=79 codeUnit=159 IGET_OBJECT v0,v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->b:Ljava/lang/String;
+index=80 codeUnit=161 IGET v4,v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->c:I
+index=81 codeUnit=163 INVOKE_STATIC v4 Lcdil;->b(I)I
+index=82 codeUnit=166 MOVE_RESULT v5 
+index=83 codeUnit=167 CONST_4 v6  literal=4
+index=84 codeUnit=168 IF_NE v5,v6  targetCodeUnit=175
+index=85 codeUnit=170 NEW_INSTANCE v12 Landroid/content/pm/PackageManager$NameNotFoundException;
+index=86 codeUnit=172 INVOKE_DIRECT v12 Landroid/content/pm/PackageManager$NameNotFoundException;-><init>()V
+index=87 codeUnit=175 CONST_STRING v5 error checking package certificate
+index=88 codeUnit=177 IF_NEZ v0  targetCodeUnit=180
+index=89 codeUnit=179 MOVE_OBJECT v0,v5 
+index=90 codeUnit=180 IGET v2,v2 Lcom/google/android/gms/common/GoogleCertificatesLookupResponse;->d:I
+index=91 codeUnit=182 INVOKE_STATIC v2 Lcdil;->c(I)I
+index=92 codeUnit=185 INVOKE_STATIC v4 Lcdil;->b(I)I
+index=93 codeUnit=188 NEW_INSTANCE v2 Lcdif;
+index=94 codeUnit=190 INVOKE_DIRECT v2, v13, v0, v12 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=95 codeUnit=193 MOVE_OBJECT v0,v2 
+index=96 codeUnit=194 GOTO   targetCodeUnit=237
+index=97 codeUnit=195 MOVE_EXCEPTION v0 
+index=98 codeUnit=196 INVOKE_STATIC v11, v10, v0 Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+index=99 codeUnit=199 CONST_STRING v2 module call
+index=100 codeUnit=201 NEW_INSTANCE v4 Lcdif;
+index=101 codeUnit=203 INVOKE_DIRECT v4, v13, v2, v0 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=102 codeUnit=206 GOTO   targetCodeUnit=236
+index=103 codeUnit=207 NEW_INSTANCE v0 Ljava/lang/NullPointerException;
+index=104 codeUnit=209 INVOKE_DIRECT v0, v2 Ljava/lang/NullPointerException;-><init>(Ljava/lang/String;)V
+index=105 codeUnit=212 THROW v0 
+index=106 codeUnit=213 MOVE_EXCEPTION v0 
+index=107 codeUnit=214 INVOKE_STATIC v11, v10, v0 Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+index=108 codeUnit=217 INVOKE_VIRTUAL v0 Lcdwo;->getMessage()Ljava/lang/String;
+index=109 codeUnit=220 MOVE_RESULT_OBJECT v2 
+index=110 codeUnit=221 CONST_STRING v4 module init: 
+index=111 codeUnit=223 INVOKE_STATIC v2 Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+index=112 codeUnit=226 MOVE_RESULT_OBJECT v2 
+index=113 codeUnit=227 INVOKE_VIRTUAL v4, v2 Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+index=114 codeUnit=230 MOVE_RESULT_OBJECT v2 
+index=115 codeUnit=231 NEW_INSTANCE v4 Lcdif;
+index=116 codeUnit=233 INVOKE_DIRECT v4, v13, v2, v0 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=117 codeUnit=236 MOVE_OBJECT v0,v4 
+index=118 codeUnit=237 INVOKE_STATIC v15 Landroid/os/StrictMode;->setThreadPolicy(Landroid/os/StrictMode$ThreadPolicy;)V
+index=119 codeUnit=240 GOTO_16   targetCodeUnit=362
+index=120 codeUnit=242 NEW_INSTANCE v0 Ljava/lang/NullPointerException;
+index=121 codeUnit=244 INVOKE_DIRECT v0, v2 Ljava/lang/NullPointerException;-><init>(Ljava/lang/String;)V
+index=122 codeUnit=247 THROW v0 
+index=123 codeUnit=248 MOVE_EXCEPTION v0 
+index=124 codeUnit=249 INVOKE_STATIC v15 Landroid/os/StrictMode;->setThreadPolicy(Landroid/os/StrictMode$ThreadPolicy;)V
+index=125 codeUnit=252 THROW v0 
+index=126 codeUnit=253 MOVE_EXCEPTION v0 
+index=127 codeUnit=254 GOTO_16   targetCodeUnit=382
+index=128 codeUnit=256 MOVE_EXCEPTION v0 
+index=129 codeUnit=257 GOTO   targetCodeUnit=259
+index=130 codeUnit=258 MOVE_EXCEPTION v0 
+index=131 codeUnit=259 INVOKE_STATIC v11, v10, v0 Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
+index=132 codeUnit=262 INVOKE_STATIC v4 Landroid/os/StrictMode;->setThreadPolicy(Landroid/os/StrictMode$ThreadPolicy;)V
+index=133 codeUnit=265 IGET_OBJECT v0,v1 Lcdij;->a:Landroid/content/Context;
+index=134 codeUnit=267 INVOKE_VIRTUAL v0 Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+index=135 codeUnit=270 MOVE_RESULT_OBJECT v0 
+index=136 codeUnit=271 CONST v4  literal=134217792
+index=137 codeUnit=274 INVOKE_VIRTUAL v0, v3, v4 Landroid/content/pm/PackageManager;->getPackageInfo(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;
+index=138 codeUnit=277 MOVE_RESULT_OBJECT v0 
+index=139 codeUnit=278 IGET_OBJECT v4,v1 Lcdij;->a:Landroid/content/Context;
+index=140 codeUnit=280 INVOKE_STATIC v4 Lcdii;->e(Landroid/content/Context;)Z
+index=141 codeUnit=283 MOVE_RESULT v4 
+index=142 codeUnit=284 IF_NEZ v0  targetCodeUnit=292
+index=143 codeUnit=286 NEW_INSTANCE v0 Lcdif;
+index=144 codeUnit=288 INVOKE_DIRECT v0, v13, v2, v12 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=145 codeUnit=291 GOTO   targetCodeUnit=362
+index=146 codeUnit=292 IGET_OBJECT v2,v0 Landroid/content/pm/PackageInfo;->signatures:[Landroid/content/pm/Signature;
+index=147 codeUnit=294 IF_EQZ v2  targetCodeUnit=355
+index=148 codeUnit=296 IGET_OBJECT v2,v0 Landroid/content/pm/PackageInfo;->signatures:[Landroid/content/pm/Signature;
+index=149 codeUnit=298 ARRAY_LENGTH v2,v2 
+index=150 codeUnit=299 IF_EQ v2,v14  targetCodeUnit=302
+index=151 codeUnit=301 GOTO   targetCodeUnit=355
+index=152 codeUnit=302 NEW_INSTANCE v2 Lcdhz;
+index=153 codeUnit=304 IGET_OBJECT v5,v0 Landroid/content/pm/PackageInfo;->signatures:[Landroid/content/pm/Signature;
+index=154 codeUnit=306 AGET_OBJECT v5,v5,v13 
+index=155 codeUnit=308 INVOKE_VIRTUAL v5 Landroid/content/pm/Signature;->toByteArray()[B
+index=156 codeUnit=311 MOVE_RESULT_OBJECT v5 
+index=157 codeUnit=312 INVOKE_DIRECT v2, v5 Lcdhz;-><init>([B)V
+index=158 codeUnit=315 IGET_OBJECT v5,v0 Landroid/content/pm/PackageInfo;->packageName:Ljava/lang/String;
+index=159 codeUnit=317 INVOKE_STATIC v5, v2, v4, v13 Lcdic;->c(Ljava/lang/String;Lcdhz;ZZ)Lcdif;
+index=160 codeUnit=320 MOVE_RESULT_OBJECT v4 
+index=161 codeUnit=321 IGET_BOOLEAN v6,v4 Lcdif;->b:Z
+index=162 codeUnit=323 IF_EQZ v6  targetCodeUnit=353
+index=163 codeUnit=325 IGET_OBJECT v6,v0 Landroid/content/pm/PackageInfo;->applicationInfo:Landroid/content/pm/ApplicationInfo;
+index=164 codeUnit=327 IF_EQZ v6  targetCodeUnit=353
+index=165 codeUnit=329 IGET_OBJECT v0,v0 Landroid/content/pm/PackageInfo;->applicationInfo:Landroid/content/pm/ApplicationInfo;
+index=166 codeUnit=331 IGET v0,v0 Landroid/content/pm/ApplicationInfo;->flags:I
+index=167 codeUnit=333 AND_INT_LIT8 v0,v0  literal=2
+index=168 codeUnit=335 IF_EQZ v0  targetCodeUnit=353
+index=169 codeUnit=337 INVOKE_STATIC v5, v2, v13, v14 Lcdic;->c(Ljava/lang/String;Lcdhz;ZZ)Lcdif;
+index=170 codeUnit=340 MOVE_RESULT_OBJECT v0 
+index=171 codeUnit=341 IGET_BOOLEAN v0,v0 Lcdif;->b:Z
+index=172 codeUnit=343 IF_EQZ v0  targetCodeUnit=353
+index=173 codeUnit=345 NEW_INSTANCE v0 Lcdif;
+index=174 codeUnit=347 CONST_STRING v2 debuggable release cert app rejected
+index=175 codeUnit=349 INVOKE_DIRECT v0, v13, v2, v12 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=176 codeUnit=352 GOTO   targetCodeUnit=362
+index=177 codeUnit=353 MOVE_OBJECT v0,v4 
+index=178 codeUnit=354 GOTO   targetCodeUnit=362
+index=179 codeUnit=355 NEW_INSTANCE v0 Lcdif;
+index=180 codeUnit=357 CONST_STRING v2 single cert required
+index=181 codeUnit=359 INVOKE_DIRECT v0, v13, v2, v12 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=182 codeUnit=362 IGET_BOOLEAN v2,v0 Lcdif;->b:Z
+index=183 codeUnit=364 IF_EQZ v2  targetCodeUnit=368
+index=184 codeUnit=366 IPUT_OBJECT v3,v1 Lcdij;->e:Ljava/lang/String;
+index=185 codeUnit=368 RETURN_OBJECT v0 
+index=186 codeUnit=369 MOVE_EXCEPTION v0 
+index=187 codeUnit=370 CONST_STRING v1 no pkg 
+index=188 codeUnit=372 INVOKE_VIRTUAL v1, v3 Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+index=189 codeUnit=375 MOVE_RESULT_OBJECT v1 
+index=190 codeUnit=376 NEW_INSTANCE v2 Lcdif;
+index=191 codeUnit=378 INVOKE_DIRECT v2, v13, v1, v0 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=192 codeUnit=381 RETURN_OBJECT v2 
+index=193 codeUnit=382 INVOKE_STATIC v4 Landroid/os/StrictMode;->setThreadPolicy(Landroid/os/StrictMode$ThreadPolicy;)V
+index=194 codeUnit=385 THROW v0 
+
+classes.dex Lcdij;->b(Ljava/lang/String;)Z registers=2 hits=0
+index=0 codeUnit=0 INVOKE_DIRECT v0, v1 Lcdij;->f(Ljava/lang/String;)Lcdif;
+index=1 codeUnit=3 MOVE_RESULT_OBJECT v0 
+index=2 codeUnit=4 INVOKE_VIRTUAL v0 Lcdif;->b()V
+index=3 codeUnit=7 IGET_BOOLEAN v0,v0 Lcdif;->b:Z
+index=4 codeUnit=9 RETURN v0 
+
+classes.dex Lcdij;->c(I)Z registers=6 hits=0
+index=0 codeUnit=0 IGET_OBJECT v0,v4 Lcdij;->a:Landroid/content/Context;
+index=1 codeUnit=2 INVOKE_VIRTUAL v0 Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+index=2 codeUnit=5 MOVE_RESULT_OBJECT v0 
+index=3 codeUnit=6 INVOKE_VIRTUAL v0, v5 Landroid/content/pm/PackageManager;->getPackagesForUid(I)[Ljava/lang/String;
+index=4 codeUnit=9 MOVE_RESULT_OBJECT v5 
+index=5 codeUnit=10 CONST_4 v0  literal=0
+index=6 codeUnit=11 CONST_4 v1  literal=0
+index=7 codeUnit=12 IF_EQZ v5  targetCodeUnit=38
+index=8 codeUnit=14 ARRAY_LENGTH v2,v5 
+index=9 codeUnit=15 IF_NEZ v2  targetCodeUnit=18
+index=10 codeUnit=17 GOTO   targetCodeUnit=38
+index=11 codeUnit=18 IF_GE v1,v2  targetCodeUnit=34
+index=12 codeUnit=20 AGET_OBJECT v0,v5,v1 
+index=13 codeUnit=22 INVOKE_DIRECT v4, v0 Lcdij;->f(Ljava/lang/String;)Lcdif;
+index=14 codeUnit=25 MOVE_RESULT_OBJECT v0 
+index=15 codeUnit=26 IGET_BOOLEAN v3,v0 Lcdif;->b:Z
+index=16 codeUnit=28 IF_EQZ v3  targetCodeUnit=31
+index=17 codeUnit=30 GOTO   targetCodeUnit=46
+index=18 codeUnit=31 ADD_INT_LIT8 v1,v1  literal=1
+index=19 codeUnit=33 GOTO   targetCodeUnit=18
+index=20 codeUnit=34 INVOKE_STATIC v0 Lcdqd;->n(Ljava/lang/Object;)V
+index=21 codeUnit=37 GOTO   targetCodeUnit=46
+index=22 codeUnit=38 NEW_INSTANCE v4 Lcdif;
+index=23 codeUnit=40 CONST_STRING v5 no pkgs
+index=24 codeUnit=42 INVOKE_DIRECT v4, v1, v5, v0 Lcdif;-><init>(ZLjava/lang/String;Ljava/lang/Throwable;)V
+index=25 codeUnit=45 MOVE_OBJECT v0,v4 
+index=26 codeUnit=46 INVOKE_VIRTUAL v0 Lcdif;->b()V
+index=27 codeUnit=49 IGET_BOOLEAN v4,v0 Lcdif;->b:Z
+index=28 codeUnit=51 RETURN v4 
 
 classes.dex Ltgj;->c()Ljava/lang/Object; registers=21 hits=1
 index=0 codeUnit=0 MOVE_OBJECT_FROM16 v0,v20 
@@ -3317,6 +3612,14 @@ index=43 codeUnit=86 INVOKE_STATIC v0, v5 Lesie;->m(Ljava/lang/Object;Ljava/lang
 index=44 codeUnit=89 MOVE_RESULT_OBJECT v5 
 index=45 codeUnit=90 RETURN_OBJECT v5 
 
+classes2.dex Ldgtn;-><init>(Landroid/content/Context;Lesnx;)V registers=3 hits=0
+index=0 codeUnit=0 INVOKE_DIRECT v0 Ljava/lang/Object;-><init>()V
+index=1 codeUnit=3 IPUT_OBJECT v1,v0 Ldgtn;->a:Landroid/content/Context;
+index=2 codeUnit=5 INVOKE_VIRTUAL v2 Lesie;->k()Lesjg;
+index=3 codeUnit=8 MOVE_RESULT_OBJECT v1 
+index=4 codeUnit=9 IPUT_OBJECT v1,v0 Ldgtn;->b:Ljava/util/Set;
+index=5 codeUnit=11 RETURN_VOID  
+
 classes2.dex Ldgtn;->a()Ljava/lang/String; registers=4 hits=1
 index=0 codeUnit=0 IGET_OBJECT v0,v3 Ldgtn;->b:Ljava/util/Set;
 index=1 codeUnit=2 INVOKE_INTERFACE v0 Ljava/util/Set;->size()I
@@ -3354,6 +3657,47 @@ index=32 codeUnit=63 IGET_OBJECT v3,v3 Ldgtn;->a:Landroid/content/Context;
 index=33 codeUnit=65 INVOKE_VIRTUAL v3 Landroid/content/Context;->getPackageName()Ljava/lang/String;
 index=34 codeUnit=68 MOVE_RESULT_OBJECT v3 
 index=35 codeUnit=69 RETURN_OBJECT v3 
+
+classes2.dex Ldgtn;->b()Z registers=2 hits=0
+index=0 codeUnit=0 INVOKE_STATIC  Ldgtr;->a()Z
+index=1 codeUnit=3 MOVE_RESULT v0 
+index=2 codeUnit=4 IF_NEZ v0  targetCodeUnit=8
+index=3 codeUnit=6 CONST_4 v1  literal=0
+index=4 codeUnit=7 RETURN v1 
+index=5 codeUnit=8 INVOKE_STATIC  Ldgtr;->b()Ljava/lang/String;
+index=6 codeUnit=11 MOVE_RESULT_OBJECT v0 
+index=7 codeUnit=12 IF_NEZ v0  targetCodeUnit=16
+index=8 codeUnit=14 CONST_4 v1  literal=1
+index=9 codeUnit=15 RETURN v1 
+index=10 codeUnit=16 INVOKE_VIRTUAL v1 Ldgtn;->a()Ljava/lang/String;
+index=11 codeUnit=19 MOVE_RESULT_OBJECT v1 
+index=12 codeUnit=20 INVOKE_VIRTUAL v0, v1 Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+index=13 codeUnit=23 MOVE_RESULT v1 
+index=14 codeUnit=24 RETURN v1 
+
+classes2.dex Ldgtr;->a()Z registers=1 hits=0
+index=0 codeUnit=0 SGET_OBJECT v0 Ldgtr;->e:Ljava/lang/Boolean;
+index=1 codeUnit=2 IF_NEZ v0  targetCodeUnit=18
+index=2 codeUnit=4 INVOKE_STATIC  Landroid/os/Process;->myUid()I
+index=3 codeUnit=7 MOVE_RESULT v0 
+index=4 codeUnit=8 INVOKE_STATIC v0 Lczd$$ExternalSyntheticApiModelOutline0;->m(I)Z
+index=5 codeUnit=11 MOVE_RESULT v0 
+index=6 codeUnit=12 INVOKE_STATIC v0 Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+index=7 codeUnit=15 MOVE_RESULT_OBJECT v0 
+index=8 codeUnit=16 SPUT_OBJECT v0 Ldgtr;->e:Ljava/lang/Boolean;
+index=9 codeUnit=18 SGET_OBJECT v0 Ldgtr;->e:Ljava/lang/Boolean;
+index=10 codeUnit=20 INVOKE_VIRTUAL v0 Ljava/lang/Boolean;->booleanValue()Z
+index=11 codeUnit=23 MOVE_RESULT v0 
+index=12 codeUnit=24 RETURN v0 
+
+classes2.dex Ldgtr;->b()Ljava/lang/String; registers=1 hits=0
+index=0 codeUnit=0 SGET_OBJECT v0 Ldgtr;->d:Ljava/lang/String;
+index=1 codeUnit=2 IF_EQZ v0  targetCodeUnit=5
+index=2 codeUnit=4 RETURN_OBJECT v0 
+index=3 codeUnit=5 INVOKE_STATIC  La$$ExternalSyntheticApiModelOutline0;->m()Ljava/lang/String;
+index=4 codeUnit=8 MOVE_RESULT_OBJECT v0 
+index=5 codeUnit=9 SPUT_OBJECT v0 Ldgtr;->d:Ljava/lang/String;
+index=6 codeUnit=11 RETURN_OBJECT v0 
 
 classes2.dex Lfhlr;->fV()Ljava/lang/Object; registers=6 hits=1
 index=0 codeUnit=0 IGET_OBJECT v0,v5 Lfhlr;->a:Ljava/lang/Object;
@@ -5619,4 +5963,4 @@ index=116 codeUnit=254 MOVE_EXCEPTION v11
 index=117 codeUnit=255 INVOKE_VIRTUAL v10, v11 Ljava/lang/Throwable;->addSuppressed(Ljava/lang/Throwable;)V
 index=118 codeUnit=258 THROW v10 
 
-matchedMethods=20 (discovery only; not proof of a safe hook)
+matchedMethods=30 (discovery only; not proof of a safe hook)
