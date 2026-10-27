@@ -99,4 +99,4 @@ jobs:
               --generate-notes \
               --latest
           fi
-          gh release view "$TAG" --json tagName,name,isLatest,url,assets --jq '{tag:.tagName,title:.name,latest:.isLatest,url,assets:[.assets[].name]}'
+          gh release view "$TAG" --json tagName,name,isDraft,isPrerelease,url,assets --jq '{tag:.tagName,title:.name,draft:.isDraft,prerelease:.isPrerelease,url,assets:[.assets[].name]}'
