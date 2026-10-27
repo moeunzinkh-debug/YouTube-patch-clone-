@@ -1,0 +1,46 @@
+name: Inspect Google and MicroG companion APKs
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/b0221262-youtube-patch-clone]
+    paths: ['tools/gemini-apk/inspect_companions.py', '.github/workflows/inspect-gemini-companions.yml']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect uploaded companion APKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/companions"
+          gh release download Google --repo "$GITHUB_REPOSITORY" --pattern base.apk --dir "$RUNNER_TEMP/companions"
+          gh release download microg-re-v7.3.0-dev.2 --repo moeunzinkh-debug/MicroG-Re-Rebuild- --pattern microg-7.3.0-dev.2-icon-arm64-v8a.apk --dir "$RUNNER_TEMP/companions"
+          cd "$RUNNER_TEMP/companions"
+          echo 'f9e5d898a8bae360e6d8654f1871b920e1a2774701fe716f4e64bb0c803b7bd9  base.apk' | sha256sum -c -
+          echo 'b650b0325de4d80606597003d64ac7b358489c4e5eba6b76dfdc0008e0ca47e4  microg-7.3.0-dev.2-icon-arm64-v8a.apk' | sha256sum -c -
+          cd "$GITHUB_WORKSPACE"
+          pip install androguard==4.1.3
+          python tools/gemini-apk/inspect_companions.py "$RUNNER_TEMP/companions/base.apk" "$RUNNER_TEMP/companions/microg-7.3.0-dev.2-icon-arm64-v8a.apk" 2>&1 | tee "$RUNNER_TEMP/companion-inspection.log"
+      - name: Surface errors
+        if: failure()
+        run: |
+          if test -f "$RUNNER_TEMP/companion-inspection.log"; then
+            tail -15 "$RUNNER_TEMP/companion-inspection.log" | while IFS= read -r line; do echo "::error::$line"; done
+          fi
+      - name: Save report only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/gemini-companion-inspection.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs: record Google and MicroG APK inspection'
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi

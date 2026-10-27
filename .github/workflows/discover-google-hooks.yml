@@ -1,0 +1,43 @@
+name: Discover exact Google target hooks
+on:
+  push:
+    branches: [arena/b0221262-youtube-patch-clone]
+    paths: ['tools/gemini-apk/InspectGoogle.kt', '.github/workflows/discover-google-hooks.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ryuya0124/gemini-microg-patches
+          ref: cef25d12c71c33f555b52d8330c1ca886bf59ccc
+          path: .gemini-build
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Discover Google hooks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          .gemini-build/scripts/setup-tools.sh
+          gh release download Google --repo "$GITHUB_REPOSITORY" --pattern base.apk --dir "$RUNNER_TEMP/google"
+          echo "f9e5d898a8bae360e6d8654f1871b920e1a2774701fe716f4e64bb0c803b7bd9  $RUNNER_TEMP/google/base.apk" | sha256sum -c -
+          .gemini-build/tools/kotlinc/bin/kotlinc tools/gemini-apk/InspectGoogle.kt -cp .gemini-build/tools/morphe-desktop.jar -d "$RUNNER_TEMP/inspect.jar"
+          java -Xmx4g -cp "$RUNNER_TEMP/inspect.jar:.gemini-build/tools/morphe-desktop.jar" InspectGoogleKt "$RUNNER_TEMP/google/base.apk" > docs/google-target-hooks.txt
+      - name: Save evidence only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/google-target-hooks.txt
+          if ! git diff --cached --quiet; then
+            git commit -m 'docs: exact Google target hook discovery'
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi
