@@ -169,7 +169,7 @@ class RecommendationTests(unittest.TestCase):
     def test_new_phone_prefers_stable_but_reports_newest(self):
         result = self.analyze(33)
         self.assertFalse(result["recommendation"]["experimental"])
-        self.assertEqual(result["recommendation"]["version"], "21.20.405")
+        self.assertEqual(result["recommendation"]["version"], "21.23.492")
         self.assertTrue(result["newestCompatible"]["experimental"])
         self.assertEqual(result["compatibleCount"], len(result["options"]))
         top_score = max(option["score"] for option in result["options"])

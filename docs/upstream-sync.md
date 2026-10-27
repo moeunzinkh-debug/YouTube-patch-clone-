@@ -8,10 +8,10 @@
 | Item | Value |
 | --- | --- |
 | Upstream base now | **v1.48.0**, commit `a5662d30d3` (2026-10-22); originally v1.47.0 `e5464395` (2026-10-11) |
-| Manifest | `patches-list.json` v1.48.0 — **110 patches** (105 YouTube + 5 generic) |
-| YouTube targets | 8 (`21.42.241`, `21.41.525`, `21.28.208`, `21.23.492`, `21.20.405`, `21.16.256`, `20.51.39`, `20.21.37`) |
-| Build | `gradle.properties` `version = 1.48.0`, Patcher **2.0.0**, patches-library `2.0.0` |
-| Bundle | `patch.mpp` declares `Version: 1.48.0`, `Patcher-Version: 2.0.0` (10,282,433 bytes) |
+| Manifest | `patches-list.json` v1.48.1 — **110 patches** (105 YouTube + 5 generic) |
+| YouTube targets | 8 (`21.42.241`, `21.41.525`, `21.28.208` experimental; `21.23.492` **recommended**, `21.20.405`, `21.16.256`, `20.51.39`, `20.21.37` stable) |
+| Build | `gradle.properties` `version = 1.48.1`, Patcher **2.0.0**, patches-library `2.0.0` |
+| Bundle | `patch.mpp` declares `Version: 1.48.1`, `Patcher-Version: 2.0.0` |
 | Local customisations preserved | Khmer voice-over TTS (`voiceovertranslation/*`, `KhmerTtsClient.java`, `Settings.java`, Khmer strings), YouTube-only resource checker, fork metadata |
 
 Only the YouTube patch set is kept — the YouTube Music and Reddit modules are excluded. This stays true for any sync.
@@ -46,13 +46,30 @@ Also new in v1.48.0 but folded into existing patches: Premium-style queue, capti
 
 ## 🎯 Supported YouTube versions
 
-| | v1.47.0 (ours) | v1.48.0 | v1.49.0-dev.7 |
+| | v1.47.0 (ours, historical) | v1.48.0 stable | v1.49.0-dev.7/8 (upstream prerelease) |
 | --- | --- | --- | --- |
 | Newest experimental | `21.40.161` | `21.42.241`, `21.41.525` | `21.43.523`, `21.42.241` |
-| Recommended stable | `21.20.405` | `21.20.405` | `21.20.405` |
+| Recommended stable | `21.20.405` | `21.20.405` | **`21.23.492`** |
 | Dropped targets | — | `21.40.161`, `21.39.522`, `21.38.130` | `21.41.525` |
 
-The advisor catalog is already refreshed: see [youtube-versions.md](youtube-versions.md). It reports `21.42.241` / `21.41.525` as **upstream-only — needs sync** because adding a target without porting the matching Kotlin patch sources does not make it patchable.
+The advisor catalog is refreshed: see [youtube-versions.md](youtube-versions.md). Adding a target without porting the matching Kotlin patch sources does not make it patchable, so we have **not** added the prerelease target `21.43.523`.
+
+## 🎯 Why Manager recommended `21.20.405` for us (fixed in v1.48.1)
+
+Morphe Manager's version picker does **not** read `patches-list.json` or `patches-bundle.json` for the version list. It loads the compiled `patch.mpp` and reads `Compatibility.targets` from `app/morphe/patches/youtube/shared/Constants.kt`:
+
+- [`AppVersionCatalog.kt`](https://github.com/MorpheApp/morphe-manager/blob/main/app/src/main/java/app/morphe/manager/domain/bundles/AppVersionCatalog.kt) → `experimentalVersions()` collects every target with `isExperimental = true`; `offered()` drops those targets unless the user enabled *experimental versions* for that bundle; `recommended()` = `offered().installable().firstOrNull()` — the **newest non-experimental** target.
+- [`PatchInfo.kt`](https://github.com/MorpheApp/morphe-manager/blob/main/app/src/main/java/app/morphe/manager/patcher/patch/PatchInfo.kt) builds `experimentalVersions` from the bundle's `Compatibility.targets`.
+
+In upstream v1.48.0, `21.23.492` was still `isExperimental = true`, so our newest stable target was `21.20.405` → Manager showed **Recommended 21.20.405** (screenshot, lower card). Upstream promoted `21.23.492` to stable in v1.49.0-dev.7 / dev.8, so their newest stable — and therefore their recommendation — became **21.23.492** (upper card). That single boolean is the whole difference. The upper card also shows three experimental rows because *experimental versions* is enabled for the upstream bundle in Manager; that is a per-bundle Manager setting (`bundleExperimentalVersionsEnabled` in `PreferencesManager.kt`), not something a patch repo controls.
+
+**Fix applied (v1.48.1):** set `isExperimental = false` for `21.23.492` in `Constants.kt` and in all 105 `patches-list.json` target entries. The compiled bundle now offers `21.23.492` as the newest stable target, so Manager recommends the same version as upstream. Stable list after the fix:
+
+`21.23.492` (Recommended) → `21.20.405` → `21.16.256` → `20.51.39` → `20.21.37`.
+
+Experimental (hidden unless enabled in Manager): `21.42.241`, `21.41.525`, `21.28.208`. Upstream's prerelease additionally has `21.43.523`; we did **not** add it because our v1.48.0 patch implementations do not contain the v1.49.0-dev.8 fingerprints for that build — adding the target alone would offer an APK the patches cannot patch. If you want the experimental list to match too, that requires the full v1.49.0-dev.8 source sync.
+
+To make Manager refresh, the bundle version was bumped `1.48.0` → `1.48.1` in `gradle.properties`, `patches-list.json` and `patches-bundle.json`, a new release/tag was published, and `patches-bundle.json` on the default branch now points at the `v1.48.1` asset.
 
 ## ⚠️ Build-system change: Patcher 2.0
 
@@ -90,6 +107,8 @@ The **9 new YouTube patches** were added. Their Kotlin/Java sources are version-
 | Local customisations preserved | Khmer TTS `voiceovertranslation/*` incl. `KhmerTtsClient.java`, Khmer/default YouTube strings, YouTube-only `AddResourcesPatch`/`CheckStringResources`, fork metadata, `Settings.java` Khmer speed/pitch entries |
 
 The compiled `patch.mpp` is rebuilt by `.github/workflows/build-mpp.yml` and declares `Patcher-Version: 2.0.0`, so users need a Manager/Patcher that supports 2.0.
+
+**Follow-up fix (v1.48.1):** see the "Why Manager recommended `21.20.405` for us" section above — `21.23.492` was promoted to stable so Manager recommends the same version as upstream. The bundle was rebuilt (SHA-256 `8ca2c9d49aa25ace1195b08e6d9789c0ae34eb0f2f1f6dea75bfc87b4537c1c3`) and released as `v1.48.1`.
 
 **Not done deliberately:** the v1.49.0-dev.7 patches (`Download post images`, `Search comments`), the YouTube `21.43.523` target, upstream's Edge TTS rewrite of the voice-over client, and the Music/Reddit patch sets. `tools/generate-patch-catalog.py` regenerates the README `<details>` catalogue from the manifest; the version advisor catalog/docs were regenerated too (21 unit tests pass).
 

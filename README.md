@@ -6,9 +6,9 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 >
 > កំណត់សម្គាល់៖ យកតែផ្នែក YouTube ប៉ុណ្ណោះ។ ឯកសារ shared ដែលចាំបាច់សម្រាប់ YouTube នៅតែមាន ប៉ុន្តែមិនបានដាក់ patch set របស់ YouTube Music ឬ Reddit ទេ។
 
-[![Release](https://img.shields.io/badge/release-v1.48.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.0)
-[![patch.mpp](https://img.shields.io/badge/patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.0/patch.mpp)
-[![YouTube stable](https://img.shields.io/badge/YouTube%20stable-21.20.405-14835b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.20.405)
+[![Release](https://img.shields.io/badge/release-v1.48.1-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.1)
+[![patch.mpp](https://img.shields.io/badge/patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.1/patch.mpp)
+[![YouTube stable](https://img.shields.io/badge/YouTube%20stable-21.23.492-14835b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.23.492)
 [![YouTube latest](https://img.shields.io/badge/YouTube%20latest-21.42.241-a8650b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.42.241)
 [![Upstream](https://img.shields.io/badge/upstream-v1.48.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.48.0)
 [![License](https://img.shields.io/badge/license-GPLv3-blue)](LICENSE)
@@ -24,7 +24,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 ### YouTube Patches
 
-និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 110 patches ពី [`patches-list.json`](patches-list.json) v1.48.0 (105 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
+និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 110 patches ពី [`patches-list.json`](patches-list.json) v1.48.1 (105 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
 
 **ឧទាហរណ៍ / Highlights**
 
@@ -202,4 +202,4 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 ## Upstream sync / ការធ្វើបច្ចុប្បន្នភាពពី upstream
 
-This fork is synced to the **YouTube-only source of upstream v1.48.0** and includes the **9 new YouTube patches** (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay) — see the «New in v1.48.0» group above. Those 9 are the net new features; to compile them the shared YouTube patch/extension sources had to be aligned with v1.48.0 (morphe-patcher 2.0.0), while our Khmer TTS package, Khmer strings, YouTube-only resource checker and fork metadata were preserved. **No YouTube Music or Reddit patches are included.** See [`docs/upstream-sync.md`](docs/upstream-sync.md) for the full comparison, the v1.49.0-dev.7 additions and the supported YouTube versions.
+This fork is synced to the **YouTube-only source of upstream v1.48.0** (bundle release `v1.48.1`) and includes the **9 new YouTube patches** (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay) — see the «New in v1.48.0» group above. Those 9 are the net new features; to compile them the shared YouTube patch/extension sources had to be aligned with v1.48.0 (morphe-patcher 2.0.0), while our Khmer TTS package, Khmer strings, YouTube-only resource checker and fork metadata were preserved. **No YouTube Music or Reddit patches are included.** See [`docs/upstream-sync.md`](docs/upstream-sync.md) for the full comparison, the v1.49.0-dev.7 additions and the supported YouTube versions. **Recommended YouTube target: `21.23.492`** — the same as upstream (Manager recommends the newest non-experimental target; `21.23.492` was promoted to stable upstream in v1.49.0-dev.7).

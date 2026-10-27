@@ -2,7 +2,7 @@
 
 `patch.mpp` is a **Morphe Patch Package** — a JAR that contains the compiled Kotlin patch classes plus the compiled extension DEX files. Morphe Desktop / Morphe Manager imports it to patch an original YouTube APK. It is **not** a YouTube APK, and it is **not** a source archive.
 
-The bundle in this repository was produced from these checked-in sources with the Morphe Gradle plugin (`app.morphe.patches` 2.0.0) at bundle version `1.48.0` (`gradle.properties`).
+The bundle in this repository was produced from these checked-in sources with the Morphe Gradle plugin (`app.morphe.patches` 2.0.0) at bundle version `1.48.1` (`gradle.properties`).
 
 ## Prerequisites for a local build
 
@@ -58,7 +58,7 @@ with zipfile.ZipFile("patch.mpp") as z:
 PY
 ```
 
-The built bundle contains 3,094 entries: 1,380 compiled `.class` patch files (847 under `app/morphe/patches/youtube/`, none from the excluded Music/Reddit sets), four extension DEX files (`extensions/all/versioncode/change-version-code.mpe`, `extensions/youtube.mpe`, `extensions/shared-youtube.mpe`, `extensions/shared.mpe`), patch resources/translations, and a `META-INF/MANIFEST.MF` declaring `Version: 1.48.0` and `Patcher-Version: 2.0.0`. `extensions/youtube.mpe` contains the Khmer voice-over client, confirming the local TTS change was compiled into the bundle.
+The current bundle contains 3,094 entries: 1,380 compiled `.class` patch files (847 under `app/morphe/patches/youtube/`, none from the excluded Music/Reddit sets), four extension DEX files (`extensions/all/versioncode/change-version-code.mpe`, `extensions/youtube.mpe`, `extensions/shared-youtube.mpe`, `extensions/shared.mpe`), patch resources/translations, and a `META-INF/MANIFEST.MF` declaring `Version: 1.48.1` and `Patcher-Version: 2.0.0`. The v1.48.1 rebuild only changed the `21.23.492` stability flag in `app/morphe/patches/youtube/shared/Constants.class`; entry/class counts are unchanged from v1.48.0. `extensions/youtube.mpe` contains the Khmer voice-over client, confirming the local TTS change was compiled into the bundle.
 
 ## Troubleshooting
 

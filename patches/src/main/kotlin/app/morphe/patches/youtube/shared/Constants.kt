@@ -33,9 +33,12 @@ internal object Constants {
                 isExperimental = true
             ),
             AppTarget(
+                // Promoted from experimental to stable by upstream v1.49.0-dev.7.
+                // Manager recommends the newest non-experimental target, so this
+                // must stay false for our bundle to recommend the same version.
                 version = "21.23.492", // Last version for Android 9.0
                 minSdk = 28,
-                isExperimental = true
+                isExperimental = false
             ),
             AppTarget(
                 version = "21.20.405",
