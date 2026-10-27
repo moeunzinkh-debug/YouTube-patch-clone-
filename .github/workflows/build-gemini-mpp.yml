@@ -2,13 +2,15 @@ name: Build standalone Gemini target bundle
 on:
   workflow_dispatch:
   push:
-    branches: [arena/b0221262-youtube-patch-clone]
+    branches: [main, 'arena/**']
     paths:
       - '.github/workflows/build-gemini-mpp.yml'
       - 'tools/gemini-apk/overlay/**'
       - 'tools/gemini-apk/prepare_build.py'
       - 'tools/gemini-apk/verify_patched.py'
       - 'tools/gemini-apk/verify_google.py'
+      - 'tools/gemini-apk/publish-bundle.sh'
+      - 'tools/gemini-apk/tests/**'
 permissions:
   contents: write
 concurrency:
@@ -19,17 +21,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v5
         with:
           repository: ryuya0124/gemini-microg-patches
           ref: cef25d12c71c33f555b52d8330c1ca886bf59ccc
           path: .gemini-build
           persist-credentials: false
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
+      - name: Test profile evidence
+        run: python3 -m unittest discover -s tools/gemini-apk/tests -v
       - name: Apply Gemini 345 profile overlay
         run: python3 tools/gemini-apk/prepare_build.py .gemini-build
       - name: Build pinned Gemini source in isolation
@@ -100,12 +106,5 @@ jobs:
           name: gemini-345-target-mpp-device-testing-pending
           path: bundles/gemini/
           retention-days: 14
-      - name: Save standalone build to session branch
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f bundles/gemini/gemini-target.mpp bundles/gemini/gemini-target.mpp.sha256 bundles/gemini/patch-list.txt bundles/gemini/patch-result.json bundles/gemini/validation.json bundles/gemini/google-patch-result.json bundles/gemini/google-validation.json bundles/gemini/bundle.mpp bundles/gemini/bundle.mpp.sha256
-          if ! git diff --cached --quiet; then
-            git commit -m 'build: standalone Gemini reference bundle (not target verified)'
-            git push origin HEAD:"${GITHUB_REF_NAME}"
-          fi
+      - name: Save standalone build to branch without force pushing
+        run: bash tools/gemini-apk/publish-bundle.sh
