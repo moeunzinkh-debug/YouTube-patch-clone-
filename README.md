@@ -15,8 +15,36 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - `patches-list.json`, filtered to 102 entries: 97 targeting YouTube and 5 generic entries without an app-specific target.
 - Khmer voice-over synthesis routed directly to the configured Takumi FastAPI Space; its route is discovered from FastAPI's `/openapi.json` at runtime.
 - Separate voice-over speed and pitch controls (0.5×–2×). The original YouTube player already has its own speed/pitch controls.
+- **Automatic YouTube version updates + phone-model analysis** in [`tools/version-advisor/`](tools/version-advisor/README.md): a catalog that refreshes itself from the upstream patch bundle (GitHub Action + server background refresh) and a bilingual (English/ខ្មែរ) advisor that recommends the YouTube version and APK variant that fit a user's phone. Current data: [`docs/youtube-versions.md`](docs/youtube-versions.md).
 
 `shared-youtube` is kept because YouTube uses it. Some helper code in that module is reusable by YouTube Music too, but **no separate YouTube Music patch module or patch package is included**. The YouTube app also has a patch that changes its own YouTube Music buttons; that remains part of the YouTube patch set.
+
+## Automatic version updates & phone-model analysis / ការធ្វើបច្ចុប្បន្នភាពដោយស្វ័យប្រវត្តិ
+
+**English.** `tools/version-advisor` keeps the supported YouTube version list current without manual edits. It reads this repo's `patches-list.json`, checks the newest upstream Morphe bundle through the GitHub API (ETag-cached), and writes [`data/supported-versions.json`](tools/version-advisor/data/supported-versions.json) plus [`docs/youtube-versions.md`](docs/youtube-versions.md). A GitHub Action runs every 6 hours, and the web server also refreshes itself in the background. It then analyses a phone (Android SDK level, CPU ABI, screen density, RAM) — detected from the browser, ADB, or a 69-model database — and explains which version is suitable, distinguishing the newest *experimental* build from the recommended *stable* one, including which APK variant (`nodpi`, ABI, density) to download.
+
+**ខ្មែរ។** `tools/version-advisor` ធ្វើបច្ចុប្បន្នភាពបញ្ជីកំណែ YouTube ដែលគាំទ្រដោយស្វ័យប្រវត្តិ ដោយអាន `patches-list.json` របស់ repository និងពិនិត្យកញ្ចប់ patch ចុងក្រោយពី upstream តាម GitHub API។ បន្ទាប់មកវាវិភាគទូរសព្ទរបស់អ្នកប្រើប្រាស់ (កម្រិត Android SDK, CPU ABI, ដង់ស៊ីតេអេក្រង់, RAM) ដែលរកឃើញពី browser, ADB ឬមូលដ្ឋានទិន្នន័យម៉ូដែលចំនួន ៦៩ ហើយប្រាប់ថាកំណែណាសាកសម — ដោយបែងចែកកំណែ «ពិសោធន៍» ថ្មីបំផុត និងកំណែ «ស្ថិរភាព» ដែលណែនាំ រួមទាំងប្រភេទ APK ដែលគួរទាញយក។
+
+```bash
+python3 tools/version-advisor/run.py update --write-docs
+python3 tools/version-advisor/run.py recommend --model "SM-A546B" --lang km
+python3 tools/version-advisor/run.py serve --host 0.0.0.0 --port 8000
+```
+
+The tool updates the **catalog**, not the Kotlin patch sources; adding a genuinely new target still needs a reviewed upstream source sync. See the [tool README](tools/version-advisor/README.md) for the full architecture and API.
+
+## Build `patch.mpp`
+
+`patch.mpp` at the repository root is the compiled **Morphe Patch Package** (JAR + extension DEX) built from these sources by `./gradlew :patches:buildAndroid`. It is what Morphe Desktop/Manager imports to patch an original YouTube APK — it is not an APK itself. Its SHA-256 is in `patch.mpp.sha256`.
+
+Because compilation needs JDK 21, Android SDK 36 and the Morphe GitHub Packages plugin, the build runs in [`.github/workflows/build-mpp.yml`](.github/workflows/build-mpp.yml) and publishes the bundle back to the branch. Locally:
+
+```bash
+./gradlew :patches:buildAndroid --no-daemon
+cp "$(ls patches/build/libs/patches-*.mpp | head -1)" patch.mpp
+```
+
+See [docs/building-mpp.md](docs/building-mpp.md) for prerequisites, tokens, CI usage and troubleshooting.
 
 ## What's excluded
 

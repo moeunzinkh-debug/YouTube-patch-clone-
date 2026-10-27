@@ -1,0 +1,52 @@
+name: Auto-update supported YouTube versions
+
+on:
+  schedule:
+    # Check upstream every 6 hours; the tool uses ETags, so unchanged checks
+    # make no commit and cost almost nothing.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'patches-list.json'
+      - 'tools/version-advisor/**'
+      - '.github/workflows/update-youtube-versions.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: youtube-version-catalog
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s tools/version-advisor/tests -v
+
+      - name: Refresh the version catalog from upstream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/version-advisor/run.py update --write-docs --json
+
+      - name: Commit generated catalog if it changed
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/version-advisor/data/supported-versions.json docs/youtube-versions.md
+          if git diff --cached --quiet; then
+            echo 'Catalog unchanged, nothing to commit.'
+          else
+            git commit -m 'chore: auto-update supported YouTube version catalog'
+            git push
+          fi

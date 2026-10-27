@@ -1,0 +1,1610 @@
+{
+  "schemaVersion": 1,
+  "note": "Indicative factory/major-upgrade specifications, used only to pre-fill the advisor. Users can override every field; ADB or browser detection is preferred when available.",
+  "fields": {
+    "sdk": "Android SDK / API level",
+    "abi": "CPU ABIs in priority order",
+    "density": "screen density bucket",
+    "dpi": "approximate DPI",
+    "ramGb": "typical RAM in GB",
+    "tags": "low-ram, go32 (Android Go / 32-bit), no-gms (no Google Play services)"
+  },
+  "devices": [
+    {
+      "id": "samsung-s24-ultra",
+      "brand": "Samsung",
+      "name": "Galaxy S24 Ultra",
+      "models": [
+        "SM-S928B",
+        "SM-S928U",
+        "SM-S928E"
+      ],
+      "aliases": [
+        "S24 Ultra"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 12,
+      "year": 2024,
+      "tags": []
+    },
+    {
+      "id": "samsung-s24",
+      "brand": "Samsung",
+      "name": "Galaxy S24",
+      "models": [
+        "SM-S921B",
+        "SM-S921U"
+      ],
+      "aliases": [
+        "S24"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2024,
+      "tags": []
+    },
+    {
+      "id": "samsung-s23-ultra",
+      "brand": "Samsung",
+      "name": "Galaxy S23 Ultra",
+      "models": [
+        "SM-S918B",
+        "SM-S918U"
+      ],
+      "aliases": [
+        "S23 Ultra"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 12,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-s23",
+      "brand": "Samsung",
+      "name": "Galaxy S23",
+      "models": [
+        "SM-S911B",
+        "SM-S911U"
+      ],
+      "aliases": [
+        "S23"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-s22-ultra",
+      "brand": "Samsung",
+      "name": "Galaxy S22 Ultra",
+      "models": [
+        "SM-S908B",
+        "SM-S908U"
+      ],
+      "aliases": [
+        "S22 Ultra"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 12,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "samsung-s21-fe",
+      "brand": "Samsung",
+      "name": "Galaxy S21 FE 5G",
+      "models": [
+        "SM-G990B",
+        "SM-G990E"
+      ],
+      "aliases": [
+        "S21 FE"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 420,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "samsung-a55",
+      "brand": "Samsung",
+      "name": "Galaxy A55 5G",
+      "models": [
+        "SM-A556B",
+        "SM-A556E"
+      ],
+      "aliases": [
+        "A55 5G",
+        "A55"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 8,
+      "year": 2024,
+      "tags": []
+    },
+    {
+      "id": "samsung-a54",
+      "brand": "Samsung",
+      "name": "Galaxy A54 5G",
+      "models": [
+        "SM-A546B",
+        "SM-A546E",
+        "SM-A5460"
+      ],
+      "aliases": [
+        "A54 5G",
+        "A54"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-a53",
+      "brand": "Samsung",
+      "name": "Galaxy A53 5G",
+      "models": [
+        "SM-A536B",
+        "SM-A536E"
+      ],
+      "aliases": [
+        "A53 5G",
+        "A53"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "samsung-a52",
+      "brand": "Samsung",
+      "name": "Galaxy A52",
+      "models": [
+        "SM-A525F",
+        "SM-A525M"
+      ],
+      "aliases": [
+        "A52"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 420,
+      "ramGb": 6,
+      "year": 2021,
+      "tags": []
+    },
+    {
+      "id": "samsung-a34",
+      "brand": "Samsung",
+      "name": "Galaxy A34 5G",
+      "models": [
+        "SM-A346B",
+        "SM-A346E"
+      ],
+      "aliases": [
+        "A34 5G",
+        "A34"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-a33",
+      "brand": "Samsung",
+      "name": "Galaxy A33 5G",
+      "models": [
+        "SM-A336B",
+        "SM-A336E"
+      ],
+      "aliases": [
+        "A33 5G",
+        "A33"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "samsung-a24",
+      "brand": "Samsung",
+      "name": "Galaxy A24",
+      "models": [
+        "SM-A245F",
+        "SM-A245M"
+      ],
+      "aliases": [
+        "A24"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-a23",
+      "brand": "Samsung",
+      "name": "Galaxy A23",
+      "models": [
+        "SM-A235F",
+        "SM-A235M"
+      ],
+      "aliases": [
+        "A23"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 420,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "samsung-a14-5g",
+      "brand": "Samsung",
+      "name": "Galaxy A14 5G",
+      "models": [
+        "SM-A146B",
+        "SM-A146U"
+      ],
+      "aliases": [
+        "A14 5G"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 4,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-a14",
+      "brand": "Samsung",
+      "name": "Galaxy A14",
+      "models": [
+        "SM-A145F",
+        "SM-A145R"
+      ],
+      "aliases": [
+        "A14 4G"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 4,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "samsung-a13",
+      "brand": "Samsung",
+      "name": "Galaxy A13",
+      "models": [
+        "SM-A135F",
+        "SM-A135U"
+      ],
+      "aliases": [
+        "A13"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "samsung-a12",
+      "brand": "Samsung",
+      "name": "Galaxy A12",
+      "models": [
+        "SM-A125F",
+        "SM-A125U"
+      ],
+      "aliases": [
+        "A12"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 4,
+      "year": 2020,
+      "tags": []
+    },
+    {
+      "id": "samsung-a10",
+      "brand": "Samsung",
+      "name": "Galaxy A10",
+      "models": [
+        "SM-A105F",
+        "SM-A105G"
+      ],
+      "aliases": [
+        "A10"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 2,
+      "year": 2019,
+      "tags": [
+        "low-ram"
+      ]
+    },
+    {
+      "id": "samsung-note10-plus",
+      "brand": "Samsung",
+      "name": "Galaxy Note 10+",
+      "models": [
+        "SM-N975F",
+        "SM-N975U"
+      ],
+      "aliases": [
+        "Note 10 Plus",
+        "Note10+"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 12,
+      "year": 2019,
+      "tags": []
+    },
+    {
+      "id": "samsung-s10",
+      "brand": "Samsung",
+      "name": "Galaxy S10",
+      "models": [
+        "SM-G973F",
+        "SM-G973U"
+      ],
+      "aliases": [
+        "S10"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 8,
+      "year": 2019,
+      "tags": []
+    },
+    {
+      "id": "samsung-s9",
+      "brand": "Samsung",
+      "name": "Galaxy S9",
+      "models": [
+        "SM-G960F",
+        "SM-G960U"
+      ],
+      "aliases": [
+        "S9"
+      ],
+      "android": "10",
+      "sdk": 29,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 4,
+      "year": 2018,
+      "tags": []
+    },
+    {
+      "id": "samsung-s8",
+      "brand": "Samsung",
+      "name": "Galaxy S8",
+      "models": [
+        "SM-G950F",
+        "SM-G950U"
+      ],
+      "aliases": [
+        "S8"
+      ],
+      "android": "9",
+      "sdk": 28,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 4,
+      "year": 2017,
+      "tags": []
+    },
+    {
+      "id": "samsung-j7-prime",
+      "brand": "Samsung",
+      "name": "Galaxy J7 Prime",
+      "models": [
+        "SM-G610F",
+        "SM-G610M"
+      ],
+      "aliases": [
+        "J7 Prime"
+      ],
+      "android": "8.1",
+      "sdk": 27,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 3,
+      "year": 2016,
+      "tags": [
+        "low-ram"
+      ]
+    },
+    {
+      "id": "xiaomi-13",
+      "brand": "Xiaomi",
+      "name": "Xiaomi 13",
+      "models": [
+        "2211133C",
+        "2211133G"
+      ],
+      "aliases": [
+        "Mi 13"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 12,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "xiaomi-12",
+      "brand": "Xiaomi",
+      "name": "Xiaomi 12",
+      "models": [
+        "2112123AC",
+        "2112123AG"
+      ],
+      "aliases": [
+        "Mi 12"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-13-pro",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 13 Pro 5G",
+      "models": [
+        "2312DRA50C",
+        "2312DRA50G"
+      ],
+      "aliases": [
+        "Note 13 Pro"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2024,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-13",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 13 4G",
+      "models": [
+        "23129RAA4G",
+        "23124RA7EO"
+      ],
+      "aliases": [
+        "Note 13"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 6,
+      "year": 2024,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-12-pro",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 12 Pro 5G",
+      "models": [
+        "22101316C",
+        "22101316G"
+      ],
+      "aliases": [
+        "Note 12 Pro"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 6,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-12",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 12 4G",
+      "models": [
+        "23021RAAEG",
+        "23021RAA2Y"
+      ],
+      "aliases": [
+        "Note 12"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 4,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-11-pro",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 11 Pro 5G",
+      "models": [
+        "21091116C",
+        "21091116G"
+      ],
+      "aliases": [
+        "Note 11 Pro"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-11",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 11",
+      "models": [
+        "2201117TY",
+        "2201117TL"
+      ],
+      "aliases": [
+        "Note 11"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-10-pro",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 10 Pro",
+      "models": [
+        "M2101K6G",
+        "M2101K6P"
+      ],
+      "aliases": [
+        "Note 10 Pro"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 6,
+      "year": 2021,
+      "tags": []
+    },
+    {
+      "id": "redmi-note-9-pro",
+      "brand": "Xiaomi",
+      "name": "Redmi Note 9 Pro",
+      "models": [
+        "M2003J6B2G",
+        "M2003J6A1R"
+      ],
+      "aliases": [
+        "Note 9 Pro"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2020,
+      "tags": []
+    },
+    {
+      "id": "redmi-9a",
+      "brand": "Xiaomi",
+      "name": "Redmi 9A",
+      "models": [
+        "M2006C3LG",
+        "M2006C3LII"
+      ],
+      "aliases": [
+        "Redmi 9A",
+        "9A"
+      ],
+      "android": "10",
+      "sdk": 29,
+      "abi": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 2,
+      "year": 2020,
+      "tags": [
+        "low-ram",
+        "go32"
+      ]
+    },
+    {
+      "id": "poco-x5-pro",
+      "brand": "Xiaomi",
+      "name": "POCO X5 Pro 5G",
+      "models": [
+        "22101320G",
+        "22101320C"
+      ],
+      "aliases": [
+        "X5 Pro"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "poco-m4-pro",
+      "brand": "Xiaomi",
+      "name": "POCO M4 Pro",
+      "models": [
+        "2201117PG",
+        "MZB0B5IN"
+      ],
+      "aliases": [
+        "M4 Pro"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "oppo-a78",
+      "brand": "OPPO",
+      "name": "OPPO A78 5G",
+      "models": [
+        "CPH2495",
+        "CPH2483"
+      ],
+      "aliases": [
+        "A78 5G"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "oppo-a77",
+      "brand": "OPPO",
+      "name": "OPPO A77",
+      "models": [
+        "CPH2385",
+        "CPH2369"
+      ],
+      "aliases": [
+        "A77"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 360,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "oppo-a57",
+      "brand": "OPPO",
+      "name": "OPPO A57",
+      "models": [
+        "CPH2387",
+        "CPH2339"
+      ],
+      "aliases": [
+        "A57"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "oppo-a54",
+      "brand": "OPPO",
+      "name": "OPPO A54",
+      "models": [
+        "CPH2239",
+        "CPH2235"
+      ],
+      "aliases": [
+        "A54"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2021,
+      "tags": []
+    },
+    {
+      "id": "oppo-a15",
+      "brand": "OPPO",
+      "name": "OPPO A15",
+      "models": [
+        "CPH2185",
+        "CPH2179"
+      ],
+      "aliases": [
+        "A15"
+      ],
+      "android": "10",
+      "sdk": 29,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 3,
+      "year": 2020,
+      "tags": [
+        "low-ram"
+      ]
+    },
+    {
+      "id": "oppo-reno8",
+      "brand": "OPPO",
+      "name": "OPPO Reno8 5G",
+      "models": [
+        "CPH2359"
+      ],
+      "aliases": [
+        "Reno 8"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "oppo-reno7",
+      "brand": "OPPO",
+      "name": "OPPO Reno7 5G",
+      "models": [
+        "PFDM00",
+        "PHU110"
+      ],
+      "aliases": [
+        "Reno 7"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "vivo-y27",
+      "brand": "vivo",
+      "name": "vivo Y27",
+      "models": [
+        "V2249"
+      ],
+      "aliases": [
+        "Y27"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 6,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "vivo-y22",
+      "brand": "vivo",
+      "name": "vivo Y22",
+      "models": [
+        "V2207"
+      ],
+      "aliases": [
+        "Y22"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "vivo-y21",
+      "brand": "vivo",
+      "name": "vivo Y21",
+      "models": [
+        "V2111",
+        "V2128"
+      ],
+      "aliases": [
+        "Y21"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2021,
+      "tags": []
+    },
+    {
+      "id": "vivo-y16",
+      "brand": "vivo",
+      "name": "vivo Y16",
+      "models": [
+        "V2204",
+        "V2214"
+      ],
+      "aliases": [
+        "Y16"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "vivo-v25-pro",
+      "brand": "vivo",
+      "name": "vivo V25 Pro",
+      "models": [
+        "V2158"
+      ],
+      "aliases": [
+        "V25 Pro"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "realme-c55",
+      "brand": "realme",
+      "name": "realme C55",
+      "models": [
+        "RMX3710"
+      ],
+      "aliases": [
+        "C55"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 6,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "realme-c33",
+      "brand": "realme",
+      "name": "realme C33",
+      "models": [
+        "RMX3624"
+      ],
+      "aliases": [
+        "C33"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "realme-c31",
+      "brand": "realme",
+      "name": "realme C31",
+      "models": [
+        "RMX3501"
+      ],
+      "aliases": [
+        "C31"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 4,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "realme-10-pro",
+      "brand": "realme",
+      "name": "realme 10 Pro 5G",
+      "models": [
+        "RMX3660",
+        "RMX3663"
+      ],
+      "aliases": [
+        "10 Pro"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "realme-9-pro-plus",
+      "brand": "realme",
+      "name": "realme 9 Pro+",
+      "models": [
+        "RMX3392",
+        "RMX3393"
+      ],
+      "aliases": [
+        "9 Pro Plus"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 450,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "tecno-camon-20",
+      "brand": "TECNO",
+      "name": "TECNO Camon 20",
+      "models": [
+        "CK6n"
+      ],
+      "aliases": [
+        "Camon 20"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "tecno-spark-10-pro",
+      "brand": "TECNO",
+      "name": "TECNO Spark 10 Pro",
+      "models": [
+        "KI7"
+      ],
+      "aliases": [
+        "Spark 10 Pro"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 440,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "infinix-note-30",
+      "brand": "Infinix",
+      "name": "Infinix Note 30",
+      "models": [
+        "X6831"
+      ],
+      "aliases": [
+        "Note 30"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "infinix-hot-20",
+      "brand": "Infinix",
+      "name": "Infinix Hot 20",
+      "models": [
+        "X6826C"
+      ],
+      "aliases": [
+        "Hot 20"
+      ],
+      "android": "12",
+      "sdk": 31,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "itel-a70",
+      "brand": "itel",
+      "name": "itel A70",
+      "models": [
+        "A665L"
+      ],
+      "aliases": [
+        "A70"
+      ],
+      "android": "13",
+      "sdk": 33,
+      "abi": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 3,
+      "year": 2023,
+      "tags": [
+        "low-ram",
+        "go32"
+      ]
+    },
+    {
+      "id": "huawei-p30-pro",
+      "brand": "Huawei",
+      "name": "Huawei P30 Pro",
+      "models": [
+        "VOG-L29",
+        "VOG-L09"
+      ],
+      "aliases": [
+        "P30 Pro"
+      ],
+      "android": "10",
+      "sdk": 29,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 440,
+      "ramGb": 8,
+      "year": 2019,
+      "tags": [
+        "no-gms"
+      ]
+    },
+    {
+      "id": "huawei-nova-7i",
+      "brand": "Huawei",
+      "name": "Huawei nova 7i",
+      "models": [
+        "JNY-LX1",
+        "JNY-L21"
+      ],
+      "aliases": [
+        "Nova 7i"
+      ],
+      "android": "10",
+      "sdk": 29,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 420,
+      "ramGb": 8,
+      "year": 2020,
+      "tags": [
+        "no-gms"
+      ]
+    },
+    {
+      "id": "pixel-8-pro",
+      "brand": "Google",
+      "name": "Pixel 8 Pro",
+      "models": [
+        "GC3VE",
+        "G1MNW"
+      ],
+      "aliases": [
+        "Pixel 8 Pro"
+      ],
+      "android": "15",
+      "sdk": 35,
+      "abi": [
+        "arm64-v8a"
+      ],
+      "density": "xxxhdpi",
+      "dpi": 560,
+      "ramGb": 12,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "pixel-7",
+      "brand": "Google",
+      "name": "Pixel 7",
+      "models": [
+        "GVU6C",
+        "GQML3"
+      ],
+      "aliases": [
+        "Pixel 7"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "pixel-6a",
+      "brand": "Google",
+      "name": "Pixel 6a",
+      "models": [
+        "GX7AS",
+        "GB62Z"
+      ],
+      "aliases": [
+        "Pixel 6a"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 6,
+      "year": 2022,
+      "tags": []
+    },
+    {
+      "id": "pixel-5",
+      "brand": "Google",
+      "name": "Pixel 5",
+      "models": [
+        "GD1YQ",
+        "GTT9Q"
+      ],
+      "aliases": [
+        "Pixel 5"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2020,
+      "tags": []
+    },
+    {
+      "id": "oneplus-nord-ce3",
+      "brand": "OnePlus",
+      "name": "OnePlus Nord CE 3 Lite",
+      "models": [
+        "CPH2467",
+        "CPH2465"
+      ],
+      "aliases": [
+        "Nord CE 3 Lite"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 420,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "motorola-g84",
+      "brand": "Motorola",
+      "name": "Moto G84 5G",
+      "models": [
+        "XT2347-1"
+      ],
+      "aliases": [
+        "Moto G84"
+      ],
+      "android": "14",
+      "sdk": 34,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xxhdpi",
+      "dpi": 480,
+      "ramGb": 8,
+      "year": 2023,
+      "tags": []
+    },
+    {
+      "id": "generic-android-go",
+      "brand": "Other",
+      "name": "Generic Android Go phone",
+      "models": [],
+      "aliases": [
+        "Android Go",
+        "Go Edition"
+      ],
+      "android": "11",
+      "sdk": 30,
+      "abi": [
+        "armeabi-v7a",
+        "arm64-v8a"
+      ],
+      "density": "hdpi",
+      "dpi": 280,
+      "ramGb": 2,
+      "year": 2021,
+      "tags": [
+        "low-ram",
+        "go32"
+      ]
+    },
+    {
+      "id": "generic-old-android",
+      "brand": "Other",
+      "name": "Older Android phone (Android 8)",
+      "models": [],
+      "aliases": [
+        "Android 8",
+        "Oreo"
+      ],
+      "android": "8.0",
+      "sdk": 26,
+      "abi": [
+        "arm64-v8a",
+        "armeabi-v7a"
+      ],
+      "density": "xhdpi",
+      "dpi": 320,
+      "ramGb": 3,
+      "year": 2018,
+      "tags": [
+        "low-ram"
+      ]
+    }
+  ]
+}

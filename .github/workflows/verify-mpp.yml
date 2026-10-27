@@ -1,0 +1,32 @@
+name: Verify patch.mpp
+
+on:
+  pull_request:
+    paths:
+      - 'patch.mpp'
+      - 'patch.mpp.sha256'
+      - '.github/scripts/verify-mpp.py'
+      - '.github/workflows/verify-mpp.yml'
+  push:
+    branches:
+      - arena/a06798d3-youtube-patch-clone
+    paths:
+      - 'patch.mpp'
+      - 'patch.mpp.sha256'
+      - '.github/scripts/verify-mpp.py'
+      - '.github/workflows/verify-mpp.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Validate compiled bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify checksum, manifest, patch classes and extension DEX
+        run: python3 .github/scripts/verify-mpp.py
