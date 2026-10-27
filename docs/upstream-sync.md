@@ -1,18 +1,18 @@
 # Upstream sync report — YouTube only / របាយការណ៍ sync ពី upstream
 
 > Compared on 2026-10-27 against [MorpheApp/morphe-patches](https://github.com/MorpheApp/morphe-patches).
-> This report describes **what upstream added**; it does **not** mean the new patch code is already in this repo.
+> The comparison was done on 2026-10-27 and the 9 new patches are now implemented (see the «Implemented» section below).
 
 ## Current state of this repository
 
 | Item | Value |
 | --- | --- |
-| Upstream base | **v1.47.0**, commit `e5464395441e916b643af4e2175c4e253e6df487` (2026-10-11) |
-| Manifest | `patches-list.json` v1.47.0 — **102 patches** (97 YouTube + 5 generic) |
-| YouTube targets | 9 (`21.40.161` … `20.21.37`) |
-| Build | `gradle.properties` `version = 1.47.0`, Patcher **1.14.0**, patches-library `1.9.0-dev.4` |
-| Bundle | `patch.mpp` declares `Version: 1.47.0`, `Patcher-Version: 1.14.0` |
-| Local customisations | Khmer voice-over TTS (`voiceovertranslation/*`, `KhmerTtsClient.java`, `Settings.java`, Khmer strings), YouTube-only resource checker, filtered manifest/settings |
+| Upstream base now | **v1.48.0**, commit `a5662d30d3` (2026-10-22); originally v1.47.0 `e5464395` (2026-10-11) |
+| Manifest | `patches-list.json` v1.48.0 — **110 patches** (105 YouTube + 5 generic) |
+| YouTube targets | 8 (`21.42.241`, `21.41.525`, `21.28.208`, `21.23.492`, `21.20.405`, `21.16.256`, `20.51.39`, `20.21.37`) |
+| Build | `gradle.properties` `version = 1.48.0`, Patcher **2.0.0**, patches-library `2.0.0` |
+| Bundle | `patch.mpp` declares `Version: 1.48.0`, `Patcher-Version: 2.0.0` (10,282,433 bytes) |
+| Local customisations preserved | Khmer voice-over TTS (`voiceovertranslation/*`, `KhmerTtsClient.java`, `Settings.java`, Khmer strings), YouTube-only resource checker, fork metadata |
 
 Only the YouTube patch set is kept — the YouTube Music and Reddit modules are excluded. This stays true for any sync.
 
@@ -56,7 +56,7 @@ The advisor catalog is already refreshed: see [youtube-versions.md](youtube-vers
 
 ## ⚠️ Build-system change: Patcher 2.0
 
-v1.48.0 migrates to `morphe-patcher 2.0.0` / `morphe-patches-library 2.0.0` (from `1.14.0` / `1.9.0-dev.4`), bumps smali, adds the `org.gradle.toolchains.foojay-resolver-convention` plugin and pins a Java 17 toolchain in `patches/build.gradle.kts`. A rebuilt `patch.mpp` would declare `Patcher-Version: 2.0.0`, so users need a Manager/Patcher that supports it. Copying only the new patch files into a v1.47.0 build would **not compile** — the new patches use new Patcher APIs (`Match`, `BytecodePatchContext`, extra `InstructionLocation` values) and updated shared fingerprints.
+v1.48.0 migrates to `morphe-patcher 2.0.0` / `morphe-patches-library 2.0.0` (from `1.14.0` / `1.9.0-dev.4`), bumps smali, adds the `org.gradle.toolchains.foojay-resolver-convention` plugin and pins a Java 17 toolchain in `patches/build.gradle.kts`. **This migration is now applied here**, so `patch.mpp` declares `Patcher-Version: 2.0.0` and users need a Manager/Patcher that supports it. Copying only the 9 new patch files into a v1.47.0 build did **not** compile (CI runs `40481673934`, `40483664233`, `40484525293`): the new patches rely on new Patcher APIs, new library methods, generated protobuf classes and updated shared fingerprints.
 
 ## Scale of the source sync (YouTube-relevant paths only)
 

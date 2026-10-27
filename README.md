@@ -7,7 +7,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 > កំណត់សម្គាល់៖ យកតែផ្នែក YouTube ប៉ុណ្ណោះ។ ឯកសារ shared ដែលចាំបាច់សម្រាប់ YouTube នៅតែមាន ប៉ុន្តែមិនបានដាក់ patch set របស់ YouTube Music ឬ Reddit ទេ។
 
 [![Release](https://img.shields.io/badge/release-v1.48.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.48.0)
-[![patch.mpp](https://img.shields.io/badge/patch.mpp-8.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.0/patch.mpp)
+[![patch.mpp](https://img.shields.io/badge/patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.0/patch.mpp)
 [![YouTube stable](https://img.shields.io/badge/YouTube%20stable-21.20.405-14835b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.20.405)
 [![YouTube latest](https://img.shields.io/badge/YouTube%20latest-21.42.241-a8650b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.42.241)
 [![Upstream](https://img.shields.io/badge/upstream-v1.48.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.48.0)
