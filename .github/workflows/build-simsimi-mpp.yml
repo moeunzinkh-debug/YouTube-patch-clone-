@@ -53,6 +53,16 @@ jobs:
           if test -n "$jar"; then
             javap -classpath "$jar" app.morphe.patcher.patch.BytecodePatchContext | grep -E 'classDefForEach|getAllClasses|classDefBy|ClassDefs|Classes' | while IFS= read -r line; do echo "::notice::$line"; done
           fi
+      - uses: actions/checkout@v5
+        with:
+          repository: P1sec/hermes-dec
+          ref: 2e796663e1fedb93dca51060797ebf3327b3fedb
+          path: .cache/simsimi-hermes
+          persist-credentials: false
+      - name: Decode actual patched Hermes instructions and preserve server data
+        run: |
+          python3 -m pip install ./.cache/simsimi-hermes
+          python3 tools/simsimi/verify_feature_hbc.py /tmp/simsimi-input/original.hbc /tmp/simsimi-input/patched.hbc.features
       - name: Collect only the separate experimental bundle
         run: |
           mkdir -p bundles/simsimi
