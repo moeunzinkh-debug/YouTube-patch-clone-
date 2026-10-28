@@ -1,0 +1,33 @@
+name: Inspect original SimSimi APK
+on:
+  push:
+    branches: [arena/e2b734f8-youtube-patch-clone]
+    paths: ['.github/workflows/inspect-simsimi.yml', 'tools/simsimi/inspect_apk.py']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download original release asset and inspect without modifying
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python -m pip install 'androguard==4.1.3'
+          mkdir -p /tmp/simsimi-input
+          gh release download Simsimi --pattern base.2.apk --dir /tmp/simsimi-input
+          python tools/simsimi/inspect_apk.py /tmp/simsimi-input/base.2.apk docs/simsimi/apk-inventory.json
+      - name: Save small inventory only (never commit the APK)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/simsimi/apk-inventory.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'docs: record original SimSimi APK static inventory [skip ci]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "$GITHUB_REF_NAME"
