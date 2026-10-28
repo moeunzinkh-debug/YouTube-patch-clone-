@@ -203,3 +203,16 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 ## Upstream sync / ការធ្វើបច្ចុប្បន្នភាពពី upstream
 
 This fork is synced to the **YouTube-only source of upstream v1.48.0** (bundle release `v1.48.1`) and includes the **9 new YouTube patches** (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay) — see the «New in v1.48.0» group above. Those 9 are the net new features; to compile them the shared YouTube patch/extension sources had to be aligned with v1.48.0 (morphe-patcher 2.0.0), while our Khmer TTS package, Khmer strings, YouTube-only resource checker and fork metadata were preserved. **No YouTube Music or Reddit patches are included.** See [`docs/upstream-sync.md`](docs/upstream-sync.md) for the full comparison, the v1.49.0-dev.7 additions and the supported YouTube versions. **Recommended YouTube target: `21.23.492`** — the same as upstream (Manager recommends the newest non-experimental target; `21.23.492` was promoted to stable upstream in v1.49.0-dev.7).
+
+## New: in-app Audio equalizer (local 1.48.2)
+
+The branch's [`patch.mpp`](patch.mpp) includes **Audio equalizer** with device-supported
+band sliders, hardware presets, enable/disable and reset to flat. Select the patch,
+then open **Morphe settings → Video → Audio equalizer** while a video is playing.
+Settings persist across sessions; unsupported audio engines show a status instead
+of intentionally stopping playback. It does not process remote/cast audio.
+
+[EQ usage and limitations](docs/youtube-equalizer.md). CI compilation and controller
+tests passed; APK/device listening tests remain pending. Release badges/source
+descriptor still point to published **1.48.1**; import this branch's new bundle to
+try **1.48.2**. No new release has been published by this change.

@@ -29,3 +29,12 @@ APK patching and listening tests remain required.
 `patches-list.json`/Gradle describe the local 1.48.2 development bundle. The source
 release descriptor remains pinned to published 1.48.1 until a separate release is
 created; importing the new local patch.mpp is required to try this feature.
+
+## Build evidence
+
+Actions run **40624052185** passed, including 18 controller checks using test
+doubles and the real extension source. The resulting bundle manifest declares
+1.48.2 / Patcher 2.0.0. Local verification checked bundle SHA-256, the compiled
+EqualizerPatchKt, and EqualizerPreference/Android audiofx code in youtube.mpe.
+Existing Khmer voice-over DEX checks still pass. No audible hardware validation
+or APK fingerprint match is claimed from these compilation checks alone.
