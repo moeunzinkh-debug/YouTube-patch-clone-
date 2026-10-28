@@ -1,5 +1,7 @@
 package app.morphe.extension.youtube.settings.preference;
 
+import static app.morphe.extension.shared.StringRef.str;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.preference.Preference;
@@ -38,7 +40,7 @@ public class EqualizerPreference extends Preference {
         content.removeAllViews();
         Context context = getContext();
         Switch enabled = new Switch(context);
-        enabled.setText("Enable equalizer");
+        enabled.setText(str("morphe_equalizer_enable"));
         enabled.setChecked(EqualizerPatch.isEnabled());
         content.addView(enabled);
         enabled.setOnCheckedChangeListener((button, checked) -> {
@@ -76,18 +78,18 @@ public class EqualizerPreference extends Preference {
             });
         }
         Button presets = new Button(context);
-        presets.setText("Presets");
+        presets.setText(str("morphe_equalizer_presets"));
         final String[] names = EqualizerPatch.presets();
         presets.setEnabled(names.length > 0);
-        presets.setOnClickListener(v -> new AlertDialog.Builder(context).setTitle("EQ presets")
+        presets.setOnClickListener(v -> new AlertDialog.Builder(context).setTitle(str("morphe_equalizer_presets"))
                 .setItems(names, (dialog, index) -> { EqualizerPatch.usePreset(index); render(content); }).show());
         content.addView(presets);
         Button reset = new Button(context);
-        reset.setText("Reset to flat");
+        reset.setText(str("morphe_equalizer_reset"));
         reset.setOnClickListener(v -> { EqualizerPatch.reset(); render(content); });
         content.addView(reset);
         Button refresh = new Button(context);
-        refresh.setText("Refresh audio session");
+        refresh.setText(str("morphe_equalizer_refresh"));
         refresh.setOnClickListener(v -> { EqualizerPatch.setEnabled(EqualizerPatch.isEnabled()); render(content); });
         content.addView(refresh);
     }

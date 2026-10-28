@@ -19,11 +19,11 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 <!-- PATCH-LIST:START -->
 <details>
-<summary>📦 YouTube • 105 patches</summary>
+<summary>📦 YouTube • 106 patches</summary>
 
 ### YouTube Patches
 
-និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 110 patches ពី [`patches-list.json`](patches-list.json) v1.48.1 (105 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
+និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 111 patches ពី [`patches-list.json`](patches-list.json) v1.48.2 (106 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
 
 **ឧទាហរណ៍ / Highlights**
 
@@ -78,8 +78,9 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 </details>
 
 <details>
-<summary>▶️ ការចាក់វីដេអូ / Playback & video • 22</summary>
+<summary>▶️ ការចាក់វីដេអូ / Playback & video • 23</summary>
 
+- `Audio equalizer`
 - `Captions`
 - `Double tap to seek`
 - `Exit fullscreen mode`

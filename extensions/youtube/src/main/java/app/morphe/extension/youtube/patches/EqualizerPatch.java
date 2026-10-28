@@ -1,5 +1,7 @@
 package app.morphe.extension.youtube.patches;
 
+import static app.morphe.extension.shared.StringRef.str;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.audiofx.Equalizer;
@@ -23,10 +25,12 @@ public final class EqualizerPatch {
     }
 
     public static synchronized void onAudioSessionId(int id) {
-        if (id == session && effect != null) return;
-        if (id != session) release();
-        session = id;
-        apply();
+        try {
+            if (id == session && effect != null) return;
+            if (id != session) release();
+            session = id;
+            apply();
+        } catch (RuntimeException ex) { failed(ex); }
     }
 
     public static synchronized void setEnabled(boolean enabled) {
@@ -43,7 +47,7 @@ public final class EqualizerPatch {
         try {
             if (effect == null) effect = new Equalizer(0, session);
             if (!effect.hasControl()) {
-                failure = "Another app controls the audio equalizer.";
+                failure = str("morphe_equalizer_control_lost");
                 release();
                 return;
             }
@@ -52,7 +56,9 @@ public final class EqualizerPatch {
                 int level = prefs().getInt(key(band), 0);
                 effect.setBandLevel(band, (short) Math.max(range[0], Math.min(range[1], level)));
             }
-            effect.setEnabled(true);
+            if (effect.setEnabled(true) != android.media.audiofx.AudioEffect.SUCCESS) {
+                throw new IllegalStateException("EQ engine did not enable");
+            }
         } catch (RuntimeException ex) {
             failed(ex);
         }
@@ -71,16 +77,16 @@ public final class EqualizerPatch {
     }
 
     private static void failed(RuntimeException ex) {
-        failure = "Equalizer unavailable on this audio session/device.";
+        failure = str("morphe_equalizer_unavailable");
         Logger.printException(() -> "YouTube equalizer unavailable", ex);
         release();
     }
 
     public static synchronized String status() {
         if (!failure.isEmpty()) return failure;
-        if (!isEnabled()) return "Equalizer is off.";
-        if (effect == null) return "Play a video, then reopen Equalizer to attach to its audio session.";
-        return "Applied to YouTube audio. Positive gain may distort; start at low volume.";
+        if (!isEnabled()) return str("morphe_equalizer_off");
+        if (effect == null) return str("morphe_equalizer_no_session");
+        return str("morphe_equalizer_active");
     }
 
     /** A UI snapshot, rather than exposing an AudioEffect across threads. */
@@ -103,7 +109,12 @@ public final class EqualizerPatch {
     public static synchronized boolean setBand(int band, int millibels) {
         if (effect == null) return false;
         try {
-            if (!effect.hasControl() || band < 0 || band >= effect.getNumberOfBands()) return false;
+            if (!effect.hasControl()) {
+                failure = str("morphe_equalizer_control_lost");
+                release();
+                return false;
+            }
+            if (band < 0 || band >= effect.getNumberOfBands()) return false;
             short[] range = effect.getBandLevelRange();
             short level = (short) Math.max(range[0], Math.min(range[1], millibels));
             effect.setBandLevel((short) band, level);

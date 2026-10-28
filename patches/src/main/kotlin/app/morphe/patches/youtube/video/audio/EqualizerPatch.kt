@@ -40,6 +40,7 @@ val equalizerPatch = bytecodePatch(
         PreferenceScreen.VIDEO.addPreferences(
             NonInteractivePreference(
                 key = "morphe_equalizer",
+                selectable = true,
                 tag = "app.morphe.extension.youtube.settings.preference.EqualizerPreference"
             )
         )
