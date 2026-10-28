@@ -44,7 +44,7 @@ val microGServicePatch = bytecodePatch(
     dependsOn(microGVisibilityPatch)
     execute {
         var replacements = 0
-        getAllClassesWithString("com.google.android.gms").forEach { clazz ->
+        classDefByStrings("com.google.android.gms").forEach { clazz ->
             clazz.methods.forEach methodLoop@ { original ->
                 val instructions = original.implementation?.instructions?.toList() ?: return@methodLoop
                 val indices = instructions.withIndex().filter { (_, instruction) ->
