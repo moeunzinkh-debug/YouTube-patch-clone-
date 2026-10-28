@@ -2,7 +2,7 @@
 
 This is an **experimental overlay**, not the upstream release. `apply_overlay.py` first verifies the 913-file upstream `extras/gboard-patches/` tree, then creates a temporary copy and adds the files in `overlay/`. It admits one additional opt-in Morphe patch while retaining the 43 upstream registrations and explicitly registers its runtime ABI calls. It never modifies the pinned source tree or the upstream MPP. The source is GPL v3; see the upstream [LICENSE](../../extras/gboard-patches/LICENSE), [NOTICE](../../extras/gboard-patches/NOTICE), and original project [Gboard-patches](https://github.com/jasonwu1994/Gboard-patches).
 
-Target: **only** `com.google.android.inputmethod.latin`, version name `18.5.4.993608717-release-arm64-v8a`, version code `176049702`. The patch validates the exact native provider, request, callback, method prototypes and selected bytecode references before rewriting. Matching signatures are not proof that a different APK is safe or that the Android runtime works.
+Target: **only** `com.google.android.inputmethod.latin`, version name `18.5.4.993608717-release-arm64-v8a`, version code `176049702`. The patch validates the exact native provider, request, callback, method prototypes and selected bytecode references before rewriting. Matching signatures are not proof that a different APK is safe or that the Android runtime works. An initial `dev.1` build was withdrawn after an illegal cross-class private-field read was found; `dev.2` uses an accessor inside the owning class and the CI fixture verifies that the readiness hook no longer reads the private field directly.
 
 ## What changes
 
