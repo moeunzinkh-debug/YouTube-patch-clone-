@@ -159,3 +159,58 @@ jobs:
             /tmp/gboard-extension-tests.log
             /tmp/gboard-source/patches/build/test-results/test/*.xml
             /tmp/gboard-source/extensions/*/build/test-results/**/*.xml
+
+  publish-approved-release:
+    # Deliberately requires the explicit release marker on this session branch;
+    # ordinary source changes or a PR do not create or replace a release.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/arena/bed34f3a-youtube-patch-clone' && contains(github.event.head_commit.message, '[gboard-release]')
+    needs: [mirror-and-load, build-from-upstream-source]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Verify release inputs and refuse an existing tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 tools/gboard/verify_bundle.py --verify-vendor
+          python3 tools/gboard/test_verification.py
+          git fetch --no-tags origin '+refs/heads/arena/bed34f3a-youtube-patch-clone:refs/remotes/origin/arena/bed34f3a-youtube-patch-clone'
+          git merge-base --is-ancestor "$GITHUB_SHA" "origin/arena/bed34f3a-youtube-patch-clone"
+          existing="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/Gboard-v4.0.0" --jq '[.[] | select(.ref == "refs/tags/Gboard-v4.0.0")] | length')"
+          test "$existing" = 0 || { echo '::error::Gboard-v4.0.0 already exists; refusing to replace it.'; exit 1; }
+      - name: Publish the separately named Gboard pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest_before="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)"
+          gh release create Gboard-v4.0.0 \
+            bundles/gboard/gboard-patches-4.0.0.mpp \
+            bundles/gboard/gboard-patches-4.0.0.mpp.sha256 \
+            bundles/gboard/patches-list.json \
+            bundles/gboard/morphe-validation.json \
+            --target "$GITHUB_SHA" --title 'Gboard patches v4.0.0' \
+            --notes-file bundles/gboard/RELEASE_NOTES.md --prerelease --latest=false
+          latest_after="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)"
+          test "$latest_before" = "$latest_after" || { echo '::error::Existing latest release changed.'; exit 1; }
+          tag_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/Gboard-v4.0.0" --jq .object.sha)"
+          test "$tag_sha" = "$GITHUB_SHA" || { echo '::error::Release tag points to the wrong commit.'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/contents/bundles/gboard/patches-bundle.json?ref=Gboard-v4.0.0" --jq .content | base64 --decode > /tmp/gboard-released-source.json
+          cmp bundles/gboard/patches-bundle.json /tmp/gboard-released-source.json
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/Gboard-v4.0.0" > /tmp/gboard-release.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          release = json.loads(Path('/tmp/gboard-release.json').read_text())
+          assert release['tag_name'] == 'Gboard-v4.0.0' and release['prerelease'] and not release['draft']
+          mpps = [asset for asset in release['assets'] if asset['name'].endswith('.mpp')]
+          assert len(mpps) == 1 and mpps[0]['name'] == 'gboard-patches-4.0.0.mpp'
+          assert mpps[0]['size'] == 8186810
+          assert mpps[0]['digest'] == 'sha256:fadf54bea20f337a03baddf2bd294c86d254a744456c6e53ee13f4ad25a58716'
+          print('Published release asset, pinned source, tag target, and unchanged latest release verified')
+          PY

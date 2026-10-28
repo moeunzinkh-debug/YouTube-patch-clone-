@@ -91,6 +91,8 @@ def verify_asset(path: Path) -> dict:
         entries = archive.namelist()
         check("META-INF/MANIFEST.MF" in entries, "Missing bundle manifest")
         check(any(name.endswith(".class") for name in entries), "No compiled patch classes in MPP")
+        for entry in ("classes.dex", "extensions/gboard-calculator.rve", "extensions/gboard-patches.rve"):
+            check(entry in entries and archive.getinfo(entry).file_size > 0, f"Missing embedded payload: {entry}")
         manifest = archive.read("META-INF/MANIFEST.MF").decode("utf-8", errors="replace")
         fields = dict(line.split(": ", 1) for line in manifest.splitlines() if ": " in line)
         check(fields.get("Version") == EXPECTED_VERSION, "Unexpected MPP manifest version")

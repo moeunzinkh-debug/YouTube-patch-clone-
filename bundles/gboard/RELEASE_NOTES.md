@@ -6,6 +6,7 @@ Release នេះចម្លង `.mpp` **មិនកែប្រែ** ពី [
 - **Patches:** 43; upstream ជ្រើសទាំង 43 ជាមុន។ [បញ្ជី និងការពន្យល់ជាភាសាខ្មែរ](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/blob/Gboard-v4.0.0/README.md#gboard-patches)។
 - **របៀបប្រើ:** ទាញយក `gboard-patches-4.0.0.mpp` → Morphe Manager → Sources → Add patch source → Local → ជ្រើសឯកសារ → ជ្រើស Gboard APK ដើមកំណែត្រូវគ្នា និងពិនិត្យ patches មុន patch។ [ការណែនាំលម្អិត និង remote source](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/blob/Gboard-v4.0.0/bundles/gboard/README.md)។
 - **SHA-256:** `fadf54bea20f337a03baddf2bd294c86d254a744456c6e53ee13f4ad25a58716`។
+- **ការតេស្ត:** [CI 40682977906](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40682977906) បាន build source, រត់ upstream unit tests និង load បញ្ជី patches ដោយ Morphe Desktop។ វាមិនមែនជាការសាកល្បង APK ឬទូរស័ព្ទទេ។
 
 **សូមប្រុងប្រយ័ត្ន៖** FTP/Web Clipboard, JavaScript និង signature bypass អាចប៉ះពាល់សុវត្ថិភាព ឬទិន្នន័យ។ ពិនិត្យមុខងារដែលជ្រើស និងរក្សា keyboard មួយផ្សេងទៀតទុកជាបម្រុង។ OCR របស់ upstream មិនបានរាយភាសាខ្មែរ។
 
