@@ -26,4 +26,4 @@ cd /tmp/gboard-direct-source
 ./gradlew :extensions:extension:testDebugUnitTest --tests '*directtranslate.*' --no-daemon
 ```
 
-This fork is not a new GitHub Release and does not replace `Gboard-v4.0.0`, the original upstream bundle, YouTube or SimSimi.
+The fork is distributed separately as the experimental [Gboard Direct Translate dev.2 pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-Direct-Translate-v4.0.0-dev.2). It does not replace `Gboard-v4.0.0`, the original upstream bundle, YouTube or SimSimi.
