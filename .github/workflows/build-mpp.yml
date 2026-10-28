@@ -17,6 +17,7 @@ on:
       - arena/b0a07006-youtube-patch-clone
       - arena/222850af-youtube-patch-clone
       - arena/2100d05e-youtube-patch-clone
+      - arena/0c8d70a1-youtube-patch-clone
     paths:
       - 'patches/**'
       - 'extensions/**'
