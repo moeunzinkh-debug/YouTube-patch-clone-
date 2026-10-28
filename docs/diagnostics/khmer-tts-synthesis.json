@@ -1,0 +1,26 @@
+{
+  "method": "POST",
+  "url": "https://takumi0002-tts-kh.hf.space/api/process-multi",
+  "request_fields": {
+    "data": "[{\"text\": \"សួស្តី នេះជាការសាកល្បងសំឡេង។\", \"voiceName\": \"piseth\", \"speed\": 1.0, \"pitch\": 0}]",
+    "autoSpeed": "false"
+  },
+  "status": 200,
+  "content_type": "audio/mpeg",
+  "received_bytes": 13004,
+  "audio_probe_exit_code": 0,
+  "audio_probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "mp3",
+        "sample_rate": "24000"
+      }
+    ],
+    "format": {
+      "format_name": "mp3",
+      "duration": "3.192000"
+    }
+  },
+  "sha256": "5c2f1325ff966998f8fdfc120330111b439e647b97607ee4f819a7d59bdb0314"
+}
