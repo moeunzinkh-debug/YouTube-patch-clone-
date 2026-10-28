@@ -1,4 +1,4 @@
-# Gemini + Google standalone bundle — local 0.1.3
+# Gemini + Google standalone bundle — local 0.1.4
 
 Use **`bundle.mpp`** (identical to `gemini-target.mpp`) for:
 
@@ -14,7 +14,7 @@ are present or that an APK installs/launches on a phone.
 
 ## Manager / patching
 
-1. Import `bundle.mpp`; ensure the source version is **0.1.3**, not 0.1.1/0.1.2.
+1. Import `bundle.mpp`; ensure the source version is **0.1.4**, not 0.1.1/0.1.2.
 2. For Gemini's original base APK, use the two default Gemini patches.
 3. For Google's original base APK, use the eight default Google patches plus
    official **Clone app** (tested with upstream's pinned official Morphe 1.41.0
@@ -58,7 +58,7 @@ This label is not evidence of runtime compatibility with either MicroG version.
 - `bundle.mpp.sha256`: checksum for the new compiled JVM + Android DEX bundle.
 - `gemini-reference.mpp`: legacy unmodified v0.1.1; **do not use for these inputs**.
 
-This is a local version 0.1.3, not an upstream release. No upstream release URL or
+This is a local version 0.1.4, not an upstream release. No upstream release URL or
 public download descriptor is published. Source attribution is retained; upstream
 has no declared license, so resolve permission before redistribution.
 
@@ -79,3 +79,13 @@ To require a full fresh APK test, restore both exact release assets and manually
 run the workflow with `require_apk_tests=true`. Missing inputs then fail clearly;
 a failed patch/rebuild or output verification also fails the build. No missing
 input is treated as a successful APK test. Device/runtime tests remain separate.
+
+## Startup hardening — local 0.1.4
+
+Process-name sanitization now preserves null and verifies scratch register safety.
+Run 40617855885 executed BOTH real-APK test paths and an additional output DEX
+check of null guards, register indices and branch targets. Both apps patched and
+rebuilt successfully; device startup/login remains unverified.
+The reuploaded inputs are now resolved by digest even when Gemini is named
+`base.1.apk` under release `Google`; the earlier missing-input note above is historical.
+See [source comparison and review](../../docs/gemini-startup-review.md).
