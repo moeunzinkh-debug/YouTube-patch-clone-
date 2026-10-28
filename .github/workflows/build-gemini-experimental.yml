@@ -87,13 +87,13 @@ jobs:
         if: failure()
         run: |
           if test -f "$RUNNER_TEMP/gemini-patch.log"; then
-            tail -25 "$RUNNER_TEMP/gemini-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            grep -E -A 6 "Exception|ERROR|Error:|Caused by:|SEVERE|FAILED" "$RUNNER_TEMP/gemini-patch.log" | head -65 | while IFS= read -r line; do echo "::error::$line"; done
           fi
       - name: Report Google patch failure
         if: failure()
         run: |
           if test -f "$RUNNER_TEMP/google-patch.log"; then
-            tail -35 "$RUNNER_TEMP/google-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            grep -E -A 6 "Exception|ERROR|Error:|Caused by:|SEVERE|FAILED" "$RUNNER_TEMP/google-patch.log" | head -65 | while IFS= read -r line; do echo "::error::$line"; done
           fi
       - name: Collect and verify Gemini-only output
         run: |
