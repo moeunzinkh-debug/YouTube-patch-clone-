@@ -89,6 +89,40 @@ jobs:
                   report[path] = {'error': str(e)}
           Path('docs/diagnostics/khmer-tts-public-client.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
           PY
+      - name: Install audio verifier
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Test frontend-compatible multipart synthesis
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.error, hashlib, subprocess
+          from pathlib import Path
+          boundary = '----YouTubePatchKhmerTtsBoundary7MA4YWxkTrZu0gW'
+          parts = [{'text':'សួស្តី នេះជាការសាកល្បងសំឡេង។', 'voiceName':'piseth', 'speed':1.0, 'pitch':0}]
+          fields = {'data': json.dumps(parts, ensure_ascii=False), 'autoSpeed': 'false'}
+          body = ''.join('--'+boundary+'\r\nContent-Disposition: form-data; name="'+k+'"\r\n\r\n'+v+'\r\n' for k,v in fields.items()) + '--'+boundary+'--\r\n'
+          report = {'method':'POST', 'url':'https://takumi0002-tts-kh.hf.space/api/process-multi', 'request_fields':fields}
+          try:
+              req = urllib.request.Request(report['url'], data=body.encode(), headers={'Content-Type':'multipart/form-data; boundary='+boundary}, method='POST')
+              try:
+                  response = urllib.request.urlopen(req, timeout=120)
+              except urllib.error.HTTPError as e:
+                  response = e
+              with response:
+                  audio = response.read(8*1024*1024+1)
+                  report.update(status=response.status, content_type=response.headers.get('Content-Type'), received_bytes=len(audio))
+              if response.status == 200 and len(audio) <= 8*1024*1024:
+                  Path('/tmp/khmer-tts-test-audio').write_bytes(audio)
+                  probe = subprocess.run(['ffprobe','-v','error','-show_entries','format=format_name,duration:stream=codec_name,sample_rate','-of','json','/tmp/khmer-tts-test-audio'], capture_output=True, text=True)
+                  report['audio_probe_exit_code'] = probe.returncode
+                  report['audio_probe'] = json.loads(probe.stdout) if probe.returncode == 0 else probe.stderr[:1000]
+                  report['sha256'] = hashlib.sha256(audio).hexdigest()
+              else:
+                  report['error_response'] = audio[:1000].decode('utf-8','replace')
+          except Exception as e:
+              report['error'] = str(e)
+          Path('docs/diagnostics/khmer-tts-synthesis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
       - name: Save diagnostic result to this branch
         run: |
           git config user.name 'github-actions[bot]'
