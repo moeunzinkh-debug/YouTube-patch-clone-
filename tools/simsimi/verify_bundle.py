@@ -18,6 +18,10 @@ with zipfile.ZipFile(bundle) as archive:
     assert 'app/morphe/patches/simsimi/AdGatePatchKt.class' in names
     assert 'app/morphe/patches/simsimi/AdGateTransform.class' in names
     assert not any(n.startswith(('app/morphe/patches/youtube/', 'app/morphe/patches/gemini/', 'app/morphe/patches/google/')) for n in names)
+    assert 'app/morphe/patches/simsimi/PullRefreshPatchKt.class' in names
+    assert 'app/morphe/patches/simsimi/MicroGServicePatchKt.class' in names
+    extension = archive.read('extensions/simsimi.mpe')
+    assert extension.startswith(b'dex\n') and b'PullRefresh' in extension and b'PullGesture' in extension
     assert not any(n.endswith('Test.class') for n in names)
 print(json.dumps({'bundle': str(bundle), 'sha256': digest, 'size': bundle.stat().st_size,
                   'status': 'Experimental standalone SimSimi package structure verified; device behavior not tested.'}, indent=2))
