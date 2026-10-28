@@ -10,8 +10,9 @@
   "translate_button_tapped": "not located",
   "android_api": "35",
   "android_abi_list": "x86_64,arm64-v8a",
-  "ime_smoke_error": "adb failed (exit 1)",
+  "synthetic_error": "adb app_process failed (exit 137)",
+  "ime_smoke_error": "adb install failed (exit 1) [INSTALL_FAILED_UPDATE_INCOMPATIBLE]",
   "bundle_sha256": "f4a7b6984071a7b3561eda6f20c4ba4cf3c7abd83b077a8ac7a76e31d626d0e4",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40693356247"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40693860601"
 }
