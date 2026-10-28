@@ -56,25 +56,41 @@ jobs:
           set -o pipefail
           ./gradlew :extensions:extension:testDebugUnitTest --tests '*directtranslate.*' \
             --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/gboard-direct-unit.log
+      - name: Probe the Java HTTPS client with synthetic text only
+        id: live-probe
+        continue-on-error: true
+        env:
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GBOARD_DIRECT_LIVE_PROBE: '1'
+        working-directory: /tmp/gboard-direct-source
+        run: |
+          set -o pipefail
+          ./gradlew :extensions:extension:testDebugUnitTest --tests '*GtxLiveProbeTest' \
+            --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/gboard-direct-live.log
       - name: Load fork with Morphe Desktop and verify all 44 registrations
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          trap 'status=$?; echo "::error::Morphe fork listing failed at line $LINENO (exit $status)"; for f in /tmp/gboard-direct-list.log /tmp/gboard-direct-verify.log; do if test -f "$f"; then tail -12 "$f" | while IFS= read -r line; do echo "::error::$line"; done; fi; done' ERR
           mkdir -p /tmp/gboard-direct-input /tmp/gboard-direct-output
           gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
             --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/gboard-direct-input
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/gboard-direct-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
-          mpp="$(find /tmp/gboard-direct-source/patches/build -name '*.mpp' -type f | head -1)"
-          test -n "$mpp" && test -s "$mpp"
+          mpp="$(find /tmp/gboard-direct-source/patches/build -name '*.mpp' -type f -print -quit)"
+          test -n "$mpp" && test -s "$mpp" || { echo '::error::No MPP was produced under patches/build'; exit 1; }
+          echo "::notice::Built MPP: $mpp"
           cp "$mpp" /tmp/gboard-direct-output/gboard-direct-translate-experimental.mpp
           cp /tmp/gboard-direct-source/patches-list.json /tmp/gboard-direct-output/patches-list.json
           java -Xmx2g -jar /tmp/gboard-direct-input/morphe-desktop-1.19.1-all.jar list-patches \
             --patches /tmp/gboard-direct-output/gboard-direct-translate-experimental.mpp \
-            --with-packages --with-versions --out /tmp/gboard-direct-output/desktop-patches.txt
+            --with-packages --with-versions --out /tmp/gboard-direct-output/desktop-patches.txt \
+            2>&1 | tee /tmp/gboard-direct-list.log
           python3 tools/gboard-translate/verify_artifact.py \
             /tmp/gboard-direct-output/gboard-direct-translate-experimental.mpp \
-            /tmp/gboard-direct-output/patches-list.json /tmp/gboard-direct-output/desktop-patches.txt
+            /tmp/gboard-direct-output/patches-list.json /tmp/gboard-direct-output/desktop-patches.txt \
+            2>&1 | tee /tmp/gboard-direct-verify.log
       - name: Make a test-only fixture from the pinned third-party prepatched APK
         env:
           GH_TOKEN: ${{ github.token }}
@@ -110,6 +126,8 @@ jobs:
           PY
           python3 tools/gboard-translate/verify_fixture_apk.py /tmp/gboard-direct-output/fixture-patched.apk
       - name: Write an honest validation report
+        env:
+          LIVE_PROBE_OUTCOME: ${{ steps.live-probe.outcome }}
         run: |
           set -euo pipefail
           python3 - <<'PY'
@@ -129,6 +147,7 @@ jobs:
                   'upstream_43_metadata_and_default_state': 'passed',
                   'experimental_patch_opt_in_and_abi_inventory': 'passed',
                   'post_parser_errors_callback_and_cancellation_unit_tests': 'passed',
+                  'java_synthetic_en_km_auto_post_on_ci_runner': os.environ['LIVE_PROBE_OUTCOME'],
                   'morphe_application_to_third_party_prepatched_fixture': 'passed',
                   'patched_fixture_dex_markers': 'passed',
                   'original_google_signed_apk_application': 'not tested',
@@ -182,6 +201,9 @@ jobs:
           path: |
             /tmp/gboard-direct-build.log
             /tmp/gboard-direct-unit.log
+            /tmp/gboard-direct-live.log
+            /tmp/gboard-direct-list.log
+            /tmp/gboard-direct-verify.log
             /tmp/gboard-direct-apply.log
             /tmp/gboard-direct-source/patches/build/test-results/test/*.xml
             /tmp/gboard-direct-source/extensions/extension/build/test-results/testDebugUnitTest/*.xml
