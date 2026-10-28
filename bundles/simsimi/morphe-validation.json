@@ -7,7 +7,7 @@
   "input": "base only; matching ABI/config splits are required for installation",
   "microg_permission_and_visibility": true,
   "hermes_payload_matches_tested_transform": true,
-  "hermes_sha256": "7738259ce661f707f9ac95a44854a0ca7972cf7f6f2a9654fb7170323cba6812",
+  "hermes_sha256": "c62c6c3e9b5a7f233da1187ffab4a1f11a517c25c77142aba33fe074a95bb61f",
   "injected_main_activity_dispatch_hook": true,
   "injected_pull_refresh_runtime": true,
   "native_microg_routed_literals": 66
