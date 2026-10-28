@@ -1,4 +1,4 @@
-# YouTube in-app equalizer (local bundle 1.48.2)
+# YouTube in-app equalizer (bundle 1.48.2)
 
 Select **Audio equalizer** when patching a supported original YouTube APK.
 Open **YouTube → Morphe settings → Video → Audio equalizer**.
@@ -26,9 +26,9 @@ reset, lost control and unsupported hardware. These tests do not prove audible
 changes on hardware. CI compiles the Android extension and patch bundle; on-device
 APK patching and listening tests remain required.
 
-`patches-list.json`/Gradle describe the local 1.48.2 development bundle. The source
-release descriptor remains pinned to published 1.48.1 until a separate release is
-created; importing the new local patch.mpp is required to try this feature.
+Release **v1.48.2** includes the compiled bundle, SHA-256 checksum and updated
+source descriptor. Refresh the source in Manager to receive it, or import the
+release `patch.mpp` directly.
 
 ## Build evidence
 
