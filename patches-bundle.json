@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-27T10:54:22Z",
-  "description": "Unofficial YouTube-only Morphe patch bundle v1.48.1. Adds 9 new YouTube patches (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay). Supports YouTube 20.21.37\u201321.42.241; recommended stable target 21.23.492. Requires Patcher 2.0. See docs/youtube-versions.md before patching.",
-  "download_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.1/patch.mpp",
+  "created_at": "2026-10-28T03:16:00Z",
+  "description": "Unofficial YouTube-only Morphe patch bundle v1.48.2. Adds in-app Audio equalizer with device-supported bands, presets and reset. 106 YouTube patches plus 5 generic patches. Recommended stable YouTube 21.23.492. Requires Patcher 2.0. Device audio-effect support varies; on-device EQ validation remains pending.",
+  "download_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.48.2/patch.mpp",
   "signature_download_url": "",
-  "version": "1.48.1"
+  "version": "1.48.2"
 }
