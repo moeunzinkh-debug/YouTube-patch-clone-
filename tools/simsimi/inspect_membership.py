@@ -26,6 +26,9 @@ for fid, header in enumerate(reader.function_headers):
              'size': header.bytecodeSizeInBytes, 'frame_size': header.frameSize,
              'has_exception_handler': bool(header.hasExceptionHandler)}
     if pattern.search(name):
+        if header.bytecodeSizeInBytes <= 768:
+            entry = dict(entry, bytecode_hex=payload[header.offset:header.offset+header.bytecodeSizeInBytes].hex(),
+                         disassembly=[repr(ins) for ins in parse_hbc_bytecode(header, reader)])
         result['named_functions'].append(entry)
     code = payload[header.offset:header.offset+header.bytecodeSizeInBytes]
     if not any(needle in code for needle in needles):
