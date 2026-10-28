@@ -19,6 +19,1318 @@
         "Lcom/google/android/apps/inputmethod/libs/autotranslate/AutoTranslateModule$TranslationStateCallback;",
         "Lcom/google/android/apps/inputmethod/libs/translate/ITranslateUiExtension;"
       ],
+      "focused_types": [
+        {
+          "class": "Lklo;",
+          "superclass": "Lhcl;",
+          "interfaces": [
+            "Lcom/google/android/apps/inputmethod/libs/translate/ITranslateUiExtension;",
+            "Landroid/view/View$OnTouchListener;",
+            "Lkkk;"
+          ],
+          "fields": [
+            {
+              "name": "A",
+              "type": "Loae;",
+              "access": "private static final"
+            },
+            {
+              "name": "l",
+              "type": "Lwvx;",
+              "access": "public static final"
+            },
+            {
+              "name": "m",
+              "type": "Landroid/text/style/UnderlineSpan;",
+              "access": "public static final"
+            },
+            {
+              "name": "n",
+              "type": "J",
+              "access": "public static"
+            },
+            {
+              "name": "z",
+              "type": "Lokc;",
+              "access": "private static final"
+            },
+            {
+              "name": "B",
+              "type": "J",
+              "access": "private"
+            },
+            {
+              "name": "C",
+              "type": "Ljava/lang/Runnable;",
+              "access": "private"
+            },
+            {
+              "name": "D",
+              "type": "Lkkg;",
+              "access": "private"
+            },
+            {
+              "name": "E",
+              "type": "Lkkg;",
+              "access": "private"
+            },
+            {
+              "name": "F",
+              "type": "Lkkb;",
+              "access": "private"
+            },
+            {
+              "name": "G",
+              "type": "Ljava/lang/String;",
+              "access": "private"
+            },
+            {
+              "name": "H",
+              "type": "Z",
+              "access": "private"
+            },
+            {
+              "name": "I",
+              "type": "Z",
+              "access": "private"
+            },
+            {
+              "name": "J",
+              "type": "Z",
+              "access": "private"
+            },
+            {
+              "name": "K",
+              "type": "I",
+              "access": "private"
+            },
+            {
+              "name": "L",
+              "type": "Z",
+              "access": "private"
+            },
+            {
+              "name": "M",
+              "type": "Lpjr;",
+              "access": "private final"
+            },
+            {
+              "name": "N",
+              "type": "Lmsf;",
+              "access": "private final"
+            },
+            {
+              "name": "O",
+              "type": "Lmfj;",
+              "access": "private final"
+            },
+            {
+              "name": "o",
+              "type": "I",
+              "access": "public"
+            },
+            {
+              "name": "p",
+              "type": "Lkkd;",
+              "access": "public"
+            },
+            {
+              "name": "q",
+              "type": "Lkld;",
+              "access": "public"
+            },
+            {
+              "name": "r",
+              "type": "Lkkq;",
+              "access": "public final"
+            },
+            {
+              "name": "s",
+              "type": "Lkkh;",
+              "access": "public"
+            },
+            {
+              "name": "t",
+              "type": "Ljava/lang/CharSequence;",
+              "access": "public"
+            },
+            {
+              "name": "u",
+              "type": "Lkko;",
+              "access": "public"
+            },
+            {
+              "name": "v",
+              "type": "Ljava/lang/String;",
+              "access": "public"
+            },
+            {
+              "name": "w",
+              "type": "Ljava/lang/String;",
+              "access": "public"
+            },
+            {
+              "name": "x",
+              "type": "Z",
+              "access": "public"
+            },
+            {
+              "name": "y",
+              "type": "Z",
+              "access": "public"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lklo;-><clinit>()V",
+              "access": "static constructor",
+              "registers": 2,
+              "incoming_registers": 0,
+              "instruction_count": 17,
+              "invokes": [
+                "Lwvx;->i(Ljava/lang/String;)Lwvx;",
+                "Lokf;->a(Ljava/lang/String; Z)Lokc;",
+                "Loae;-><init>(Ljava/lang/String;)V",
+                "Landroid/text/style/UnderlineSpan;-><init>()V"
+              ],
+              "fields_used": [
+                "sput-object Lklo;->l Lwvx;",
+                "sput-object Lklo;->z Lokc;",
+                "sput-object Lklo;->A Loae;",
+                "sput-object Lklo;->m Landroid/text/style/UnderlineSpan;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;-><init>(Lqec;)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 2,
+              "instruction_count": 21,
+              "invokes": [
+                "Lhcl;-><init>()V",
+                "Lkkq;-><init>()V",
+                "Ljava/lang/Object;-><init>()V",
+                "Lklm;-><init>(Lklo;)V",
+                "Lkln;-><init>(Lklo;)V"
+              ],
+              "fields_used": [
+                "iput-wide Lklo;->B J",
+                "iput-object Lklo;->r Lkkq;",
+                "iput-object Lklo;->t Ljava/lang/CharSequence;",
+                "iput Lklo;->K I",
+                "iput-object Lklo;->O Lmfj;",
+                "iput-object Lklo;->M Lpjr;",
+                "iput-object Lklo;->N Lmsf;",
+                "iput-object Lklo;->j Lqec;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ao(I)Z",
+              "access": "public static",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 7,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->aq()Lkkd;",
+              "access": "private final",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 5,
+              "invokes": [
+                "Lkjx;-><init>(Landroid/content/Context; Lqec;)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->c Landroid/content/Context;",
+                "iget-object Lklo;->j Lqec;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ar(Ljava/util/Map; Ljava/lang/String;)Ljava/lang/String;",
+              "access": "private static",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 8,
+              "invokes": [
+                "Ljava/util/Map;->get(Ljava/lang/Object;)Ljava/lang/Object;"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->as()V",
+              "access": "private final",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 8,
+              "invokes": [
+                "Lklo;->E()V"
+              ],
+              "fields_used": [
+                "iput-object Lhcl;->a Ljava/lang/String;",
+                "iput-boolean Lklo;->J Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->at(Z)V",
+              "access": "private final",
+              "registers": 4,
+              "incoming_registers": 2,
+              "instruction_count": 18,
+              "invokes": [
+                "Lkla;->n()Z",
+                "Lkld;->a()Ljava/util/Locale;",
+                "Lkkd;->b(Ljava/util/Locale; Lkkb;)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->F Lkkb;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->au(Z)V",
+              "access": "private final",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 12,
+              "invokes": [
+                "Lhcp;->aa()Loid;",
+                "Llnz;->bk(Loid;)Lpcn;",
+                "Llnz;->bl(Loid;)Lpcn;",
+                "Lpcn;->u()V"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->av()V",
+              "access": "private final",
+              "registers": 8,
+              "incoming_registers": 1,
+              "instruction_count": 44,
+              "invokes": [
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Lhcp;->aa()Loid;",
+                "Llnz;->bk(Loid;)Lpcn;",
+                "Lpcn;->J()Ljava/lang/CharSequence;",
+                "Ljava/lang/CharSequence;->toString()Ljava/lang/String;",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lpku;->y(Ljava/lang/CharSequence;)Z"
+              ],
+              "fields_used": [
+                "iget-object Lhcl;->a Ljava/lang/String;",
+                "iput Lklo;->o I",
+                "iget-object Lklo;->j Lqec;",
+                "sget-object Lkle;->a Lkle;",
+                "iput-object Lhcl;->a Ljava/lang/String;",
+                "iget-object Lklo;->e Lpky;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->aw(Lkkh;)V",
+              "access": "private final",
+              "registers": 3,
+              "incoming_registers": 2,
+              "instruction_count": 8,
+              "invokes": [
+                "Lhcp;->A()Landroid/content/Context;",
+                "Lncr;->g()V",
+                "Lncm;->a(Landroid/content/Context; Ljava/lang/String;)V"
+              ],
+              "fields_used": [
+                "iput-object Lklo;->s Lkkh;",
+                "sget-object Lncl;->a Lncm;",
+                "iget-object Lkkh;->f Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ax()V",
+              "access": "private final",
+              "registers": 4,
+              "incoming_registers": 1,
+              "instruction_count": 18,
+              "invokes": [
+                "Lkkd;->f(Ljava/lang/String; Ljava/lang/String;)Z",
+                "Lkko;->b()I",
+                "Lkko;->d(I)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->u Lkko;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-boolean Lkko;->i Z",
+                "iput-boolean Lkko;->i Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ay(I)Z",
+              "access": "private static",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 7,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->E()V",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 11,
+              "invokes": [
+                "Lkkq;->a()V",
+                "Lklo;->aj(Ljava/lang/CharSequence;)V",
+                "Lklo;->af(Z)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->r Lkkq;",
+                "iget-boolean Lklo;->J Z",
+                "iput-boolean Lklo;->I Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->F()V",
+              "access": "public final",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 11,
+              "invokes": [
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->hb(Ljava/lang/String;)V"
+              ],
+              "fields_used": [
+                "iput-boolean Lklo;->J Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->H(Ljava/lang/CharSequence;)V",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 6,
+              "invokes": [
+                "Lhcp;->aa()Loid;",
+                "Llnz;->bk(Loid;)Lpcn;",
+                "Lpcn;->a(Ljava/lang/CharSequence;)V"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->I(I)V",
+              "access": "public final",
+              "registers": 8,
+              "incoming_registers": 2,
+              "instruction_count": 54,
+              "invokes": [
+                "Lklo;->ao(I)Z",
+                "Lklo;->ap()Z",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Ljava/lang/String;->length()I",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lkkq;->a()V",
+                "Lklo;->au(Z)V",
+                "Lklo;->af(Z)V",
+                "Lklo;->ah(Ljava/lang/String;)V"
+              ],
+              "fields_used": [
+                "iget Lklo;->o I",
+                "iput Lklo;->o I",
+                "iget-object Lhcl;->a Ljava/lang/String;",
+                "iget-object Lklo;->j Lqec;",
+                "sget-object Lkle;->h Lkle;",
+                "sget-object Lkle;->d Lkle;",
+                "iget Lklo;->K I",
+                "iput Lklo;->K I",
+                "iget-object Lklo;->r Lkkq;",
+                "iput-object Lhcl;->a Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->L()Lxqp;",
+              "access": "protected final",
+              "registers": 6,
+              "incoming_registers": 1,
+              "instruction_count": 26,
+              "invokes": [
+                "Lqcc;-><init>()V",
+                "Ljava/util/ArrayList;-><init>(I)V",
+                "Lcom/google/android/libraries/inputmethod/metadata/KeyboardSource$Xml;-><init>(I)V",
+                "Ljava/util/Collection;->add(Ljava/lang/Object;)Z",
+                "Lqcc;->c(Lqch; Ljava/util/List;)V",
+                "Lcom/google/android/libraries/inputmethod/metadata/KeyboardGroupDef;-><init>(Lqcc;)V",
+                "Lklo;->G(Lcom/google/android/libraries/inputmethod/metadata/KeyboardGroupDef;)Lcom/google/android/libraries/inputmethod/metadata/ImeDef;",
+                "Lhcu;-><init>(Landroid/content/Context; Lhct; Lcom/google/android/libraries/inputmethod/metadata/KeyboardGroupDef; Lcom/google/android/libraries/inputmethod/metadata/ImeDef;)V",
+                "Lwzl;->q(Ljava/lang/Object;)Lxqp;"
+              ],
+              "fields_used": [
+                "sget-object Lcom/google/android/libraries/inputmethod/metadata/KeyboardGroupDef;->a Lwvx;",
+                "sget-object Lqch;->b Lqch;",
+                "iget-object Lklo;->c Landroid/content/Context;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->O()V",
+              "access": "public final synchronized",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 11,
+              "invokes": [
+                "Lklo;->I(I)V",
+                "Lhcl;->O()V"
+              ],
+              "fields_used": [
+                "iput Lklo;->o I"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->S()V",
+              "access": "protected final",
+              "registers": 1,
+              "incoming_registers": 1,
+              "instruction_count": 2,
+              "invokes": [
+                "Lklo;->as()V"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->Y(Z)Z",
+              "access": "public final",
+              "registers": 11,
+              "incoming_registers": 2,
+              "instruction_count": 42,
+              "invokes": [
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->v(Ljava/lang/String; J)V",
+                "Lhcp;->aa()Loid;",
+                "Loid;->n()Landroid/view/inputmethod/EditorInfo;",
+                "Lobk;->X(Landroid/view/inputmethod/EditorInfo;)Z"
+              ],
+              "fields_used": [
+                "sget-wide Lklo;->n J",
+                "sget-object Lklo;->l Lwvx;",
+                "iget-wide Lklo;->B J",
+                "iput-boolean Lklo;->H Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->Z(I)Lqek;",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 2,
+              "invokes": [],
+              "fields_used": [
+                "sget-object Lqdx;->a Lqdx;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->a(I)V",
+              "access": "public final",
+              "registers": 4,
+              "incoming_registers": 2,
+              "instruction_count": 16,
+              "invokes": [
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lklo;->ap()Z",
+                "Lklo;->I(I)V",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->a(I)V",
+                "Lklo;->ag()V",
+                "Lklo;->al(Ljava/lang/String;)V"
+              ],
+              "fields_used": [
+                "iget-object Lhcl;->a Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ad(I I I I)V",
+              "access": "public final",
+              "registers": 5,
+              "incoming_registers": 5,
+              "instruction_count": 32,
+              "invokes": [
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lklo;->ao(I)Z",
+                "Lpdv;->a()Lpdg;",
+                "Lpdg;->n()Z",
+                "Loae;->a(Ljava/lang/String;)V",
+                "Lklo;->au(Z)V",
+                "Lklo;->F()V",
+                "Lklo;->ag()V"
+              ],
+              "fields_used": [
+                "iget Lklo;->o I",
+                "sget Landroid/os/Build$VERSION;->SDK_INT I",
+                "iget-boolean Lklo;->I Z",
+                "iput-boolean Lklo;->I Z",
+                "sget-object Lklo;->A Loae;",
+                "iput-object Lklo;->t Ljava/lang/CharSequence;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->af(Z)V",
+              "access": "public final",
+              "registers": 8,
+              "incoming_registers": 2,
+              "instruction_count": 42,
+              "invokes": [
+                "Lklo;->au(Z)V",
+                "Ljava/lang/CharSequence;->length()I",
+                "Landroid/text/Spannable;->getSpans(I I Ljava/lang/Class;)[Ljava/lang/Object;",
+                "Ljava/util/ArrayList;-><init>()V",
+                "Landroid/text/Spannable;->getSpanFlags(Ljava/lang/Object;)I",
+                "Ljava/util/List;->add(Ljava/lang/Object;)Z",
+                "Ljava/util/List;->size()I",
+                "Ljava/util/List;->get(I)Ljava/lang/Object;",
+                "Landroid/text/Spannable;->removeSpan(Ljava/lang/Object;)V",
+                "Lklo;->H(Ljava/lang/CharSequence;)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->t Ljava/lang/CharSequence;",
+                "iput-object Lklo;->t Ljava/lang/CharSequence;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ag()V",
+              "access": "public final",
+              "registers": 4,
+              "incoming_registers": 1,
+              "instruction_count": 30,
+              "invokes": [
+                "Lhcp;->W()Z",
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lklo;->ap()Z",
+                "Lklo;->ay(I)Z",
+                "Lhcp;->aa()Loid;",
+                "Loid;->n()Landroid/view/inputmethod/EditorInfo;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->C(Landroid/view/inputmethod/EditorInfo;)Lpdb;",
+                "Loid;->am(Lpdb; Z)V"
+              ],
+              "fields_used": [
+                "iget Lklo;->o I"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ah(Ljava/lang/String;)V",
+              "access": "public final",
+              "registers": 6,
+              "incoming_registers": 2,
+              "instruction_count": 37,
+              "invokes": [
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lkld;->e()Z",
+                "Lsfc;->g(Ljava/lang/String;)Lsfc;",
+                "Lsfc;->H()Z",
+                "Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->l()V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lklb;->d Ljava/lang/String;",
+                "iput-object Lklb;->h Ljava/lang/String;",
+                "sget-object Lkld;->a Lwvx;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ai(Z)V",
+              "access": "public final",
+              "registers": 21,
+              "incoming_registers": 2,
+              "instruction_count": 241,
+              "invokes": [
+                "Lklo;->ax()V",
+                "Lkkq;->a()V",
+                "Lkld;->b()V",
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->l()V",
+                "Lklo;->al(Ljava/lang/String;)V",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Lkld;->e()Z",
+                "Lpga;->F(Landroid/content/Context;)Lpga;",
+                "Lsfc;->g(Ljava/lang/String;)Lsfc;",
+                "Ljava/lang/String;->startsWith(Ljava/lang/String;)Z",
+                "Lpeu;->a()Lwns;",
+                "Lpfn;-><init>(I)V",
+                "Lzli;->U(Ljava/util/List; Lwgh;)Ljava/util/List;",
+                "Ljava/util/List;->size()I",
+                "Ljava/util/List;->get(I)Ljava/lang/Object;",
+                "Lsfc;->equals(Ljava/lang/Object;)Z",
+                "Landroid/text/TextUtils;->equals(Ljava/lang/CharSequence; Ljava/lang/CharSequence;)Z",
+                "Lwns;->get(I)Ljava/lang/Object;",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lpgr;->e(Lpex; Lpev;)V",
+                "Laabp;->m()Lpev;",
+                "Lpev;->i()Lsfc;",
+                "Lsfc;->t()Ljava/util/Locale;",
+                "Lklq;->a(Ljava/util/Locale;)Ljava/lang/String;",
+                "Ljava/lang/String;->equals(Ljava/lang/Object;)Z",
+                "Lcom/google/android/libraries/inputmethod/widgets/EditTextOnKeyboard;->getInputType()I",
+                "Lcom/google/android/libraries/inputmethod/widgets/EditTextOnKeyboard;->setPrivateImeOptions(Ljava/lang/String;)V",
+                "Landroid/content/Context;->getPackageName()Ljava/lang/String;",
+                "Lcom/google/android/libraries/inputmethod/widgets/EditTextOnKeyboard;->getPrivateImeOptions()Ljava/lang/String;",
+                "Ljava/lang/StringBuilder;-><init>()V",
+                "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+                "Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;",
+                "Lobk;->g(Ljava/lang/String; Ljava/lang/String;)Ljava/lang/String;",
+                "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
+                "Lcom/google/android/libraries/inputmethod/widgets/EditTextOnKeyboard;->setInputType(I)V",
+                "Lhcp;->aa()Loid;",
+                "Loid;->n()Landroid/view/inputmethod/EditorInfo;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->C(Landroid/view/inputmethod/EditorInfo;)Lpdb;",
+                "Loid;->am(Lpdb; Z)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->r Lkkq;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "iget-object Lhcl;->a Ljava/lang/String;",
+                "iget-object Lklo;->c Landroid/content/Context;",
+                "iget-object Lsfc;->g Ljava/lang/String;",
+                "iget-object Lsfc;->i Ljava/lang/String;",
+                "iget-object Lsfc;->j Ljava/lang/String;",
+                "iget-object Lklo;->j Lqec;",
+                "sget-object Lkle;->f Lkle;",
+                "iget-boolean Lklo;->L Z",
+                "iget-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->a Lcom/google/android/libraries/inputmethod/widgets/EditTextOnKeyboard;",
+                "iget-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->e Ljava/lang/String;",
+                "iget-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->z Landroid/content/Context;",
+                "sget-object Lobk;->a Landroid/view/inputmethod/EditorInfo;",
+                "iget-object Lklo;->G Ljava/lang/String;",
+                "iput-object Lklo;->G Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->aj(Ljava/lang/CharSequence;)V",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 6,
+              "invokes": [
+                "Lhcp;->aa()Loid;",
+                "Llnz;->bk(Loid;)Lpcn;",
+                "Lpcn;->c(Ljava/lang/CharSequence;)V"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ak(Ljava/lang/String; Z)V",
+              "access": "public final",
+              "registers": 6,
+              "incoming_registers": 3,
+              "instruction_count": 42,
+              "invokes": [
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Ljava/lang/String;->equals(Ljava/lang/Object;)Z",
+                "Lkld;->e()Z",
+                "Lkkz;->h(Ljava/lang/String;)Z",
+                "Lkld;->d()Z",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->w(Ljava/lang/String; Ljava/lang/Object;)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "iget-object Lkld;->c Lklc;",
+                "sget-object Lklo;->l Lwvx;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->al(Ljava/lang/String;)V",
+              "access": "public final",
+              "registers": 10,
+              "incoming_registers": 2,
+              "instruction_count": 79,
+              "invokes": [
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Ljava/lang/String;->trim()Ljava/lang/String;",
+                "Lkkq;->a()V",
+                "Lklo;->aj(Ljava/lang/CharSequence;)V",
+                "Ljava/lang/String;->length()I",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->u(Ljava/lang/String; I)V",
+                "Lklo;->ap()Z",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J",
+                "Lklf;-><init>()V",
+                "Lklf;->a(Ljava/lang/String;)V",
+                "Lklf;->b(Ljava/lang/String;)V",
+                "Lklg;-><init>(Lklf;)V",
+                "Lkli;-><init>(Lklo; J Ljava/lang/String; Ljava/lang/String;)V",
+                "Lkkd;->d(Lklg; Lkkc;)V",
+                "Lwvu;->t(Ljava/lang/String;)V"
+              ],
+              "fields_used": [
+                "iget Lklo;->o I",
+                "iget-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->r Lkkq;",
+                "iput-object Lklo;->t Ljava/lang/CharSequence;",
+                "sget-object Lklo;->l Lwvx;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "iget-object Lkld;->c Lklc;",
+                "iput-object Lklf;->a Ljava/lang/String;",
+                "iput-boolean Lklf;->d Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->am(Z)V",
+              "access": "public final",
+              "registers": 4,
+              "incoming_registers": 2,
+              "instruction_count": 11,
+              "invokes": [
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lklo;->I(I)V",
+                "Lkky;->c()V"
+              ],
+              "fields_used": [
+                "iget-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->b Lkky;",
+                "iput-boolean Lkky;->b Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->an(Z Ljava/lang/String;)Z",
+              "access": "public final",
+              "registers": 8,
+              "incoming_registers": 3,
+              "instruction_count": 39,
+              "invokes": [
+                "Lkkd;->f(Ljava/lang/String; Ljava/lang/String;)Z",
+                "Lhcp;->B()Lpev;",
+                "Lpev;->a()Landroid/content/Context;",
+                "Ljtw;-><init>(Ljava/lang/Object; Ljava/lang/Object; I)V",
+                "Lmfj;->b(Landroid/content/Context; Ljava/lang/Runnable;)Z"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "iget-object Lklo;->D Lkkg;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lklo;->E Lkkg;",
+                "iget-object Lklo;->p Lkkd;",
+                "iget-boolean Lklo;->L Z",
+                "iget-object Lklo;->O Lmfj;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ap()Z",
+              "access": "final",
+              "registers": 5,
+              "incoming_registers": 1,
+              "instruction_count": 29,
+              "invokes": [
+                "Lwvx;->h(Ljava/util/logging/Level;)Lwvu;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lkko;->a(I)I",
+                "Lkik;->c(I)Z"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->u Lkko;",
+                "iget-boolean Lkko;->i Z",
+                "iget-boolean Lkko;->c Z",
+                "sget-object Lkko;->a Lwvx;",
+                "sget-object Lolz;->a Lolz;",
+                "iget Lkko;->b I"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->b()I",
+              "access": "protected final",
+              "registers": 1,
+              "incoming_registers": 1,
+              "instruction_count": 2,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 7,
+              "invokes": [],
+              "fields_used": [
+                "iget-object Lklo;->e Lpky;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->fL()V",
+              "access": "public final",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 10,
+              "invokes": [
+                "Lklo;->I(I)V",
+                "Lklo;->F()V",
+                "Loae;->a(Ljava/lang/String;)V",
+                "Lklo;->ag()V"
+              ],
+              "fields_used": [
+                "sget-object Lklo;->A Loae;",
+                "iput-object Lklo;->t Ljava/lang/CharSequence;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->fM(Landroid/content/Context; Lqhb;)V",
+              "access": "public final",
+              "registers": 12,
+              "incoming_registers": 3,
+              "instruction_count": 95,
+              "invokes": [
+                "Landroid/os/Trace;->beginSection(Ljava/lang/String;)V",
+                "Lhcl;->fM(Landroid/content/Context; Lqhb;)V",
+                "Lkld;-><init>(Landroid/content/Context;)V",
+                "Lkla;->k(I I I)V",
+                "Lkkj;->d()Z",
+                "Lpga;->F(Landroid/content/Context;)Lpga;",
+                "Lpeu;->a()Lwns;",
+                "Lwns;->isEmpty()Z",
+                "Ljava/util/ArrayList;-><init>()V",
+                "Ljava/util/List;->size()I",
+                "Ljava/util/List;->get(I)Ljava/lang/Object;",
+                "Lpev;->i()Lsfc;",
+                "Lkla;->a(Ljava/lang/String;)Ljava/lang/String;",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Ljava/util/List;->add(Ljava/lang/Object;)Z",
+                "Ljava/util/List;->isEmpty()Z",
+                "Lkkj;->c(Ljava/lang/Object;)V",
+                "Lkkj;->e()V",
+                "Landroid/content/Context;->getResources()Landroid/content/res/Resources;",
+                "Landroid/content/res/Resources;->getConfiguration()Landroid/content/res/Configuration;",
+                "Ljava/util/Locale;->getDefault()Ljava/util/Locale;",
+                "Lkld;->c(Ljava/util/Locale;)V",
+                "Lkda;-><init>(Ljava/lang/Object; I)V",
+                "Lklk;-><init>(Lklo; I)V",
+                "Lkll;-><init>(Lklo;)V",
+                "Lpjr;->z(Ljava/util/concurrent/Executor;)V",
+                "Landroid/os/Trace;->endSection()V"
+              ],
+              "fields_used": [
+                "iput-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lklb;->e Lkkj;",
+                "iget-object Lklb;->a Landroid/content/Context;",
+                "iget-object Lsfc;->n Ljava/lang/String;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-object Landroid/content/res/Configuration;->locale Ljava/util/Locale;",
+                "iget-object Lklo;->q Lkld;",
+                "iput Lklo;->o I",
+                "iput-object Lklo;->C Ljava/lang/Runnable;",
+                "iput-object Lklo;->D Lkkg;",
+                "iput-object Lklo;->E Lkkg;",
+                "iput-object Lklo;->F Lkkb;",
+                "iget-object Lklo;->M Lpjr;",
+                "sget-object Lnos;->a Lnos;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->fN()V",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 17,
+              "invokes": [
+                "Landroid/os/Trace;->beginSection(Ljava/lang/String;)V",
+                "Lpjr;->B()V",
+                "Lngq;->a(Ljava/lang/AutoCloseable;)V",
+                "Lkld;->b()V",
+                "Lhcl;->fN()V",
+                "Landroid/os/Trace;->endSection()V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->M Lpjr;",
+                "iget-object Lklo;->p Lkkd;",
+                "iput-object Lklo;->p Lkkd;",
+                "iput-object Lklo;->u Lkko;",
+                "iget-object Lklo;->q Lkld;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->fP()V",
+              "access": "public final",
+              "registers": 5,
+              "incoming_registers": 1,
+              "instruction_count": 15,
+              "invokes": [
+                "Lklo;->ay(I)Z",
+                "Lklo;->ao(I)Z",
+                "Lxqt;->a(Ljava/lang/Runnable; J Ljava/util/concurrent/TimeUnit;)Lxqr;"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->e Lpky;",
+                "iget Lklo;->o I",
+                "sget-object Lnos;->b Lnos;",
+                "iget-object Lklo;->C Ljava/lang/Runnable;",
+                "sget-object Ljava/util/concurrent/TimeUnit;->MILLISECONDS Ljava/util/concurrent/TimeUnit;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->ft(Lpev; Landroid/view/inputmethod/EditorInfo; Z Ljava/util/Map; Lohr;)Z",
+              "access": "public final synchronized",
+              "registers": 15,
+              "incoming_registers": 6,
+              "instruction_count": 164,
+              "invokes": [
+                "Lkki;-><init>(Lmfj; Lqec;)V",
+                "Lncr;->g()V",
+                "Lklo;->aq()Lkkd;",
+                "Lklo;->at(Z)V",
+                "Lkkd;->ho()V",
+                "Lkko;-><init>(Lqec; Lkkk; Lkkd;)V",
+                "Lkkm;-><init>(Lkko;)V",
+                "Lrfl;->e(Ljava/util/concurrent/Executor;)V",
+                "Lrfn;->c()Z",
+                "Lmsf;->d(Ljava/util/concurrent/Executor;)V",
+                "Lpev;->a()Landroid/content/Context;",
+                "Lkda;-><init>(Ljava/lang/Object; I)V",
+                "Lmfj;->b(Landroid/content/Context; Ljava/lang/Runnable;)Z",
+                "Lpev;->i()Lsfc;",
+                "Lsfc;->t()Ljava/util/Locale;",
+                "Lkld;->c(Ljava/util/Locale;)V",
+                "Lklo;->ar(Ljava/util/Map; Ljava/lang/String;)Ljava/lang/String;",
+                "Ljava/util/Map;->get(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Boolean;->booleanValue()Z",
+                "Lokc;->g()Ljava/lang/Object;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/SystemTranslateProvider;-><init>(Landroid/content/Context;)V",
+                "Lkka;-><init>(Lkkd; Lkkd;)V",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J",
+                "Lkko;->a(I)I",
+                "Lkik;->a(I)Z",
+                "Lkko;->f(I Z)V",
+                "Lklo;->ax()V",
+                "Lhcl;->ft(Lpev; Landroid/view/inputmethod/EditorInfo; Z Ljava/util/Map; Lohr;)Z"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->O Lmfj;",
+                "iget-object Lklo;->j Lqec;",
+                "iget-object Lmfj;->a Ljava/lang/Object;",
+                "iput-object Lmfj;->a Ljava/lang/Object;",
+                "iput-boolean Lklo;->x Z",
+                "iput-boolean Lklo;->H Z",
+                "iput-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->u Lkko;",
+                "iput-object Lklo;->u Lkko;",
+                "iget-boolean Lkko;->c Z",
+                "iput-boolean Lkko;->c Z",
+                "iput-object Lkko;->j Lkkc;",
+                "iget-object Lkko;->f Lrfl;",
+                "iget-object Lkko;->g Lxqt;",
+                "iget Lkko;->b I",
+                "sget-object Lohr;->h Lohr;",
+                "iput-boolean Lklo;->L Z",
+                "iget-object Lklo;->N Lmsf;",
+                "sget-object Lnos;->a Lnos;",
+                "iput-boolean Lklo;->y Z",
+                "iget-boolean Lklo;->L Z",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iput-object Lkla;->c Ljava/util/Locale;",
+                "iget-object Lkld;->c Lklc;",
+                "iput-object Lklo;->v Ljava/lang/String;",
+                "iput-object Lklo;->w Ljava/lang/String;",
+                "sget Landroid/os/Build$VERSION;->SDK_INT I",
+                "sget-object Lklo;->z Lokc;",
+                "iget-object Lklo;->c Landroid/content/Context;",
+                "iget-wide Lkko;->h J",
+                "iput Lklo;->o I"
+              ],
+              "protocol_literals": [
+                "source",
+                "target"
+              ]
+            },
+            {
+              "method": "Lklo;->m(Lohe;)Z",
+              "access": "public final",
+              "registers": 12,
+              "incoming_registers": 2,
+              "instruction_count": 127,
+              "invokes": [
+                "Lklo;->ay(I)Z",
+                "Lhcl;->m(Lohe;)Z",
+                "Lohe;->g()Lqbc;",
+                "Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z",
+                "Ljhk;-><init>(Ljava/lang/Object; I)V",
+                "Lkda;-><init>(Ljava/lang/Object; I)V",
+                "Lkkh;-><init>(I Lkld; Lkkz; Lwgh; Lkkg; Ljava/lang/Runnable;)V",
+                "Lklo;->aw(Lkkh;)V",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lkld;->d()Z",
+                "Lkla;->a(Ljava/lang/String;)Ljava/lang/String;",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Lklb;->o()Ljava/lang/String;",
+                "Lkla;->h(Ljava/lang/String;)Z",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->J(Ljava/lang/String; Ljava/lang/Object; Ljava/lang/Object;)V",
+                "Lklo;->ai(Z)V",
+                "Lqbd;->d(I)Z"
+              ],
+              "fields_used": [
+                "iget Lklo;->o I",
+                "iget Lqbc;->c I",
+                "iget-object Lqbc;->e Ljava/lang/Object;",
+                "iget-object Lklo;->s Lkkh;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lklo;->D Lkkg;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-object Lklo;->E Lkkg;",
+                "iget-object Lklo;->j Lqec;",
+                "sget-object Lkle;->e Lkle;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "sget-object Lkld;->a Lwvx;",
+                "iput-boolean Lklo;->y Z",
+                "iget-object Lklo;->e Lpky;",
+                "sget-object Lqbe;->a Lqbd;",
+                "iput Lklo;->o I"
+              ],
+              "protocol_literals": [
+                "source",
+                "target"
+              ]
+            },
+            {
+              "method": "Lklo;->onTouch(Landroid/view/View; Landroid/view/MotionEvent;)Z",
+              "access": "public final",
+              "registers": 4,
+              "incoming_registers": 3,
+              "instruction_count": 29,
+              "invokes": [
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lklo;->ay(I)Z",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Lklo;->am(Z)V",
+                "Lklo;->ag()V",
+                "Lklo;->ap()Z",
+                "Lklo;->av()V",
+                "Lhcp;->aa()Loid;",
+                "Loid;->n()Landroid/view/inputmethod/EditorInfo;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->G(Landroid/view/inputmethod/EditorInfo;)V"
+              ],
+              "fields_used": [
+                "iget Lklo;->o I",
+                "iget-object Lhcl;->a Ljava/lang/String;",
+                "iput Lklo;->o I"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->p()Z",
+              "access": "public final",
+              "registers": 1,
+              "incoming_registers": 1,
+              "instruction_count": 2,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->s()Ljava/lang/CharSequence;",
+              "access": "protected final",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 17,
+              "invokes": [
+                "Lhcp;->A()Landroid/content/Context;",
+                "Lhcp;->aa()Loid;",
+                "Loid;->ax()Z",
+                "Landroid/content/Context;->getText(I)Ljava/lang/CharSequence;"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->t(Ljava/util/Map; Lohr;)V",
+              "access": "protected final",
+              "registers": 6,
+              "incoming_registers": 3,
+              "instruction_count": 67,
+              "invokes": [
+                "Lkkq;->a()V",
+                "Lklo;->c()Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
+                "Lkko;->b()I",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->a(I)V",
+                "Lhcp;->aa()Loid;",
+                "Loid;->n()Landroid/view/inputmethod/EditorInfo;",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->G(Landroid/view/inputmethod/EditorInfo;)V",
+                "Lhcl;->t(Ljava/util/Map; Lohr;)V",
+                "Lklj;-><init>(Lklo; Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;)V",
+                "Lkls;-><init>(Ljava/lang/Object; I)V",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->k()V",
+                "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->o(Landroid/view/View$OnTouchListener;)V",
+                "Lklo;->ap()Z",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lkko;->c()V",
+                "Lklo;->ag()V",
+                "Lklo;->at(Z)V",
+                "Lklo;->av()V",
+                "Lhcp;->B()Lpev;",
+                "Lpev;->i()Lsfc;",
+                "Lkkz;->a(Ljava/lang/String;)Ljava/lang/String;",
+                "Lklo;->ak(Ljava/lang/String; Z)V",
+                "Lklo;->ai(Z)V"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->r Lkkq;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->b Lkky;",
+                "iput-object Lkky;->a Lkld;",
+                "iget-object Lklo;->u Lkko;",
+                "iput-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->f Landroid/widget/TextView$OnEditorActionListener;",
+                "iget-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->c Ljava/util/function/Consumer;",
+                "iput-object Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;->c Ljava/util/function/Consumer;",
+                "iget-object Lklo;->j Lqec;",
+                "sget-object Lkle;->a Lkle;",
+                "iget-boolean Lklo;->H Z",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lsfc;->n Ljava/lang/String;",
+                "iput-boolean Lklo;->H Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->u()V",
+              "access": "protected final",
+              "registers": 7,
+              "incoming_registers": 1,
+              "instruction_count": 57,
+              "invokes": [
+                "Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lklo;->I(I)V",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lkkq;->a()V",
+                "Lkld;->b()V",
+                "Lrfl;->g()V",
+                "Lkkh;->d()V",
+                "Lncr;->h()V",
+                "Lkkd;->c()V",
+                "Lmsf;->e()V",
+                "Lhcl;->u()V",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J"
+              ],
+              "fields_used": [
+                "iget-object Lklo;->j Lqec;",
+                "sget-object Lkle;->b Lkle;",
+                "iget-boolean Lklo;->y Z",
+                "iput-boolean Lklo;->y Z",
+                "sget-object Lkle;->c Lkle;",
+                "iget Lklo;->K I",
+                "iput Lklo;->K I",
+                "iget-object Lklo;->r Lkkq;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lklo;->u Lkko;",
+                "iget-boolean Lkko;->c Z",
+                "iput-boolean Lkko;->c Z",
+                "iget-object Lkko;->f Lrfl;",
+                "iget-object Lklo;->s Lkkh;",
+                "iput-object Lklo;->s Lkkh;",
+                "iget-object Lklo;->O Lmfj;",
+                "iget-object Lmfj;->a Ljava/lang/Object;",
+                "iput-object Lmfj;->a Ljava/lang/Object;",
+                "iput-object Lmfj;->b Ljava/lang/Object;",
+                "iget-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->N Lmsf;",
+                "iput Lklo;->o I",
+                "iput-wide Lklo;->B J"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->v()Z",
+              "access": "protected final",
+              "registers": 1,
+              "incoming_registers": 1,
+              "instruction_count": 2,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklo;->x()V",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 5,
+              "invokes": [
+                "Lklo;->af(Z)V",
+                "Lklo;->as()V",
+                "Lhcl;->x()V"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            }
+          ]
+        }
+      ],
       "strings": [
         {
           "value": " translateX,Y=%.1f,%.1f",
@@ -1587,6 +2899,1822 @@
         "Lcom/google/android/apps/inputmethod/libs/translate/TranslateKeyboard;",
         "Lcom/google/android/apps/inputmethod/libs/translate/TranslateLanguageBar;",
         "Lorg/chromium/net/ExperimentalOptionsTranslator$$ExternalSyntheticBackport0;"
+      ],
+      "focused_types": [
+        {
+          "class": "Labxb;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [],
+          "fields": [
+            {
+              "name": "a",
+              "type": "Ljava/lang/Object;",
+              "access": "public final"
+            },
+            {
+              "name": "b",
+              "type": "I",
+              "access": "public"
+            },
+            {
+              "name": "c",
+              "type": "Ljava/lang/Object;",
+              "access": "public"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Labxb;-><init>()V",
+              "access": "public constructor",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 8,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V",
+                "Ljava/util/concurrent/locks/ReentrantLock;-><init>()V",
+                "Ljava/util/ArrayList;-><init>()V"
+              ],
+              "fields_used": [
+                "iput-object Labxb;->a Ljava/lang/Object;",
+                "iput-object Labxb;->c Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Labxb;-><init>(I)V",
+              "access": "public constructor",
+              "registers": 3,
+              "incoming_registers": 2,
+              "instruction_count": 12,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V",
+                "Ljava/util/ArrayList;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Labxb;->b I",
+                "iput-object Labxb;->c Ljava/lang/Object;",
+                "iput-object Labxb;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Labxb;-><init>(Ljava/lang/Object;)V",
+              "access": "public constructor",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 3,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput-object Labxb;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Labxb;-><init>(Ljava/lang/String;)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 2,
+              "instruction_count": 13,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V",
+                "Ljava/util/ArrayList;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Labxb;->b I",
+                "iput-object Labxb;->c Ljava/lang/Object;",
+                "iput-object Labxb;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Lkkd;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [
+            "Ljava/lang/AutoCloseable;"
+          ],
+          "fields": [],
+          "methods": [
+            {
+              "method": "Lkkd;->b(Ljava/util/Locale; Lkkb;)V",
+              "access": "public abstract"
+            },
+            {
+              "method": "Lkkd;->c()V",
+              "access": "public abstract"
+            },
+            {
+              "method": "Lkkd;->d(Lklg; Lkkc;)V",
+              "access": "public abstract"
+            },
+            {
+              "method": "Lkkd;->f(Ljava/lang/String; Ljava/lang/String;)Z",
+              "access": "public abstract"
+            },
+            {
+              "method": "Lkkd;->ho()V",
+              "access": "public abstract"
+            }
+          ]
+        },
+        {
+          "class": "Litp;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [
+            "Lxqa;"
+          ],
+          "fields": [
+            {
+              "name": "$cid",
+              "type": "I",
+              "access": "private final synthetic"
+            },
+            {
+              "name": "a",
+              "type": "Ljava/lang/Object;",
+              "access": "final synthetic"
+            },
+            {
+              "name": "b",
+              "type": "Ljava/lang/Object;",
+              "access": "final synthetic"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Litp;-><init>(Lcom/google/android/apps/inputmethod/libs/trainingcache/replaycache/precomputedfeature/speech/examplestoreservice/SpeechPrecomputedFeatureExampleStoreService; Llvl; Ljava/lang/String; I)V",
+              "access": "public constructor",
+              "registers": 5,
+              "incoming_registers": 5,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->b Ljava/lang/Object;",
+                "iput-object Litp;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Liom; Lqyu; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Litr; Lqeg; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Litr; Lxqp; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Litr; Lzmm; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Litw; Lqeg; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Litw; Lxqp; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Litw; Lzms; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Ljha; Lgkh; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->b Ljava/lang/Object;",
+                "iput-object Litp;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lkei; Ljava/util/List; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lkjx; Lklg; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lksq; Lsfc; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lkts; Lsfc; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Locb; Locl; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lodr; Lwns; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lpga; Lxqp; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lpmz; Lxqp; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lrhy; Lpev; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->b Ljava/lang/Object;",
+                "iput-object Litp;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lsjg; Lwns; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Lthk; Lthm; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->a Ljava/lang/Object;",
+                "iput-object Litp;->b Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;-><init>(Ltvz; Ltrz; I)V",
+              "access": "public constructor",
+              "registers": 4,
+              "incoming_registers": 4,
+              "instruction_count": 6,
+              "invokes": [
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Litp;->$cid I",
+                "iput-object Litp;->b Ljava/lang/Object;",
+                "iput-object Litp;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;->c()V",
+              "access": "private final",
+              "registers": 6,
+              "incoming_registers": 1,
+              "instruction_count": 28,
+              "invokes": [
+                "Loae;->b(Ljava/lang/String; Ljava/lang/Object;)V",
+                "Litr;->g(Lzmm;)Lxqp;",
+                "Lxqi;->v(Lxqp;)Lxqi;",
+                "Litk;-><init>(Ljava/lang/Object; I)V",
+                "Lxqi;->w(Lwgh; Ljava/util/concurrent/Executor;)Lxqi;",
+                "Litq;-><init>(Ljava/lang/Object; I)V",
+                "Lxqi;->u(Ljava/lang/Class; Lxou; Ljava/util/concurrent/Executor;)Lxqi;"
+              ],
+              "fields_used": [
+                "iget-object Litp;->a Ljava/lang/Object;",
+                "iget-object Litp;->b Ljava/lang/Object;",
+                "sget-object Litr;->a Loae;",
+                "iget-object Litr;->f Lsfc;",
+                "sget-object Lxpi;->a Lxpi;",
+                "iput-object Litr;->k Lxqp;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;->d()V",
+              "access": "private final",
+              "registers": 7,
+              "incoming_registers": 1,
+              "instruction_count": 29,
+              "invokes": [
+                "Loae;->c(Ljava/lang/String; Ljava/lang/Object; Ljava/lang/Object;)V",
+                "Litw;->g(Lzms;)Lxqp;",
+                "Lxqi;->v(Lxqp;)Lxqi;",
+                "Litk;-><init>(Ljava/lang/Object; I)V",
+                "Lxqi;->w(Lwgh; Ljava/util/concurrent/Executor;)Lxqi;",
+                "Litq;-><init>(Ljava/lang/Object; I)V",
+                "Lxqi;->u(Ljava/lang/Class; Lxou; Ljava/util/concurrent/Executor;)Lxqi;"
+              ],
+              "fields_used": [
+                "iget-object Litp;->a Ljava/lang/Object;",
+                "iget-object Litp;->b Ljava/lang/Object;",
+                "sget-object Litw;->a Loae;",
+                "iget-object Litw;->g Lotc;",
+                "iget-object Litw;->f Lsfc;",
+                "sget-object Lxpi;->a Lxpi;",
+                "iput-object Litw;->k Lxqp;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;->a(Ljava/lang/Throwable;)V",
+              "access": "public final",
+              "registers": 15,
+              "incoming_registers": 2,
+              "instruction_count": 321,
+              "invokes": [
+                "Lvec;->aw(Landroid/content/Context; Lwgs; Ltrz; Llse;)V",
+                "Lwvn;->d()Lwwl;",
+                "La;->cr(Lwwl; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; C Ljava/lang/String; Ljava/lang/Throwable;)V",
+                "Lwvn;->c()Lwwl;",
+                "Lwvu;->i(Ljava/lang/Throwable;)Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwns;->size()I",
+                "Lwvu;->u(Ljava/lang/String; I)V",
+                "Lrhy;->g(Lrhy;)V",
+                "Lpmz;->f(J)V",
+                "Lpga;->al(Lpga;)V",
+                "Lwvn;->b()Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lods;->y(Lwns;)V",
+                "Lwvu;->w(Ljava/lang/String; Ljava/lang/Object;)V",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;",
+                "Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;",
+                "Llvl;->a(I Ljava/lang/String;)V",
+                "Lkei;->f(Ljava/util/List;)V",
+                "Litp;->d()V",
+                "Loae;->d(Ljava/lang/String; Ljava/lang/Object; Ljava/lang/Object; [Ljava/lang/Object;)V",
+                "Lqeg;->b()V",
+                "Litp;->c()V",
+                "Liom;->H(Liom;)V",
+                "Liom;->u(Lote; Lxif;)V",
+                "Loae;->c(Ljava/lang/String; Ljava/lang/Object; Ljava/lang/Object;)V"
+              ],
+              "fields_used": [
+                "iget Litp;->$cid I",
+                "sget Ltxc;->a I",
+                "iget-object Litp;->a Ljava/lang/Object;",
+                "iget-object Ltvz;->f Ljava/lang/Object;",
+                "iget-object Ltvz;->j Ljava/lang/Object;",
+                "iget-object Litp;->b Ljava/lang/Object;",
+                "iget-object Ltvz;->c Ljava/lang/Object;",
+                "sget-object Lthk;->a Lwvx;",
+                "sget-object Lsjg;->a Lwvx;",
+                "sget-object Lrhy;->a Lwvx;",
+                "sget-object Lpmz;->a Lwvx;",
+                "iget-object Lpga;->N Lxqp;",
+                "sget-object Lodr;->a Lwvx;",
+                "iget-object Lodr;->f Lods;",
+                "sget-object Locb;->a Lwvx;",
+                "sget-object Lkts;->a Lwvx;",
+                "sget-object Lksq;->a Lwvx;",
+                "sget-object Lkjx;->a Lwvx;",
+                "sget-object Lkle;->g Lkle;",
+                "iget-object Lkjx;->f Lqec;",
+                "sget-object Lcom/google/android/apps/inputmethod/libs/trainingcache/replaycache/precomputedfeature/speech/examplestoreservice/SpeechPrecomputedFeatureExampleStoreService;->a Lwvx;",
+                "sget-object Lkei;->a Lwvx;",
+                "sget-object Ljha;->p Lwvx;",
+                "iget-object Ljha;->j Lqec;",
+                "sget-object Lgxn;->h Lgxn;",
+                "iget-object Litw;->d Ljava/lang/Object;",
+                "iget-object Litw;->e Lxqp;",
+                "iput-object Litw;->e Lxqp;",
+                "sget-object Litw;->a Loae;",
+                "iget-object Litw;->g Lotc;",
+                "iget-object Litw;->f Lsfc;",
+                "iget-object Litr;->d Ljava/lang/Object;",
+                "iget-object Litr;->e Lxqp;",
+                "iput-object Litr;->e Lxqp;",
+                "sget-object Liom;->a Lwvx;",
+                "sget-object Lote;->d Lote;",
+                "sget-object Lote;->b Lote;",
+                "iget-object Lqyu;->a Lxif;",
+                "sget-object Litr;->a Loae;",
+                "iget-object Litr;->f Lsfc;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Litp;->b(Ljava/lang/Object;)V",
+              "access": "public final synthetic",
+              "registers": 15,
+              "incoming_registers": 2,
+              "instruction_count": 446,
+              "invokes": [
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lody;-><init>(I)V",
+                "Lzli;->ak(Ljava/lang/Iterable; Lwgu;)Ljava/lang/Iterable;",
+                "Lwns;->n(Ljava/lang/Iterable;)Lwns;",
+                "Lwns;->isEmpty()Z",
+                "Lpga;->m(Ljava/util/Collection;)V",
+                "Ljava/util/List;->size()I",
+                "Ljava/util/List;->get(I)Ljava/lang/Object;",
+                "Lpev;->q()Ljava/lang/String;",
+                "Lpev;->i()Lsfc;",
+                "Ljava/lang/String;->equals(Ljava/lang/Object;)Z",
+                "Lpgr;->e(Lpex; Lpev;)V",
+                "Liot;-><init>(Ljava/lang/Object; I)V",
+                "Lj$/util/Optional;->isPresent()Z",
+                "Lj$/util/Optional;->get()Ljava/lang/Object;",
+                "Lwns;->size()I",
+                "Llez;->I(I)V",
+                "Lrhy;->g(Lrhy;)V",
+                "Lrhy;->d(Lpev;)V",
+                "Lpmz;->f(J)V",
+                "Lpga;->al(Lpga;)V",
+                "Lods;->y(Lwns;)V",
+                "Lj$/util/DesugarCollections;->unmodifiableMap(Ljava/util/Map;)Ljava/util/Map;",
+                "Lwnz;->i(Ljava/util/Map;)Lwnz;",
+                "Lokc;->g()Ljava/lang/Object;",
+                "Ljava/lang/Boolean;->booleanValue()Z",
+                "Ljava/util/HashSet;-><init>()V",
+                "Lwnz;->e()Lwpa;",
+                "Lwpa;->k()Lwui;",
+                "Ljava/util/Iterator;->hasNext()Z",
+                "Ljava/util/Iterator;->next()Ljava/lang/Object;",
+                "Ljava/util/Map$Entry;->getKey()Ljava/lang/Object;",
+                "Ljava/util/Map$Entry;->getValue()Ljava/lang/Object;",
+                "Lwgo;->g(Ljava/lang/Object; Ljava/lang/Object; [Ljava/lang/Object;)Ljava/lang/String;",
+                "Ljava/util/Set;->add(Ljava/lang/Object;)Z",
+                "Lock;->a()Landroid/content/SharedPreferences;",
+                "Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;",
+                "Landroid/content/SharedPreferences$Editor;->putStringSet(Ljava/lang/String; Ljava/util/Set;)Landroid/content/SharedPreferences$Editor;",
+                "Landroid/content/SharedPreferences$Editor;->apply()V",
+                "Lwnz;->isEmpty()Z",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lwvn;->b()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lkse;->g(Lsfc;)V",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J",
+                "Lcht;->h(Ljava/lang/String; J)V",
+                "Lcht;->b(Ljava/lang/String; I)I",
+                "Lcht;->g(Ljava/lang/String; I)V",
+                "Ltnc;->g(Landroid/content/Context;)Ltmw;",
+                "Lcwm;-><init>()V",
+                "Lcwm;->b(I)V",
+                "Lcxo;-><init>(Ljava/lang/Class;)V",
+                "Lcxo;->b(Ljava/lang/String;)V",
+                "Lcxo;->f(Ljava/lang/String;)V",
+                "Ljava/util/LinkedHashMap;-><init>()V",
+                "Lceh;->m(Ljava/lang/String; Ljava/lang/Object; Ljava/util/Map;)V",
+                "Lceh;->k(Ljava/util/Map;)Lcwq;",
+                "Lcxo;->e(Lcwq;)V",
+                "Lcwm;->a()Lcwo;",
+                "Lcxo;->d(Lcwo;)V",
+                "Lcxo;->g()Llse;",
+                "Ltmw;->c(Ljava/lang/String; I Llse;)Lxqp;",
+                "Ljava/util/List;->iterator()Ljava/util/Iterator;",
+                "Lkjc;-><init>(Ljava/util/Iterator; I)V",
+                "Llvl;->b(Llrv;)V",
+                "Lwvu;->w(Ljava/lang/String; Ljava/lang/Object;)V",
+                "Lwvn;->c()Lwwl;",
+                "Lkei;->f(Ljava/util/List;)V",
+                "Ljava/lang/Integer;->intValue()I",
+                "Litp;->d()V",
+                "Loae;->c(Ljava/lang/String; Ljava/lang/Object; Ljava/lang/Object;)V",
+                "Liti;->c(Z)V",
+                "Lqeg;->b()V",
+                "Litp;->c()V",
+                "Liom;->H(Liom;)V",
+                "Lwvn;->d()Lwwl;",
+                "Liom;->s(Z)V",
+                "Lwns;->get(I)Ljava/lang/Object;",
+                "Liom;->u(Lote; Lxif;)V",
+                "Lqyu;->A(Lqyu;)Lxif;",
+                "Lhof;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lhtv;->e()I",
+                "Lhtv;->t(Ljava/lang/CharSequence; Ljava/lang/CharSequence; I)Landroid/text/Spannable;",
+                "Lhtv;->R(Ljava/lang/CharSequence; Ljava/lang/String; I Lotc;)V",
+                "Lhtv;->Y(Lotc; Lwns; Lwns;)V",
+                "Liom;->I(I)V",
+                "Loae;->b(Ljava/lang/String; Ljava/lang/Object;)V"
+              ],
+              "fields_used": [
+                "iget Litp;->$cid I",
+                "iget-object Litp;->b Ljava/lang/Object;",
+                "iget-object Lthk;->b Lpga;",
+                "iget-object Litp;->a Ljava/lang/Object;",
+                "iget-object Lsfc;->n Ljava/lang/String;",
+                "iget-object Lthm;->c Ljava/lang/String;",
+                "iget-object Lthm;->e Ljava/lang/String;",
+                "iget-object Lsjg;->b Lj$/util/Optional;",
+                "iget-object Liot;->a Ljava/lang/Object;",
+                "iget-object Lpmz;->h Lxqp;",
+                "iput-object Lpmz;->h Lxqp;",
+                "iput-object Lpmz;->g Lcom/google/android/libraries/inputmethod/metadata/KeyMappingDef;",
+                "iget-object Lpga;->N Lxqp;",
+                "iget-object Lodr;->f Lods;",
+                "sget-object Locb;->a Lwvx;",
+                "iget-object Locl;->b Laamo;",
+                "sget-object Lock;->d Lokc;",
+                "sget-object Lock;->b Lwgo;",
+                "iget-object Locb;->d Lock;",
+                "iget-object Lock;->e Lqec;",
+                "sget-object Locm;->a Locm;",
+                "sget-object Lkts;->a Lwvx;",
+                "iget-object Lkts;->c Lkse;",
+                "sget-object Lksq;->a Lwvx;",
+                "iget-object Lksq;->e Lqvt;",
+                "iget-object Lksq;->f Landroid/content/Context;",
+                "iput-boolean Lcwm;->a Z",
+                "iput-boolean Lcwm;->b Z",
+                "sget-object Lsgz;->m Lsgz;",
+                "iget-object Lksq;->g Lqec;",
+                "sget-object Lcom/google/android/apps/inputmethod/libs/trainingcache/replaycache/precomputedfeature/speech/examplestoreservice/SpeechPrecomputedFeatureExampleStoreService;->a Lwvx;",
+                "sget-object Lkei;->a Lwvx;",
+                "iget-object Ljha;->j Lqec;",
+                "sget-object Lgxn;->h Lgxn;",
+                "sget-object Litw;->a Loae;",
+                "iget-object Litw;->g Lotc;",
+                "iget-object Litw;->f Lsfc;",
+                "iget-object Litw;->c Liti;",
+                "sget-object Liom;->a Lwvx;",
+                "iget-object Lotd;->h Lote;",
+                "sget-object Lote;->a Lote;",
+                "iget-object Lqyu;->a Lxif;",
+                "iget-object Lotd;->b Ljava/lang/String;",
+                "iget-object Lotd;->g Ljava/lang/String;",
+                "iget-object Liom;->j Lhof;",
+                "sget-object Lhuz;->l Lhuz;",
+                "sget-object Lotc;->f Lotc;",
+                "sget-object Lxih;->b Lxih;",
+                "sget-object Ljava/lang/Boolean;->FALSE Ljava/lang/Boolean;",
+                "iget-object Liom;->e Lhtv;",
+                "iget-object Lqyu;->b Lpdx;",
+                "iget-object Lpdx;->b Ljava/lang/CharSequence;",
+                "sget-object Lwsx;->a Lwns;",
+                "sget-object Litr;->a Loae;",
+                "iget-object Litr;->f Lsfc;",
+                "iget-object Litr;->c Liti;"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Ljhk;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [
+            "Lwgh;"
+          ],
+          "fields": [
+            {
+              "name": "$cid",
+              "type": "I",
+              "access": "private final synthetic"
+            },
+            {
+              "name": "a",
+              "type": "Ljava/lang/Object;",
+              "access": "public final synthetic"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Ljhk;-><init>(Ljava/lang/Object; I)V",
+              "access": "public synthetic constructor",
+              "registers": 3,
+              "incoming_registers": 3,
+              "instruction_count": 4,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput Ljhk;->$cid I",
+                "iput-object Ljhk;->a Ljava/lang/Object;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Ljhk;->apply(Ljava/lang/Object;)Ljava/lang/Object;",
+              "access": "public final",
+              "registers": 14,
+              "incoming_registers": 2,
+              "instruction_count": 438,
+              "invokes": [
+                "Lj$/util/Collection$-EL;->stream(Ljava/util/Collection;)Lj$/util/stream/Stream;",
+                "Lj$/util/Objects;->requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljvz;-><init>(Ljava/lang/Object; I)V",
+                "Lj$/util/stream/Stream;->map(Ljava/util/function/Function;)Lj$/util/stream/Stream;",
+                "Lj$/util/stream/Stream;->distinct()Lj$/util/stream/Stream;",
+                "Lj$/util/stream/Stream;->collect(Lj$/util/stream/Collector;)Ljava/lang/Object;",
+                "Laaln;->o()Laali;",
+                "Laamd;->size()I",
+                "Laamd;->get(I)Ljava/lang/Object;",
+                "Ljava/lang/String;->equals(Ljava/lang/Object;)Z",
+                "Laali;->t()V",
+                "Lmmx;->b()V",
+                "Laamd;->set(I Ljava/lang/Object;)Ljava/lang/Object;",
+                "Laali;->o()Laaln;",
+                "Laamd;->add(Ljava/lang/Object;)Z",
+                "Ljava/lang/Boolean;->booleanValue()Z",
+                "Ltyx;->h(Ljava/lang/String;)V",
+                "Llsa;->e(Ltzi;)V",
+                "Lkkd;->f(Ljava/lang/String; Ljava/lang/String;)Z",
+                "Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->i(Ljava/lang/Throwable;)Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->u(Ljava/lang/String; I)V",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Labxb;-><init>(I)V",
+                "Laakp;->A()[B",
+                "Ljava/lang/String;-><init>([B)V",
+                "Lorg/json/JSONObject;-><init>(Ljava/lang/String;)V",
+                "Lorg/json/JSONObject;->getJSONObject(Ljava/lang/String;)Lorg/json/JSONObject;",
+                "Lorg/json/JSONObject;->getJSONArray(Ljava/lang/String;)Lorg/json/JSONArray;",
+                "Lorg/json/JSONArray;->length()I",
+                "Lorg/json/JSONArray;->getJSONObject(I)Lorg/json/JSONObject;",
+                "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;",
+                "Lorg/json/JSONObject;->has(Ljava/lang/String;)Z",
+                "Ljava/util/List;->clear()V",
+                "Ljava/util/List;->add(Ljava/lang/Object;)Z",
+                "Lwvu;->w(Ljava/lang/String; Ljava/lang/Object;)V",
+                "Lkcx;->A()Landroid/content/Context;",
+                "Lkbm;->b(Landroid/content/Context;)Lkbi;",
+                "Lwvu;->J(Ljava/lang/String; Ljava/lang/Object; Ljava/lang/Object;)V",
+                "Ljzp;->b()Ljava/lang/String;",
+                "Lfxa;->g()Ljava/util/Collection;",
+                "Ljzr;->f(Ljava/util/Collection;)V",
+                "Ldlj;->h(Lwwl; Ljava/lang/Object; Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; C Ljava/lang/String;)V",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J",
+                "Ljava/util/concurrent/atomic/AtomicLong;->set(J)V",
+                "Ljava/util/concurrent/atomic/AtomicBoolean;->set(Z)V",
+                "Ljtd;-><init>(I)V",
+                "Ljwg;-><init>(Landroid/view/View; Lwgh; Ljava/util/function/BiConsumer; Lsrk;)V",
+                "Landroid/content/Context;->getTheme()Landroid/content/res/Resources$Theme;",
+                "Lsgd;->n(Landroid/content/res/Resources$Theme; I I)I",
+                "Ljvr;-><init>(Landroid/view/View; I)V",
+                "Ljava/util/concurrent/atomic/AtomicReference;->set(Ljava/lang/Object;)V",
+                "Lndj;-><init>()V",
+                "Ljsf;-><init>(Ljava/lang/Object; I)V",
+                "Ljpy;-><init>(Ljava/lang/Object; I)V",
+                "Ljsd;-><init>(Ljava/lang/Object; I)V",
+                "Lndj;->a()Lndk;",
+                "Lhap;->a()Lhao;",
+                "Lhao;->g(Z)V",
+                "Lhao;->i(Ljava/util/List; Ldjy;)V",
+                "Lhao;->a()Lhap;",
+                "Lwns;->isEmpty()Z",
+                "Ldjy;->k(Ljava/util/List;)Lwns;",
+                "Ljava/lang/IllegalStateException;-><init>(Ljava/lang/String;)V",
+                "Ljmx;-><init>(Landroid/view/View; Labtb;)V",
+                "Lacgy;->a(Ljava/lang/Object;)Ljava/lang/Object;"
+              ],
+              "fields_used": [
+                "iget Ljhk;->$cid I",
+                "iget-object Ljhk;->a Ljava/lang/Object;",
+                "sget-object Lwlk;->a Lj$/util/stream/Collector;",
+                "iget-object Laali;->b Laaln;",
+                "iget-object Lmmx;->b Laamd;",
+                "iget-object Lmmv;->d Ljava/lang/String;",
+                "sget-object Llyo;->a Ltyx;",
+                "sget-object Ltzi;->cL Ltzi;",
+                "iget-object Llyo;->d Llsa;",
+                "iget-object Lklo;->p Lkkd;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->b Lklb;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-boolean Lqke;->c Z",
+                "sget-object Lkjx;->a Lwvx;",
+                "iget-object Lqke;->d Ljava/lang/Exception;",
+                "iget Lqke;->b I",
+                "iget-object Lkjx;->f Lqec;",
+                "sget-object Lkle;->g Lkle;",
+                "sget-object Lkle;->k Lkle;",
+                "sget-object Lkle;->i Lkle;",
+                "iget Lqke;->g I",
+                "iget-object Lqke;->e Laakp;",
+                "iput Labxb;->b I",
+                "iput-object Labxb;->c Ljava/lang/Object;",
+                "iget-object Labxb;->a Ljava/lang/Object;",
+                "iget Labxb;->b I",
+                "sget-object Lkdc;->a Lwvx;",
+                "iget-object Lkdb;->i Lkdc;",
+                "iget-object Lkdc;->b Lkcx;",
+                "iget-object Lkdb;->c Lkbm;",
+                "iget-object Lkbi;->b Ljava/lang/String;",
+                "iget-object Lkdb;->b Ljava/lang/String;",
+                "sget-object Lwsx;->a Lwns;",
+                "iput-object Ljzp;->e Lfxb;",
+                "iget-object Ljzp;->e Lfxb;",
+                "sget-object Ljava/lang/Boolean;->TRUE Ljava/lang/Boolean;",
+                "sget-object Ljava/lang/Boolean;->FALSE Ljava/lang/Boolean;",
+                "sget-object Ljzr;->a Lwvx;",
+                "iget-object Ljzr;->e Ljava/util/concurrent/atomic/AtomicLong;",
+                "iget-object Ljzr;->f Ljava/util/concurrent/atomic/AtomicBoolean;",
+                "iget-object Ljzr;->g Ljava/util/concurrent/atomic/AtomicBoolean;",
+                "iget-object Ljzr;->h Ljava/util/concurrent/atomic/AtomicBoolean;",
+                "iget-object Ljwh;->c Lsrk;",
+                "iget-object Ljwh;->a Ljava/util/function/BiConsumer;",
+                "iget-object Ljvl;->c Ljava/util/concurrent/atomic/AtomicReference;",
+                "sget Lndk;->y I",
+                "iput-object Lndj;->a Landroid/view/View;",
+                "iput-object Lndj;->c Lwgh;",
+                "iput-object Lndj;->b Lwhq;",
+                "iput-object Lndj;->d Ljava/util/function/BiConsumer;",
+                "iput-object Lndj;->e Ljava/util/function/BiFunction;",
+                "iget-object Ljtk;->z Lsrk;",
+                "iput-object Lndj;->g Lsrk;",
+                "iput-object Lndj;->f Lwgh;",
+                "iget-object Ljsw;->d Ldjy;",
+                "iget-object Ljrr;->c Ldjy;"
+              ],
+              "protocol_literals": [
+                "detectedSourceLanguage",
+                "data",
+                "translations",
+                "translatedText"
+              ]
+            }
+          ]
+        },
+        {
+          "class": "Lkkp;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [
+            "Lkkd;",
+            "Lkkr;"
+          ],
+          "fields": [
+            {
+              "name": "g",
+              "type": "Lwvx;",
+              "access": "public static final"
+            },
+            {
+              "name": "a",
+              "type": "Lqec;",
+              "access": "private final"
+            },
+            {
+              "name": "b",
+              "type": "Lkks;",
+              "access": "private"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lkkp;-><clinit>()V",
+              "access": "static constructor",
+              "registers": 1,
+              "incoming_registers": 0,
+              "instruction_count": 5,
+              "invokes": [
+                "Lwvx;->i(Ljava/lang/String;)Lwvx;"
+              ],
+              "fields_used": [
+                "sput-object Lkkp;->g Lwvx;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkkp;-><init>(Lqec;)V",
+              "access": "public constructor",
+              "registers": 2,
+              "incoming_registers": 2,
+              "instruction_count": 3,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput-object Lkkp;->a Lqec;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkkp;->a(Lklg;)Lxqp;",
+              "access": "protected abstract"
+            },
+            {
+              "method": "Lkkp;->c()V",
+              "access": "public final",
+              "registers": 1,
+              "incoming_registers": 1,
+              "instruction_count": 4,
+              "invokes": [
+                "Lkks;->a()V"
+              ],
+              "fields_used": [
+                "iget-object Lkkp;->b Lkks;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkkp;->d(Lklg; Lkkc;)V",
+              "access": "public final",
+              "registers": 12,
+              "incoming_registers": 3,
+              "instruction_count": 49,
+              "invokes": [
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Labxb;-><init>(I)V",
+                "Lkkc;->a(Labxb;)V",
+                "Lkks;->a()V",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J",
+                "Lkfv;-><init>(Ljava/lang/Object; Ljava/lang/Object; Ljava/lang/Object; I [C)V",
+                "Ljava/lang/Math;->max(J J)J",
+                "Lvgb;->d(Ljava/lang/Runnable; J)V",
+                "Lkks;->b(Lklg; Lkkc;)V",
+                "Lkkp;->e(Lklg; Lkkc;)V"
+              ],
+              "fields_used": [
+                "iget-object Lklg;->a Ljava/lang/String;",
+                "iget-boolean Lklg;->e Z",
+                "iget-object Lkkp;->b Lkks;",
+                "iget-wide Lkks;->b J",
+                "iget-wide Lkks;->d J",
+                "iput-object Lkks;->a Ljava/lang/Runnable;",
+                "iget-wide Lkks;->e J",
+                "iget-wide Lkks;->c J",
+                "iget-object Lkks;->a Ljava/lang/Runnable;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkkp;->e(Lklg; Lkkc;)V",
+              "access": "public final",
+              "registers": 5,
+              "incoming_registers": 3,
+              "instruction_count": 8,
+              "invokes": [
+                "Lkkp;->a(Lklg;)Lxqp;",
+                "Litd;-><init>(Lkkp; Lkkc; I)V",
+                "Lwzl;->C(Lxqp; Lxqa; Ljava/util/concurrent/Executor;)V"
+              ],
+              "fields_used": [
+                "sget-object Lnos;->b Lnos;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkkp;->f(Ljava/lang/String; Ljava/lang/String;)Z",
+              "access": "public final synthetic",
+              "registers": 3,
+              "incoming_registers": 3,
+              "instruction_count": 2,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkkp;->ho()V",
+              "access": "public final",
+              "registers": 4,
+              "incoming_registers": 1,
+              "instruction_count": 30,
+              "invokes": [
+                "Lkks;-><init>(Lkkr;)V",
+                "Lokc;->g()Ljava/lang/Object;",
+                "Ljava/lang/Long;->longValue()J"
+              ],
+              "fields_used": [
+                "iget-object Lkkp;->b Lkks;",
+                "iput-object Lkkp;->b Lkks;",
+                "iput-wide Lkks;->b J",
+                "sget-object Lkkx;->b Lokc;",
+                "iput-wide Lkks;->c J",
+                "sget-object Lkkx;->c Lokc;",
+                "iput-wide Lkks;->d J",
+                "sget-object Lkkx;->d Lokc;",
+                "iput-wide Lkks;->e J"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Lkjx;",
+          "superclass": "Lkkp;",
+          "interfaces": [],
+          "fields": [
+            {
+              "name": "a",
+              "type": "Lwvx;",
+              "access": "public static final"
+            },
+            {
+              "name": "b",
+              "type": "Ljava/lang/String;",
+              "access": "public static final"
+            },
+            {
+              "name": "c",
+              "type": "Loot;",
+              "access": "public final"
+            },
+            {
+              "name": "d",
+              "type": "Landroid/content/Context;",
+              "access": "public final"
+            },
+            {
+              "name": "e",
+              "type": "Ljava/lang/String;",
+              "access": "public final"
+            },
+            {
+              "name": "f",
+              "type": "Lqec;",
+              "access": "public final"
+            },
+            {
+              "name": "h",
+              "type": "Lqkc;",
+              "access": "private final"
+            },
+            {
+              "name": "i",
+              "type": "Ljava/util/concurrent/Executor;",
+              "access": "private final"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lkjx;-><clinit>()V",
+              "access": "static constructor",
+              "registers": 5,
+              "incoming_registers": 0,
+              "instruction_count": 26,
+              "invokes": [
+                "Lwvx;->i(Ljava/lang/String;)Lwvx;",
+                "Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;",
+                "Lngt;->a(J)J",
+                "Ljava/lang/String;->format(Ljava/util/Locale; Ljava/lang/String; [Ljava/lang/Object;)Ljava/lang/String;"
+              ],
+              "fields_used": [
+                "sput-object Lkjx;->a Lwvx;",
+                "sget-object Ljava/util/Locale;->ENGLISH Ljava/util/Locale;",
+                "sget-object Ljava/util/concurrent/TimeUnit;->DAYS Ljava/util/concurrent/TimeUnit;",
+                "sget-object Lngt;->f Lngt;",
+                "sput-object Lkjx;->b Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkjx;-><init>(Landroid/content/Context; Lqec;)V",
+              "access": "public constructor",
+              "registers": 6,
+              "incoming_registers": 3,
+              "instruction_count": 41,
+              "invokes": [
+                "Lkkp;-><init>(Lqec;)V",
+                "Ljava/lang/Object;-><init>()V",
+                "Lj$/time/Duration;->ofDays(J)Lj$/time/Duration;",
+                "Lxnb;->h(Lj$/time/Duration;)V",
+                "Lxnb;->g()Lqjx;",
+                "Lqkj;->a(Landroid/content/Context; Lqjx;)Loot;",
+                "Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V",
+                "Lses;->f(Landroid/content/Context;)Ljava/lang/String;",
+                "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+                "Ljava/lang/StringBuilder;->append(C)Ljava/lang/StringBuilder;",
+                "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
+                "Lnok;->a()Lnok;",
+                "Lqkc;-><init>(Landroid/content/Context; Ljava/util/concurrent/Executor;)V"
+              ],
+              "fields_used": [
+                "iput-object Lkjx;->c Loot;",
+                "iput-object Lkjx;->d Landroid/content/Context;",
+                "sget-object Landroid/os/Build$VERSION;->RELEASE Ljava/lang/String;",
+                "sget-object Landroid/os/Build;->MODEL Ljava/lang/String;",
+                "iput-object Lkjx;->e Ljava/lang/String;",
+                "iget-object Lnok;->d Lxqt;",
+                "iput-object Lkjx;->i Ljava/util/concurrent/Executor;",
+                "iput-object Lkjx;->h Lqkc;",
+                "iput-object Lkjx;->f Lqec;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkjx;->a(Lklg;)Lxqp;",
+              "access": "protected final",
+              "registers": 6,
+              "incoming_registers": 2,
+              "instruction_count": 39,
+              "invokes": [
+                "Lokc;->g()Ljava/lang/Object;",
+                "Ljava/lang/String;->isEmpty()Z",
+                "Lqkc;->a()Loot;",
+                "Loot;->k(Ljava/lang/Object;)Loot;",
+                "Loot;->L([Lxqp;)Llsn;",
+                "Lskl;-><init>(Ljava/lang/Object; Ljava/lang/Object; Ljava/lang/Object; I)V",
+                "Llsn;->l(Lxot; Ljava/util/concurrent/Executor;)Loot;",
+                "Ljhk;-><init>(Ljava/lang/Object; I)V",
+                "Loot;->r(Lwgh; Ljava/util/concurrent/Executor;)Loot;",
+                "Litp;-><init>(Lkjx; Lklg; I)V",
+                "Loot;->E(Lxqa; Ljava/util/concurrent/Executor;)V"
+              ],
+              "fields_used": [
+                "sget-object Lkkx;->e Lokc;",
+                "iget-object Lkjx;->h Lqkc;",
+                "sget-object Lwtc;->b Lwnz;",
+                "iget-object Lkjx;->c Loot;",
+                "iget-object Lkjx;->i Ljava/util/concurrent/Executor;",
+                "sget-object Lxpi;->a Lxpi;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkjx;->b(Ljava/util/Locale; Lkkb;)V",
+              "access": "public final",
+              "registers": 11,
+              "incoming_registers": 3,
+              "instruction_count": 60,
+              "invokes": [
+                "Ljava/util/LinkedHashMap;-><init>()V",
+                "Lklq;->d(Landroid/content/Context; Ljava/util/Locale;)Ljava/lang/String;",
+                "Ljava/util/Map;->put(Ljava/lang/Object; Ljava/lang/Object;)Ljava/lang/Object;",
+                "Ljava/util/List;->get(I)Ljava/lang/Object;",
+                "Ljava/lang/String;->equals(Ljava/lang/Object;)Z",
+                "Lklq;->b(Ljava/lang/String;)Ljava/lang/String;",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Lsff;->a(Ljava/lang/String; Ljava/util/Locale;)Ljava/lang/String;",
+                "Lklq;->c(Ljava/lang/String;)Ljava/lang/String;",
+                "Lkkb;->a(Ljava/util/Map; Ljava/util/Map;)V"
+              ],
+              "fields_used": [
+                "sget-object Lklq;->a Lwns;",
+                "iget-object Lkjx;->d Landroid/content/Context;",
+                "iget Lwsx;->d I",
+                "sget-object Lklq;->b Lwns;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkjx;->close()V",
+              "access": "public final",
+              "registers": 1,
+              "incoming_registers": 1,
+              "instruction_count": 1,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Lkkc;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [],
+          "fields": [],
+          "methods": [
+            {
+              "method": "Lkkc;->a(Labxb;)V",
+              "access": "public abstract"
+            }
+          ]
+        },
+        {
+          "class": "Lkko;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [],
+          "fields": [
+            {
+              "name": "a",
+              "type": "Lwvx;",
+              "access": "public static final"
+            },
+            {
+              "name": "b",
+              "type": "I",
+              "access": "public"
+            },
+            {
+              "name": "c",
+              "type": "Z",
+              "access": "public"
+            },
+            {
+              "name": "d",
+              "type": "Lqec;",
+              "access": "public final"
+            },
+            {
+              "name": "e",
+              "type": "Lkkd;",
+              "access": "final"
+            },
+            {
+              "name": "f",
+              "type": "Lrfl;",
+              "access": "public final"
+            },
+            {
+              "name": "g",
+              "type": "Lxqt;",
+              "access": "public final"
+            },
+            {
+              "name": "h",
+              "type": "J",
+              "access": "public"
+            },
+            {
+              "name": "i",
+              "type": "Z",
+              "access": "public"
+            },
+            {
+              "name": "j",
+              "type": "Lkkc;",
+              "access": "public"
+            },
+            {
+              "name": "k",
+              "type": "Lkkk;",
+              "access": "private final"
+            },
+            {
+              "name": "l",
+              "type": "Lklg;",
+              "access": "private final"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lkko;-><clinit>()V",
+              "access": "static constructor",
+              "registers": 1,
+              "incoming_registers": 0,
+              "instruction_count": 5,
+              "invokes": [
+                "Lwvx;->i(Ljava/lang/String;)Lwvx;"
+              ],
+              "fields_used": [
+                "sput-object Lkko;->a Lwvx;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;-><init>(Lqec; Lkkk; Lkkd;)V",
+              "access": "public constructor",
+              "registers": 7,
+              "incoming_registers": 4,
+              "instruction_count": 36,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V",
+                "Lkkn;-><init>(Lkko;)V",
+                "Lklf;-><init>()V",
+                "Lklf;->a(Ljava/lang/String;)V",
+                "Lklf;->b(Ljava/lang/String;)V",
+                "Lklg;-><init>(Lklf;)V",
+                "Lrfn;->c()Z"
+              ],
+              "fields_used": [
+                "iput Lkko;->b I",
+                "iput-object Lkko;->f Lrfl;",
+                "sget-object Lnos;->b Lnos;",
+                "iput-object Lkko;->g Lxqt;",
+                "iput-wide Lkko;->h J",
+                "iput-object Lkko;->k Lkkk;",
+                "iput-object Lkko;->e Lkkd;",
+                "iput-object Lkko;->d Lqec;",
+                "iput-object Lklf;->a Ljava/lang/String;",
+                "iput-boolean Lklf;->d Z",
+                "iput-boolean Lklf;->e Z",
+                "iput-object Lkko;->l Lklg;",
+                "iput-object Lkko;->j Lkkc;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;->a(I)I",
+              "access": "public static",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 9,
+              "invokes": [],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;->b()I",
+              "access": "public final",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 8,
+              "invokes": [
+                "Lkko;->a(I)I"
+              ],
+              "fields_used": [
+                "iget-boolean Lkko;->i Z",
+                "iget Lkko;->b I"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;->c()V",
+              "access": "public final",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 15,
+              "invokes": [
+                "Lrfn;->c()Z",
+                "Lkkd;->d(Lklg; Lkkc;)V",
+                "Lkko;->f(I Z)V"
+              ],
+              "fields_used": [
+                "iget-boolean Lkko;->i Z",
+                "iget-object Lkko;->e Lkkd;",
+                "iget-object Lkko;->l Lklg;",
+                "iget-object Lkko;->j Lkkc;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;->d(I)V",
+              "access": "public final",
+              "registers": 7,
+              "incoming_registers": 2,
+              "instruction_count": 58,
+              "invokes": [
+                "Lkko;->a(I)I",
+                "Lkik;->b(I)Z",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lkkk;->a(I)V"
+              ],
+              "fields_used": [
+                "iget-boolean Lkko;->c Z",
+                "iget-object Lkko;->k Lkkk;",
+                "iget Lkko;->b I",
+                "iget-object Lkko;->d Lqec;",
+                "sget-object Lkle;->j Lkle;",
+                "sget-object Lkko;->a Lwvx;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;->e(Z)V",
+              "access": "public final",
+              "registers": 7,
+              "incoming_registers": 2,
+              "instruction_count": 29,
+              "invokes": [
+                "Lrfn;->c()Z",
+                "Lkko;->f(I Z)V",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lj$/time/Instant;->now()Lj$/time/Instant;",
+                "Lj$/time/Instant;->toEpochMilli()J"
+              ],
+              "fields_used": [
+                "sget-object Lkko;->a Lwvx;",
+                "iput-wide Lkko;->h J"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkko;->f(I Z)V",
+              "access": "public final",
+              "registers": 9,
+              "incoming_registers": 3,
+              "instruction_count": 59,
+              "invokes": [
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V",
+                "Lkko;->a(I)I",
+                "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;",
+                "Lqec;->n(Lqeh; [Ljava/lang/Object;)V",
+                "Laff;-><init>(Ljava/lang/Object; I I)V",
+                "Lxqt;->a(Ljava/lang/Runnable; J Ljava/util/concurrent/TimeUnit;)Lxqr;",
+                "Lkko;->c()V"
+              ],
+              "fields_used": [
+                "iget-boolean Lkko;->c Z",
+                "sget-object Lkko;->a Lwvx;",
+                "iget-boolean Lkko;->i Z",
+                "iget Lkko;->b I",
+                "iput Lkko;->b I",
+                "iget-object Lkko;->d Lqec;",
+                "sget-object Lkle;->j Lkle;",
+                "iget-object Lkko;->g Lxqt;",
+                "sget-object Ljava/util/concurrent/TimeUnit;->MILLISECONDS Ljava/util/concurrent/TimeUnit;"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Lklf;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [],
+          "fields": [
+            {
+              "name": "a",
+              "type": "Ljava/lang/String;",
+              "access": "public"
+            },
+            {
+              "name": "b",
+              "type": "Ljava/lang/String;",
+              "access": "public"
+            },
+            {
+              "name": "c",
+              "type": "Ljava/lang/String;",
+              "access": "public"
+            },
+            {
+              "name": "d",
+              "type": "Z",
+              "access": "public"
+            },
+            {
+              "name": "e",
+              "type": "Z",
+              "access": "public"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lklf;-><clinit>()V",
+              "access": "static constructor",
+              "registers": 2,
+              "incoming_registers": 0,
+              "instruction_count": 3,
+              "invokes": [
+                "Lj$/time/Duration;->ofMillis(J)Lj$/time/Duration;"
+              ],
+              "fields_used": [],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklf;-><init>()V",
+              "access": "public constructor",
+              "registers": 2,
+              "incoming_registers": 1,
+              "instruction_count": 11,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput-object Lklf;->a Ljava/lang/String;",
+                "iput-object Lklf;->b Ljava/lang/String;",
+                "iput-object Lklf;->c Ljava/lang/String;",
+                "iput-boolean Lklf;->d Z",
+                "iput-boolean Lklf;->e Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklf;->a(Ljava/lang/String;)V",
+              "access": "public final",
+              "registers": 4,
+              "incoming_registers": 2,
+              "instruction_count": 11,
+              "invokes": [
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Ljava/lang/String;->equals(Ljava/lang/Object;)Z",
+                "Lklq;->b(Ljava/lang/String;)Ljava/lang/String;"
+              ],
+              "fields_used": [
+                "iput-object Lklf;->b Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklf;->b(Ljava/lang/String;)V",
+              "access": "public final",
+              "registers": 3,
+              "incoming_registers": 2,
+              "instruction_count": 9,
+              "invokes": [
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Lklq;->c(Ljava/lang/String;)Ljava/lang/String;"
+              ],
+              "fields_used": [
+                "iput-object Lklf;->c Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Lklg;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [],
+          "fields": [
+            {
+              "name": "a",
+              "type": "Ljava/lang/String;",
+              "access": "public final"
+            },
+            {
+              "name": "b",
+              "type": "Ljava/lang/String;",
+              "access": "public final"
+            },
+            {
+              "name": "c",
+              "type": "Ljava/lang/String;",
+              "access": "public final"
+            },
+            {
+              "name": "d",
+              "type": "Z",
+              "access": "public final"
+            },
+            {
+              "name": "e",
+              "type": "Z",
+              "access": "public final"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lklg;-><init>(Lklf;)V",
+              "access": "public constructor",
+              "registers": 3,
+              "incoming_registers": 2,
+              "instruction_count": 12,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iget-object Lklf;->a Ljava/lang/String;",
+                "iput-object Lklg;->a Ljava/lang/String;",
+                "iget-object Lklf;->b Ljava/lang/String;",
+                "iput-object Lklg;->b Ljava/lang/String;",
+                "iget-object Lklf;->c Ljava/lang/String;",
+                "iput-object Lklg;->c Ljava/lang/String;",
+                "iget-boolean Lklf;->d Z",
+                "iput-boolean Lklg;->d Z",
+                "iget-boolean Lklf;->e Z",
+                "iput-boolean Lklg;->e Z"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lklg;->toString()Ljava/lang/String;",
+              "access": "public final",
+              "registers": 3,
+              "incoming_registers": 1,
+              "instruction_count": 16,
+              "invokes": [
+                "Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V",
+                "Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+                "Ljava/lang/StringBuilder;->toString()Ljava/lang/String;"
+              ],
+              "fields_used": [
+                "iget-object Lklg;->a Ljava/lang/String;",
+                "iget-object Lklg;->b Ljava/lang/String;",
+                "iget-object Lklg;->c Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        },
+        {
+          "class": "Lkli;",
+          "superclass": "Ljava/lang/Object;",
+          "interfaces": [
+            "Lkkc;"
+          ],
+          "fields": [
+            {
+              "name": "a",
+              "type": "Lklo;",
+              "access": "public final synthetic"
+            },
+            {
+              "name": "b",
+              "type": "J",
+              "access": "public final synthetic"
+            },
+            {
+              "name": "c",
+              "type": "Ljava/lang/String;",
+              "access": "public final synthetic"
+            },
+            {
+              "name": "d",
+              "type": "Ljava/lang/String;",
+              "access": "public final synthetic"
+            }
+          ],
+          "methods": [
+            {
+              "method": "Lkli;-><init>(Lklo; J Ljava/lang/String; Ljava/lang/String;)V",
+              "access": "public synthetic constructor",
+              "registers": 6,
+              "incoming_registers": 6,
+              "instruction_count": 6,
+              "invokes": [
+                "Ljava/lang/Object;-><init>()V"
+              ],
+              "fields_used": [
+                "iput-object Lkli;->a Lklo;",
+                "iput-wide Lkli;->b J",
+                "iput-object Lkli;->c Ljava/lang/String;",
+                "iput-object Lkli;->d Ljava/lang/String;"
+              ],
+              "protocol_literals": []
+            },
+            {
+              "method": "Lkli;->a(Labxb;)V",
+              "access": "public final",
+              "registers": 11,
+              "incoming_registers": 2,
+              "instruction_count": 101,
+              "invokes": [
+                "Lkko;->e(Z)V",
+                "Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z",
+                "Ljava/lang/String;->indexOf(Ljava/lang/String;)I",
+                "Ljava/lang/String;->length()I",
+                "Landroid/text/SpannableStringBuilder;-><init>()V",
+                "Ljava/lang/String;->substring(I I)Ljava/lang/String;",
+                "Landroid/text/SpannableStringBuilder;->append(Ljava/lang/CharSequence;)Landroid/text/SpannableStringBuilder;",
+                "Ljava/util/Locale;-><init>(Ljava/lang/String;)V",
+                "Landroid/text/style/LocaleSpan;-><init>(Ljava/util/Locale;)V",
+                "Landroid/text/SpannableString;->valueOf(Ljava/lang/CharSequence;)Landroid/text/SpannableString;",
+                "Landroid/text/SpannableString;->length()I",
+                "Landroid/text/SpannableString;->setSpan(Ljava/lang/Object; I I I)V",
+                "Landroid/text/SpannableString;-><init>(Ljava/lang/CharSequence;)V",
+                "Ljava/lang/String;->substring(I)Ljava/lang/String;",
+                "Landroid/text/SpannableStringBuilder;->length()I",
+                "Landroid/text/SpannableStringBuilder;->setSpan(Ljava/lang/Object; I I I)V",
+                "Lklo;->aj(Ljava/lang/CharSequence;)V",
+                "Ljava/util/List;->isEmpty()Z",
+                "Ljava/util/List;->get(I)Ljava/lang/Object;",
+                "Lklo;->ah(Ljava/lang/String;)V",
+                "Lwvn;->d()Lwwl;",
+                "Lwvu;->j(Ljava/lang/String; Ljava/lang/String; I Ljava/lang/String;)Lwwl;",
+                "Lwvu;->t(Ljava/lang/String;)V"
+              ],
+              "fields_used": [
+                "iget Labxb;->b I",
+                "iget-object Lkli;->a Lklo;",
+                "iget-object Lklo;->u Lkko;",
+                "iget-wide Lkli;->b J",
+                "iget-object Lklo;->r Lkkq;",
+                "iget-wide Lkkq;->a J",
+                "iget-object Lkli;->c Ljava/lang/String;",
+                "iput-wide Lkkq;->a J",
+                "iget-object Labxb;->c Ljava/lang/Object;",
+                "iput-object Lklo;->t Ljava/lang/CharSequence;",
+                "iget-object Lkli;->d Ljava/lang/String;",
+                "iget-object Lklo;->q Lkld;",
+                "iget-object Lkld;->c Lklc;",
+                "iget-object Lkla;->d Ljava/lang/String;",
+                "sget-object Lklo;->m Landroid/text/style/UnderlineSpan;",
+                "iget-object Lklo;->t Ljava/lang/CharSequence;",
+                "iget-object Labxb;->a Ljava/lang/Object;",
+                "sget-object Lklo;->l Lwvx;"
+              ],
+              "protocol_literals": []
+            }
+          ]
+        }
       ],
       "strings": [
         {
@@ -4146,6 +7274,7 @@
       "matching_string_count": 37,
       "matching_class_count": 0,
       "classes": [],
+      "focused_types": [],
       "strings": [
         {
           "value": "getRect1TranslationX",
@@ -4683,6 +7812,7 @@
       "matching_string_count": 0,
       "matching_class_count": 0,
       "classes": [],
+      "focused_types": [],
       "strings": [],
       "truncated": false
     },
@@ -4692,6 +7822,7 @@
       "matching_string_count": 9,
       "matching_class_count": 0,
       "classes": [],
+      "focused_types": [],
       "strings": [
         {
           "value": "getTranslationX",
@@ -4819,6 +7950,7 @@
       "matching_string_count": 6,
       "matching_class_count": 0,
       "classes": [],
+      "focused_types": [],
       "strings": [
         {
           "value": "getTranslationY",
@@ -4859,6 +7991,7 @@
       "matching_string_count": 1,
       "matching_class_count": 0,
       "classes": [],
+      "focused_types": [],
       "strings": [
         {
           "value": "translate",
@@ -4876,6 +8009,7 @@
       "classes": [
         "Lorg/apache/ftpserver/impl/FtpReplyTranslator;"
       ],
+      "focused_types": [],
       "strings": [
         {
           "value": "FtpReplyTranslator.java",
