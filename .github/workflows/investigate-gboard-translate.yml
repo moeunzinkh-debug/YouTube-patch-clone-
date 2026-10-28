@@ -78,12 +78,17 @@ jobs:
             echo "::error::APK signature verification failed: $(tail -1 /tmp/gboard-signature.txt)"
             exit 1
           fi
-          signer="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/gboard-signature.txt | tr '[:upper:]' '[:lower:]')"
-          test "${#signer}" -eq 64 || { echo '::error::Could not read the APK signing certificate digest.'; exit 1; }
-          echo "::notice::APK signing certificate SHA-256: $signer"
+          # Android build-tools 37 prints 'V2 Signer:' / 'V3.0 Signer:';
+          # older releases print 'Signer #1'. Accept both, de-duplicate schemes.
+          signers="$(sed -nE 's/^.*certificate SHA-256 digest: ([[:xdigit:]]{64})$/\1/p' /tmp/gboard-signature.txt | tr '[:upper:]' '[:lower:]' | sort -u)"
+          test -n "$signers" || { echo '::error::Could not read the APK signing certificate digest.'; exit 1; }
           if [ "$source" = google-play ]; then
-            test "$signer" = f0fd6c5b410f25cb25c3b53346c8972fae30f8ee7411df910480ad6b2d60db83 || { echo '::error::Downloaded APK is not signed by the expected Google certificate.'; exit 1; }
+            signer=f0fd6c5b410f25cb25c3b53346c8972fae30f8ee7411df910480ad6b2d60db83
+            grep -Fxq "$signer" <<< "$signers" || { echo '::error::Downloaded APK is not signed by the expected Google certificate.'; exit 1; }
+          else
+            signer="$(head -1 <<< "$signers")"
           fi
+          echo "::notice::APK signing certificate SHA-256: $signer"
           if ! python tools/gboard/investigate_translate.py "$apk" /tmp/gboard-report/translate-inventory.json \
             --source "$source" --signer-sha256 "$signer" > /tmp/gboard-inventory.log 2>&1; then
             echo "::error::DEX inventory failed: $(tail -1 /tmp/gboard-inventory.log)"
