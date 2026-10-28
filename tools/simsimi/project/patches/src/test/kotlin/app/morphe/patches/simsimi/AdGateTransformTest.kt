@@ -31,9 +31,10 @@ class AdGateTransformTest {
         val both = AdGateTransform.patch(membership)
         assertContentEquals(both, AdGateTransform.patchMembership(AdGateTransform.patch(source)))
         assertContentEquals(AdGateTransform.clientMembership, membership.copyOfRange(AdGateTransform.MEMBERSHIP_OFFSET, AdGateTransform.MEMBERSHIP_OFFSET+201))
+        assertContentEquals(AdGateTransform.clientMembershipEvents, membership.copyOfRange(AdGateTransform.MEMBERSHIP_EVENTS_OFFSET, AdGateTransform.MEMBERSHIP_EVENTS_OFFSET+95))
         assertEquals(source.size, both.size)
         val changed = (0 until source.size-20).filter { source[it] != both[it] }
-        assertTrue(changed.all { it == AdGateTransform.GATE_OFFSET || it in AdGateTransform.MEMBERSHIP_OFFSET until AdGateTransform.MEMBERSHIP_OFFSET+201 })
+        assertTrue(changed.all { it == AdGateTransform.GATE_OFFSET || it in AdGateTransform.MEMBERSHIP_OFFSET until AdGateTransform.MEMBERSHIP_OFFSET+201 || it in AdGateTransform.MEMBERSHIP_EVENTS_OFFSET until AdGateTransform.MEMBERSHIP_EVENTS_OFFSET+95 })
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patchMembership(membership) }
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(both) }
         System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".combined").writeBytes(both) }

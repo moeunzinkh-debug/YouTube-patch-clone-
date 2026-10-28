@@ -26,7 +26,13 @@ object AdGateTransform {
     // Existing loadMembershipAdmob still fetches server state and preserves errors.
     const val DAILY_BONUS_OFFSET = 23509822 + 0x13
     private val dailyBonus = Region(DAILY_BONUS_OFFSET, hex("3701010243f4"), hex("780176017801"))
-    private val regions = listOf(ads, membership, dailyBonus)
+    // Live listeners must receive the same cloned UI status as initial reads.
+    // The original getter-only patch could be overwritten by a server update.
+    const val MEMBERSHIP_EVENTS_OFFSET = 17279803
+    internal val originalMembershipEvents = hex("32017c026c00012a0100002a0101023703020163f27600bc4603003702020163f22a0102022902002e02020037020202f7dd2a0103023003390403031a00360304049a370202050bfb5303030402360203067f640101bf1a53010203015c00")
+    internal val clientMembershipEvents = hex("32017c026c00012a0100002a0101023703020185c45003030276000802030802022a0102022902002e02020037020202f7dd2a0103023003390403031a00360304049a370202050bfb5303030402360203067f640101bf1a53010203015c00")
+    private val membershipEvents = Region(MEMBERSHIP_EVENTS_OFFSET, originalMembershipEvents, clientMembershipEvents)
+    private val regions = listOf(ads, membership, dailyBonus, membershipEvents)
     fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }
     private fun checksum(bytes: ByteArray) = MessageDigest.getInstance("SHA-1").digest(bytes.copyOfRange(0, bytes.size-20))
@@ -51,6 +57,6 @@ object AdGateTransform {
         }
     }
     fun patch(original: ByteArray): ByteArray = apply(original,ads)
-    fun patchMembership(original: ByteArray): ByteArray = apply(original,membership)
+    fun patchMembership(original: ByteArray): ByteArray = apply(apply(original,membership),membershipEvents)
     fun patchDailyBonus(original: ByteArray): ByteArray = apply(original,dailyBonus)
 }
