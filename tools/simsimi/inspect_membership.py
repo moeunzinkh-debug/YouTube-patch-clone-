@@ -19,7 +19,7 @@ for text in reader.strings:
     if text.startswith('/') and pattern.search(text):
         result['api_paths'].append(text)
 ids = [reader.strings.index(text) for text in ('hasMembership', 'getMembershipObject', 'checkDailyPhotoSendUsage')]
-needles = [index.to_bytes(length, 'little') for index in ids for length in (2, 4)]
+needles = [index.to_bytes(length, 'little') for index in ids for length in (2, 4) if index < (1 << (length*8))]
 needles += [index.to_bytes(1, 'little') for index in ids if index < 256]
 for fid, header in enumerate(reader.function_headers):
     name = reader.strings[header.functionName]
