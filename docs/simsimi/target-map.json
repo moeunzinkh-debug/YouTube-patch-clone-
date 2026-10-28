@@ -1,0 +1,828 @@
+{
+  "sha256": "f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70",
+  "package": "com.ismaker.android.simsimi",
+  "version": "9.2.3",
+  "application": "com.ismaker.android.simsimi.MainApplication",
+  "asset_bundles": [
+    {
+      "name": "assets/ad-viewer/omid-session-client-v1.js",
+      "size": 68100,
+      "header_hex": "3b2866756e6374696f6e286f6d696447",
+      "sha256": "f15e5ce012c87bd32c15d71d2fd0b954b9b2fd9d5818d817b3820af3d93d5a35",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 0,
+          "sample": []
+        },
+        "interstitial": {
+          "count": 0,
+          "sample": []
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 0,
+          "sample": []
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    },
+    {
+      "name": "assets/ad-viewer/omsdk-v1.js",
+      "size": 43924,
+      "header_hex": "3b2866756e6374696f6e286f6d696447",
+      "sha256": "896cf905b2b562818da58e19e25b525083f18638f6b9b0d7c6aea411a9907585",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 0,
+          "sample": []
+        },
+        "interstitial": {
+          "count": 0,
+          "sample": []
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 0,
+          "sample": []
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    },
+    {
+      "name": "assets/iads/index.js",
+      "size": 861122,
+      "header_hex": "7661722051323d4f626a6563742e6465",
+      "sha256": "40407a81055c1901152e7ca35360e9fa439031f68fc87a815eead64a8706b24d",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 9,
+          "sample": [
+            "Top=\"top\",e.Bottom=\"bottom\",e))(ha||{}),W=(e=>(e.Android=\"android\",e.IOS=\"ios\",e))(W||{}),ti=(e=>(e.RewardedVideo=\"RewardedVideo\",e.Interstitial=\"Interstitial\",e.Banner=\"Banner\",e))(ti||{}),V$=(e=>(e.External=\"external\",e))(V$||{}),_$=(e=>(e.Native=\"native\",e))(_$||{}),pA=(e=>(e[e.No=5]=",
+            "tom=\"bottom\",e))(ha||{}),W=(e=>(e.Android=\"android\",e.IOS=\"ios\",e))(W||{}),ti=(e=>(e.RewardedVideo=\"RewardedVideo\",e.Interstitial=\"Interstitial\",e.Banner=\"Banner\",e))(ti||{}),V$=(e=>(e.External=\"external\",e))(V$||{}),_$=(e=>(e.Native=\"native\",e))(_$||{}),pA=(e=>(e[e.No=5]=\"No\",e[e.Yes=6]",
+            ">(e.Loading=\"loading\",e.Ready=\"ready\",e.Resized=\"resized\",e.Hidden=\"hidden\",e))(Hs||{}),Gr=(e=>(e.AdRewarded=\"connection.adRewarded\",e.Ready=\"connection.ready\",e.AdResized=\"connection.adResized\",e.ViewableChange=\"connection.viewableChange\",e.TimeUpdate=\"connection.timeUpdate\",e.CloseButt",
+            ".Ready=\"ready\",e.Resized=\"resized\",e.Hidden=\"hidden\",e))(Hs||{}),Gr=(e=>(e.AdRewarded=\"connection.adRewarded\",e.Ready=\"connection.ready\",e.AdResized=\"connection.adResized\",e.ViewableChange=\"connection.viewableChange\",e.TimeUpdate=\"connection.timeUpdate\",e.CloseButtonVisibilityChange=\"con"
+          ]
+        },
+        "interstitial": {
+          "count": 6,
+          "sample": [
+            "ha||{}),W=(e=>(e.Android=\"android\",e.IOS=\"ios\",e))(W||{}),ti=(e=>(e.RewardedVideo=\"RewardedVideo\",e.Interstitial=\"Interstitial\",e.Banner=\"Banner\",e))(ti||{}),V$=(e=>(e.External=\"external\",e))(V$||{}),_$=(e=>(e.Native=\"native\",e))(_$||{}),pA=(e=>(e[e.No=5]=\"No\",e[e.Yes=6]=\"Yes\",e))(pA||{}),Vs",
+            "(e.Android=\"android\",e.IOS=\"ios\",e))(W||{}),ti=(e=>(e.RewardedVideo=\"RewardedVideo\",e.Interstitial=\"Interstitial\",e.Banner=\"Banner\",e))(ti||{}),V$=(e=>(e.External=\"external\",e))(V$||{}),_$=(e=>(e.Native=\"native\",e))(_$||{}),pA=(e=>(e[e.No=5]=\"No\",e[e.Yes=6]=\"Yes\",e))(pA||{}),Vs=(e=>(e.CloseX",
+            "ed\",e[e.MrailImpression=11]=\"MrailImpression\",e[e.TapTracked=12]=\"TapTracked\",e))(Ro||{}),mA=(e=>(e.Interstitial=\"interstitial\",e.Inline=\"inline\",e))(mA||{}),Ys=(e=>(e.Portrait=\"portrait\",e.Landscape=\"landscape\",e.None=\"none\",e))(Ys||{});const xge={[Gd.SetMraidStatus](e,t){e.status=t}};funct",
+            "mpression=11]=\"MrailImpression\",e[e.TapTracked=12]=\"TapTracked\",e))(Ro||{}),mA=(e=>(e.Interstitial=\"interstitial\",e.Inline=\"inline\",e))(mA||{}),Ys=(e=>(e.Portrait=\"portrait\",e.Landscape=\"landscape\",e.None=\"none\",e))(Ys||{});const xge={[Gd.SetMraidStatus](e,t){e.status=t}};function Sge(){retu"
+          ]
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 38,
+          "sample": [
+            ")});(function(){const t=document.createElement(\"link\").relList;if(t&&t.supports&&t.supports(\"modulepreload\"))return;for(const o of document.querySelectorAll('link[rel=\"modulepreload\"]'))i(o);new MutationObserver(o=>{for(const n of o)if(n.type===\"childList\")for(const a of n.addedNodes)a",
+            "orts&&t.supports(\"modulepreload\"))return;for(const o of document.querySelectorAll('link[rel=\"modulepreload\"]'))i(o);new MutationObserver(o=>{for(const n of o)if(n.type===\"childList\")for(const a of n.addedNodes)a.tagName===\"LINK\"&&a.rel===\"modulepreload\"&&i(a)}).observe(document,{childL",
+            "onst n of o)if(n.type===\"childList\")for(const a of n.addedNodes)a.tagName===\"LINK\"&&a.rel===\"modulepreload\"&&i(a)}).observe(document,{childList:!0,subtree:!0});function r(o){const n={};return o.integrity&&(n.integrity=o.integrity),o.referrerPolicy&&(n.referrerPolicy=o.referrerPolicy),o",
+            "mptyNonce=\"appStoreInsideEmptyNonce\",e.ViewableChangeDuringStoreKit=\"viewableChangeInSK\",e.StoreKitPreloadTimeout=\"appStoreLoadingTimeout\",e.UpdateUserSegments=\"updateUserSegments\",e.EnterBackground=\"enterBackground\",e.EnterForeground=\"enterForeground\",e.DeviceStatusChanged=\"deviceStat"
+          ]
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 17,
+          "sample": [
+            "nstructor({communicator:t,mandatoryFields:r,extendedFieldsGetter:i}){this.callbackPool=new Map,this.subscriptions=new Map,this.communicator=t,this.mandatoryFields=r,this.extendedFieldsGetter=i,t.setIncomingMessageHandler(this.onMessageReceived.bind(this))}onMessageReceived(t){if(!r(t))return",
+            ",s)}}sendPayload(t){const r=JSON.stringify(t);this.communicator.send(r)}subscribe(t,r){const i=this.subscriptions.get(t);i?i.add(r):this.subscriptions.set(t,new Set([r]))}unsubscribe(t,r){const i=this.subscriptions.get(t);(i==null?void 0:i.size)===1?this.subscriptions.delete(t):i==null||i.de",
+            "ngify(t);this.communicator.send(r)}subscribe(t,r){const i=this.subscriptions.get(t);i?i.add(r):this.subscriptions.set(t,new Set([r]))}unsubscribe(t,r){const i=this.subscriptions.get(t);(i==null?void 0:i.size)===1?this.subscriptions.delete(t):i==null||i.delete(r)}fireCallback(t){const r=this.",
+            "ubscriptions.get(t);i?i.add(r):this.subscriptions.set(t,new Set([r]))}unsubscribe(t,r){const i=this.subscriptions.get(t);(i==null?void 0:i.size)===1?this.subscriptions.delete(t):i==null||i.delete(r)}fireCallback(t){const r=this.callbackPool.get(t.id);r&&(r(t.data),this.callbackPool.delete(t."
+          ]
+        }
+      }
+    },
+    {
+      "name": "assets/iads/sdk_controller.min.gz.js",
+      "size": 566126,
+      "header_hex": "2166756e6374696f6e2865297b696628",
+      "sha256": "4bdb1cb2b25dc6f413f141267d14f7619c14679f8f1439e041d2b389b02dd39a",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 53,
+          "sample": [
+            "&this.core.Utils.extend(e,{\"2EC\":r}),this.core.Utils.isDefined(a)&&(e.sfts=a)}getProductType(e){if(\"RewardedVideo\"!==e)return e;var t=this.controller.getConfig().mobileSDKSettings.SDKVersion;return this.core.VersionUtils.isHigher(t,\"8.0.0\")?this.constants.Rewarded:e}extendDSConfigSetting",
+            "fig().mobileSDKSettings.SDKVersion;return this.core.VersionUtils.isHigher(t,\"8.0.0\")?this.constants.Rewarded:e}extendDSConfigSettings(e){this.core.Utils.extend(!0,e,this.dsConfig.overrideFeedSettings)}extendNetworkConfigSettings(e){var t,n;const i=null!==(n=null===(t=e.seatbid.bid[0])||v",
+            "../constants/featureCompatibilityMap\");t.exports={CB:\"NativeCallback\",WebControls:\"WebControls\",RV:\"RewardedVideo\",Rewarded:\"Rewarded\",IS:\"Interstitial\",BN:\"Banner\",RIS:\"RIS\",taskManager:\"TaskManagerDS\",libs:\"libs\",timeunit:6e4,closeAndBackDisabledTimer:1e4,vastResponseTimeout:8e3,vastMi",
+            "atureCompatibilityMap\");t.exports={CB:\"NativeCallback\",WebControls:\"WebControls\",RV:\"RewardedVideo\",Rewarded:\"Rewarded\",IS:\"Interstitial\",BN:\"Banner\",RIS:\"RIS\",taskManager:\"TaskManagerDS\",libs:\"libs\",timeunit:6e4,closeAndBackDisabledTimer:1e4,vastResponseTimeout:8e3,vastMinimumResponseTi"
+          ]
+        },
+        "interstitial": {
+          "count": 35,
+          "sample": [
+            "VAST\",d=\"EXTERNAL\",l=\"INTERACTIVE_END_CARD\",c=\"INTERNAL\",u=\"AT_MP\",p=\"IEC_MP\",f=\"PLAYABLE\",g=\"IMAGE_INTERSTITIAL\",v=\"STATIC_BANNER\",m=\"HTML_MP\",h=\"VPAID_WRAPPER\",b=\"OTHER\",S=\"imageInterstitial\",y={};function A(e){if(e){if(!e.id){T(e,I(e)||\"\",D(e)||\"\")}return e.id&&e.id.toString()}}function C",
+            "\"PLAYABLE\",g=\"IMAGE_INTERSTITIAL\",v=\"STATIC_BANNER\",m=\"HTML_MP\",h=\"VPAID_WRAPPER\",b=\"OTHER\",S=\"imageInterstitial\",y={};function A(e){if(e){if(!e.id){T(e,I(e)||\"\",D(e)||\"\")}return e.id&&e.id.toString()}}function C(e){var t,n,i;return null!==(n=null===(t=null==e?void 0:e.settings)||void 0===t?",
+            "t.exports={CB:\"NativeCallback\",WebControls:\"WebControls\",RV:\"RewardedVideo\",Rewarded:\"Rewarded\",IS:\"Interstitial\",BN:\"Banner\",RIS:\"RIS\",taskManager:\"TaskManagerDS\",libs:\"libs\",timeunit:6e4,closeAndBackDisabledTimer:1e4,vastResponseTimeout:8e3,vastMinimumResponseTimeout:500,legacyCreativeId:0",
+            "ortrait:\"portrait\",none:\"none\"}},sspProductNames:{Rewarded:\"rewarded\",RewardedVideo:\"rewardedVideo\",Interstitial:\"interstitial\",Banner:\"banner\"},demandSourceType:{demandSource:\"demandSource\",instance:\"instance\"},demandSourceStates:{notInitiated:0,initFail:1,initiated:2,available:3,notAvailab"
+          ]
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 105,
+          "sample": [
+            "vice:\"Failed to retrieve device status\",filemap:\"Failed to retrieve file map\",showAdFailedReasons:{preloadNoAd:\"No ad on preload function\",showNoAd:\"No ad on show function\",taskManagerPreload:\"taskManager failed to preload\",taskManagerEngage:\"taskManager failed to engage\",onAdVisibleFa",
+            "ve device status\",filemap:\"Failed to retrieve file map\",showAdFailedReasons:{preloadNoAd:\"No ad on preload function\",showNoAd:\"No ad on show function\",taskManagerPreload:\"taskManager failed to preload\",taskManagerEngage:\"taskManager failed to engage\",onAdVisibleFailed:\"onAdVisible fail",
+            "ailedReasons:{preloadNoAd:\"No ad on preload function\",showNoAd:\"No ad on show function\",taskManagerPreload:\"taskManager failed to preload\",taskManagerEngage:\"taskManager failed to engage\",onAdVisibleFailed:\"onAdVisible failed\",screenVisibleTimeout:\"Screen visible timeout\",userClosedBef",
+            "d on preload function\",showNoAd:\"No ad on show function\",taskManagerPreload:\"taskManager failed to preload\",taskManagerEngage:\"taskManager failed to engage\",onAdVisibleFailed:\"onAdVisible failed\",screenVisibleTimeout:\"Screen visible timeout\",userClosedBeforeAdVisible:\"userClosedBeforeA"
+          ]
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    },
+    {
+      "name": "assets/index.android.bundle",
+      "size": 26008892,
+      "header_hex": "c61fbc03c103191f6000000013ced080",
+      "sha256": "203256d3824cfbc449d110fca1601095ecf283f555079407d03a2f46ca0c7489",
+      "format": "hermes",
+      "hermes_version": 96,
+      "contexts": {
+        "membership": {
+          "count": 165,
+          "sample": [
+            " See https://github.com/th3rdwave/react-native-safe-area-contextMenuHiddenSUID-SOEDANEMARCAC-AD_BOX_MEMBERSHIP_BACKGROUNDEFINED_IMAGEORGIA SELATAN DAN KEPULAUAN SANDWICH SELATANZANIEntrada de saludos: total {{{greeting_num}}} EAblihi ang discord channel ni SimSimiApilbrkslu[{(@@toStringTag",
+            "ount}}} Freagair luach saothairlineWidthkapreviewModalcloseButtonImagetCurrentInvertColorsStatePuhasMembership benefits will continue to be added.E0109_thumbaseNthawi yathasOwnProperty|(function).*?(?=\\\\\\()| for .+?(?=\\\\\\])Setuju dan kirimgheightScaleMga benepisyo nga mahimong idugang sa u",
+            " expects a FirebaseApp instance or undefined.Creu \"fy SimSimi\"Mon SimSimi\" est requisIOSReferenceFramembership_name_titlePagsulod sa Interes: Kabuangan {{{interest_num}}} EAconsegueix les respostes que vulguisPhotoProfileMenukar jawapanBonvolu doni la nomon de mia SimSimi Per tuttisSelecte",
+            "intsDifferFANARAHANAlles regist_dateIcontentRuleScrollViewReesenderProfileUris_first_fetchCompleteTimembership_registerAssetServiceDisconnectedFalaicheckUndefinedAnimationFailed to execute 'readAsArrayBuffer' on 'FileReader': parameter 1 is not of type 'Blob' has a ViewManager and you want"
+          ]
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 24,
+          "sample": [
+            "baint air leth oilbheumach no claon-bhreitheachRighttps://lottery.simicoin.io/fi_evaluation/provide_rewardedInterstitialRequest abortedGuul biladdNewSimSimiTextraScrollHeighttps://player.vimeo.com/video/fi_evaluation/staticOptionsIfPossible Unhandled Promise Rejection (id: F_GetIsBannedF",
+            "xt/medal/medal_list_access_pathForAppGroup chat room introduksimsimiAiMarkContainer/medal/rcv_medal_rewardedRequest body larger than maxBodyLength limitsNavigationsToAppBoundDomainsertEmbedded/moderation/checkAdsConsent, isBusy?/push/account_push_change_often/push/account_push_checkInter",
+            "EAbonohue-rotateVaihda avatariksimsimi_teach_success_titleGestione di l'IAbonumBits must be even, 0)RewardedAdEventType.EARNED_REWARD_30QAMBIYArtoAbortSignal cannot be constructed directlyCarane njaluk dhuwit recehandleAbortedHar du allerede en pung?Greetings Entry: Total {{{greeting_num",
+            "onboard_aic_pauserDislikedTheApp use is restricted.Kuhifadhi\nTafadhali subiri kidogoogle_mobile_ads_rewarded_interstitial_eventNameForApp-indstillingerror happended while getting greet data from server in TeachMySimSimiScreenFitur sing ora diidinit_interest_friend_topbar_icon_groupchat_e"
+          ]
+        },
+        "interstitial": {
+          "count": 55,
+          "sample": [
+            "rtu \"Nire SimSimi\" berrizendatu dezakezu.optional' on ' must extend Realm.ObjectNotifier.external_pointerstitialShowDrecera a \"Afegeix interessos\"Nire SimSimi\" sortzenqueueForceUpdateDrecera a \"Afegeix salutacions\"Nire SimSimi\" zure avatar da SimSimi eta elkarrizketa bat egiteko aukera emate",
+            "o faltsua zabaltzea, adingabeak sexualizatzea, etab./groups/fi_chat/send_image_block_msgHasBeenReaddInterstitialAdsListener/models/fi_chat/send_msg_check_user_badgeCount/track/fi_chat/unread_msg_listAll()/tsm/num_of_all_taught_sentence_by_sentence/fi_chat/unread_msg_room_listAccessor<rootDir",
+            "r leth oilbheumach no claon-bhreitheachRighttps://lottery.simicoin.io/fi_evaluation/provide_rewardedInterstitialRequest abortedGuul biladdNewSimSimiTextraScrollHeighttps://player.vimeo.com/video/fi_evaluation/staticOptionsIfPossible Unhandled Promise Rejection (id: F_GetIsBannedFromServerify",
+            "imSimi/fi_friend/friend_deleteApp()/fi_friend/friend_list_no_itemContainerWithMembership Show After InterstitialAD Failed : /fi_friend/unblock_findFirstChildWithMore accurate images are generated when written in English./fi_match/fi_latest_listBullet/fi_match/fi_new_latest_listContent/fi_mat"
+          ]
+        },
+        "RefreshControl": {
+          "count": 6,
+          "sample": [
+            " be rendered within a <Text> component.Nqi zog rau kev pom zoomedal_curiosity_icon_search_circledRCTRefreshControleer @Privacybeleid@.FILIPINIYUWEEKUADORCTSwitching account_delete_titleBigTextfunction createViewDescriptorPaper_reactNativeReanimated_styleUpdaterTs1(screenId){return{tag:screenId",
+            "ersToObject__setInternalXMLHttpRequest get headerDescriptTextAnimatedScrollViewWithOrWithoutInvertedRefreshControleer de statusBarTranslucenterXMLHttpRequest send currentPageXMLHttpRequest set onreadystatechangeHoneyPreWarnmiddleAlertContentTextAsia/Krasnoyarskeleton-dragXarakteristikaflipInXa",
+            "ating most eval trait in MyProfileScreen__getNativeAnimatedEventTuplesAnimatedScrollViewWithInvertedRefreshControleer de informatie over het AI-model.AnimatedWrapplyRelationProportionalAntarctica/CaseyAntarctica/DavisibleSteparsePropPathAntarctica/DumontDUrvilleAntarctica/MacquarieAntarctica/M",
+            "stamp_get_secondspread$1F_SetClaimedFfqaRewardToRealm.KeyPathMapping.external_pointermediatePropsForRefreshControleer de aankondiging.F_SetGroupRoomHostOutRealm.ListF_SetMessageBlindedRealm.LogCategoryRef.external_pointermediatePropsForScrollViewF_SetMessageDeletedRealm.Logger.external_pointer"
+          ]
+        },
+        "onRefresh": {
+          "count": 2,
+          "sample": [
+            "eView config not found for component `%s`refreshing` prop must be set as a boolean in order to use `onRefresh`, but got ` to `createAnimatedComponent` function which supports only class components. Please wrap your function component with `React.forwardRef()` or use a class component inst",
+            "eSelectionTopContentRuleView_onLayoutFootergba(0,0,0,0.74)_onLayoutHeadergba(0,0,0,0.8)_onMoreTasks_onRefreshAction_onRegister super properties once_onRegistrationError checking Android external storage permission:_onRemoteFetch was superseded and is not stale. Ignoring resultName_onStick"
+          ]
+        },
+        "reload": {
+          "count": 55,
+          "sample": [
+            "ADUa Nyiaj nrog zib must not contain null bytes)(?!-|_|:\\d|\\.-|\\.(?!$|[\"]).)+\\\"|[.]).|DecodingError reloading file existence cache:Ngganti syarat entries)(?=(\\s|/?>|$))Gitt Grupp Chat Sall Titel des Gruppenchatrooms exceeded limit of 200]\" was passed to VirtualizedList._createRenderMas",
+            "9ada16#DDD39Fa {{{time}}} mesosetProhibitVisible#DFDFDFa {{{time}}} minutsetPromotionFindFriendsPushReloadSplashScreen#E0C6FFQA_ANSWER_OVERRIDE_CONFIRMV958d63d24dbcc2e77943e5b6eaf1370da236991c53feef7f72479f5b9686735af647be3583ad7f829acc6edf712#E0E3ECONNABORTEDankie dat jy ons gehelp he",
+            "avascript/fi_evaluation/update_evaluationDisconnect()/fi_friend/block_fid_listAreact.suspense_listMoreLoadFooter/fi_friend/friend_addAdEventListenerewardCustomNickname pribadi anjeun dijieun ku SimSimi/fi_friend/friend_deleteApp()/fi_friend/friend_list_no_itemContainerWithMembership Sh",
+            "RFORMANCENTRALAFRIKANSKE REPUBLIK AFRIKA TENGAHVENANMAAdolygiad wedi'i wrthodAiLangEncoderror while reloading received tab by btn : Gwall Adolygu delweddautochat_onboard_desc215653208ce8c8256df354d786a0058COUNSELOR_SIMSIMI_PRE_CHAT_G1_TICKET_FREETRIALBAANIAdolygwch y cynnwys ar gyfer p"
+          ]
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 104,
+          "sample": [
+            "_LIMITALUJObtenga recompensas con bonos diarios_backgroundColorIndexchangedCryptoAmountStateImpl/v1/subscriptions/bind-user/assets/resource/img/character_ai_s001_splash.pngroupchat_notice_viewabilityTuplesE0073_thumb0449a9e12b321996b41bf933c4665e2b2d7e6efe1dffcf7e9711879af1ab8f25da8d777a44ba",
+            "*)\\.)* Aron usbon ang litrato, i-press ug dugay ang thumbnailWheelContainer(timed\\sout|timedout)/v1/subscriptions/entitlements/assets/resource/img/group_room_ranked_list/store/item/buy_honeyInReview Not Available after creating a group chat room_push_check_out_ruby_benefit_can_add_up_toValue",
+            "ar/uid_get_partshcyF_ClaimBoostAttendancePointroductoryPriceAsAmountIOSales de xat en grupdate_date_subscriptionsuitemLiveEdgeContainer_maybeScrollToInitialScrollIndexplanation_simsimi_firstElementChild abuseCallback_button_rtlExperimentalGroupChat_BTN_EMOJI_OPEN_FI_CHAT_SCHEMA_VERENIGD KONI",
+            "rcionades no es poden recuperar un cop suprimideslint \"**/*.{js,ts,tsx}\" --fixDefaultLanguagetActiveSubscriptionsKhalanipo tsiku lililonse kuti mupeze **{{{amount}}} Boost** Metro (the local dev server) is run from the wrong folder. Method called was ` for Touchable responder `scrollResponde"
+          ]
+        }
+      }
+    },
+    {
+      "name": "assets/resource/html/home_reels_script.js",
+      "size": 90563,
+      "header_hex": "2f2a2065736c696e742d64697361626c",
+      "sha256": "22949821b1382e64e6a9403efd3b378174240983d71e4de9a28a77a0311d0a23",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 0,
+          "sample": []
+        },
+        "interstitial": {
+          "count": 0,
+          "sample": []
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 2,
+          "sample": [
+            "           try {\n                    window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'onRefresh' }));\n                } catch(_) {}\n                return;\n            } else {\n                sendRNMessage('onClick_Enter', { index: data.id, reelsId: data.reelsId });\n       ",
+            ");\n            try {\n                window.ReactNativeWebView?.postMessage(JSON.stringify({ type: 'onRefresh' }));\n            } catch(_) {}\n        } else {\n            hidePtrIndicator();\n        }\n        isPulling = false;\n        pullDistancePx = 0;\n        pullCandidate = false;\n  "
+          ]
+        },
+        "reload": {
+          "count": 0,
+          "sample": []
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    },
+    {
+      "name": "assets/resource/html/home_reels_script_chat.js",
+      "size": 6880,
+      "header_hex": "2f2a2065736c696e742d64697361626c",
+      "sha256": "14b02338f97681f10b69b66d3c0e3651a48b1b3da4dc56ce0a833c116f26c6d7",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 0,
+          "sample": []
+        },
+        "interstitial": {
+          "count": 0,
+          "sample": []
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 0,
+          "sample": []
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    },
+    {
+      "name": "assets/resource/html/home_reels_script_init.js",
+      "size": 5372,
+      "header_hex": "2f2a2065736c696e742d64697361626c",
+      "sha256": "d5a8c1229c56c402a565542c9466c10262bda81bcd2f68a25a52dbf62bd18683",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 0,
+          "sample": []
+        },
+        "interstitial": {
+          "count": 0,
+          "sample": []
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 0,
+          "sample": []
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    },
+    {
+      "name": "assets/resource/html/home_reels_script_typography.js",
+      "size": 15965,
+      "header_hex": "2f2a2065736c696e742d64697361626c",
+      "sha256": "f726eec0b725e5b64afa6a48250621f37b43d62d1687db89ac0fdeb0e00cefac",
+      "format": "text-or-other",
+      "contexts": {
+        "membership": {
+          "count": 0,
+          "sample": []
+        },
+        "isPremium": {
+          "count": 0,
+          "sample": []
+        },
+        "isVip": {
+          "count": 0,
+          "sample": []
+        },
+        "rewarded": {
+          "count": 0,
+          "sample": []
+        },
+        "interstitial": {
+          "count": 0,
+          "sample": []
+        },
+        "RefreshControl": {
+          "count": 0,
+          "sample": []
+        },
+        "onRefresh": {
+          "count": 0,
+          "sample": []
+        },
+        "reload": {
+          "count": 0,
+          "sample": []
+        },
+        "readReceipt": {
+          "count": 0,
+          "sample": []
+        },
+        "subscription": {
+          "count": 0,
+          "sample": []
+        }
+      }
+    }
+  ],
+  "split_metadata": [
+    {
+      "{http://schemas.android.com/apk/res/android}name": "com.android.vending.splits.required",
+      "{http://schemas.android.com/apk/res/android}value": "true"
+    },
+    {
+      "{http://schemas.android.com/apk/res/android}name": "com.android.vending.splits",
+      "{http://schemas.android.com/apk/res/android}resource": "@7F150007"
+    }
+  ],
+  "app_classes": [
+    {
+      "name": "Lcom/ismaker/android/simsimi/APKCodeTransparencyModule$a;",
+      "super": "Lx9/b;",
+      "methods": [
+        "<init>(Ljava/util/zip/ZipFile; Ljava/util/zip/ZipEntry;)V",
+        "d()Ljava/io/InputStream;",
+        "f()Lu9/l;",
+        "toString()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/APKCodeTransparencyModule;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "checkApkSigninig(Landroid/content/pm/PackageManager; Ljava/lang/String;)Ljava/lang/String;",
+        "checkSha256(Ljava/util/jar/JarFile; Ljava/util/jar/JarEntry; Lorg/json/JSONArray;)Z",
+        "checkTransparencyFromBaseAPKFile()Ljava/lang/String;",
+        "getAbiIndex(Ljava/lang/String; Z)I",
+        "getPackageInfo(Landroid/content/pm/PackageManager; Ljava/lang/String; Ljava/lang/Integer;)Landroid/content/pm/PackageInfo;",
+        "signatureDigest(Landroid/content/pm/Signature;)Ljava/lang/String;",
+        "signatureDigest([Landroid/content/pm/Signature;)Ljava/util/List;",
+        "getConstants()Ljava/util/Map;",
+        "getName()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/APKHashModule;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "getPackageInfo(Landroid/content/pm/PackageManager; Ljava/lang/String; Ljava/lang/Integer;)Landroid/content/pm/PackageInfo;",
+        "hashFromAPKFile()Ljava/lang/String;",
+        "getConstants()Ljava/util/Map;",
+        "getName()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/BuildConfig;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>()V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/CheckAgeSignals;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "a(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ls9/f;)V",
+        "accessStatusToName(Ljava/lang/Integer;)Ljava/lang/String;",
+        "b(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ls9/c; Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Lcom/google/android/play/agesignals/a;)V",
+        "c(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ljava/lang/Exception;)V",
+        "checkAgeSignals(Ls9/c; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "d(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ljava/lang/Exception;)V",
+        "describeAgeSignalsError(I)Ljava/lang/String;",
+        "getRestrictedAge(Ljava/lang/String;)Ljava/lang/Integer;",
+        "isHoldTargetGeo(Ljava/lang/String;)Z",
+        "lambda$checkAgeSignals$2(Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ls9/f;)V",
+        "lambda$checkAgeSignals$3(Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ljava/lang/Exception;)V",
+        "lambda$requestAccessAndCheck$0(Ls9/c; Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Lcom/google/android/play/agesignals/a;)V",
+        "lambda$requestAccessAndCheck$1(Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ljava/lang/Exception;)V",
+        "logError(Ljava/lang/Exception;)V",
+        "putIntIfNotNull(Lcom/facebook/react/bridge/WritableMap; Ljava/lang/String; Ljava/lang/Integer;)V",
+        "putStringIfNotNull(Lcom/facebook/react/bridge/WritableMap; Ljava/lang/String; Ljava/lang/String;)V",
+        "requestAccessAndCheck(Ls9/c; Landroid/app/Activity; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "resolve(Lcom/facebook/react/bridge/Promise; Ljava/lang/String; Z Ls9/f;)V",
+        "resolveApprovalRequired(Ljava/lang/String; Lcom/facebook/react/bridge/Promise; Ls9/f;)V",
+        "resolveFromSignals(Ls9/f; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "resolveUnverified(Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "getAgeSignals(Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "getName()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/DrawableCopyToCacheModule;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "copy(Ljava/lang/String; Ljava/lang/String; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "getName()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/ExitAppModule;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "exitApp()V",
+        "getName()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/FrescoClearCacheModule;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "getConstants()Ljava/util/Map;",
+        "getName()Ljava/lang/String;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/GetAppCheckTokenModule$a;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/ismaker/android/simsimi/GetAppCheckTokenModule; Ljava/util/concurrent/CompletableFuture;)V",
+        "onComplete(Lcom/google/android/gms/tasks/Task;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/GetAppCheckTokenModule;",
+      "super": "Lcom/facebook/react/bridge/ReactContextBaseJavaModule;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/ReactApplicationContext;)V",
+        "a(Lcom/facebook/react/bridge/Promise; Ljava/lang/Throwable;)Ljava/lang/Void;",
+        "getAppCheckToken()Ljava/util/concurrent/CompletableFuture;",
+        "getConstants()Ljava/util/Map;",
+        "getName()Ljava/lang/String;",
+        "refreshAppCheckToken(Lcom/facebook/react/bridge/Promise;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/MainActivity;",
+      "super": "Lcom/reactnativenavigation/NavigationActivity;",
+      "methods": [
+        "<init>()V",
+        "onPostCreate(Landroid/os/Bundle;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/MainApplication$a;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>()V",
+        "<init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V",
+        "getInstance$annotations()V",
+        "getAppContext()Landroid/content/Context;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/MainApplication$b;",
+      "super": "Lcom/reactnativenavigation/react/NavigationReactNativeHost;",
+      "methods": [
+        "<init>(Lcom/ismaker/android/simsimi/MainApplication;)V",
+        "getJSMainModuleName()Ljava/lang/String;",
+        "getPackages()Ljava/util/List;",
+        "getUseDeveloperSupport()Z",
+        "isHermesEnabled()Z",
+        "isNewArchEnabled()Z"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/MainApplication;",
+      "super": "Lcom/reactnativenavigation/NavigationApplication;",
+      "methods": [
+        "<clinit>()V",
+        "<init>()V",
+        "a()Lcom/ismaker/android/simsimi/MainApplication;",
+        "getAppContext()Landroid/content/Context;",
+        "getReactHost()Lcom/facebook/react/ReactHost;",
+        "getReactNativeHost()Lcom/facebook/react/ReactNativeHost;",
+        "onCreate()V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/a;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ls9/c; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "onSuccess(Ljava/lang/Object;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/b;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "onFailure(Ljava/lang/Exception;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/c;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "onSuccess(Ljava/lang/Object;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/d;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/ismaker/android/simsimi/CheckAgeSignals; Ljava/lang/String; Lcom/facebook/react/bridge/Promise;)V",
+        "onFailure(Ljava/lang/Exception;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/e;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>()V",
+        "createNativeModules(Lcom/facebook/react/bridge/ReactApplicationContext;)Ljava/util/List;",
+        "createViewManagers(Lcom/facebook/react/bridge/ReactApplicationContext;)Ljava/util/List;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/f;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/Promise;)V",
+        "accept(Ljava/lang/Object;)V"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/g;",
+      "super": "Ljava/lang/Object;",
+      "methods": [
+        "<init>(Lcom/facebook/react/bridge/Promise;)V",
+        "apply(Ljava/lang/Object;)Ljava/lang/Object;"
+      ]
+    },
+    {
+      "name": "Lcom/ismaker/android/simsimi/h;",
+      "super": "Ljava/lang/Object;",
+      "methods": []
+    }
+  ],
+  "entrypoint_disassembly": {
+    "Lcom/ismaker/android/simsimi/MainActivity;-><init>()V": [
+      "invoke-direct v0, Lcom/reactnativenavigation/NavigationActivity;-><init>()V",
+      "return-void "
+    ],
+    "Lcom/ismaker/android/simsimi/MainActivity;->onPostCreate(Landroid/os/Bundle;)V": [
+      "invoke-super v1, v2, Lcom/reactnativenavigation/NavigationActivity;->onPostCreate(Landroid/os/Bundle;)V",
+      "sget v2, Lcom/ismaker/android/simsimi/h;->a I",
+      "const/4 v0, 0",
+      "invoke-static v1, v2, v0, Lhe/c;->g(Landroid/app/Activity; I Z)V",
+      "return-void "
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;-><clinit>()V": [
+      "new-instance v0, Lcom/ismaker/android/simsimi/MainApplication$a;",
+      "const/4 v1, 0",
+      "invoke-direct v0, v1, Lcom/ismaker/android/simsimi/MainApplication$a;-><init>(Lkotlin/jvm/internal/DefaultConstructorMarker;)V",
+      "sput-object v0, Lcom/ismaker/android/simsimi/MainApplication;->b Lcom/ismaker/android/simsimi/MainApplication$a;",
+      "return-void "
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;-><init>()V": [
+      "invoke-direct v1, Lcom/reactnativenavigation/NavigationApplication;-><init>()V",
+      "new-instance v0, Lcom/ismaker/android/simsimi/MainApplication$b;",
+      "invoke-direct v0, v1, Lcom/ismaker/android/simsimi/MainApplication$b;-><init>(Lcom/ismaker/android/simsimi/MainApplication;)V",
+      "iput-object v0, v1, Lcom/ismaker/android/simsimi/MainApplication;->a Lcom/facebook/react/ReactNativeHost;",
+      "return-void "
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;->a()Lcom/ismaker/android/simsimi/MainApplication;": [
+      "sget-object v0, Lcom/ismaker/android/simsimi/MainApplication;->c Lcom/ismaker/android/simsimi/MainApplication;",
+      "return-object v0"
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;->getAppContext()Landroid/content/Context;": [
+      "sget-object v0, Lcom/ismaker/android/simsimi/MainApplication;->b Lcom/ismaker/android/simsimi/MainApplication$a;",
+      "invoke-virtual v0, Lcom/ismaker/android/simsimi/MainApplication$a;->getAppContext()Landroid/content/Context;",
+      "move-result-object v0",
+      "return-object v0"
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;->getReactHost()Lcom/facebook/react/ReactHost;": [
+      "invoke-virtual v4, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;",
+      "move-result-object v0",
+      "const-string v1, \"getApplicationContext(...)\"",
+      "invoke-static v0, v1, Lkotlin/jvm/internal/Intrinsics;->checkNotNullExpressionValue(Ljava/lang/Object; Ljava/lang/String;)V",
+      "invoke-virtual v4, Lcom/ismaker/android/simsimi/MainApplication;->getReactNativeHost()Lcom/facebook/react/ReactNativeHost;",
+      "move-result-object v1",
+      "const/4 v2, 0",
+      "const/4 v3, 4",
+      "invoke-static v0, v1, v2, v3, v2, Lcom/facebook/react/defaults/DefaultReactHost;->getDefaultReactHost$default(Landroid/content/Context; Lcom/facebook/react/ReactNativeHost; Lcom/facebook/react/runtime/JSRuntimeFactory; I Ljava/lang/Object;)Lcom/facebook/react/ReactHost;",
+      "move-result-object v0",
+      "return-object v0"
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;->getReactNativeHost()Lcom/facebook/react/ReactNativeHost;": [
+      "iget-object v0, v1, Lcom/ismaker/android/simsimi/MainApplication;->a Lcom/facebook/react/ReactNativeHost;",
+      "return-object v0"
+    ],
+    "Lcom/ismaker/android/simsimi/MainApplication;->onCreate()V": [
+      "invoke-super v3, Lcom/reactnativenavigation/NavigationApplication;->onCreate()V",
+      "sput-object v3, Lcom/ismaker/android/simsimi/MainApplication;->c Lcom/ismaker/android/simsimi/MainApplication;",
+      "sget-object v0, Lcom/facebook/react/modules/i18nmanager/I18nUtil;->Companion Lcom/facebook/react/modules/i18nmanager/I18nUtil$Companion;",
+      "invoke-virtual v0, Lcom/facebook/react/modules/i18nmanager/I18nUtil$Companion;->getInstance()Lcom/facebook/react/modules/i18nmanager/I18nUtil;",
+      "move-result-object v0",
+      "invoke-virtual v3, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;",
+      "move-result-object v1",
+      "const-string v2, \"getApplicationContext(...)\"",
+      "invoke-static v1, v2, Lkotlin/jvm/internal/Intrinsics;->checkNotNullExpressionValue(Ljava/lang/Object; Ljava/lang/String;)V",
+      "const/4 v2, 1",
+      "invoke-virtual v0, v1, v2, Lcom/facebook/react/modules/i18nmanager/I18nUtil;->allowRTL(Landroid/content/Context; Z)V",
+      "return-void "
+    ]
+  },
+  "note": "Static targets only. Features are not implemented by this report."
+}
