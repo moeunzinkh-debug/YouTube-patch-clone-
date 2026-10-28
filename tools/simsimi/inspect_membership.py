@@ -12,7 +12,7 @@ with zipfile.ZipFile(sys.argv[1]) as apk:
     payload = apk.read('assets/index.android.bundle')
 reader = HBCReader()
 reader.read_whole_file(io.BytesIO(payload))
-pattern = re.compile(r'conversation.*level|level.*conversation|profile|cover|photo|read.*message|message.*read|receipt|membership|item|slider|topic', re.I)
+pattern = re.compile(r'level|profile|cover|photo|read|seen|receipt|membership|item|slider|topic|sendImage|checkingImage', re.I)
 result = {'status': 'Analysis only; individual feature functionality is not established.',
           'named_functions': [], 'membership_references': [], 'api_paths': []}
 for text in reader.strings:
@@ -44,5 +44,14 @@ for fid, header in enumerate(reader.function_headers):
     entry = dict(entry, instruction_count=len(disassembly), bytecode_hex=code.hex(),
                  disassembly=[disassembly[index] for index in sorted(selected)])
     result['membership_references'].append(entry)
+result['feature_helpers'] = []
+for fid in list(range(20605,20637)) + list(range(16260,16269)):
+    header = reader.function_headers[fid]
+    result['feature_helpers'].append({
+        'function_id': fid, 'name': reader.strings[header.functionName],
+        'offset': header.offset, 'size': header.bytecodeSizeInBytes,
+        'frame_size': header.frameSize, 'has_exception_handler': bool(header.hasExceptionHandler),
+        'bytecode_hex': payload[header.offset:header.offset+header.bytecodeSizeInBytes].hex(),
+        'disassembly': [repr(ins) for ins in parse_hbc_bytecode(header, reader)]})
 Path(sys.argv[2]).write_text(json.dumps(result, indent=2, ensure_ascii=False)+'\n')
 print('Membership references:', len(result['membership_references']))
