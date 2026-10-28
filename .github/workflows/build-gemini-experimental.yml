@@ -135,13 +135,23 @@ jobs:
             bundles/gemini-experimental/build-status.json
             bundles/gemini-experimental/README.md
           retention-days: 14
-      - name: Save standalone build to branch without force pushing
+      - name: Save experimental output after synchronizing branch
         run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp -a bundles/gemini-experimental "$RUNNER_TEMP/experimental-output"
+          git restore --staged --worktree bundles/gemini-experimental
+          git clean -fd -- bundles/gemini-experimental
+          git fetch origin "$GITHUB_REF_NAME"
+          if ! git diff --quiet HEAD FETCH_HEAD -- tools/gemini-experimental tools/gemini-apk/overlay tools/gemini-apk/prepare_build.py; then
+            echo '::error::Build source changed during execution; rerun against the latest commit.'
+            exit 1
+          fi
+          git rebase FETCH_HEAD
+          cp -a "$RUNNER_TEMP/experimental-output/." bundles/gemini-experimental/
           git add -f bundles/gemini-experimental/
           if ! git diff --cached --quiet; then
             git commit -m 'build: isolated experimental Google process identity bundle'
-            git pull --rebase origin "$GITHUB_REF_NAME"
             git push origin HEAD:"$GITHUB_REF_NAME"
           fi
