@@ -54,7 +54,7 @@ def main() -> None:
     if set(bodies) != TARGETS or classes != {RUNTIME, CLIENT}:
         raise SystemExit("Expected patched methods or extension classes are missing")
     checks = {
-        ("Lkkp;", "e", "(Lklg;Lkkc;)V"): ["->tryDispatch(", "Lkkp;->a(Lklg;)Lxqp;"],
+        ("Lkkp;", "e", "(Lklg;Lkkc;)V"): [RUNTIME + "->tryDispatch(", "Lkkp;->a(Lklg;)Lxqp;"],
         ("Lkka;", "d", "(Lklg;Lkkc;)V"): ["Lkli;", "Lkka;->fLkkd;", "Lkjx;", "Lkkd;->d(Lklg;Lkkc;)V"],
         ("Lklo;", "ap", "()Z"): ["Lkko;->cZ", "Lklo;->pLkkd;", "Lkjx;", "Lkko;->a(I)I"],
     }
@@ -62,9 +62,9 @@ def main() -> None:
         if not all(marker in bodies[key] for marker in markers):
             raise SystemExit(f"Patched control flow marker missing for {key}")
     for key in TARGETS - set(checks):
-        if "->cancel()V" not in bodies[key]:
+        if RUNTIME + "->cancel()V" not in bodies[key]:
             raise SystemExit(f"Missing lifecycle/input cancellation for {key}")
-    if "->prepare(" not in bodies[("Lklo;", "al", "(Ljava/lang/String;)V")]:
+    if RUNTIME + "->prepare(" not in bodies[("Lklo;", "al", "(Ljava/lang/String;)V")]:
         raise SystemExit("Missing exact request/callback preparation hook")
     print("Verified fork calls and guarded routing in the rebuilt third-party-derived DEX fixture.")
     print("This is not an original stock APK, a device test, or evidence that Translate works on Android.")
