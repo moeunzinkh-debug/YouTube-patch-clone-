@@ -1,0 +1,30 @@
+{
+  "version": "0.1.0-dev.1",
+  "status": "experimental_compiled_transform_tested",
+  "package": "com.ismaker.android.simsimi",
+  "target_version": "9.2.3",
+  "target_version_code": "1119001",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40647207815",
+  "bundle_sha256": "e83b7edde0793b899920548cdbaf6fe33fee3a94f3262c043012e2ef23553ab7",
+  "bundle_bytes": 9956,
+  "implemented_patches": [
+    "Disable ad eligibility (experimental)"
+  ],
+  "tests": {
+    "isolated_android_bundle_compile": "passed",
+    "exact_hermes_transform_jvm_tests": "passed",
+    "local_archive_checksum_and_app_scope_verification": "passed",
+    "complete_apk_patch_pipeline": "not_run",
+    "device_install_and_runtime": "not_run"
+  },
+  "pending_features": [
+    "complete_ad_removal",
+    "membership_features",
+    "daily_bonus_without_ads",
+    "gms_microg_re",
+    "pull_down_reload_home_chat"
+  ],
+  "input_constraint": "Uploaded base declares splits.required=true and contains no native libraries. Matching split APKs are required for installation testing.",
+  "release_published": false,
+  "youtube_bundle_changed": false
+}

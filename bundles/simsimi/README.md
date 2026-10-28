@@ -53,3 +53,15 @@ would not create the missing libraries.
 Read-only evidence: `docs/simsimi/apk-inventory.json`, `target-map.json`, and
 `hermes-targets.json`. The Hermes parser is pinned to
 P1sec/hermes-dec commit `2e796663e1fedb93dca51060797ebf3327b3fedb`.
+
+## First build result
+
+Separate package: [`bundle.mpp`](bundle.mpp), **0.1.0-dev.1**, 9,956 bytes.
+SHA-256: `e83b7edde0793b899920548cdbaf6fe33fee3a94f3262c043012e2ef23553ab7`.
+
+[CI build and exact-payload JVM tests passed](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40647207815).
+The package structure/checksum was also verified using
+`python3 tools/simsimi/verify_bundle.py bundles/simsimi/bundle.mpp`.
+See `build-status.json` for the precise validation boundary: the full APK patch
+pipeline and device installation/runtime have **not** been tested. No release
+was published; the original APK release remains unchanged.
