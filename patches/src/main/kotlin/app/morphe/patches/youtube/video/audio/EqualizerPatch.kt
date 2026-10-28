@@ -5,6 +5,12 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patches.shared.misc.settings.preference.NonInteractivePreference
+import app.morphe.patches.shared.misc.settings.preference.SwitchPreference
+import app.morphe.patches.youtube.misc.playercontrols.addTopControl
+import app.morphe.patches.youtube.misc.playercontrols.initializeTopControl
+import app.morphe.patches.youtube.misc.playercontrols.legacyPlayerControlsPatch
+import app.morphe.patches.youtube.misc.playercontrols.legacyPlayerControlsResourcePatch
+import app.morphe.patches.youtube.layout.player.icons.copyPlayerButtonIcons
 import app.morphe.patches.youtube.misc.extension.sharedExtensionPatch
 import app.morphe.patches.youtube.misc.settings.PreferenceScreen
 import app.morphe.patches.youtube.misc.settings.settingsPatch
@@ -12,7 +18,9 @@ import app.morphe.patches.youtube.shared.Constants.COMPATIBILITY_YOUTUBE
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 private val equalizerResourcesPatch = resourcePatch {
+    dependsOn(legacyPlayerControlsResourcePatch)
     execute {
+        copyPlayerButtonIcons("equalizer", "morphe_equalizer_button")
         document("AndroidManifest.xml").use { document ->
             val root = document.documentElement
             val permission = "android.permission.MODIFY_AUDIO_SETTINGS"
@@ -27,17 +35,22 @@ private val equalizerResourcesPatch = resourcePatch {
             }
         }
     }
+    finalize {
+        addTopControl("equalizer", "@+id/morphe_equalizer_button", "@+id/morphe_equalizer_button")
+    }
 }
 
 @Suppress("unused")
 val equalizerPatch = bytecodePatch(
     name = "Audio equalizer",
-    description = "Adds an in-app audio equalizer with device-supported bands, presets and reset."
+    description = "Adds an in-app audio equalizer with device-supported bands, presets, reset and a top-player shortcut."
 ) {
-    dependsOn(sharedExtensionPatch, settingsPatch, equalizerResourcesPatch)
+    dependsOn(sharedExtensionPatch, settingsPatch, legacyPlayerControlsPatch, equalizerResourcesPatch)
     compatibleWith(COMPATIBILITY_YOUTUBE)
     execute {
+        initializeTopControl("Lapp/morphe/extension/youtube/videoplayer/EqualizerPlayerButton;")
         PreferenceScreen.VIDEO.addPreferences(
+            SwitchPreference("morphe_equalizer_player_button", summary = true),
             NonInteractivePreference(
                 key = "morphe_equalizer",
                 selectable = true,

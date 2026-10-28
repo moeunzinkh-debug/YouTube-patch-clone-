@@ -16,6 +16,7 @@ on:
       - arena/83fe2f55-youtube-patch-clone
       - arena/b0a07006-youtube-patch-clone
       - arena/222850af-youtube-patch-clone
+      - arena/2100d05e-youtube-patch-clone
     paths:
       - 'patches/**'
       - 'extensions/**'
@@ -24,6 +25,7 @@ on:
       - 'gradle.properties'
       - '.github/workflows/build-mpp.yml'
       - 'tools/equalizer-tests/**'
+      - 'tools/tests/test_equalizer_player_button.py'
 
 permissions:
   contents: write
@@ -50,6 +52,9 @@ jobs:
 
       - name: Test equalizer controller behavior
         run: bash tools/equalizer-tests/run.sh
+
+      - name: Test EQ player shortcut layout and wiring
+        run: python3 -m unittest discover -s tools/tests -v
 
       - name: Show Android SDK
         run: |
@@ -111,5 +116,8 @@ jobs:
             echo 'Bundle unchanged, nothing to commit.'
           else
             git commit -m 'build: publish compiled patch.mpp bundle [skip ci]'
-            git push
+            # Catalog updates or documentation commits can land during a build.
+            # Integrate them without overwriting the branch's newer work.
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "${GITHUB_REF_NAME}"
           fi

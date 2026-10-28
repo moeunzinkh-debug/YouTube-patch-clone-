@@ -75,12 +75,13 @@ public class VoiceOverTranslationPatch {
     private static void showExportWarningIfNeeded(@Nullable Activity activity) {
         Utils.verifyOnMainThread();
         if (activity == null) return;
-        if (Settings.VOT_OPENROUTER_API_KEY.get().trim().isEmpty()) return;
+        if (Settings.VOT_OPENROUTER_API_KEY.get().trim().isEmpty()
+                && Settings.VOT_SEALION_API_KEY.get().trim().isEmpty()) return;
         if (Settings.VOT_HIDE_EXPORT_WARNING.get()) return;
         Pair<Dialog, LinearLayout> dialogPair = CustomDialog.create(
                 activity,
                 null,
-                str("morphe_vot_export_api_key_warning"),
+                str("morphe_vot_export_provider_key_warning"),
                 null,
                 null,
                 () -> {},
@@ -100,6 +101,15 @@ public class VoiceOverTranslationPatch {
 
         @Override
         public List<Setting<?>> getParentSettings() {
+            return List.of(Settings.VOT_TRANSLATION_SERVICE);
+        }
+    }
+
+    public static class SeaLionServiceAvailability implements Setting.Availability {
+        @Override public boolean isAvailable() {
+            return Settings.VOT_TRANSLATION_SERVICE.get().equals(TranscriptTranslator.TRANSLATION_SERVICE_SEALION);
+        }
+        @Override public List<Setting<?>> getParentSettings() {
             return List.of(Settings.VOT_TRANSLATION_SERVICE);
         }
     }
