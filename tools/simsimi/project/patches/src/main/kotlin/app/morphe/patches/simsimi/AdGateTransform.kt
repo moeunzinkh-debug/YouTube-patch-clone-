@@ -18,7 +18,12 @@ object AdGateTransform {
     // then put hasMembership=true on the CLONE. Preserve other fields and stored state.
     // Object id=26, assign id=67, currentMembershipStatus id=62051, hasMembership id=136.
     internal val clientMembership = hex("2900012e01000d7c003702000163f23000390300021a0037040303430003055500040305010278013b00010188005c00080000760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600760076007600")
-    private data class Region(val offset: Int, val original: ByteArray, val replacement: ByteArray)
+    private data class Region(val offset: Int, val original: ByteArray, val replacement: ByteArray) {
+        init {
+            require(original.isNotEmpty() && original.size == replacement.size) { "Invalid Hermes patch region" }
+            require(offset >= 0 && offset + original.size <= EXPECTED_SIZE - 20) { "Hermes patch region out of range" }
+        }
+    }
     private val ads = Region(GATE_OFFSET, byteArrayOf(120,0,92,0), byteArrayOf(121,0,92,0))
     private val membership = Region(MEMBERSHIP_OFFSET, originalMembership, clientMembership)
     // #22097: replace only the membershipStatus read with true/undefined/true
@@ -37,15 +42,32 @@ object AdGateTransform {
         "conversation_level" to listOf(Region(24125135, hex("3605050166"), hex("7805080505"))),
         "profile_photo" to listOf(Region(23545009, hex("2e010909"), hex("78017801"))),
         "group_cover" to listOf(Region(23207839, hex("3602020388"), hex("7802080202")), Region(23208563, hex("3605050c88"), hex("7805080505"))),
-        "photo_send" to listOf(Region(23919819, hex("360d000b88"), hex("780d080d0d")), Region(25253997, hex("3602020c88"), hex("7802080202"))),
+        // Keep both composer state and the actual send callbacks on the existing
+        // member path; preserve upload, response handling and server enforcement.
+        "photo_send" to listOf(
+            Region(23919819, hex("360d000b88"), hex("780d080d0d")),
+            Region(25253997, hex("3602020c88"), hex("7802080202")),
+            Region(23938312, hex("2e020105"), hex("78027802")),
+            Region(25262480, hex("2e040307"), hex("78047804"))
+        ),
         "read_receipts" to listOf(Region(23982256, hex("3601000188"), hex("7801080101"))),
         "item_controls" to listOf(Region(23121857, hex("3602000288"), hex("7802080202")), Region(23523080, hex("3602000288"), hex("7802080202")))
     )
     internal val featureKeys get() = featureRegions.keys.toList()
     private val regions = listOf(ads, membership, dailyBonus, membershipEvents) + featureRegions.values.flatten()
+    init {
+        for ((first, second) in regions.sortedBy { it.offset }.zipWithNext()) {
+            require(first.offset+first.original.size <= second.offset) { "Overlapping Hermes patch regions" }
+        }
+    }
     fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }
-    private fun checksum(bytes: ByteArray) = MessageDigest.getInstance("SHA-1").digest(bytes.copyOfRange(0, bytes.size-20))
+    // Stream the 26 MB input instead of allocating another full-size copy on
+    // Android each time the user selects one of the composable feature patches.
+    private fun checksum(bytes: ByteArray): ByteArray = MessageDigest.getInstance("SHA-1").run {
+        update(bytes, 0, bytes.size-20)
+        digest()
+    }
     private fun apply(original: ByteArray, target: Region): ByteArray {
         require(original.size == EXPECTED_SIZE) { "Unsupported SimSimi Hermes payload size" }
         require(original.copyOfRange(0,8).contentEquals(magic)) { "Not a Hermes payload" }
@@ -61,10 +83,14 @@ object AdGateTransform {
         checksum(normalized).copyInto(normalized,normalized.size-20)
         require(sha256(normalized)==ORIGINAL_SHA256) { "Unsupported SimSimi payload; unknown changes detected" }
         require(original.copyOfRange(target.offset,target.offset+target.original.size).contentEquals(target.original)) { "Patch is already applied" }
-        return original.copyOf().also {
-            target.replacement.copyInto(it,target.offset)
-            checksum(it).copyInto(it,it.size-20)
+        // Reuse the validated buffer, restoring all previously selected regions
+        // from the input before adding this one. Avoid a third full HBC buffer.
+        for (region in regions) {
+            original.copyInto(normalized, region.offset, region.offset, region.offset+region.original.size)
         }
+        target.replacement.copyInto(normalized,target.offset)
+        checksum(normalized).copyInto(normalized,normalized.size-20)
+        return normalized
     }
     fun patch(original: ByteArray): ByteArray = apply(original,ads)
     fun patchMembership(original: ByteArray): ByteArray = apply(apply(original,membership),membershipEvents)

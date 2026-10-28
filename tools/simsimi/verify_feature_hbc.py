@@ -49,6 +49,8 @@ for fid, address, instruction, destination in (
     (26734, 0x60, 'JStrictEqual', 0xa3),  # level setter + server save
     (22281, 0x6a, 'JStrictEqualLong', 0xfd),  # photo picker
     (21153, 0x39, 'JStrictEqualLong', 0xca),  # custom cover picker
+    (25717, 0x13, 'JStrictEqualLong', 0xb7),  # direct-photo member send
+    (31005, 0x383, 'JmpTrue', 0x3da),  # group-photo member send
     (25984, 0x17, 'JmpTrueLong', 0xb1),  # receipt renderer
     (25984, 0xb7, 'JmpTrue', 0xff),  # real message-read flag
 ):
@@ -58,6 +60,8 @@ for fid, address, instruction, destination in (
 assert any("'F_SaveFreetalkLevelToServer'" in line for line in decoded[26734])
 assert any("'MyProfileSetImageScreen'" in line for line in decoded[22281])
 assert any("'GroupRoomSetCoverScreen'" in line for line in decoded[21153])
+assert any("'checkShowRewardAds'" in line for line in decoded[25717])
+assert any("'F_CheckImageSendLimit'" in line for line in decoded[31005])
 assert any("'msgHasBeenRead'" in line for line in decoded[25984])
 # Actual read state and server item use/photo counting must not be fabricated.
 for fid in (20620, 16263):
@@ -67,5 +71,5 @@ for fid in (20620, 16263):
 header = reader.function_headers[25984]
 assert original[header.offset+0xb1:header.offset+header.bytecodeSizeInBytes] == patched[header.offset+0xb1:header.offset+header.bytecodeSizeInBytes], 'Actual receipt truth modified'
 print(json.dumps({'decoded_function_ids': ids, 'listener_uses_clone': True,
-                  'six_client_gates_decoded': True, 'read_truth_server_item_use_photo_count_preserved': True,
+                  'six_client_gates_decoded': True, 'read_truth_server_item_use_photo_count_code_unchanged': True,
                   'device_runtime_tested': False}, indent=2))

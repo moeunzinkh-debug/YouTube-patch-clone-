@@ -33,12 +33,12 @@ val profilePhotoPatch = featureGate(
 @Suppress("unused")
 val groupCoverPatch = featureGate(
     "Custom group cover controls (client only, experimental)", "group_cover",
-    "Opens the custom-cover picker and preserves the custom selection on submission. Does not grant group ownership or server upload rights."
+    "Opens the custom-cover picker and uses the local member flag in submitted group data. Does not grant group ownership or server upload rights."
 )
 @Suppress("unused")
 val photoSendPatch = featureGate(
     "Photo sending controls (client only, experimental)", "photo_send",
-    "Enables membership controls in direct/group photo composers. Does not fake sends, reset quotas, remove moderation or override server upload limits."
+    "Uses the existing membership send path in direct and group chats, which can skip local quota/ad checks. Does not fake delivery or override server limits or moderation."
 )
 @Suppress("unused")
 val readReceiptsPatch = featureGate(
@@ -48,5 +48,5 @@ val readReceiptsPatch = featureGate(
 @Suppress("unused")
 val itemControlsPatch = featureGate(
     "Membership item controls (client only, experimental)", "item_controls",
-    "Enables membership UI controls in both item modal paths. Does NOT grant all items, unlimited stock, coins or successful server item use."
+    "Shows the membership item UI, which may display an unlimited-use label. Does NOT grant all items, unlimited stock, coins or successful server item use."
 )

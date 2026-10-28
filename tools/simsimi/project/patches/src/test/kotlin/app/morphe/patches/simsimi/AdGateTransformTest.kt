@@ -68,6 +68,17 @@ class AdGateTransformTest {
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(byteArrayOf()) }
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(ByteArray(AdGateTransform.EXPECTED_SIZE)) }
     }
+    @Test fun rejectsForeignChangesEvenWithARecomputedHermesFooter() {
+        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+        fun changedAt(offset: Int): ByteArray = source.copyOf().also { changed ->
+            changed[offset] = (changed[offset].toInt() xor 1).toByte()
+            val digest = MessageDigest.getInstance("SHA-1")
+            digest.update(changed, 0, changed.size-20)
+            digest.digest().copyInto(changed, changed.size-20)
+        }
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(changedAt(100)) }
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(changedAt(AdGateTransform.GATE_OFFSET+1)) }
+    }
     @Test fun patchesExactUploadedPayloadWithoutMovingOffsets() {
         val fixture = System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact APK fixture is required in CI")
         val source = File(fixture).readBytes()

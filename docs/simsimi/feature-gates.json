@@ -43,7 +43,7 @@
       "offset": 23208563,
       "original": "3605050c88",
       "replacement": "7805080505",
-      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+      "scope": "Sets a client-provided hasMembership flag in group data; server authorization can still reject the action."
     },
     {
       "feature": "photo_send",
@@ -54,7 +54,7 @@
       "offset": 23919819,
       "original": "360d000b88",
       "replacement": "780d080d0d",
-      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+      "scope": "Sets client membership state for the photo composer; server upload and moderation are not bypassed."
     },
     {
       "feature": "photo_send",
@@ -65,7 +65,29 @@
       "offset": 25253997,
       "original": "3602020c88",
       "replacement": "7802080202",
-      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+      "scope": "Sets client membership state for the photo composer; server upload and moderation are not bypassed."
+    },
+    {
+      "feature": "photo_send",
+      "function_id": 25717,
+      "function_name": "?anon_0_",
+      "function_offset": 23938299,
+      "relative_offset": 13,
+      "offset": 23938312,
+      "original": "2e020105",
+      "replacement": "78027802",
+      "scope": "Selects existing member send action, possibly skipping local quota/ad checks; server upload and moderation are not bypassed."
+    },
+    {
+      "feature": "photo_send",
+      "function_id": 31005,
+      "function_name": "?anon_0_",
+      "function_offset": 25261585,
+      "relative_offset": 895,
+      "offset": 25262480,
+      "original": "2e040307",
+      "replacement": "78047804",
+      "scope": "Selects existing member send action, possibly skipping local quota/ad checks; server upload and moderation are not bypassed."
     },
     {
       "feature": "read_receipts",
@@ -87,7 +109,7 @@
       "offset": 23121857,
       "original": "3602000288",
       "replacement": "7802080202",
-      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+      "scope": "Changes member UI state only; it can display an unlimited-use label without granting server stock or item use."
     },
     {
       "feature": "item_controls",
@@ -98,7 +120,7 @@
       "offset": 23523080,
       "original": "3602000288",
       "replacement": "7802080202",
-      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+      "scope": "Changes member UI state only; it can display an unlimited-use label without granting server stock or item use."
     }
   ]
 }
