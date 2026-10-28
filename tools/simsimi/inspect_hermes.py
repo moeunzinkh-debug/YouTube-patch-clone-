@@ -55,6 +55,16 @@ for fid, header in enumerate(reader.function_headers):
         'instruction_count': len(disassembly),
         'disassembly_excerpts': [disassembly[index] for index in sorted(selected)]
     })
+result['daily_bonus_handlers'] = []
+for fid in range(22090, 22113):
+    header = reader.function_headers[fid]
+    result['daily_bonus_handlers'].append({
+        'function_id': fid, 'name': reader.strings[header.functionName],
+        'offset': header.offset, 'size': header.bytecodeSizeInBytes,
+        'frame_size': header.frameSize, 'has_exception_handler': bool(header.hasExceptionHandler),
+        'bytecode_hex': payload[header.offset:header.offset+header.bytecodeSizeInBytes].hex(),
+        'disassembly': [repr(ins) for ins in parse_hbc_bytecode(header, reader)]
+    })
 result['total_function_count'] = len(reader.function_headers)
 Path(sys.argv[2]).write_text(json.dumps(result, indent=2, ensure_ascii=False)+'\n')
 print('Matched', len(result['functions']), 'functions out of', result['total_function_count'])
