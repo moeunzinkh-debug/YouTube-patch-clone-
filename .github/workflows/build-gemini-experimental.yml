@@ -111,7 +111,7 @@ jobs:
               assert not any('/patches/youtube/' in n for n in names)
           PY
           cp bundles/gemini-experimental/gemini-target.mpp bundles/gemini-experimental/bundle.mpp
-          cd bundles/gemini
+          cd bundles/gemini-experimental
           sha256sum bundle.mpp > bundle.mpp.sha256
           sha256sum gemini-target.mpp > gemini-target.mpp.sha256
       - name: Record this run's validation scope
