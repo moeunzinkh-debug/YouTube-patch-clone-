@@ -74,6 +74,21 @@ jobs:
               print(json.dumps(item, ensure_ascii=False))
           Path('docs/diagnostics/khmer-tts-direct-post.json').write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
           PYCODE
+      - name: Inspect public client request format
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json
+          from pathlib import Path
+          base = 'https://takumi0002-tts-kh.hf.space'
+          report = {}
+          for path in ('/',):
+              try:
+                  with urllib.request.urlopen(base + path, timeout=60) as r:
+                      report[path] = {'status': r.status, 'content': r.read(100000).decode('utf-8', 'replace')}
+              except Exception as e:
+                  report[path] = {'error': str(e)}
+          Path('docs/diagnostics/khmer-tts-public-client.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
+          PY
       - name: Save diagnostic result to this branch
         run: |
           git config user.name 'github-actions[bot]'
