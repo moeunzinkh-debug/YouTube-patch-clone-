@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-10-28T04:47:12.941089+00:00",
+  "url": "https://takumi0002-tts-kh.hf.space/openapi.json",
+  "status": 200,
+  "paths": [
+    "/api/health",
+    "/api/process-multi"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "source_commit": "4a8b2a26381abf0067a1f0dc423e8d6bc5fb9f38",
+  "client": "actual KhmerTtsClient.java",
+  "received_bytes": 13004,
+  "sha256": "dd88853f0ba76dfa72307c124c760543c90fccbd12b2cc787d7477ed0d83d2cb",
+  "offline_checks": "passed",
+  "audio_probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "mp3",
+        "sample_rate": "24000"
+      }
+    ],
+    "format": {
+      "format_name": "mp3",
+      "duration": "3.192000"
+    }
+  }
+}

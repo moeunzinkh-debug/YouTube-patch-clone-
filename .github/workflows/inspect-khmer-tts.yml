@@ -1,0 +1,154 @@
+name: Inspect Khmer FastAPI TTS schema
+on:
+  push:
+    branches: [arena/6b029760-youtube-patch-clone]
+    paths: ['.github/workflows/inspect-khmer-tts.yml']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fetch public FastAPI schema (no synthesis request)
+        run: |
+          mkdir -p docs/diagnostics
+          python3 - <<'PY'
+          import datetime, json, urllib.request
+          from pathlib import Path
+          url = 'https://takumi0002-tts-kh.hf.space/openapi.json'
+          report = {'checked_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'url': url}
+          try:
+              request = urllib.request.Request(url, headers={'Accept':'application/json', 'User-Agent':'YouTube-Patch-Clone-Diagnostics/1.0'})
+              with urllib.request.urlopen(request, timeout=120) as response:
+                  report['status'] = response.status
+                  data = response.read(2 * 1024 * 1024 + 1)
+                  assert len(data) <= 2 * 1024 * 1024, 'Schema size limit exceeded'
+                  schema = json.loads(data)
+              Path('docs/diagnostics/khmer-tts-openapi.json').write_text(json.dumps(schema, indent=2, ensure_ascii=False) + '\n')
+              report['paths'] = list(schema.get('paths', {}))
+          except Exception as exc:
+              report['error'] = str(exc)
+          Path('docs/diagnostics/khmer-tts-check.json').write_text(json.dumps(report, indent=2) + '\n')
+          print(json.dumps(report, indent=2))
+          PY
+      - name: Probe direct POST with bounded test requests
+        run: |
+          python3 - <<'PYCODE'
+          import datetime, json, urllib.request, urllib.error
+          from pathlib import Path
+          base = 'https://takumi0002-tts-kh.hf.space'
+          report = {'checked_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'tests': []}
+          probes = [('health', '/api/health', None),
+                    ('post_empty_json', '/api/process-multi', {}),
+                    ('post_text_json', '/api/process-multi', {'text': 'សួស្តី នេះជាការសាកល្បងសំឡេង។'})]
+          for name, path, body in probes:
+              item = {'name': name, 'method': 'GET' if body is None else 'POST', 'url': base + path, 'request_json': body}
+              headers = {'Accept': 'application/json, audio/*', 'User-Agent': 'YouTube-Patch-Clone-Diagnostics/1.0'}
+              data = None
+              if body is not None:
+                  headers['Content-Type'] = 'application/json'
+                  data = json.dumps(body, ensure_ascii=False).encode()
+              try:
+                  req = urllib.request.Request(base + path, data=data, headers=headers, method=item['method'])
+                  try:
+                      response = urllib.request.urlopen(req, timeout=120)
+                  except urllib.error.HTTPError as exc:
+                      response = exc
+                  with response:
+                      item['status'] = response.code
+                      item['content_type'] = response.headers.get('Content-Type', '')
+                      content = response.read(8 * 1024 * 1024 + 1)
+                      item['received_bytes'] = len(content)
+                      item['size_limit_exceeded'] = len(content) > 8 * 1024 * 1024
+                      if 'json' in item['content_type']:
+                          parsed = json.loads(content)
+                          item['response_json'] = parsed if len(content) < 8192 else {'note': 'JSON response too large to record'}
+                      elif not item['content_type'].startswith('audio/'):
+                          item['response_preview'] = content[:1000].decode('utf-8', 'replace')
+                      else:
+                          item['audio_header_hex'] = content[:16].hex()
+              except Exception as exc:
+                  item['error'] = str(exc)
+              report['tests'].append(item)
+              print(json.dumps(item, ensure_ascii=False))
+          Path('docs/diagnostics/khmer-tts-direct-post.json').write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
+          PYCODE
+      - name: Inspect public client request format
+        run: |
+          python3 - <<'PY'
+          import urllib.request, urllib.error, json
+          from pathlib import Path
+          base = 'https://takumi0002-tts-kh.hf.space'
+          report = {}
+          for path in ('/', '/script.js'):
+              try:
+                  with urllib.request.urlopen(base + path, timeout=60) as r:
+                      report[path] = {'status': r.status, 'content': r.read(100000).decode('utf-8', 'replace')}
+              except Exception as e:
+                  report[path] = {'error': str(e)}
+          Path('docs/diagnostics/khmer-tts-public-client.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
+          PY
+      - name: Install audio verifier
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Test frontend-compatible multipart synthesis
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.error, hashlib, subprocess
+          from pathlib import Path
+          boundary = '----YouTubePatchKhmerTtsBoundary7MA4YWxkTrZu0gW'
+          parts = [{'text':'សួស្តី នេះជាការសាកល្បងសំឡេង។', 'voiceName':'piseth', 'speed':1.0, 'pitch':0}]
+          fields = {'data': json.dumps(parts, ensure_ascii=False), 'autoSpeed': 'false'}
+          body = ''.join('--'+boundary+'\r\nContent-Disposition: form-data; name="'+k+'"\r\n\r\n'+v+'\r\n' for k,v in fields.items()) + '--'+boundary+'--\r\n'
+          report = {'method':'POST', 'url':'https://takumi0002-tts-kh.hf.space/api/process-multi', 'request_fields':fields}
+          try:
+              req = urllib.request.Request(report['url'], data=body.encode(), headers={'Content-Type':'multipart/form-data; boundary='+boundary}, method='POST')
+              try:
+                  response = urllib.request.urlopen(req, timeout=120)
+              except urllib.error.HTTPError as e:
+                  response = e
+              with response:
+                  audio = response.read(8*1024*1024+1)
+                  report.update(status=response.status, content_type=response.headers.get('Content-Type'), received_bytes=len(audio))
+              if response.status == 200 and len(audio) <= 8*1024*1024:
+                  Path('/tmp/khmer-tts-test-audio').write_bytes(audio)
+                  probe = subprocess.run(['ffprobe','-v','error','-show_entries','format=format_name,duration:stream=codec_name,sample_rate','-of','json','/tmp/khmer-tts-test-audio'], capture_output=True, text=True)
+                  report['audio_probe_exit_code'] = probe.returncode
+                  report['audio_probe'] = json.loads(probe.stdout) if probe.returncode == 0 else probe.stderr[:1000]
+                  report['sha256'] = hashlib.sha256(audio).hexdigest()
+              else:
+                  report['error_response'] = audio[:1000].decode('utf-8','replace')
+          except Exception as e:
+              report['error'] = str(e)
+          Path('docs/diagnostics/khmer-tts-synthesis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          PY
+      - name: Verify actual Java client offline and against live FastAPI
+        run: |
+          sudo apt-get install -y -qq libandroid-json-java
+          bash tools/khmer-tts-tests/run.sh
+          bash tools/khmer-tts-tests/run.sh --live /tmp/khmer-tts-java.mp3
+          ffprobe -v error -show_entries format=format_name,duration:stream=codec_name,sample_rate -of json /tmp/khmer-tts-java.mp3 > /tmp/khmer-tts-java-probe.json
+          python3 - <<'PY'
+          import json, hashlib, os
+          from pathlib import Path
+          audio = Path('/tmp/khmer-tts-java.mp3').read_bytes()
+          probe = json.loads(Path('/tmp/khmer-tts-java-probe.json').read_text())
+          assert len(audio) > 0
+          assert any(s.get('codec_name') == 'mp3' for s in probe['streams'])
+          assert float(probe['format']['duration']) > 0
+          report = {'source_commit': os.environ['GITHUB_SHA'], 'client': 'actual KhmerTtsClient.java',
+                    'received_bytes': len(audio), 'sha256': hashlib.sha256(audio).hexdigest(),
+                    'offline_checks': 'passed', 'audio_probe': probe}
+          Path('docs/diagnostics/khmer-tts-java-client.json').write_text(json.dumps(report, indent=2)+'\n')
+          print(json.dumps(report, indent=2))
+          PY
+      - name: Save diagnostic result to this branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/diagnostics/khmer-tts-*.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'diagnostics: record public Khmer FastAPI schema [skip ci]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "$GITHUB_REF_NAME"

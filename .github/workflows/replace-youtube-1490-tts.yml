@@ -1,0 +1,64 @@
+name: Replace v1.49.0 bundle with verified FastAPI fix
+on:
+  push:
+    branches: [arena/6b029760-youtube-patch-clone]
+    paths: ['.github/workflows/replace-youtube-1490-tts.yml']
+permissions:
+  contents: write
+concurrency:
+  group: release-youtube-v1.49.0
+  cancel-in-progress: false
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify approved replacement
+        run: |
+          python3 .github/scripts/verify-mpp.py
+          python3 - <<'PY'
+          import hashlib, json, zipfile
+          from pathlib import Path
+          expected = '62e5136b09c670528d9310812d34de59d4c2de02c82452e039b00ff17d9dc887'
+          assert hashlib.sha256(Path('patch.mpp').read_bytes()).hexdigest() == expected
+          assert Path('patch.mpp.sha256').read_text().split()[0] == expected
+          assert json.loads(Path('patches-bundle.json').read_text())['version'] == '1.49.0'
+          with zipfile.ZipFile('patch.mpp') as z:
+              assert '\nVersion: 1.49.0\n' in z.read('META-INF/MANIFEST.MF').decode().replace('\r','')
+              dex = z.read('extensions/youtube.mpe')
+              assert b'/api/process-multi' in dex and b'autoSpeed' in dex and b'voiceName' in dex
+          PY
+      - name: Replace assets and disclose source revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh release view v1.49.0 --json isDraft --jq .isDraft)" = false
+          gh release upload v1.49.0 patch.mpp patch.mpp.sha256 patches-bundle.json --clobber
+          gh release view v1.49.0 --json body --jq .body > /tmp/release-notes.md
+          if ! grep -q 'Direct FastAPI TTS hotfix' /tmp/release-notes.md; then
+            cat >> /tmp/release-notes.md <<NOTES
+
+          ## Direct FastAPI TTS hotfix
+          The three release assets were replaced on 2026-10-28 with the corrected Khmer voice-generation bundle. Download patch.mpp again and re-patch an original supported APK to apply this fix.
+
+          Uses POST /api/process-multi with multipart data and autoSpeed fields. The actual Java client returned a valid MP3 (13,004 bytes, 24 kHz, 3.192 seconds), verified by FFprobe. Android compilation and regression checks passed; on-device playback synchronization still needs verification.
+
+          SHA-256 (patch.mpp): 62e5136b09c670528d9310812d34de59d4c2de02c82452e039b00ff17d9dc887
+
+          Replacement source revision: $GITHUB_SHA (PR #14). The original v1.49.0 tag and automatic source archives were not moved; they predate this asset hotfix. Use the linked revision for the replacement source: https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA
+          NOTES
+          fi
+          gh release edit v1.49.0 --notes-file /tmp/release-notes.md --latest
+      - name: Verify downloaded public assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/release-verification
+          gh release download v1.49.0 --dir /tmp/release-verification --pattern patch.mpp --pattern patch.mpp.sha256 --pattern patches-bundle.json
+          cmp patch.mpp /tmp/release-verification/patch.mpp
+          cmp patch.mpp.sha256 /tmp/release-verification/patch.mpp.sha256
+          cmp patches-bundle.json /tmp/release-verification/patches-bundle.json
+          cd /tmp/release-verification
+          sha256sum --check patch.mpp.sha256
