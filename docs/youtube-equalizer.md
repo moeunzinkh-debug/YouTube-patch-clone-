@@ -38,3 +38,26 @@ doubles and the real extension source. The resulting bundle manifest declares
 EqualizerPatchKt, and EqualizerPreference/Android audiofx code in youtube.mpe.
 Existing Khmer voice-over DEX checks still pass. No audible hardware validation
 or APK fingerprint match is claimed from these compilation checks alone.
+
+## Player shortcut (local 1.48.3)
+
+The Audio equalizer patch now adds a sliders icon to the **top player-control
+row near CC/settings**, matching native control size, padding and visibility.
+It uses the existing relative top-control insertion chain, not absolute screen
+coordinates or a floating overlay. Neighboring controls stay in separate layout
+slots; other enabled custom controls can affect the final order. The shared
+controller follows the native Settings button visibility/alpha.
+
+Tap the icon to open the SAME EQ dialog used by the Video settings entry. Opening
+one entry while its dialog is already shown does not stack another dialog.
+**Show EQ player button** in Morphe settings → Video is on by default; changes to
+that visibility setting require restarting YouTube. Turning the shortcut off
+does not turn EQ off, and disabling the EQ effect does not hide the shortcut.
+The sliders are an EQ symbol, not a system floating-window permission.
+
+Patch an original supported YouTube APK with the new local 1.48.3 bundle. The
+published release/source descriptor stays at 1.48.2 until separately released.
+Static layout/wiring tests can be run with
+`python3 -m unittest discover -s tools/tests -v`. On-device portrait/fullscreen,
+RTL, small-screen spacing and interaction with other enabled top buttons still
+need visual verification; CI compilation alone cannot prove pixel placement.
