@@ -1742,4 +1742,6 @@ Automatic recording is optional. It stops in incognito or when the account chang
     <string name="morphe_equalizer_off">Equalizer is off.</string>
     <string name="morphe_equalizer_no_session">Play a video, then reopen Equalizer to attach to its audio session.</string>
     <string name="morphe_equalizer_active">Applied to YouTube audio. Positive gain may distort; start at low volume.</string>
+    <string name="morphe_equalizer_player_button_title">Show EQ player button</string>
+    <string name="morphe_equalizer_player_button_summary">Show the equalizer shortcut in the top player controls. Restart YouTube to apply.</string>
 </resources>
