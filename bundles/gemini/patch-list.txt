@@ -1,26 +1,26 @@
 Index: 0
-Name: Account Switch Lock Bypass
-Description: アカウント切り替えロックのタイムアウトをスキップし、スプラッシュ画面からの即時初期化を可能にします。
-Enabled: false
-
-Index: 1
-Name: Account Sync Binder Loop Fix
-Description: AccountSyncService へのバインド失敗による無限リトライと Binder リミットクラッシュを防止します。
-Enabled: false
-
-Index: 2
 Name: Account ID Fallback for Clone
 Description: AGSA アカウント名から Account ID への変換失敗例外（flgu）を防止し、デフォルト AccountId でフォールバックします。
 Enabled: false
 
+Index: 1
+Name: Account Switch Lock Bypass
+Description: アカウント切り替えロックのタイムアウトをスキップし、スプラッシュ画面からの即時初期化を可能にします。
+Enabled: false
+
+Index: 2
+Name: Account Sync Binder Loop Fix
+Description: AccountSyncService へのバインド失敗による無限リトライと Binder リミットクラッシュを防止します。
+Enabled: false
+
 Index: 3
-Name: Gemini Standalone Support
-Description: Gemini アプリの AndroidManifest.xml から Split APK 制約（requiredSplitTypes等）を除去し単体インストール可能にします。
+Name: Gemini Redirect to Cloned Google App
+Description: Gemini アプリからの連携先 Google アプリをクローン版（com.google.android.googlequicksearchbox.morphe）へリダイレクトします。
 Enabled: true
 
 Index: 4
-Name: Gemini Redirect to Cloned Google App
-Description: Gemini アプリからの連携先 Google アプリをクローン版（com.google.android.googlequicksearchbox.morphe）へリダイレクトします。
+Name: Gemini Standalone Support
+Description: Gemini アプリの AndroidManifest.xml から Split APK 制約（requiredSplitTypes等）を除去し単体インストール可能にします。
 Enabled: true
 
 Index: 5
