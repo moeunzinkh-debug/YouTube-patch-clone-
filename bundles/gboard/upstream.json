@@ -1,0 +1,20 @@
+{
+  "project": "Gboard-patches",
+  "author": "jasonwu1994",
+  "repository": "https://github.com/jasonwu1994/Gboard-patches",
+  "tag": "v4.0.0",
+  "commit": "2eb71854accc7e906d3e4f5495b2a54ed1e2af47",
+  "git_tree": "b8dc2c76f8a17259c2e3eaa6b9f8565fb19d730b",
+  "license": "GPL v3; see upstream LICENSE and NOTICE",
+  "asset": "patches-4.0.0.mpp",
+  "asset_id": 679709732,
+  "asset_url": "https://github.com/jasonwu1994/Gboard-patches/releases/download/v4.0.0/patches-4.0.0.mpp",
+  "asset_size": 8186810,
+  "asset_sha256": "fadf54bea20f337a03baddf2bd294c86d254a744456c6e53ee13f4ad25a58716",
+  "local_asset": "gboard-patches-4.0.0.mpp",
+  "patches": 43,
+  "default_selected": 43,
+  "package": "com.google.android.inputmethod.latin",
+  "supported_versions": ["18.5.4.993608717-release-arm64-v8a"],
+  "note": "The bundled MPP is an unmodified copy of the upstream release, not a new fork build. A hash verifies byte identity, not independent authenticity."
+}

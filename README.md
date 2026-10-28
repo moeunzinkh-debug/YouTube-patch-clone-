@@ -17,6 +17,96 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Verify patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml)
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
+<!-- GBOARD-PATCH-LIST:START -->
+<a id="gboard-patches"></a>
+<details>
+<summary>⌨️ Gboard • 43 patches (bundle ដាច់ដោយឡែក)</summary>
+
+ប្រភព៖ [jasonwu1994/Gboard-patches v4.0.0](https://github.com/jasonwu1994/Gboard-patches/releases/tag/v4.0.0)។
+Bundle នេះគឺជាច្បាប់ចម្លងឯកសារ `.mpp` របស់ upstream ដោយមិនកែប្រែ; វា **មិនមែន** `patch.mpp` របស់ YouTube ទេ។
+
+គោលដៅដែល upstream រាយ៖ `com.google.android.inputmethod.latin` កំណែ
+`18.5.4.993608717-release-arm64-v8a` ប៉ុណ្ណោះ។ Patches ទាំង 43 ត្រូវបានជ្រើសជាមុនក្នុង upstream;
+នេះមិនមានន័យថាមុខងារបណ្ដាញទាំងអស់ចាប់ផ្ដើមដោយស្វ័យប្រវត្តិទេ។ ពិនិត្យជម្រើសមុន patch។
+
+[ទាញយក Gboard bundle](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-v4.0.0) ·
+[ការដំឡើង សុវត្ថិភាព និងកម្រិតកំណត់](bundles/gboard/README.md) ·
+[Source និងអាជ្ញាបណ្ណ](extras/gboard-patches/)
+
+<details>
+<summary>⌨️ ការវាយអក្សរ ភាសា និងឧបករណ៍ • 18</summary>
+
+- `AI Writing Tools` — បង្ហាញឧបករណ៍សរសេរ AI។ Upstream កំណត់ឲ្យគាំទ្រគ្រប់ភាសា ប៉ុន្តែភាសាខ្មែរមិនទាន់បានសាកល្បងនៅទីនេះទេ។
+- `Advanced Voice Typing` — បើកការវាយដោយសំឡេងកម្រិតខ្ពស់ និងសញ្ញាវណ្ណយុត្តិស្វ័យប្រវត្តិតាមការគាំទ្ររបស់ Gboard។
+- `Custom Symbols` — បន្ថែមផ្ទាំងនិមិត្តសញ្ញាផ្ទាល់ខ្លួន និងផ្លូវកាត់ពីការចុចក្បៀសឲ្យយូរ។
+- `Enable Inline Autofill Suggestions` — បើកការណែនាំបំពេញទិន្នន័យដោយស្វ័យប្រវត្តិក្នុងបរិបទដែលគាំទ្រ។
+- `Enable cursor trackpad mode` — ចុច spacebar ឲ្យយូរ ដើម្បីប្រើរបៀបបញ្ជាទីតាំងទស្សន៍ទ្រនិច។
+- `English QWERTY Up-Flick Uppercase` — លើក្តារចុច QWERTY អង់គ្លេស អូសឡើងដើម្បីប្ដូរអក្សរធំ និងតូច។
+- `Grammar Checker` — បើកជម្រើសពិនិត្យវេយ្យាករណ៍ក្នុងការកែអត្ថបទ។
+- `Inline Suggestions` — បើកជម្រើស Smart Compose ក្នុងការកែអត្ថបទ។
+- `Latin Globe Key Ignore Interval` — កំណត់រយៈពេលរង់ចាំប៊ូតុងផ្លាស់ប្ដូរភាសាលើក្តារចុចអង់គ្លេស។
+- `Long-Press Editing Shortcuts` — បន្ថែមផ្លូវកាត់ចុចឲ្យយូរសម្រាប់ជ្រើសទាំងអស់ ធ្វើវិញ ថតចម្លង កាត់ និងបិទភ្ជាប់លើ QWERTY អង់គ្លេស និង Zhuyin។
+- `Quick Insert` — បើកផ្ទាំងបញ្ចូលរហ័ស និងប៊ូតុងក្នុង toolbar។
+- `Simple Calculator` — បង្ហាញលទ្ធផលគណនាពីកន្សោមដែលវាយក្នុងជួរណែនាំ។
+- `Swipeable Custom Top Row` — អូសជួរខាងលើដើម្បីប្ដូរទៅជួរអត្ថបទ ឬ JavaScript ផ្ទាល់ខ្លួន។ ប្រើតែកូដដែលទុកចិត្ត។
+- `Toolbar Editing Buttons` — បន្ថែមប៊ូតុងជ្រើសទាំងអស់ ថតចម្លង កាត់ និងបិទភ្ជាប់ទៅម៉ឺនុយ។
+- `Use Bluetooth Microphone` — បើកជម្រើសប្រើមីក្រូហ្វូន Bluetooth សម្រាប់វាយដោយសំឡេង។
+- `Zhuyin Bottom Row Key Sizes` — កែទំហំប៊ូតុងជួរខាងក្រោមនៃក្តារចុច Zhuyin។
+- `Zhuyin Quick Traditional/Simplified Toggle` — អូសឡើងលើប៊ូតុង Zhuyin ㄥ ដើម្បីប្ដូរអក្សរចិនបុរាណ និងសាមញ្ញ។
+- `Zhuyin Slide Input` — បើកការអូសឡើង និងចុះសម្រាប់ក្តារចុច Zhuyin។
+
+</details>
+
+<details>
+<summary>🔐 Clipboard បណ្ដាញ និង package • 8</summary>
+
+- `Add Gboard Signature Bypass` — រំលងការត្រួតពិនិត្យបញ្ជីហត្ថលេខាខាងក្នុង Gboard; មិនរំលងការត្រួតពិនិត្យហត្ថលេខាដំឡើងរបស់ Android ទេ។
+- `Clipboard Custom Character Limit` — កំណត់ចំនួនតួអក្សរអតិបរមាក្នុងធាតុ clipboard នីមួយៗ។
+- `Clipboard Enhancements` — កែរយៈពេលរក្សាទុក ចំនួនធាតុ ការបង្ហាញពេលវេលា និងទម្រង់ clipboard។
+- `FTP Server` — បន្ថែមម៉ាស៊ីន FTP លើបណ្ដាញក្នុងស្រុក សម្រាប់មើល និងផ្ទេរឯកសារ។ កំណត់ការចូល និងពាក្យសម្ងាត់ឲ្យប្រុងប្រយ័ត្ន។
+- `Floating Web Search` — បើកទំព័របណ្ដែតពី Gboard សម្រាប់ស្វែងរកតាមវេបសាយ។
+- `Incognito Mode Toggle` — បន្ថែមប៊ូតុងប្ដូររបៀបអនាមិក និងការកំណត់ clipboard/សំឡេងក្នុងរបៀបនោះ។
+- `Package Rename` — ប្ដូរ package ទៅ dev.jason.com.google.android.inputmethod.latin និងអាចកំណត់ឈ្មោះ app ដើម្បីដំឡើងក្បែរច្បាប់ដើម។
+- `Web Clipboard` — បន្ថែម clipboard តាម browser ក្នុង LAN ដោយមានកូដភ្ជាប់ និង Quick Settings Tile ជាជម្រើស។
+
+</details>
+
+<details>
+<summary>🎨 រូបរាង ប្លង់ និង toolbar • 14</summary>
+
+- `Access Points menu style` — ប្ដូររចនាប័ទ្មម៉ឺនុយ Access Points ថ្មី ឬចាស់។
+- `Change emoji size` — កែទំហំ emoji។
+- `Close Proactive Suggestions` — បង្ហាញប៊ូតុងបិទនៅលើជួរការណែនាំ។
+- `Custom Theme` — នាំចូលស្បែក ZIP ផ្ទាល់ខ្លួន ឬស្បែកពីឃ្លាំង Rboard។
+- `Emojis, stickers & GIFs Tab Order` — អូសរៀបលំដាប់ផ្ទាំង emoji, sticker និង GIF។
+- `Enable accessibility layout` — បើកប្លង់ក្តារចុចសម្រាប់ភាពងាយស្រួលប្រើប្រាស់។
+- `Enable split keyboard` — បើកប្លង់ក្តារចុចបំបែកពីរផ្នែក។
+- `Frosted Glass` — បន្ថែមផ្ទៃព្រិល និងតម្លាភាពស្បែក; ត្រូវការ Android 12+ និងឧបករណ៍គាំទ្រ cross-window blur។
+- `G Logo on Spacebar` — បង្ហាញរូប G លើ spacebar ជំនួសស្លាកឈ្មោះភាសា។
+- `Key Shape Selection` — បើកជម្រើសរូបរាងប៊ូតុងក្នុងព័ត៌មានស្បែក។
+- `Rounded Keyboard Panel` — កំណត់ជ្រុងមូល និងកម្រិតមូលខាងលើ/ក្រោមនៃផ្ទាំងក្តារចុច។
+- `Settings Homepage Override` — ប្ដូរទំព័រកំណត់ Gboard រវាងរចនាប័ទ្មថ្មី និងចាស់។
+- `Swipe Down to Dismiss Keyboard` — អូសចុះពីជួរការណែនាំ ឬ toolbar ដើម្បីបិទក្តារចុច។
+- `Top Toolbar Item Count` — កំណត់ចំនួនធាតុក្នុង toolbar ខាងលើ។
+
+</details>
+
+<details>
+<summary>🧰 បម្រុងទុក កំណត់កម្រិតខ្ពស់ និង OCR • 3</summary>
+
+- `Backup & Restore` — នាំចេញ និងស្ដារការកំណត់ patches ព្រមទាំងបម្រុងទុក ប្រៀបធៀប ឬស្ដារ Gboard PB/XML flags។
+- `Developer options` — បើក Developer options និង Flag Editor សម្រាប់កែ flags។
+- `Enable OCR / Scan Text` — បើកស្កែនអក្សរសម្រាប់ Latin, ចិន, ជប៉ុន, កូរ៉េ និង Devanagari; upstream មិនបានរាយភាសាខ្មែរទេ។
+
+</details>
+
+**សុវត្ថិភាព៖** FTP, Web Clipboard, JavaScript និង signature bypass មានផលប៉ះពាល់លើសុវត្ថិភាព/ទិន្នន័យ;
+ដកជម្រើសដែលមិនត្រូវការ និងប្រើតែនៅក្នុងបណ្ដាញដែលទុកចិត្ត។ រក្សាក្តារចុចមួយផ្សេងទៀតទុកជាបម្រុង។
+OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភាសាខ្មែរមិនត្រូវបានផ្ទៀងផ្ទាត់នៅទីនេះទេ។
+
+</details>
+<!-- GBOARD-PATCH-LIST:END -->
+
 <details>
 <summary>🗨️ SimSimi • 11 experimental patches (separate bundle)</summary>
 

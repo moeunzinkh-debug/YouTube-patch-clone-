@@ -1,0 +1,68 @@
+{
+  "version": "4.0.0",
+  "groups": [
+    {
+      "title": "⌨️ ការវាយអក្សរ ភាសា និងឧបករណ៍",
+      "patches": [
+        {"name": "AI Writing Tools", "khmer": "បង្ហាញឧបករណ៍សរសេរ AI។ Upstream កំណត់ឲ្យគាំទ្រគ្រប់ភាសា ប៉ុន្តែភាសាខ្មែរមិនទាន់បានសាកល្បងនៅទីនេះទេ។"},
+        {"name": "Advanced Voice Typing", "khmer": "បើកការវាយដោយសំឡេងកម្រិតខ្ពស់ និងសញ្ញាវណ្ណយុត្តិស្វ័យប្រវត្តិតាមការគាំទ្ររបស់ Gboard។"},
+        {"name": "Custom Symbols", "khmer": "បន្ថែមផ្ទាំងនិមិត្តសញ្ញាផ្ទាល់ខ្លួន និងផ្លូវកាត់ពីការចុចក្បៀសឲ្យយូរ។"},
+        {"name": "Enable Inline Autofill Suggestions", "khmer": "បើកការណែនាំបំពេញទិន្នន័យដោយស្វ័យប្រវត្តិក្នុងបរិបទដែលគាំទ្រ។"},
+        {"name": "Enable cursor trackpad mode", "khmer": "ចុច spacebar ឲ្យយូរ ដើម្បីប្រើរបៀបបញ្ជាទីតាំងទស្សន៍ទ្រនិច។"},
+        {"name": "English QWERTY Up-Flick Uppercase", "khmer": "លើក្តារចុច QWERTY អង់គ្លេស អូសឡើងដើម្បីប្ដូរអក្សរធំ និងតូច។"},
+        {"name": "Grammar Checker", "khmer": "បើកជម្រើសពិនិត្យវេយ្យាករណ៍ក្នុងការកែអត្ថបទ។"},
+        {"name": "Inline Suggestions", "khmer": "បើកជម្រើស Smart Compose ក្នុងការកែអត្ថបទ។"},
+        {"name": "Latin Globe Key Ignore Interval", "khmer": "កំណត់រយៈពេលរង់ចាំប៊ូតុងផ្លាស់ប្ដូរភាសាលើក្តារចុចអង់គ្លេស។"},
+        {"name": "Long-Press Editing Shortcuts", "khmer": "បន្ថែមផ្លូវកាត់ចុចឲ្យយូរសម្រាប់ជ្រើសទាំងអស់ ធ្វើវិញ ថតចម្លង កាត់ និងបិទភ្ជាប់លើ QWERTY អង់គ្លេស និង Zhuyin។"},
+        {"name": "Quick Insert", "khmer": "បើកផ្ទាំងបញ្ចូលរហ័ស និងប៊ូតុងក្នុង toolbar។"},
+        {"name": "Simple Calculator", "khmer": "បង្ហាញលទ្ធផលគណនាពីកន្សោមដែលវាយក្នុងជួរណែនាំ។"},
+        {"name": "Swipeable Custom Top Row", "khmer": "អូសជួរខាងលើដើម្បីប្ដូរទៅជួរអត្ថបទ ឬ JavaScript ផ្ទាល់ខ្លួន។ ប្រើតែកូដដែលទុកចិត្ត។"},
+        {"name": "Toolbar Editing Buttons", "khmer": "បន្ថែមប៊ូតុងជ្រើសទាំងអស់ ថតចម្លង កាត់ និងបិទភ្ជាប់ទៅម៉ឺនុយ។"},
+        {"name": "Use Bluetooth Microphone", "khmer": "បើកជម្រើសប្រើមីក្រូហ្វូន Bluetooth សម្រាប់វាយដោយសំឡេង។"},
+        {"name": "Zhuyin Bottom Row Key Sizes", "khmer": "កែទំហំប៊ូតុងជួរខាងក្រោមនៃក្តារចុច Zhuyin។"},
+        {"name": "Zhuyin Quick Traditional/Simplified Toggle", "khmer": "អូសឡើងលើប៊ូតុង Zhuyin ㄥ ដើម្បីប្ដូរអក្សរចិនបុរាណ និងសាមញ្ញ។"},
+        {"name": "Zhuyin Slide Input", "khmer": "បើកការអូសឡើង និងចុះសម្រាប់ក្តារចុច Zhuyin។"}
+      ]
+    },
+    {
+      "title": "🔐 Clipboard បណ្ដាញ និង package",
+      "patches": [
+        {"name": "Add Gboard Signature Bypass", "khmer": "រំលងការត្រួតពិនិត្យបញ្ជីហត្ថលេខាខាងក្នុង Gboard; មិនរំលងការត្រួតពិនិត្យហត្ថលេខាដំឡើងរបស់ Android ទេ។"},
+        {"name": "Clipboard Custom Character Limit", "khmer": "កំណត់ចំនួនតួអក្សរអតិបរមាក្នុងធាតុ clipboard នីមួយៗ។"},
+        {"name": "Clipboard Enhancements", "khmer": "កែរយៈពេលរក្សាទុក ចំនួនធាតុ ការបង្ហាញពេលវេលា និងទម្រង់ clipboard។"},
+        {"name": "FTP Server", "khmer": "បន្ថែមម៉ាស៊ីន FTP លើបណ្ដាញក្នុងស្រុក សម្រាប់មើល និងផ្ទេរឯកសារ។ កំណត់ការចូល និងពាក្យសម្ងាត់ឲ្យប្រុងប្រយ័ត្ន។"},
+        {"name": "Floating Web Search", "khmer": "បើកទំព័របណ្ដែតពី Gboard សម្រាប់ស្វែងរកតាមវេបសាយ។"},
+        {"name": "Incognito Mode Toggle", "khmer": "បន្ថែមប៊ូតុងប្ដូររបៀបអនាមិក និងការកំណត់ clipboard/សំឡេងក្នុងរបៀបនោះ។"},
+        {"name": "Package Rename", "khmer": "ប្ដូរ package ទៅ dev.jason.com.google.android.inputmethod.latin និងអាចកំណត់ឈ្មោះ app ដើម្បីដំឡើងក្បែរច្បាប់ដើម។"},
+        {"name": "Web Clipboard", "khmer": "បន្ថែម clipboard តាម browser ក្នុង LAN ដោយមានកូដភ្ជាប់ និង Quick Settings Tile ជាជម្រើស។"}
+      ]
+    },
+    {
+      "title": "🎨 រូបរាង ប្លង់ និង toolbar",
+      "patches": [
+        {"name": "Access Points menu style", "khmer": "ប្ដូររចនាប័ទ្មម៉ឺនុយ Access Points ថ្មី ឬចាស់។"},
+        {"name": "Change emoji size", "khmer": "កែទំហំ emoji។"},
+        {"name": "Close Proactive Suggestions", "khmer": "បង្ហាញប៊ូតុងបិទនៅលើជួរការណែនាំ។"},
+        {"name": "Custom Theme", "khmer": "នាំចូលស្បែក ZIP ផ្ទាល់ខ្លួន ឬស្បែកពីឃ្លាំង Rboard។"},
+        {"name": "Emojis, stickers & GIFs Tab Order", "khmer": "អូសរៀបលំដាប់ផ្ទាំង emoji, sticker និង GIF។"},
+        {"name": "Enable accessibility layout", "khmer": "បើកប្លង់ក្តារចុចសម្រាប់ភាពងាយស្រួលប្រើប្រាស់។"},
+        {"name": "Enable split keyboard", "khmer": "បើកប្លង់ក្តារចុចបំបែកពីរផ្នែក។"},
+        {"name": "Frosted Glass", "khmer": "បន្ថែមផ្ទៃព្រិល និងតម្លាភាពស្បែក; ត្រូវការ Android 12+ និងឧបករណ៍គាំទ្រ cross-window blur។"},
+        {"name": "G Logo on Spacebar", "khmer": "បង្ហាញរូប G លើ spacebar ជំនួសស្លាកឈ្មោះភាសា។"},
+        {"name": "Key Shape Selection", "khmer": "បើកជម្រើសរូបរាងប៊ូតុងក្នុងព័ត៌មានស្បែក។"},
+        {"name": "Rounded Keyboard Panel", "khmer": "កំណត់ជ្រុងមូល និងកម្រិតមូលខាងលើ/ក្រោមនៃផ្ទាំងក្តារចុច។"},
+        {"name": "Settings Homepage Override", "khmer": "ប្ដូរទំព័រកំណត់ Gboard រវាងរចនាប័ទ្មថ្មី និងចាស់។"},
+        {"name": "Swipe Down to Dismiss Keyboard", "khmer": "អូសចុះពីជួរការណែនាំ ឬ toolbar ដើម្បីបិទក្តារចុច។"},
+        {"name": "Top Toolbar Item Count", "khmer": "កំណត់ចំនួនធាតុក្នុង toolbar ខាងលើ។"}
+      ]
+    },
+    {
+      "title": "🧰 បម្រុងទុក កំណត់កម្រិតខ្ពស់ និង OCR",
+      "patches": [
+        {"name": "Backup & Restore", "khmer": "នាំចេញ និងស្ដារការកំណត់ patches ព្រមទាំងបម្រុងទុក ប្រៀបធៀប ឬស្ដារ Gboard PB/XML flags។"},
+        {"name": "Developer options", "khmer": "បើក Developer options និង Flag Editor សម្រាប់កែ flags។"},
+        {"name": "Enable OCR / Scan Text", "khmer": "បើកស្កែនអក្សរសម្រាប់ Latin, ចិន, ជប៉ុន, កូរ៉េ និង Devanagari; upstream មិនបានរាយភាសាខ្មែរទេ។"}
+      ]
+    }
+  ]
+}
