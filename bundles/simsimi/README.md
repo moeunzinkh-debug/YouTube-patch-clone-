@@ -1,13 +1,13 @@
 # SimSimi patches — experimental, separate from YouTube
 
-**Morphe patch bundle:** [`bundle.mpp`](bundle.mpp), **0.2.0-dev.1**, 41,923 bytes.
+**Morphe patch bundle:** [`bundle.mpp`](bundle.mpp), **0.2.0-dev.1**, 42,955 bytes.
 Targets **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, code `1119001`, API 24+).
 Import this separate `.mpp` into Morphe Manager and select the SimSimi APK. These
 are real selectable patches, not a standalone Python APK patcher. Do not replace
 the root YouTube `patch.mpp` with this bundle.
 
 <details>
-<summary>SimSimi • 4 selectable experimental patches</summary>
+<summary>SimSimi • 5 selectable experimental patches</summary>
 
 | Exact patch name | Default | What it changes / limits |
 |---|---|---|
@@ -16,33 +16,42 @@ the root YouTube `patch.mpp` with this bundle.
 | Pull down to restart chat (experimental) | On | Injects an Activity touch observer and React reload extension. Pull from the top 96dp down at least 160dp; ignores focused text input/scrolled content, cancels multitouch and debounces. Enabled only on the **English Conversation list**, identified by its visible heading and room-list section. Disabled inside chat rooms and on unknown screens. Requests React runtime reload, not process termination or a data-only list refresh; unsaved state may be lost. New screen restriction not yet device-tested. |
 | MicroG RE service routing (experimental) | **Off, opt-in** | Routes exact native GMS package literals to `app.revanced.android.gms`; adds package visibility and `EXTENDED_ACCESS`. Requires separately installed compatible MicroG RE. This is partial routing, **not full GMS compatibility** or an implementation of missing APIs. |
 
+| Daily bonus without video (client path, experimental) | **Off, opt-in** | Selects the existing membership non-video loader instead of the non-member ad loader. Keeps server state/reward calls and errors intact. Does not guarantee server credit or change limits; device testing needed. |
+
 </details>
 
 The user reports the existing features working on their device. This does not
 independently verify server entitlements, full GMS coverage or the newly added
 Conversation-only screen restriction.
 
+To try daily bonuses, explicitly select **Daily bonus without video (client path,
+experimental)** in Manager. MicroG routing is also opt-in; select it only when
+using compatible MicroG RE. The new screen guard recognizes the English UI in
+your screenshot. The reload is still a React runtime reload, not a data-only refresh.
+
 ## Requested feature status
 
 - **Ads:** shared eligibility gate implemented; complete ad/reward-SDK removal unverified.
 - **Membership:** local UI gates implemented, not backend entitlements. All items,
   read receipts and individual server-controlled features are **not unlocked** by proof.
-- **Daily bonus without rewarded video:** no dedicated bypass implemented; no
-  fabricated reward callbacks or server credit grants.
+- **Daily bonus without rewarded video:** opt-in patch selects the existing
+  membership non-video loader. Server-state lookup, reward requests and error
+  handling remain intact. No fabricated ad-completion callbacks or granted credits;
+  actual server acceptance/device behavior is not yet verified.
 - **MicroG RE:** native routing implemented; sign-in, Firebase App Check,
   signatures, attestation, Billing and other API compatibility remain unverified.
 - **Swipe down:** corrected to the Conversation list in your screenshot, not inside chat rooms. Screen matching is currently English-only and fails closed for other layouts/languages.
 
 ## Verification — actual MPP application passed
 
-[Actions run 40653945775](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40653945775)
-built the isolated bundle, ran exact-input Hermes JVM tests and the 12-check Java
+[Actions run 40654752231](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40654752231)
+built the isolated bundle, ran exact-input Hermes JVM tests (including all six orders of the three transforms) and the 12-check Java
 gesture harness plus 8 Conversation screen checks, then **applied the actual `.mpp` to the original APK using Morphe
-Desktop v1.19.1 / Morphe Patcher**, explicitly enabling the optional MicroG patch.
+Desktop v1.19.1 / Morphe Patcher**, explicitly enabling the optional MicroG and daily-bonus patches.
 Static validation of that output APK confirmed:
 
-- Combined ads + membership Hermes payload SHA-256:
-  `7738259ce661f707f9ac95a44854a0ca7972cf7f6f2a9654fb7170323cba6812`.
+- Combined ads + membership + daily-bonus Hermes payload SHA-256:
+  `c62c6c3e9b5a7f233da1187ffab4a1f11a517c25c77142aba33fe074a95bb61f`.
 - MainActivity dispatch hook and injected pull-refresh runtime in output DEX.
 - **66** native literals routed to MicroG RE, with permission/package visibility.
 - Original required-splits metadata retained.
@@ -53,7 +62,7 @@ See [`morphe-validation.json`](morphe-validation.json) and
 full GMS compatibility test**. No SimSimi release has been published.
 
 Bundle SHA-256:
-`52980e1bccdcc22b1b146b1f73a9498f404b0c079f494871a871b703aee8ad51`.
+`beb3ff5b2062f97a6ac7e82add6707d7cb5edf3f00a8c59b27f300ae8f716e9d`.
 Local archive/checksum verification:
 `python3 tools/simsimi/verify_bundle.py bundles/simsimi/bundle.mpp`.
 

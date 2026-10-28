@@ -18,7 +18,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
-<summary>🗨️ SimSimi • 4 experimental patches (separate bundle)</summary>
+<summary>🗨️ SimSimi • 5 experimental patches (separate bundle)</summary>
 
 For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
 into Morphe Manager. This is separate from the YouTube `patch.mpp`.
@@ -26,12 +26,13 @@ into Morphe Manager. This is separate from the YouTube `patch.mpp`.
 - **Disable ad eligibility (experimental)** — shared ad gate, not proven complete SDK removal.
 - **Unlock membership UI (client only, experimental)** — local gates only, not server entitlements/items/read receipts.
 - **Pull down to restart chat (experimental)** — gesture on the English Conversation list only (not inside chat rooms), requesting React runtime reload, not process termination.
+- **Daily bonus without video (client path, experimental)** — opt-in existing non-video flow; original server calls/errors retained, server rewards not guaranteed.
 - **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility.
 
 The actual `.mpp` was successfully applied to the original APK with Morphe's engine
-([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40653945775));
+([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40654752231));
 output Hermes, native hook, extension, 66 routed literals and manifest checks passed.
-**Device runtime is untested. Daily bonus without videos is not implemented.**
+**New Conversation-only reload and daily-bonus flow are not yet device-tested.**
 Matching splits are required for installation. See the
 [full catalog and limitations](bundles/simsimi/README.md). No SimSimi release published.
 

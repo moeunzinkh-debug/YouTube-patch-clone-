@@ -22,6 +22,8 @@ with zipfile.ZipFile(bundle) as archive:
     assert 'app/morphe/patches/simsimi/MicroGServicePatchKt.class' in names
     extension = archive.read('extensions/simsimi.mpe')
     assert extension.startswith(b'dex\n') and b'PullRefresh' in extension and b'PullGesture' in extension
+    assert b'ConversationScreen' in extension, 'Missing Conversation-only screen guard'
+    assert any(b'Daily bonus without video (client path, experimental)' in archive.read(name) for name in names if name.endswith('.class')), 'Missing daily bonus selector'
     assert not any(n.endswith('Test.class') for n in names)
 print(json.dumps({'bundle': str(bundle), 'sha256': digest, 'size': bundle.stat().st_size,
                   'status': 'Experimental standalone SimSimi package structure verified; device behavior not tested.'}, indent=2))

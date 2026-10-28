@@ -4,14 +4,15 @@
   "package": "com.ismaker.android.simsimi",
   "target_version": "9.2.3",
   "target_version_code": "1119001",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40653945775",
-  "bundle_sha256": "52980e1bccdcc22b1b146b1f73a9498f404b0c079f494871a871b703aee8ad51",
-  "bundle_bytes": 41923,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40654752231",
+  "bundle_sha256": "beb3ff5b2062f97a6ac7e82add6707d7cb5edf3f00a8c59b27f300ae8f716e9d",
+  "bundle_bytes": 42955,
   "implemented_patches": [
     "Disable ad eligibility (experimental)",
     "Unlock membership UI (client only, experimental)",
     "Pull down to restart chat (experimental)",
-    "MicroG RE service routing (experimental)"
+    "MicroG RE service routing (experimental)",
+    "Daily bonus without video (client path, experimental)"
   ],
   "tests": {
     "isolated_android_bundle_compile": "passed",
@@ -22,18 +23,20 @@
     "pull_gesture_java_harness": "passed_12_checks",
     "output_dex_manifest_and_hermes_verification": "passed",
     "android_manager_ui": "not_run",
-    "conversation_screen_java_harness": "passed_8_checks"
+    "conversation_screen_java_harness": "passed_8_checks",
+    "daily_bonus_transform_and_six_composition_orders": "passed"
   },
   "pending_features": [
     "complete_ad_removal_device_verification",
     "server_membership_entitlements_items_read_receipts",
-    "daily_bonus_without_ads",
     "full_gms_microg_re_compatibility",
-    "pull_down_reload_device_verification"
+    "pull_down_reload_device_verification",
+    "daily_bonus_server_acceptance_device_verification"
   ],
   "input_constraint": "Uploaded base declares splits.required=true and contains no native libraries. Matching split APKs are required for installation testing.",
   "release_published": false,
   "youtube_bundle_changed": false,
   "pull_reload_scope": "English Conversation list only, recognized by visible heading plus room-list section; disabled in chat rooms and unknown screens. React runtime reload, not a data-only refresh.",
-  "user_report": "User reports existing features working; requested reload location corrected to Conversation list. New screen restriction not yet device-tested."
+  "user_report": "User reports existing features working; requested reload location corrected to Conversation list. New screen restriction not yet device-tested.",
+  "daily_bonus_scope": "Opt-in: existing membership non-video loader, with original server state, reward requests and errors retained. No fabricated ad completion or guaranteed credits."
 }
