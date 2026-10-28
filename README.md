@@ -18,21 +18,28 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
-<summary>🗨️ SimSimi • 5 experimental patches (separate bundle)</summary>
+<summary>🗨️ SimSimi • 11 experimental patches (separate bundle)</summary>
 
 For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
-into Morphe Manager. This is separate from the YouTube `patch.mpp`.
+into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
 
 - **Disable ad eligibility (experimental)** — shared ad gate, not proven complete SDK removal.
-- **Unlock membership UI (client only, experimental)** — local gates only, not server entitlements/items/read receipts.
-- **Pull down to restart chat (experimental)** — gesture on the English Conversation list only (not inside chat rooms), requesting React runtime reload, not process termination.
-- **Daily bonus without video (client path, experimental)** — opt-in existing non-video flow; original server calls/errors retained, server rewards not guaranteed.
+- **Unlock membership UI (client only, experimental)** — client UI status only, not a server subscription.
+- **Pull down to restart chat (experimental)** — English Conversation list only, not inside chat rooms; requests React runtime reload.
+- **Daily bonus without video (client path, experimental)** — opt-in existing non-video flow; server reward is not guaranteed.
 - **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility.
+- **Conversation level controls (client only, experimental)** — opt-in member slider path; server level/topic handling remains authoritative.
+- **Profile photo controls (client only, experimental)** — opt-in profile picker path; server upload still required.
+- **Custom group cover controls (client only, experimental)** — opt-in cover picker; no group ownership or server upload rights are granted.
+- **Photo sending controls (client only, experimental)** — opt-in existing direct/group member send paths; server limits and moderation still apply.
+- **Read receipt display (client only, experimental)** — opt-in display of the real supplied read flag; no receipt is fabricated.
+- **Membership item controls (client only, experimental)** — opt-in member UI only; does **not** grant free or unlimited server items, even if the UI says unlimited.
 
-The actual `.mpp` was successfully applied to the original APK with Morphe's engine
-([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40654752231));
-output Hermes, native hook, extension, 66 routed literals and manifest checks passed.
-**New Conversation-only reload and daily-bonus flow are not yet device-tested.**
+The six individual feature patches are **off by default** and require the membership UI patch.
+The actual `.mpp` was applied to the original APK using Morphe's engine
+([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40658603472));
+all six client gates, output Hermes, native hook, 66 routed literals and manifest checks passed.
+**The new feature patches are not device-tested, and server acceptance is unverified.**
 Matching splits are required for installation. See the
 [full catalog and limitations](bundles/simsimi/README.md). No SimSimi release published.
 

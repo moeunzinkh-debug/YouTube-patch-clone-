@@ -1,91 +1,48 @@
-# SimSimi patches — experimental, separate from YouTube
+# SimSimi patches — កំណែសាកល្បង ដាច់ដោយឡែកពី YouTube
 
-**Morphe patch bundle:** [`bundle.mpp`](bundle.mpp), **0.2.0-dev.1**, 42,955 bytes.
-Targets **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, code `1119001`, API 24+).
-Import this separate `.mpp` into Morphe Manager and select the SimSimi APK. These
-are real selectable patches, not a standalone Python APK patcher. Do not replace
-the root YouTube `patch.mpp` with this bundle.
+**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.3.0-dev.1**, 53,855 bytes។ សម្រាប់ **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, version code `1119001`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
+
+**ស្ថានភាពសំខាន់៖** បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
+
+## របៀបសាកល្បង
+
+1. Import `bundles/simsimi/bundle.mpp` ទៅ Morphe Manager ហើយជ្រើស APK ដើម SimSimi 9.2.3។ កុំប្រើ APK ដែលបាន patch រួចជាធាតុបញ្ចូលសម្រាប់ bundle នេះ។
+2. ក្នុងបញ្ជី patches សូម **បើក selectors ទាំង ៦** ដែលមានពាក្យ `client only` ក្នុងតារាងខាងក្រោម៖ ពួកវា **បិទជាមុន**។ ពេលបើក selector ណាមួយ វាត្រូវការ `Unlock membership UI` ជា dependency។
+3. Patch និងដំឡើងជាមួយ split APK ដែលត្រូវគ្នា បន្ទាប់មកសាកមុខងារម្ដងមួយៗ។ សម្រាប់រូបថត និង read receipt សូមផ្ទៀងផ្ទាត់ជាមួយអ្នកទទួលពិត មិនមើលតែ UI ខាងអ្នកទេ។
+4. សម្រាប់ Items សូមប្រយ័ត្នប៊ូតុងទិញ៖ **ការទិញនៅតែអាចចំណាយ coins**។ ស្លាកថា unlimited នៅលើ UI មិនបញ្ជាក់ថាប្រើបានឥតគិតថ្លៃទេ។
 
 <details>
-<summary>SimSimi • 5 selectable experimental patches</summary>
+<summary>SimSimi • 11 selectable experimental patches</summary>
 
-| Exact patch name | Default | What it changes / limits |
+| ឈ្មោះ patch ក្នុង Manager | លំនាំដើម | អ្វីដែលកែ និងដែនកំណត់ |
 |---|---|---|
-| Disable ad eligibility (experimental) | On | Changes the shared Hermes `canShowAds` gate to false. Not proof every SDK ad is removed; does not simulate rewarded-video completion. |
-| Unlock membership UI (client only, experimental) | On | Returns a cloned membership status with `hasMembership=true` for local UI gates. Conversation controls, profile/cover images and photo controls may still require server authorization. Does not grant server items, read receipts, billing, or daily rewards. |
-| Pull down to restart chat (experimental) | On | Injects an Activity touch observer and React reload extension. Pull from the top 96dp down at least 160dp; ignores focused text input/scrolled content, cancels multitouch and debounces. Enabled only on the **English Conversation list**, identified by its visible heading and room-list section. Disabled inside chat rooms and on unknown screens. Requests React runtime reload, not process termination or a data-only list refresh; unsaved state may be lost. New screen restriction not yet device-tested. |
-| MicroG RE service routing (experimental) | **Off, opt-in** | Routes exact native GMS package literals to `app.revanced.android.gms`; adds package visibility and `EXTENDED_ACCESS`. Requires separately installed compatible MicroG RE. This is partial routing, **not full GMS compatibility** or an implementation of missing APIs. |
-
-| Daily bonus without video (client path, experimental) | **Off, opt-in** | Selects the existing membership non-video loader instead of the non-member ad loader. Keeps server state/reward calls and errors intact. Does not guarantee server credit or change limits; device testing needed. |
+| Disable ad eligibility (experimental) | On | បិទ shared `canShowAds` gate; មិនទាន់បញ្ជាក់ថាលុប ads SDK ទាំងអស់។ |
+| Unlock membership UI (client only, experimental) | On | ផ្ដល់ `hasMembership=true` ក្នុង client UI និង listener ដោយ clone ស្ថានភាព។ មិនបង្កើតការជាវ ឬសិទ្ធិនៅម៉ាស៊ីនមេ។ |
+| Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ មិនមែនក្នុងបន្ទប់ឆាត។ វា reload React runtime ទាំងមូល មិនសម្លាប់ app និងមិនមែន refresh តែទិន្នន័យបញ្ជីទេ។ |
+| MicroG RE service routing (experimental) | Off | ប្ដូរផ្លូវ native GMS ទៅ `app.revanced.android.gms`; ត្រូវដំឡើង MicroG RE ដាច់ដោយឡែក ហើយមិនមែន GMS support ពេញលេញ។ |
+| Daily bonus without video (client path, experimental) | Off | ជ្រើសផ្លូវ membership ដែលមានស្រាប់ដោយមិនផ្ទុកវីដេអូ។ Server reward និង error នៅដដែល; មិនធានាការទទួលរង្វាន់។ |
+| Conversation level controls (client only, experimental) | Off | ជ្រើស member branch ក្នុងសកម្មភាពប្ដូរ Freetalk level និងទុកសំណើរក្សាទុកកម្រិតទៅ server ដដែល។ មិនធានាប្រធានបទដែល server ផ្ដល់។ |
+| Profile photo controls (client only, experimental) | Off | ជ្រើសផ្លូវបើក photo picker ជំនួសអេក្រង់ជាវ; ការផ្ទុក និងរក្សាទុករូបអាស្រ័យលើ server។ |
+| Custom group cover controls (client only, experimental) | Off | បើក custom-cover picker និងប្រើ client membership flag ក្នុងទិន្នន័យ group។ មិនផ្ដល់ភាពជាម្ចាស់បន្ទប់ ឬសិទ្ធិ upload លើ server។ |
+| Photo sending controls (client only, experimental) | Off | ជ្រើសផ្លូវផ្ញើរូបរបស់ member ទាំង direct និង group; ផ្លូវនេះអាចរំលង local quota/ad check។ មិនក្លែងការផ្ញើជោគជ័យ និងមិនប្ដូរច្បាប់ server ឬ moderation។ |
+| Read receipt display (client only, experimental) | Off | បង្ហាញ indicator ដែលប្រើ `msgHasBeenRead` ដើម ជំនួសសញ្ញាសួររបស់ membership។ មិនបង្កើតទិន្នន័យថាបានអាន ប្រសិនបើ server មិនផ្ដល់។ |
+| Membership item controls (client only, experimental) | Off | បង្ហាញ member item UI ដែលអាចមានស្លាក unlimited។ **មិនផ្ដល់ Items, coins, stock ឬធានាថា server អនុញ្ញាតឱ្យប្រើដោយឥតគិតថ្លៃ។** |
 
 </details>
 
-The user reports the existing features working on their device. This does not
-independently verify server entitlements, full GMS coverage or the newly added
-Conversation-only screen restriction.
+## ការផ្ទៀងផ្ទាត់
 
-To try daily bonuses, explicitly select **Daily bonus without video (client path,
-experimental)** in Manager. MicroG routing is also opt-in; select it only when
-using compatible MicroG RE. The new screen guard recognizes the English UI in
-your screenshot. The reload is still a React runtime reload, not a data-only refresh.
+[Actions run 40658603472](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40658603472) បាន៖
 
-## Requested feature status
+- Compile bundle និងដំណើរការ JVM tests លើ Hermes payload ដើម រួមទាំងការសាកល្បងបញ្ចូល patches រួមគ្នា និងបដិសេធ bytecode មិនស្គាល់។
+- Decode instructions និងពិនិត្យថា feature branches ទៅផ្លូវដែលចង់បាន ដោយទុក read flag និងកូដប្រើ item នៅដដែល។
+- អនុវត្ត `.mpp` ពិតលើ APK ដើមដោយ **Morphe Desktop v1.19.1** ជាមួយ selectors ថ្មីទាំង ៦ និង MicroG/daily bonus បើក។ Output Hermes ត្រូវគ្នានឹង payload ដែលបានតេស្ត; native reload hook និង MicroG visibility ត្រូវបានពិនិត្យ។
+- **មិនបាន** សាកល្បង Android Manager UI, ការដំឡើង/runtime លើទូរសព្ទ, ឬ server entitlement។
 
-- **Ads:** shared eligibility gate implemented; complete ad/reward-SDK removal unverified.
-- **Membership:** local UI gates implemented, not backend entitlements. All items,
-  read receipts and individual server-controlled features are **not unlocked** by proof.
-- **Daily bonus without rewarded video:** opt-in patch selects the existing
-  membership non-video loader. Server-state lookup, reward requests and error
-  handling remain intact. No fabricated ad-completion callbacks or granted credits;
-  actual server acceptance/device behavior is not yet verified.
-- **MicroG RE:** native routing implemented; sign-in, Firebase App Check,
-  signatures, attestation, Billing and other API compatibility remain unverified.
-- **Swipe down:** corrected to the Conversation list in your screenshot, not inside chat rooms. Screen matching is currently English-only and fails closed for other layouts/languages.
+Combined output Hermes SHA-256: `97bbf6a26444dd5755173800eae31579e972df1d1e54777d4dd68be7f7c89892`។ Bundle SHA-256: `5f1aca7743f2e8c68b0b7b13ed4470aaa855d1245dd4ef7c22ac27a475a88d87`។ ព័ត៌មានម៉ាស៊ីនតេស្តនៅ [`morphe-validation.json`](morphe-validation.json) និង [`build-status.json`](build-status.json)។
 
-## Verification — actual MPP application passed
+## APK splits និងការបង្កើត
 
-[Actions run 40654752231](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40654752231)
-built the isolated bundle, ran exact-input Hermes JVM tests (including all six orders of the three transforms) and the 12-check Java
-gesture harness plus 8 Conversation screen checks, then **applied the actual `.mpp` to the original APK using Morphe
-Desktop v1.19.1 / Morphe Patcher**, explicitly enabling the optional MicroG and daily-bonus patches.
-Static validation of that output APK confirmed:
+APK ដើមដែលបានផ្ដល់ជា base APK មាន `splits.required=true` និងគ្មាន native libraries។ ការដំឡើងត្រូវមាន ABI/config splits ដែលត្រូវគ្នា; ការលុប metadata មិនបង្កើត libraries ទេ។
 
-- Combined ads + membership + daily-bonus Hermes payload SHA-256:
-  `c62c6c3e9b5a7f233da1187ffab4a1f11a517c25c77142aba33fe074a95bb61f`.
-- MainActivity dispatch hook and injected pull-refresh runtime in output DEX.
-- **66** native literals routed to MicroG RE, with permission/package visibility.
-- Original required-splits metadata retained.
-
-See [`morphe-validation.json`](morphe-validation.json) and
-[`build-status.json`](build-status.json). This is engine/output validation,
-**not an Android Manager UI, installation, device runtime, backend entitlement or
-full GMS compatibility test**. No SimSimi release has been published.
-
-Bundle SHA-256:
-`beb3ff5b2062f97a6ac7e82add6707d7cb5edf3f00a8c59b27f300ae8f716e9d`.
-Local archive/checksum verification:
-`python3 tools/simsimi/verify_bundle.py bundles/simsimi/bundle.mpp`.
-
-## Installation constraint
-
-The supplied `Simsimi/base.2.apk` declares
-`com.android.vending.splits.required=true` and has no native `.so` libraries.
-Installation/device testing needs its matching ABI/configuration splits; the
-base APK alone is not a complete installable app. Removing that flag would not
-create the missing libraries. The current bundle deliberately preserves it.
-
-## Build and safety
-
-- Sources: `tools/simsimi/project`; isolated build: `prepare_build.py`;
-  workflow: `.github/workflows/build-simsimi-mpp.yml`.
-- Original Hermes SHA-256 is guarded:
-  `203256d3824cfbc449d110fca1601095ecf283f555079407d03a2f46ca0c7489`.
-- Guarded, composable Hermes transforms preserve sizes/offsets and recompute the
-  SHA-1 footer. Membership status is cloned rather than rewriting cached state.
-- Native patching preserves superclass touch dispatch; does not kill the app.
-- MicroG routing leaves service actions, API hosts and class names unchanged;
-  does not fabricate service availability or bypass signature/attestation checks.
-- Evidence: `docs/simsimi/apk-inventory.json`, `target-map.json`, `hermes-targets.json`.
-  Hermes parser pinned to P1sec/hermes-dec
-  `2e796663e1fedb93dca51060797ebf3327b3fedb`.
-- YouTube/Gemini bundles and original APK release assets remain untouched.
+ប្រភពនៅ `tools/simsimi/project` និង workflow នៅ `.github/workflows/build-simsimi-mpp.yml`។ Bytecode កំណែដែលមិនត្រូវ SHA-256 ដើមនឹងត្រូវបដិសេធ។ ទិន្នន័យវិភាគនៅ `docs/simsimi/feature-gates.json` និង `docs/simsimi/membership-targets.json`។ គ្មាន SimSimi release ត្រូវបានចេញ ហើយ bundle YouTube មិនបានផ្លាស់ប្ដូរ។
