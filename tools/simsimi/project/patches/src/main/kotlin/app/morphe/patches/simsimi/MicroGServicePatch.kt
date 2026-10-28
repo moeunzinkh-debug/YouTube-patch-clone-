@@ -5,6 +5,7 @@ import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
+import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
@@ -47,7 +48,7 @@ val microGServicePatch = bytecodePatch(
             clazz.methods.forEach methodLoop@ { original ->
                 val instructions = original.implementation?.instructions?.toList() ?: return@methodLoop
                 val indices = instructions.withIndex().filter { (_, instruction) ->
-                    instruction.opcode.name.startsWith("CONST_STRING") &&
+                    (instruction.opcode == Opcode.CONST_STRING || instruction.opcode == Opcode.CONST_STRING_JUMBO) &&
                         ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string == "com.google.android.gms"
                 }
                 if (indices.isEmpty()) return@methodLoop
