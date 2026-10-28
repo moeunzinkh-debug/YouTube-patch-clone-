@@ -1,0 +1,17 @@
+{
+  "engine": "Morphe Desktop v1.19.1",
+  "actual_mpp_applied_to_original_apk": true,
+  "device_runtime_tested": false,
+  "full_gms_compatibility_tested": false,
+  "server_membership_or_rewards_granted": false,
+  "six_feature_backend_entitlements_verified": false,
+  "unlimited_items_verified": false,
+  "input": "base only; matching ABI/config splits are required for installation",
+  "microg_permission_and_visibility": true,
+  "hermes_payload_matches_tested_transform": true,
+  "six_client_feature_gate_bytes_match": true,
+  "hermes_sha256": "97bbf6a26444dd5755173800eae31579e972df1d1e54777d4dd68be7f7c89892",
+  "injected_main_activity_dispatch_hook": true,
+  "injected_pull_refresh_runtime": true,
+  "native_microg_routed_literals": 66
+}
