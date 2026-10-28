@@ -38,7 +38,12 @@ class TranslateInvestigationTest(unittest.TestCase):
         self.assertEqual(result['status'], 'ok')
         self.assertEqual(result['sample_translation'], 'សួស្តី')
         self.assertTrue(opener.request.full_url.startswith('https://translate.googleapis.com/translate_a/single?'))
-        self.assertEqual([(s['source'], s['target']) for s in probe.CASES], [('en', 'km'), ('km', 'en')])
+        self.assertEqual([(s['source'], s['target'], s['method']) for s in probe.CASES],
+                         [('en', 'km', 'GET'), ('km', 'en', 'GET'), ('auto', 'km', 'POST')])
+        post = Opener(json.dumps([[['សួស្តី']]]).encode())
+        self.assertEqual(probe.run_case(post, probe.CASES[2])['status'], 'ok')
+        self.assertEqual(post.request.get_method(), 'POST')
+        self.assertNotIn('How+are+you', post.request.full_url)
 
     def test_http_failure_is_reported_not_silently_marked_success(self):
         error = HTTPError(probe.ENDPOINT, 429, 'Too Many Requests', {}, None)

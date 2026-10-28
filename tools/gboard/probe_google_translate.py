@@ -14,8 +14,9 @@ from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_ope
 
 ENDPOINT = "https://translate.googleapis.com/translate_a/single"
 CASES = (
-    {"source": "en", "target": "km", "text": "Hello world"},
-    {"source": "km", "target": "en", "text": "សួស្តី"},
+    {"source": "en", "target": "km", "text": "Hello world", "method": "GET"},
+    {"source": "km", "target": "en", "text": "សួស្តី", "method": "GET"},
+    {"source": "auto", "target": "km", "text": "How are you?", "method": "POST"},
 )
 
 
@@ -25,9 +26,15 @@ class NoRedirect(HTTPRedirectHandler):
 
 
 def run_case(opener, sample):
-    params = {"client": "gtx", "sl": sample["source"], "tl": sample["target"], "dt": "t", "q": sample["text"]}
-    request = Request(ENDPOINT + "?" + urlencode(params), headers={"Accept": "application/json", "User-Agent": "Mozilla/5.0"})
-    result = {"source": sample["source"], "target": sample["target"], "status": "error"}
+    params = {"client": "gtx", "sl": sample["source"], "tl": sample["target"], "dt": "t"}
+    data = None
+    if sample["method"] == "POST":
+        data = urlencode({"q": sample["text"]}).encode("utf-8")
+    else:
+        params["q"] = sample["text"]
+    request = Request(ENDPOINT + "?" + urlencode(params), data=data,
+                      headers={"Accept": "application/json", "User-Agent": "Mozilla/5.0"})
+    result = {"source": sample["source"], "target": sample["target"], "method": sample["method"], "status": "error"}
     try:
         with opener.open(request, timeout=20) as response:
             result["http_status"] = response.status

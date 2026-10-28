@@ -159,7 +159,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("apk", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--source", choices=("google-play", "third-party-prepatched"), required=True)
+    parser.add_argument("--source", choices=("google-play", "google-signed-mirror", "third-party-prepatched"), required=True)
     parser.add_argument("--signer-sha256", required=True)
     args = parser.parse_args()
     apk = APK(str(args.apk))
@@ -168,8 +168,8 @@ def main():
     version_code = str(apk.get_androidversion_code())
     if version_name != "18.5.4.993608717-release-arm64-v8a" or version_code != "176049702":
         raise SystemExit("APK does not have the expected version name and version code")
-    if args.source == "google-play" and package != "com.google.android.inputmethod.latin":
-        raise SystemExit("Google Play APK does not have the expected package")
+    if args.source != "third-party-prepatched" and package != "com.google.android.inputmethod.latin":
+        raise SystemExit("Google-signed APK does not have the expected package")
     report = {
         "input": {
             "source": args.source,

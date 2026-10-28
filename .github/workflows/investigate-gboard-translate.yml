@@ -41,14 +41,14 @@ jobs:
           python - <<'PY'
           import json
           for case in json.load(open('/tmp/gboard-report/google-translate-probe.json'))['results']:
-              print(f"::notice::Synthetic {case['source']} to {case['target']}: {case['status']}, HTTP {case.get('http_status', 'unavailable')}")
+              print(f"::notice::Synthetic {case['source']} to {case['target']} via {case['method']}: {case['status']}, HTTP {case.get('http_status', 'unavailable')}")
           PY
       - name: Acquire an exact-version APK for static inspection only
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p /tmp/gboard-play /tmp/gboard-third-party
+          mkdir -p /tmp/gboard-play /tmp/gboard-mirror /tmp/gboard-third-party
           # No personal Google account, typed keyboard text, or user credentials.
           # The anonymous dispenser's raw output is intentionally not published.
           if timeout 240s python -m goopdl download com.google.android.inputmethod.latin \
@@ -58,8 +58,17 @@ jobs:
             echo 'source=google-play' >> "$GITHUB_ENV"
             echo 'apk=/tmp/gboard-play/com.google.android.inputmethod.latin-176049702.apk' >> "$GITHUB_ENV"
             echo 'Exact Google Play build downloaded; signature will be independently verified.'
+          elif curl --fail --location --silent --show-error --max-time 90 \
+                'https://d.apkpure.com/b/APK/com.google.android.inputmethod.latin?versionCode=176049702' \
+                --output /tmp/gboard-mirror/gboard.apk \
+                && unzip -tq /tmp/gboard-mirror/gboard.apk > /dev/null 2>&1; then
+            # A mirror is not Google Play. Verify Google's signing certificate
+            # and the exact manifest separately before using it.
+            echo 'source=google-signed-mirror' >> "$GITHUB_ENV"
+            echo 'apk=/tmp/gboard-mirror/gboard.apk' >> "$GITHUB_ENV"
+            echo 'Downloaded from a public mirror; Google signature and version still require verification.'
           else
-            echo 'Anonymous Google Play download unavailable; use a pinned third-party patched build for static investigation only.'
+            echo 'Stock download unavailable; use a pinned third-party patched build for static investigation only.'
             gh release download 'gboard-v18.5.4.993608717-release-arm64-v8a-p4.0.0' \
               --repo iamwaqargulzar/auto-morphe-apk-builds \
               --pattern 'gboard-18.5.4.993608717-release-arm64-v8a-arm64-v8a.apk' \
@@ -83,7 +92,7 @@ jobs:
           # older releases print 'Signer #1'. Accept both, de-duplicate schemes.
           signers="$(sed -nE 's/^.*certificate SHA-256 digest: ([[:xdigit:]]{64})$/\1/p' /tmp/gboard-signature.txt | tr '[:upper:]' '[:lower:]' | sort -u)"
           test -n "$signers" || { echo '::error::Could not read the APK signing certificate digest.'; exit 1; }
-          if [ "$source" = google-play ]; then
+          if [ "$source" != third-party-prepatched ]; then
             signer=f0fd6c5b410f25cb25c3b53346c8972fae30f8ee7411df910480ad6b2d60db83
             grep -Fxq "$signer" <<< "$signers" || { echo '::error::Downloaded APK is not signed by the expected Google certificate.'; exit 1; }
           else

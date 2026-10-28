@@ -20,9 +20,10 @@ DEX_NAME = re.compile(r"classes(?:[2-9]|[1-9][0-9]+)?\.dex\Z")
 TARGETS = {
     "Lkjx;": {"a", "b"},
     "Lkkp;": {"d", "e", "ho"},
-    "Lklo;": {"al", "ap", "aj", "fL", "fN"},
+    "Lklo;": {"al", "ap", "aj", "fL", "fN", "ft", "I", "aq"},
     "Lkli;": {"a"},
-    "Lkko;": {"e"},
+    "Lkko;": {"c", "e", "f"},
+    "Lkka;": {"<init>", "b", "c", "d", "f", "ho", "close"},
     "Lklf;": {"a", "b"},
     "Lklg;": {"<init>"},
     "Labxb;": {"<init>"},
