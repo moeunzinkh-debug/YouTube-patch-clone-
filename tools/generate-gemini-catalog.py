@@ -75,6 +75,10 @@ def patches() -> list[dict]:
 
 
 def main() -> None:
+    text = README.read_text(encoding="utf-8")
+    if START not in text and END not in text:
+        print("Gemini README catalog retired; leaving YouTube-only README unchanged")
+        return
     prov = json.loads((EXTRA / "SOURCE.json").read_text(encoding="utf-8"))
     items = patches()
     if not items:
