@@ -37,6 +37,11 @@ jobs:
         run: |
           mkdir -p /tmp/gboard-report
           python tools/gboard/probe_google_translate.py /tmp/gboard-report/google-translate-probe.json
+          python - <<'PY'
+          import json
+          for case in json.load(open('/tmp/gboard-report/google-translate-probe.json'))['results']:
+              print(f"::notice::Synthetic {case['source']} to {case['target']}: {case['status']}, HTTP {case.get('http_status', 'unavailable')}")
+          PY
       - name: Acquire an exact-version APK for static inspection only
         env:
           GH_TOKEN: ${{ github.token }}
@@ -65,16 +70,26 @@ jobs:
       - name: Verify APK signature and inventory native Translate references
         run: |
           set -euo pipefail
+          trap 'status=$?; echo "::error::APK inspection failed at shell line $LINENO (exit $status)."' ERR
+          echo "::notice::APK source: $source"
           signer_tool="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1)"
-          test -n "$signer_tool"
-          "$signer_tool" verify --print-certs "$apk" > /tmp/gboard-signature.txt
+          test -n "$signer_tool" || { echo '::error::Android apksigner not found.'; exit 1; }
+          if ! "$signer_tool" verify --print-certs "$apk" > /tmp/gboard-signature.txt 2>&1; then
+            echo "::error::APK signature verification failed: $(tail -1 /tmp/gboard-signature.txt)"
+            exit 1
+          fi
           signer="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/gboard-signature.txt | tr '[:upper:]' '[:lower:]')"
-          test "${#signer}" -eq 64
+          test "${#signer}" -eq 64 || { echo '::error::Could not read the APK signing certificate digest.'; exit 1; }
+          echo "::notice::APK signing certificate SHA-256: $signer"
           if [ "$source" = google-play ]; then
             test "$signer" = f0fd6c5b410f25cb25c3b53346c8972fae30f8ee7411df910480ad6b2d60db83 || { echo '::error::Downloaded APK is not signed by the expected Google certificate.'; exit 1; }
           fi
-          python tools/gboard/investigate_translate.py "$apk" /tmp/gboard-report/translate-inventory.json \
-            --source "$source" --signer-sha256 "$signer"
+          if ! python tools/gboard/investigate_translate.py "$apk" /tmp/gboard-report/translate-inventory.json \
+            --source "$source" --signer-sha256 "$signer" > /tmp/gboard-inventory.log 2>&1; then
+            echo "::error::DEX inventory failed: $(tail -1 /tmp/gboard-inventory.log)"
+            exit 1
+          fi
+          cat /tmp/gboard-inventory.log
       - name: Publish only sanitized diagnostic reports to this session branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/arena/69154a0c-youtube-patch-clone'
         run: |
