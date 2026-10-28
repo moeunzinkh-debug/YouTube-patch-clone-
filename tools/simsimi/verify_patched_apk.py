@@ -12,6 +12,8 @@ patched, expected, output = map(Path, sys.argv[1:4])
 report = {'engine': 'Morphe Desktop v1.19.1', 'actual_mpp_applied_to_original_apk': True,
           'device_runtime_tested': False, 'full_gms_compatibility_tested': False,
           'server_membership_or_rewards_granted': False,
+          'six_feature_backend_entitlements_verified': False,
+          'unlimited_items_verified': False,
           'input': 'base only; matching ABI/config splits are required for installation'}
 apk = APK(str(patched))
 assert 'app.revanced.android.gms.EXTENDED_ACCESS' in apk.get_permissions()
@@ -22,8 +24,9 @@ assert any(e.get(ns+'name') == 'com.android.vending.splits.required' and e.get(n
 report['microg_permission_and_visibility'] = True
 with zipfile.ZipFile(patched) as z:
     actual = z.read('assets/index.android.bundle')
-    assert actual == expected.read_bytes(), 'Morphe did not apply both tested Hermes edits'
+    assert actual == expected.read_bytes(), 'Morphe output differs from the tested combined Hermes transforms'
     report['hermes_payload_matches_tested_transform'] = True
+    report['six_client_feature_gate_bytes_match'] = True
     report['hermes_sha256'] = hashlib.sha256(actual).hexdigest()
     hook_found = runtime_found = False
     routes = 0

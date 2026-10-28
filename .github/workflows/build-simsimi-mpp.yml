@@ -2,7 +2,7 @@ name: Build experimental SimSimi-only patch bundle
 on:
   push:
     branches: [arena/e2b734f8-youtube-patch-clone]
-    paths: ['tools/simsimi/project/**', 'tools/simsimi/prepare_build.py', '.github/workflows/build-simsimi-mpp.yml']
+    paths: ['tools/simsimi/project/**', 'tools/simsimi/tests/**', 'tools/simsimi/prepare_build.py', 'tools/simsimi/verify_bundle.py', 'tools/simsimi/verify_feature_hbc.py', 'tools/simsimi/verify_patched_apk.py', 'docs/simsimi/feature-gates.json', '.github/workflows/build-simsimi-mpp.yml']
 concurrency:
   group: simsimi-build-${{ github.ref }}
   cancel-in-progress: false
@@ -67,8 +67,8 @@ jobs:
         run: |
           mkdir -p bundles/simsimi
           cp /tmp/simsimi-build/patches/build/libs/*.mpp bundles/simsimi/bundle.mpp
-          cd bundles/simsimi
-          sha256sum bundle.mpp > bundle.mpp.sha256
+          (cd bundles/simsimi && sha256sum bundle.mpp > bundle.mpp.sha256)
+          python3 tools/simsimi/verify_bundle.py bundles/simsimi/bundle.mpp
       - name: Apply the actual MPP using Morphe Patcher on the original APK
         env:
           GH_TOKEN: ${{ github.token }}
@@ -98,10 +98,26 @@ jobs:
             /tmp/simsimi-build/patches/build/test-results/test/*.xml
       - name: Save isolated bundle (leave YouTube untouched)
         run: |
+          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # A previous queued build may have committed a different binary after
+          # this run's checkout. Save our output, update cleanly, then copy it
+          # back: rebasing two independently-built binary commits conflicts.
+          mkdir -p /tmp/simsimi-output
+          cp bundles/simsimi/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json} /tmp/simsimi-output/
+          git restore --worktree --staged bundles/simsimi/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json}
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          # Do not publish an old job's output over newer patch sources.
+          for source in tools/simsimi/project tools/simsimi/prepare_build.py; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
+              echo "Patch sources changed after this job started; leaving newer build to publish."
+              exit 0
+            fi
+          done
+          cp /tmp/simsimi-output/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json} bundles/simsimi/
           git add -f bundles/simsimi/bundle.mpp bundles/simsimi/bundle.mpp.sha256 bundles/simsimi/morphe-validation.json
           git diff --cached --quiet && exit 0
-          git commit -m 'build: experimental SimSimi-only ad eligibility bundle [skip ci]'
+          git commit -m 'build: experimental SimSimi-only bundle [skip ci]'
           git pull --rebase origin "$GITHUB_REF_NAME"
           git push origin "$GITHUB_REF_NAME"

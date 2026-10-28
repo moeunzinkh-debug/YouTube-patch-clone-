@@ -54,5 +54,19 @@ for fid in list(range(20605,20637)) + list(range(16260,16269)):
         'frame_size': header.frameSize, 'has_exception_handler': bool(header.hasExceptionHandler),
         'bytecode_hex': payload[header.offset:header.offset+header.bytecodeSizeInBytes].hex(),
         'disassembly': [repr(ins) for ins in parse_hbc_bytecode(header, reader)]})
+# Adjacent closures reveal which original UI action, upload or server call follows
+# each gate. They are read-only evidence, not proof of remote authorization.
+flow_ids = (
+    list(range(20677, 20706)) + [25613] + list(range(25710, 25726)) +
+    [30984] + list(range(30985, 31025)) + [30601, 30696] +
+    list(range(26935, 26942))
+)
+result['feature_flow_handlers'] = []
+for fid in flow_ids:
+    header = reader.function_headers[fid]
+    result['feature_flow_handlers'].append({
+        'function_id': fid, 'name': reader.strings[header.functionName],
+        'offset': header.offset, 'size': header.bytecodeSizeInBytes,
+        'disassembly': [repr(ins) for ins in parse_hbc_bytecode(header, reader)]})
 Path(sys.argv[2]).write_text(json.dumps(result, indent=2, ensure_ascii=False)+'\n')
 print('Membership references:', len(result['membership_references']))

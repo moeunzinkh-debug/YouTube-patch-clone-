@@ -2,7 +2,7 @@ name: Inspect original SimSimi APK
 on:
   push:
     branches: [arena/e2b734f8-youtube-patch-clone]
-    paths: ['.github/workflows/inspect-simsimi.yml', 'tools/simsimi/*.py']
+    paths: ['.github/workflows/inspect-simsimi.yml', 'tools/simsimi/inspect_apk.py', 'tools/simsimi/map_targets.py', 'tools/simsimi/inspect_hermes.py', 'tools/simsimi/inspect_membership.py']
 permissions:
   contents: write
 jobs:

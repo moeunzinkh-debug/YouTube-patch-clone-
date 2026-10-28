@@ -24,6 +24,13 @@ with zipfile.ZipFile(bundle) as archive:
     assert extension.startswith(b'dex\n') and b'PullRefresh' in extension and b'PullGesture' in extension
     assert b'ConversationScreen' in extension, 'Missing Conversation-only screen guard'
     assert any(b'Daily bonus without video (client path, experimental)' in archive.read(name) for name in names if name.endswith('.class')), 'Missing daily bonus selector'
+    feature_class = archive.read('app/morphe/patches/simsimi/MembershipFeaturePatchesKt.class')
+    for label in (
+        'Conversation level controls', 'Profile photo controls',
+        'Custom group cover controls', 'Photo sending controls',
+        'Read receipt display', 'Membership item controls',
+    ):
+        assert (label + ' (client only, experimental)').encode() in feature_class, f'Missing selector: {label}'
     assert not any(n.endswith('Test.class') for n in names)
 print(json.dumps({'bundle': str(bundle), 'sha256': digest, 'size': bundle.stat().st_size,
                   'status': 'Experimental standalone SimSimi package structure verified; device behavior not tested.'}, indent=2))
