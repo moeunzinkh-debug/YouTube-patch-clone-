@@ -30,12 +30,14 @@ val processIdentityPatch = bytecodePatch(
                 val names = ins.mapNotNull { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string }
                     .filter { it.startsWith(prefix) }.distinct()
                 if (names.isEmpty()) continue
-                // Fail closed instead of leaving sparse/packed switch payload keys stale.
-                check(ins.none { it.opcode == Opcode.SPARSE_SWITCH || it.opcode == Opcode.PACKED_SWITCH }) {
-                    "Process method contains switch payload; implement key remapping before patching ${clazz.type}->${method.name}"
-                }
                 val hashMap = names.associate { it.hashCode() to (target + it.removePrefix(original)).hashCode() }
                 check(hashMap.values.distinct().size == hashMap.size) { "Process hash collision" }
+                // Unrelated enum/id switches may coexist with process strings.
+                // Reject only payload keys that actually encode one of these hashes.
+                check(ins.filterIsInstance<SwitchPayload>().none { payload ->
+                    payload.switchElements.any { hashMap.containsKey(it.key) }
+                }) { "Process hash switch payload requires explicit key remapping: ${clazz.type}->${method.name}" }
+
                 val comparesHash = ins.any { (it as? ReferenceInstruction)?.reference.toString() == "Ljava/lang/String;->hashCode()I" }
                 for ((index, instruction) in ins.withIndex()) {
                     val value = ((instruction as? ReferenceInstruction)?.reference as? StringReference)?.string
