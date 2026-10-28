@@ -14,6 +14,7 @@ on:
       - 'tools/gemini-apk/prepare_build.py'
       - 'tools/gemini-apk/verify_patched.py'
       - 'tools/gemini-apk/verify_google.py'
+      - 'tools/gemini-apk/fetch_test_inputs.py'
       - 'tools/gemini-apk/publish-bundle.sh'
       - 'tools/gemini-apk/tests/**'
 permissions:
@@ -57,26 +58,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REQUIRE_APK_TESTS: ${{ inputs.require_apk_tests || false }}
         run: |
-          set -euo pipefail
-          available=true
-          for tag in Gemini Google; do
-            if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' | grep -qx base.apk; then
-              echo "::warning::Release $tag/base.apk is unavailable. APK tests cannot run."
-              available=false
-            fi
-          done
-          echo "available=$available" >> "$GITHUB_OUTPUT"
-          if [[ "$REQUIRE_APK_TESTS" == true && "$available" != true ]]; then
-            echo '::error::Restore the exact Gemini and Google base.apk release assets to run required APK tests.'
-            exit 1
-          fi
+          python3 tools/gemini-apk/fetch_test_inputs.py
       - name: Test both Gemini patches on the uploaded exact APK
         if: steps.inputs.outputs.available == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release download Gemini --repo "$GITHUB_REPOSITORY" --pattern base.apk --dir "$RUNNER_TEMP/gemini"
           echo "bfa9b10060a1c0e8a1c3f2b01cd513f74a53b364ab9bdb1bca02ae103de3f7e5  $RUNNER_TEMP/gemini/base.apk" | sha256sum -c -
           cd .gemini-build/build
           set -o pipefail
@@ -92,7 +80,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release download Google --repo "$GITHUB_REPOSITORY" --pattern base.apk --dir "$RUNNER_TEMP/google"
           echo "f9e5d898a8bae360e6d8654f1871b920e1a2774701fe716f4e64bb0c803b7bd9  $RUNNER_TEMP/google/base.apk" | sha256sum -c -
           cd .gemini-build/build
           java -Xmx5g -jar ../tools/morphe-desktop.jar patch "$RUNNER_TEMP/google/base.apk" -p release/gemini-microg-patches-0.1.3.mpp -p ../tools/patches.mpp -e 'Clone app' -O updatePermissions=true -O updateProviders=true --unsigned -o "$RUNNER_TEMP/google/patched.apk" -r ../../bundles/gemini/google-patch-result.json 2>&1 | tee "$RUNNER_TEMP/google-patch.log"
