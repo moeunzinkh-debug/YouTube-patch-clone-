@@ -1730,4 +1730,7 @@ Automatic recording is optional. It stops in incognito or when the account chang
     <string name="morphe_series_tracker_no_search_results">No series found</string>
     <string name="morphe_series_tracker_untitled_episode">Untitled episode</string>
     <string name="morphe_series_tracker_unavailable_episode">Unavailable episode</string>
+    <!-- video.audio.equalizerPatch -->
+    <string name="morphe_equalizer_title">Audio equalizer</string>
+    <string name="morphe_equalizer_summary">Adjust YouTube audio bands and presets. Device audio-effect support is required.</string>
 </resources>
