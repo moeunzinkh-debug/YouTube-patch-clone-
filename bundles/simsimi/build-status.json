@@ -1,28 +1,34 @@
 {
-  "version": "0.1.0-dev.1",
-  "status": "experimental_compiled_transform_tested",
+  "version": "0.2.0-dev.1",
+  "status": "experimental_actual_mpp_applied_static_output_verified",
   "package": "com.ismaker.android.simsimi",
   "target_version": "9.2.3",
   "target_version_code": "1119001",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40647207815",
-  "bundle_sha256": "e83b7edde0793b899920548cdbaf6fe33fee3a94f3262c043012e2ef23553ab7",
-  "bundle_bytes": 9956,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40649985544",
+  "bundle_sha256": "7991819f0f70a04094d4bafd114b60155b98e8fc181102d7a2f44a6729fa7b73",
+  "bundle_bytes": 41257,
   "implemented_patches": [
-    "Disable ad eligibility (experimental)"
+    "Disable ad eligibility (experimental)",
+    "Unlock membership UI (client only, experimental)",
+    "Pull down to restart chat (experimental)",
+    "MicroG RE service routing (experimental)"
   ],
   "tests": {
     "isolated_android_bundle_compile": "passed",
     "exact_hermes_transform_jvm_tests": "passed",
     "local_archive_checksum_and_app_scope_verification": "passed",
-    "complete_apk_patch_pipeline": "not_run",
-    "device_install_and_runtime": "not_run"
+    "complete_apk_patch_pipeline": "passed_using_actual_mpp_with_morphe_desktop_1.19.1",
+    "device_install_and_runtime": "not_run",
+    "pull_gesture_java_harness": "passed_12_checks",
+    "output_dex_manifest_and_hermes_verification": "passed",
+    "android_manager_ui": "not_run"
   },
   "pending_features": [
-    "complete_ad_removal",
-    "membership_features",
+    "complete_ad_removal_device_verification",
+    "server_membership_entitlements_items_read_receipts",
     "daily_bonus_without_ads",
-    "gms_microg_re",
-    "pull_down_reload_home_chat"
+    "full_gms_microg_re_compatibility",
+    "pull_down_reload_device_verification"
   ],
   "input_constraint": "Uploaded base declares splits.required=true and contains no native libraries. Matching split APKs are required for installation testing.",
   "release_published": false,

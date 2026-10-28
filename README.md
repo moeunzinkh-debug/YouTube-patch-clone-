@@ -17,6 +17,26 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Verify patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml)
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
+<details>
+<summary>🗨️ SimSimi • 4 experimental patches (separate bundle)</summary>
+
+For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
+into Morphe Manager. This is separate from the YouTube `patch.mpp`.
+
+- **Disable ad eligibility (experimental)** — shared ad gate, not proven complete SDK removal.
+- **Unlock membership UI (client only, experimental)** — local gates only, not server entitlements/items/read receipts.
+- **Pull down to restart chat (experimental)** — native gesture requesting React reload, not process termination.
+- **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility.
+
+The actual `.mpp` was successfully applied to the original APK with Morphe's engine
+([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40649985544));
+output Hermes, native hook, extension, 66 routed literals and manifest checks passed.
+**Device runtime is untested. Daily bonus without videos is not implemented.**
+Matching splits are required for installation. See the
+[full catalog and limitations](bundles/simsimi/README.md). No SimSimi release published.
+
+</details>
+
 <!-- PATCH-LIST:START -->
 <details>
 <summary>📦 YouTube • 106 patches</summary>
