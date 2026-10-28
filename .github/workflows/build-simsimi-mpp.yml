@@ -28,6 +28,11 @@ jobs:
           echo 'f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70  /tmp/simsimi-input/base.2.apk' | sha256sum --check
           unzip -p /tmp/simsimi-input/base.2.apk assets/index.android.bundle > /tmp/simsimi-input/original.hbc
           python3 tools/simsimi/prepare_build.py /tmp/simsimi-build
+      - name: Test pull gesture thresholds without consuming touch events
+        run: |
+          mkdir -p /tmp/gesture-tests
+          javac -d /tmp/gesture-tests tools/simsimi/project/extensions/simsimi/src/main/java/app/morphe/extension/simsimi/PullGesture.java tools/simsimi/tests/PullGestureTest.java
+          java -cp /tmp/gesture-tests PullGestureTest
       - name: Compile independent bundle and test exact payload transformation
         env:
           GITHUB_TOKEN: ${{ github.token }}

@@ -15,7 +15,7 @@ settings = settings[:settings.index('// Include morphe-patcher as composite buil
 settings = settings.replace('rootProject.name = "youtube-patch-clone"', 'rootProject.name = "simsimi-patches"')
 settings = settings.replace('include(":patches:stub")', '')
 (dest / 'settings.gradle.kts').write_text(settings)
-(dest / 'extensions').mkdir()
+(dest / 'extensions').mkdir(exist_ok=True)
 shutil.copy2(root / 'extensions/proguard-rules.pro', dest / 'extensions/proguard-rules.pro')
 (dest / 'gradle.properties').write_text('org.gradle.jvmargs=-Xmx2048M\nversion=0.2.0-dev.1\nandroid.useAndroidX=true\n')
 print('Isolated project:', dest)
