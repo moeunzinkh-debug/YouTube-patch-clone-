@@ -45,7 +45,12 @@ jobs:
       - name: Report errors
         if: failure()
         run: |
-          grep -E -A 12 '(^e:|error:|FAILED|FAILURE:|What went wrong|Execution failed|Unsupported|mismatch)' /tmp/simsimi-build.log | tail -35 | while IFS= read -r line; do echo "::error::$line"; done || true
+          grep -E '^e:|^error:|Unresolved reference|Cannot infer|Overload resolution ambiguity' /tmp/simsimi-build.log | head -35 | while IFS= read -r line; do echo "::error::$line"; done || true
+          grep -E -A 5 'What went wrong|Execution failed|Unsupported|mismatch' /tmp/simsimi-build.log | head -25 | while IFS= read -r line; do echo "::error::$line"; done || true
+          jar="$(find "$HOME/.gradle/caches" -name 'morphe-patcher-2.0.0.jar' | head -1)"
+          if test -n "$jar"; then
+            javap -classpath "$jar" app.morphe.patcher.patch.BytecodePatchContext | grep -E 'classDefForEach|getAllClasses|classDefBy|ClassDefs|Classes' | while IFS= read -r line; do echo "::notice::$line"; done
+          fi
       - name: Collect only the separate experimental bundle
         run: |
           mkdir -p bundles/simsimi
