@@ -225,8 +225,17 @@ def flatten_window_nodes(windows: list):
 def gboard_ime_smoke(apk: Path, report: dict) -> None:
     run("adb", "install", "-r", str(apk), timeout=180)
     report["fixture_install"] = "passed"
-    methods = run("adb", "shell", "ime", "list", "-s", "-a")
-    candidates = [line.strip() for line in methods.splitlines() if line.strip().startswith(PACKAGE + "/")]
+    # Package manager can report install success before the input-method
+    # service registry reflects the new package on a cold emulator.
+    deadline = time.monotonic() + 25
+    candidates = []
+    while time.monotonic() < deadline:
+        methods = run("adb", "shell", "ime", "list", "-s", "-a")
+        candidates = [line.strip() for line in methods.splitlines() if line.strip().startswith(PACKAGE + "/")]
+        if len(candidates) >= 1:
+            break
+        time.sleep(2)
+    report["ime_components_found"] = len(candidates)
     if len(candidates) != 1:
         raise RuntimeError("Expected one Gboard IME component in the emulator")
     ime = candidates[0]
