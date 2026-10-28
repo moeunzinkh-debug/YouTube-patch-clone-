@@ -67,14 +67,20 @@ class TranslateInvestigationTest(unittest.TestCase):
         with ZipFile(root / 'bundles/gboard/gboard-patches-4.0.0.mpp') as archive:
             data = archive.read('classes.dex')
         old_terms = inventory.TERMS
+        old_focus = inventory.FOCUS_CLASSES
         try:
             inventory.TERMS = re.compile('IDENTITY', re.I)
+            inventory.FOCUS_CLASSES = {'Lcom/google/gson/FieldNamingPolicy;'}
             result = inventory.inspect_dex(data, 'classes.dex')
         finally:
             inventory.TERMS = old_terms
+            inventory.FOCUS_CLASSES = old_focus
         entry = next(item for item in result['strings'] if item['value'] == 'IDENTITY')
         self.assertGreater(entry['reference_count'], 0)
         self.assertTrue(any('FieldNamingPolicy' in ref['method'] for ref in entry['references']))
+        focused = result['focused_types']
+        self.assertEqual(len(focused), 1)
+        self.assertTrue(any(method['invokes'] for method in focused[0]['methods'] if 'invokes' in method))
 
 
 if __name__ == '__main__':

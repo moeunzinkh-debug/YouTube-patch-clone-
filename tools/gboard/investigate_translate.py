@@ -25,6 +25,11 @@ SECRET_MARKERS = re.compile(r"(AIza[\w-]{10,}|api[_-]?key|access[_-]?token|autho
 DEX_NAME = re.compile(r"classes(?:[2-9]|[1-9][0-9]+)?\.dex\Z")
 MAX_STRINGS = 600
 MAX_METHODS_PER_STRING = 20
+FOCUS_CLASSES = {
+    "Lkjx;", "Lkkp;", "Lkkd;", "Lklg;", "Lklf;", "Lkkc;", "Labxb;", "Lkli;", "Lklo;", "Lkko;", "Ljhk;", "Litp;"
+}
+# Only protocol field names are copied from otherwise-redacted app constants.
+PROTOCOL_LITERALS = {"q", "source", "target", "format", "text", "html", "data", "translations", "translatedText", "detectedSourceLanguage"}
 
 
 def safe_string(value):
@@ -53,6 +58,52 @@ def has_candidate(raw, targets):
 
 def method_id(method):
     return method.get_class_name() + "->" + method.get_name() + method.get_descriptor()
+
+
+def focus_class(item, dex):
+    """Summarize selected types and method/field relationships without code bytes."""
+    methods = []
+    for method in item.get_methods():
+        entry = {"method": method_id(method), "access": method.get_access_flags_string()}
+        code = method.get_code()
+        if code is not None:
+            instructions = list(method.get_instructions())
+            invoked = []
+            fields = []
+            literals = []
+            for instruction in instructions:
+                name = instruction.get_name()
+                if name.startswith("invoke-"):
+                    output = instruction.get_output().split(", ")[-1]
+                    if "->" in output and len(output) < 240:
+                        invoked.append(output)
+                elif name.startswith(("iget", "iput", "sget", "sput")):
+                    output = instruction.get_output().split(", ")[-1]
+                    if "->" in output and len(output) < 240:
+                        fields.append(name + " " + output)
+                elif name in ("const-string", "const-string/jumbo"):
+                    value = dex.get_cm_string(instruction.get_ref_kind())
+                    if value in PROTOCOL_LITERALS:
+                        literals.append(value)
+            entry.update({
+                "registers": code.get_registers_size(),
+                "incoming_registers": code.get_ins_size(),
+                "instruction_count": len(instructions),
+                "invokes": list(dict.fromkeys(invoked)),
+                "fields_used": list(dict.fromkeys(fields)),
+                "protocol_literals": list(dict.fromkeys(literals)),
+            })
+        methods.append(entry)
+    return {
+        "class": item.get_name(),
+        "superclass": item.get_superclassname(),
+        "interfaces": item.get_interfaces(),
+        "fields": [
+            {"name": field.get_name(), "type": field.get_descriptor(), "access": field.get_access_flags_string()}
+            for field in item.get_fields()
+        ],
+        "methods": methods,
+    }
 
 
 def inspect_dex(data, dex_name):
@@ -95,6 +146,7 @@ def inspect_dex(data, dex_name):
         "matching_string_count": len(ordered),
         "matching_class_count": len(classes),
         "classes": classes[:MAX_STRINGS],
+        "focused_types": [focus_class(item, dex) for item in dex.get_classes() if item.get_name() in FOCUS_CLASSES],
         "strings": [
             {"value": value, "reference_count": len(references[value]), "references": references[value][:MAX_METHODS_PER_STRING]}
             for value in ordered[:MAX_STRINGS]
