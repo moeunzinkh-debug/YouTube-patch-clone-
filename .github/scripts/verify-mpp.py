@@ -58,7 +58,8 @@ def main() -> None:
 
         youtube_dex = archive.read("extensions/youtube.mpe")
         check(b"KhmerTtsClient" in youtube_dex, "Khmer voice-over client compiled into extensions/youtube.mpe")
-        check(b"openapi.json" in youtube_dex, "FastAPI OpenAPI discovery compiled into extensions/youtube.mpe")
+        check(b"/api/process-multi" in youtube_dex, "Direct FastAPI synthesis endpoint compiled into extensions/youtube.mpe")
+        check(b"autoSpeed" in youtube_dex and b"voiceName" in youtube_dex, "FastAPI multipart request fields compiled into extensions/youtube.mpe")
 
     print("\npatch.mpp is a valid Morphe patch bundle.")
 

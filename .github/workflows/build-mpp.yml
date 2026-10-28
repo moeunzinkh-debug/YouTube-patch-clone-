@@ -18,6 +18,7 @@ on:
       - arena/222850af-youtube-patch-clone
       - arena/2100d05e-youtube-patch-clone
       - arena/0c8d70a1-youtube-patch-clone
+      - arena/6b029760-youtube-patch-clone
     paths:
       - 'patches/**'
       - 'extensions/**'
@@ -26,6 +27,7 @@ on:
       - 'gradle.properties'
       - '.github/workflows/build-mpp.yml'
       - 'tools/equalizer-tests/**'
+      - 'tools/khmer-tts-tests/**'
       - 'tools/tests/test_equalizer_player_button.py'
 
 permissions:
@@ -56,6 +58,12 @@ jobs:
 
       - name: Test EQ player shortcut layout and wiring
         run: python3 -m unittest discover -s tools/tests -v
+
+      - name: Test direct Khmer FastAPI request and response handling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libandroid-json-java
+          bash tools/khmer-tts-tests/run.sh
 
       - name: Show Android SDK
         run: |
