@@ -1,3 +1,4 @@
+import os
 """Validate the patched artifact statically; does not assert device compatibility."""
 import json
 from pathlib import Path
@@ -36,5 +37,5 @@ assert app.get(ns + 'label') == 'Gemini (Morphe)'
 report = {'package': apk.get_package(), 'version': apk.get_androidversion_name(), 'version_code': '345',
           'dex_redirects': counts, 'manifest_checks': 'passed', 'patch_execution': 'passed',
           'device_runtime_tested': False, 'google_microg_new_targets_verified': False}
-Path('bundles/gemini/validation.json').write_text(json.dumps(report, indent=2) + '\n')
+Path(os.environ.get('GEMINI_OUTPUT_DIR', 'bundles/gemini') + '/validation.json').write_text(json.dumps(report, indent=2) + '\n')
 print(json.dumps(report, indent=2))
