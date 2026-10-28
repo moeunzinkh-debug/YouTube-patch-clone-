@@ -15,8 +15,8 @@ s = s.replace('listOf(google175418, gemini10958859967)', 'listOf(google175418, g
 p.write_text(s)
 p = root / 'patches-bundle.json'
 data = json.loads(p.read_text())
-data['version'] = '0.1.3'
-data['download_url'] = 'https://github.com/ryuya0124/gemini-microg-patches/releases/download/v0.1.3/gemini-microg-patches-0.1.3.mpp'
+data['version'] = '0.1.4'
+data['download_url'] = 'https://github.com/ryuya0124/gemini-microg-patches/releases/download/v0.1.4/gemini-microg-patches-0.1.4.mpp'
 p.write_text(json.dumps(data, indent=2) + '\n')
 # Local artifact: no release or upstream download descriptor is published.
 p = root / 'scripts/package-mpp.py'
@@ -45,3 +45,7 @@ for filename in ('GmsCoreSupportPatch.kt', 'MicrogRuntimePermissionsPatch.kt'):
         s = s.replace('        val arrayRegister =', '        val extendedAccess = if (packageMetadata.versionName == "17.6.59.ve.arm64") "app.revanced.android.gms.EXTENDED_ACCESS" else "app.revanced.gms.EXTENDED_ACCESS"\n        val arrayRegister =')
         s = s.replace('const-string v$arrayRegister, "app.revanced.gms.EXTENDED_ACCESS"', 'const-string v$arrayRegister, "$extendedAccess"').replace('const-string v$stringRegister, "app.revanced.gms.EXTENDED_ACCESS"', 'const-string v$stringRegister, "$extendedAccess"')
     p.write_text(s)
+
+# Local startup hardening: preserve nullable process names and fail on invalid registers.
+shutil.copyfile(Path(__file__).parent / 'overlay/ProcessNameSanitizePatch.kt',
+                common.parent / 'workprofile/ProcessNameSanitizePatch.kt')
