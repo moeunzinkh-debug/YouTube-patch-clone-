@@ -6,10 +6,12 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLa
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
+import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import dev.jason.gboardpatches.patches.gboard.shared.findMutableMethodOrThrow
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesExtensionCarrierPatch
 import dev.jason.gboardpatches.patches.gboard.shared.isMethodReference
 import dev.jason.gboardpatches.patches.gboard.shared.mutableClass
+import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeAbiCatalog
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallEmitter
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallId
 import dev.jason.gboardpatches.patches.shared.Constants.COMPATIBILITY_GBOARD
@@ -66,6 +68,25 @@ internal val gboardDirectGoogleTranslatePatch = bytecodePatch(
         listOf(inputStarted, close, finishView, finishInput, windowHidden).forEach {
             check(it.implementation != null) { "Missing native Translate lifecycle body" }
         }
+        val runtimeReferences = listOf(
+            RuntimeCallId.DIRECT_TRANSLATE_TRY_DISPATCH,
+            RuntimeCallId.DIRECT_TRANSLATE_PREPARE,
+            RuntimeCallId.DIRECT_TRANSLATE_CANCEL,
+        ).map { RuntimeAbiCatalog.abi(it).reference }
+        listOf(dispatch, wrapper, ready, input, inputStarted, close, finishView, finishInput, windowHidden)
+            .forEach { method ->
+                check(method.implementation!!.instructions.none { instruction ->
+                    runtimeReferences.any { reference -> instruction.isMethodReference(reference) }
+                }) { "Direct Translate is already applied or the native method has drifted" }
+            }
+        val inputInvokeIndex = input.implementation!!.instructions.indexOfFirst {
+            it.isMethodReference("Lkkd;->d(Lklg;Lkkc;)V")
+        }
+        val inputInvoke = input.implementation!!.instructions[inputInvokeIndex] as? FiveRegisterInstruction
+            ?: error("Native Translate request dispatch instruction changed")
+        check(inputInvoke.registerCount == 3) { "Unexpected native Translate dispatch registers" }
+        val requestRegister = inputInvoke.registerD
+        val callbackRegister = inputInvoke.registerE
 
         // Keep Gboard's throttle and all non-UI/health callbacks. The Java
         // bridge additionally checks the exact native provider and callback.
@@ -128,6 +149,16 @@ internal val gboardDirectGoogleTranslatePatch = bytecodePatch(
             ExternalLabel("original_ready", originalReady),
         )
 
+        // Record the exact native request/callback pair immediately before
+        // Gboard queues it. A delayed native throttle callback arriving after
+        // a later edit or keyboard close must not initiate a new HTTP request.
+        input.addInstructions(
+            inputInvokeIndex,
+            RuntimeCallEmitter.invoke(
+                RuntimeCallId.DIRECT_TRANSLATE_PREPARE,
+                "v$requestRegister, v$callbackRegister",
+            ),
+        )
         val cancel = RuntimeCallEmitter.invoke(RuntimeCallId.DIRECT_TRANSLATE_CANCEL, "")
         // Invalidate even an empty edit before the next throttled request, so
         // an older HTTP result cannot overwrite newer input or a closed view.

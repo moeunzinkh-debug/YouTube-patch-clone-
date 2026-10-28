@@ -64,6 +64,8 @@ def main() -> None:
     for key in TARGETS - set(checks):
         if "->cancel()V" not in bodies[key]:
             raise SystemExit(f"Missing lifecycle/input cancellation for {key}")
+    if "->prepare(" not in bodies[("Lklo;", "al", "(Ljava/lang/String;)V")]:
+        raise SystemExit("Missing exact request/callback preparation hook")
     print("Verified fork calls and guarded routing in the rebuilt third-party-derived DEX fixture.")
     print("This is not an original stock APK, a device test, or evidence that Translate works on Android.")
 

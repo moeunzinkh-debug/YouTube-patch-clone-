@@ -66,8 +66,19 @@ jobs:
         working-directory: /tmp/gboard-direct-source
         run: |
           set -o pipefail
-          ./gradlew :extensions:extension:testDebugUnitTest --tests '*GtxLiveProbeTest' \
-            --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/gboard-direct-live.log
+          if ! ./gradlew :extensions:extension:testDebugUnitTest --tests '*GtxLiveProbeTest' \
+            --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/gboard-direct-live.log; then
+            echo '::warning::Synthetic Java POST probe failed or was rate-limited on this runner.'
+            exit 1
+          fi
+          python3 - <<'PY'
+          import glob, xml.etree.ElementTree as ET
+          paths = glob.glob('extensions/extension/build/test-results/testDebugUnitTest/TEST-*GtxLiveProbeTest.xml')
+          assert len(paths) == 1, 'Missing live probe result'
+          root = ET.parse(paths[0]).getroot()
+          assert root.get('tests') == '1' and root.get('failures') == '0' and root.get('errors') == '0' and root.get('skipped') == '0', root.attrib
+          print('::notice::Java HTTPS POST synthetic English→Khmer, Khmer→English and auto→Khmer all passed on the CI runner.')
+          PY
       - name: Load fork with Morphe Desktop and verify all 44 registrations
         env:
           GH_TOKEN: ${{ github.token }}
@@ -78,8 +89,8 @@ jobs:
           gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
             --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/gboard-direct-input
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/gboard-direct-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
-          mpp="$(find /tmp/gboard-direct-source/patches/build -name '*.mpp' -type f -print -quit)"
-          test -n "$mpp" && test -s "$mpp" || { echo '::error::No MPP was produced under patches/build'; exit 1; }
+          mpp=/tmp/gboard-direct-source/patches/build/libs/patches-4.0.0-direct-translate-dev.1.mpp
+          test -s "$mpp" || { echo '::error::The binary MPP was not produced (do not use the sources MPP).'; exit 1; }
           echo "::notice::Built MPP: $mpp"
           cp "$mpp" /tmp/gboard-direct-output/gboard-direct-translate-experimental.mpp
           cp /tmp/gboard-direct-source/patches-list.json /tmp/gboard-direct-output/patches-list.json

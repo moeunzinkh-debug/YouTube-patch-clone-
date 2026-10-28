@@ -1,6 +1,7 @@
 /* Copyright (C) 2026. This fork is distributed under GPL-3.0-or-later. */
 package dev.jason.gboardpatches.extension.directtranslate;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -18,6 +19,8 @@ final class TranslateCoordinator {
     private final Executor main;
     private final Runnable clearPending;
     private final Client client;
+    private WeakReference<Object> expectedRequest = new WeakReference<>(null);
+    private WeakReference<Object> expectedCallback = new WeakReference<>(null);
     private long generation;
 
     TranslateCoordinator(Executor worker, Executor main, Runnable clearPending, Client client) {
@@ -27,6 +30,13 @@ final class TranslateCoordinator {
         this.client = client;
     }
 
+    void prepare(Object request, Object callback) {
+        synchronized (lock) {
+            expectedRequest = new WeakReference<>(request);
+            expectedCallback = new WeakReference<>(callback);
+        }
+    }
+
     boolean tryDispatch(Object provider, Object request, Object callback) {
         // Gboard uses the same provider for server-health probes. Only replace
         // requests with the actual Translate UI callback; leave probes alone.
@@ -34,6 +44,9 @@ final class TranslateCoordinator {
                 || !"kjx".equals(provider.getClass().getName())
                 || !"klg".equals(request.getClass().getName())
                 || !"kli".equals(callback.getClass().getName())) return false;
+        synchronized (lock) {
+            if (expectedRequest.get() != request || expectedCallback.get() != callback) return true;
+        }
         final Bindings bindings;
         final String text;
         final String source;
@@ -44,10 +57,22 @@ final class TranslateCoordinator {
             source = (String) bindings.source.get(request);
             target = (String) bindings.target.get(request);
         } catch (ReflectiveOperationException | RuntimeException mismatch) {
-            // An unexpected runtime shape leaves the original Gboard route intact.
+            // If still current, an unexpected runtime shape leaves Gboard's
+            // original route intact. A request cancelled meanwhile is dropped.
+            synchronized (lock) {
+                if (expectedRequest.get() != request || expectedCallback.get() != callback) return true;
+                expectedRequest.clear();
+                expectedCallback.clear();
+            }
             return false;
         }
         synchronized (lock) {
+            // Native throttling can call e() after an empty edit or view close.
+            // Only the request/callback pair prepared by the latest actual UI
+            // dispatch may send; consume it exactly once, without retaining text.
+            if (expectedRequest.get() != request || expectedCallback.get() != callback) return true;
+            expectedRequest.clear();
+            expectedCallback.clear();
             long ticket = ++generation;
             clearPending.run();
             try {
@@ -63,6 +88,8 @@ final class TranslateCoordinator {
     void cancel() {
         synchronized (lock) {
             generation++;
+            expectedRequest.clear();
+            expectedCallback.clear();
             clearPending.run();
         }
     }

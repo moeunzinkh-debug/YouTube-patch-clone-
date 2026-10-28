@@ -16,12 +16,12 @@ public class TranslateCoordinatorTest {
         TranslateCoordinator coordinator = new TranslateCoordinator(worker, main, worker::clear,
                 (text, source, target) -> new GtxClient.Translation(target.equals("km") ? "សួស្តី" : "hello", "km"));
         Object callback1 = create("kli"), callback2 = create("kli");
-        assertTrue(coordinator.tryDispatch(create("kjx"), request("hello", "en", "km"), callback1));
+        assertTrue(dispatch(coordinator, create("kjx"), request("hello", "en", "km"), callback1));
         worker.runOne(); main.runOne();
         assertEquals("សួស្តី", responseField(callback1, "c"));
         assertEquals(0, responseField(callback1, "b"));
         assertTrue(((List<?>) responseField(callback1, "a")).isEmpty());
-        assertTrue(coordinator.tryDispatch(create("kjx"), request("សួស្តី", "auto", "en"), callback2));
+        assertTrue(dispatch(coordinator, create("kjx"), request("សួស្តី", "auto", "en"), callback2));
         worker.runOne(); main.runOne();
         assertEquals("hello", responseField(callback2, "c"));
         assertEquals(List.of("km"), responseField(callback2, "a"));
@@ -33,17 +33,17 @@ public class TranslateCoordinatorTest {
         TranslateCoordinator coordinator = new TranslateCoordinator(worker, main, worker::clear,
                 (text, source, target) -> { requests[0]++; return new GtxClient.Translation(text, "en"); });
         Object old = create("kli"), current = create("kli");
-        assertTrue(coordinator.tryDispatch(create("kjx"), request("old", "en", "km"), old));
+        assertTrue(dispatch(coordinator, create("kjx"), request("old", "en", "km"), old));
         worker.runOne(); // Old HTTP response is waiting on the UI thread.
         coordinator.cancel(); // A native input edit invalidates it immediately.
-        assertTrue(coordinator.tryDispatch(create("kjx"), request("new", "en", "km"), current));
+        assertTrue(dispatch(coordinator, create("kjx"), request("new", "en", "km"), current));
         worker.runOne(); main.runAll();
         assertEquals(0, value(old, "calls"));
         assertEquals(1, value(current, "calls"));
         assertEquals("new", responseField(current, "c"));
         assertEquals(2, requests[0]);
         Object closed = create("kli");
-        assertTrue(coordinator.tryDispatch(create("kjx"), request("private", "en", "km"), closed));
+        assertTrue(dispatch(coordinator, create("kjx"), request("private", "en", "km"), closed));
         coordinator.cancel();
         assertTrue(worker.tasks.isEmpty());
         main.runAll();
@@ -51,19 +51,45 @@ public class TranslateCoordinatorTest {
         assertEquals(2, requests[0]);
     }
 
+    @Test public void lateNativeThrottleCallbackAfterEditOrCloseNeverSends() throws Exception {
+        Manual worker = new Manual(), main = new Manual();
+        int[] requests = {0};
+        TranslateCoordinator coordinator = new TranslateCoordinator(worker, main, worker::clear,
+                (text, source, target) -> { requests[0]++; return new GtxClient.Translation(text, "en"); });
+        Object provider = create("kjx");
+        Object oldRequest = request("old", "en", "km"), oldCallback = create("kli");
+        coordinator.prepare(oldRequest, oldCallback);
+        coordinator.cancel(); // An empty edit or keyboard close happens before native throttle fires.
+        assertTrue(coordinator.tryDispatch(provider, oldRequest, oldCallback)); // Swallowed, not native fallback.
+        assertTrue(worker.tasks.isEmpty());
+        assertEquals(0, requests[0]);
+
+        Object newerRequest = request("new", "en", "km"), newerCallback = create("kli");
+        coordinator.prepare(newerRequest, newerCallback);
+        assertTrue(coordinator.tryDispatch(provider, oldRequest, oldCallback));
+        assertTrue(worker.tasks.isEmpty());
+        assertTrue(coordinator.tryDispatch(provider, newerRequest, newerCallback));
+        worker.runOne(); main.runAll();
+        assertEquals(1, requests[0]);
+        assertEquals("new", responseField(newerCallback, "c"));
+        // The same request cannot be dispatched a second time.
+        assertTrue(coordinator.tryDispatch(provider, newerRequest, newerCallback));
+        assertTrue(worker.tasks.isEmpty());
+    }
+
     @Test public void errorAndRejectionProduceNativeFailureWithoutText() throws Exception {
         Manual worker = new Manual(), main = new Manual();
         TranslateCoordinator coordinator = new TranslateCoordinator(worker, main, worker::clear,
                 (text, source, target) -> { throw new IllegalStateException(text); });
         Object callback = create("kli");
-        assertTrue(coordinator.tryDispatch(create("kjx"), request("sensitive", "en", "km"), callback));
+        assertTrue(dispatch(coordinator, create("kjx"), request("sensitive", "en", "km"), callback));
         worker.runOne(); main.runAll();
         assertEquals(1, responseField(callback, "b"));
         assertEquals("", responseField(callback, "c"));
         Object rejected = create("kli");
         TranslateCoordinator rejecting = new TranslateCoordinator(task -> { throw new RejectedExecutionException(); },
                 main, () -> {}, (text, source, target) -> { throw new AssertionError(); });
-        assertTrue(rejecting.tryDispatch(create("kjx"), request("sensitive", "en", "km"), rejected));
+        assertTrue(dispatch(rejecting, create("kjx"), request("sensitive", "en", "km"), rejected));
         main.runAll();
         assertEquals(1, responseField(rejected, "b"));
     }
@@ -72,11 +98,15 @@ public class TranslateCoordinatorTest {
         Manual worker = new Manual(), main = new Manual();
         TranslateCoordinator coordinator = new TranslateCoordinator(worker, main, worker::clear,
                 (text, source, target) -> { throw new AssertionError(); });
-        assertFalse(coordinator.tryDispatch(create("kjx"), request("test", "en", "km"), new Object()));
-        assertFalse(coordinator.tryDispatch(new Object(), request("test", "en", "km"), create("kli")));
+        assertFalse(dispatch(coordinator, create("kjx"), request("test", "en", "km"), new Object()));
+        assertFalse(dispatch(coordinator, new Object(), request("test", "en", "km"), create("kli")));
         assertTrue(worker.tasks.isEmpty());
     }
 
+    private static boolean dispatch(TranslateCoordinator coordinator, Object provider, Object request, Object callback) {
+        coordinator.prepare(request, callback);
+        return coordinator.tryDispatch(provider, request, callback);
+    }
     private static Object create(String name) throws Exception {
         return Class.forName(name).getDeclaredConstructor().newInstance();
     }

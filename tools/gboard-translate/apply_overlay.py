@@ -64,6 +64,7 @@ def main() -> None:
     replace_once(abi, "internal enum class RuntimeCallId(internal val encodedAbi: String) {\n",
                  "internal enum class RuntimeCallId(internal val encodedAbi: String) {\n"
                  '    DIRECT_TRANSLATE_TRY_DISPATCH("Ldev/jason/gboardpatches/extension/directtranslate/GboardDirectTranslateRuntime;->tryDispatch(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z"),\n'
+                 '    DIRECT_TRANSLATE_PREPARE("Ldev/jason/gboardpatches/extension/directtranslate/GboardDirectTranslateRuntime;->prepare(Ljava/lang/Object;Ljava/lang/Object;)V"),\n'
                  '    DIRECT_TRANSLATE_CANCEL("Ldev/jason/gboardpatches/extension/directtranslate/GboardDirectTranslateRuntime;->cancel()V"),\n')
     extension_gradle = destination / "extensions/extension/build.gradle.kts"
     replace_once(extension_gradle, '    testImplementation("junit:junit:4.13.2")\n',

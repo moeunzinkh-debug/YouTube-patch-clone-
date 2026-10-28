@@ -26,6 +26,10 @@ public final class GboardDirectTranslateRuntime {
 
     private GboardDirectTranslateRuntime() {}
 
+    public static void prepare(Object request, Object callback) {
+        COORDINATOR.prepare(request, callback);
+    }
+
     public static boolean tryDispatch(Object provider, Object request, Object callback) {
         return COORDINATOR.tryDispatch(provider, request, callback);
     }
