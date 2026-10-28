@@ -56,7 +56,7 @@ GROUPS: list[tuple[str, list[str]]] = [
     (
         "▶️ ការចាក់វីដេអូ / Playback & video",
         [
-            "Captions", "Double tap to seek", "Exit fullscreen mode",
+            "Audio equalizer", "Captions", "Double tap to seek", "Exit fullscreen mode",
             "Force fullscreen landscape", "Force original audio",
             "Fullscreen video scale", "Loop video", "Media notification controls",
             "Miniplayer", "Mute button", "Open videos fullscreen",

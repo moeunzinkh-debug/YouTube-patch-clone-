@@ -15,6 +15,7 @@ on:
       - arena/a06798d3-youtube-patch-clone
       - arena/83fe2f55-youtube-patch-clone
       - arena/b0a07006-youtube-patch-clone
+      - arena/222850af-youtube-patch-clone
     paths:
       - 'patches/**'
       - 'extensions/**'
@@ -22,6 +23,7 @@ on:
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/build-mpp.yml'
+      - 'tools/equalizer-tests/**'
 
 permissions:
   contents: write
@@ -45,6 +47,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+
+      - name: Test equalizer controller behavior
+        run: bash tools/equalizer-tests/run.sh
 
       - name: Show Android SDK
         run: |

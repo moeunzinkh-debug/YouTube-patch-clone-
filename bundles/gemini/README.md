@@ -1,63 +1,45 @@
-# Gemini + Google standalone bundle — local 0.1.3
+# Gemini / Google bundle — 0.2.0
 
-Use **`bundle.mpp`** (identical to `gemini-target.mpp`) for:
+**`bundle.mpp` is the active bundle.** `gemini-target.mpp` is an identical alias.
+The former 0.1.x/reference binaries and duplicate experimental workflow were
+removed from the current tree. Git history retains the previous versions.
 
-| Component | Exact inspected input | Validation |
-| --- | --- | --- |
-| Gemini launcher | 1.0.995038376 / code 345 | Both patches, rebuild, output DEX and manifest passed |
-| Google App | 17.6.59.ve.arm64 / code 301698282 | Eight default custom patches + official Clone app and rebuild passed; output manifest checked |
-| MicroG RE | 7.3.0-dev.2 / code 255070302 | APK inspected; app.revanced.android.gms package and EXTENDED_ACCESS declaration confirmed |
+## Active implementation
 
-MicroG is installed separately, not patched by this bundle. No login/chat/device
-runtime validation is claimed. CI does not prove that missing split resources
-are present or that an APK installs/launches on a phone.
+Google process identity is now handled by `ProcessIdentityPatch.kt`: rewrite
+process strings and their same-method hash comparisons to the cloned package,
+while keeping the real Android process-name provider unchanged. The old
+`ProcessNameSanitizePatch` is deleted from the build checkout before compilation.
+Only one process strategy is compiled. The patch name still says experimental
+because successful device launch has not been established.
 
-## Manager / patching
+This replaces the **process strategy**, not every supporting patch. Existing
+version-specific Google/Gemini GMS, manifest and account-permission patches are
+retained. The original vendored upstream snapshot remains reference-only for
+provenance; it is not an alternate active bundle.
 
-1. Import `bundle.mpp`; ensure the source version is **0.1.3**, not 0.1.1/0.1.2.
-2. For Gemini's original base APK, use the two default Gemini patches.
-3. For Google's original base APK, use the eight default Google patches plus
-   official **Clone app** (tested with upstream's pinned official Morphe 1.41.0
-   bundle). Set `updatePermissions=true` and `updateProviders=true`; leave
-   Clone app's package name at its default. Expected output package:
-   `com.google.android.googlequicksearchbox.morphe`.
-4. Leave the three account workaround patches disabled. They were not ported,
-   are not runtime verified, and must not be enabled for this target.
-5. The Google input requires a density split (`base__density`). Obtain the split
-   from the exact same original app bundle. Adapt its package for the clone and
-   sign it with the **same key** as the patched base before installing together.
-   Removing manifest split requirements cannot recreate missing resources.
-6. Install the user's MicroG RE 7.3.0-dev.2 ARM64 build separately, complete its
-   account setup, then test the Google clone and Gemini. Signing/install and
-   device runtime behavior still need verification. Do not uninstall existing
-   apps or accounts without backing up data and checking signing compatibility.
+## Exact inputs
 
-Do not use a full YouTube bundle as a replacement for the official Clone app
-prerequisite. YouTube source/configuration/root `patch.mpp` are not part of this
-workstream and have not been modified.
+- Google 17.6.59.ve.arm64 / code 301698282.
+- Gemini 1.0.995038376 / code 345.
+- MicroG RE 7.3.0-dev.2 (`app.revanced.android.gms`), installed separately.
 
-## Compatibility implementation
+Build workflow: `.github/workflows/build-gemini-mpp.yml`.
+Evidence: `build-status.json`, `process-validation.txt`, patch-result and
+validation JSON files. APK validation is separate from Android runtime testing.
+The output DEX comparison verifies the native provider stays unchanged, 40
+process strings are renamed, and two process hash constants are updated.
 
-Exact source profiles are in `tools/gemini-apk/overlay/` and are applied to a fresh
-pinned upstream checkout. Original vendored files remain unchanged. Google hooks
-were resolved from actual DEX evidence (`docs/google-target-hooks.txt`), not by
-renaming obfuscated classes blindly. The MicroG permission is changed only for
-Google 17.6.59; legacy profiles retain their original permission.
+## Device testing
 
-The historical patch name `GmsCore Bytecode Redirect (MicroG RE 7.0.0)` is retained
-from upstream. For the new Google profile the target package is still
-`app.revanced.android.gms`, with the new fully qualified extended-access permission.
-This label is not evidence of runtime compatibility with either MicroG version.
+Import this bundle only (source version 0.2.0); deselect older custom sources.
+Start from original APKs. For Google, also select official Clone app with
+`updatePermissions=true`, `updateProviders=true` and default package name.
+Expected clone: `com.google.android.googlequicksearchbox.morphe`.
+Leave the three account workaround patches off. Use matching density splits
+from the original Google bundle and consistent base/split signing.
+Test Google launch first, then Gemini/account/chat. Do not erase app/account data
+to force installation. No device crash fix or end-to-end compatibility is claimed.
 
-## Evidence and artifacts
-
-- `patch-result.json`: Gemini execution/rebuild results.
-- `validation.json`: Gemini output DEX (four redirects) and manifest validation.
-- `google-patch-result.json`: all nine selected Google patches passed.
-- `google-validation.json`: Google clone manifest/package/permission checks.
-- `bundle.mpp.sha256`: checksum for the new compiled JVM + Android DEX bundle.
-- `gemini-reference.mpp`: legacy unmodified v0.1.1; **do not use for these inputs**.
-
-This is a local version 0.1.3, not an upstream release. No upstream release URL or
-public download descriptor is published. Source attribution is retained; upstream
-has no declared license, so resolve permission before redistribution.
+YouTube code and root patch.mpp are unchanged. Attribution/license notices for
+upstream remain applicable; upstream snapshot permission is still unresolved.

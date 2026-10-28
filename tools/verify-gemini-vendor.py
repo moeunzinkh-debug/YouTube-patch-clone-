@@ -58,12 +58,18 @@ def main() -> None:
     check(len(names) == EXPECTED_PATCHES, f"{len(names)} patch declarations found")
 
     readme = README.read_text(encoding="utf-8")
-    block = readme.split("<!-- GEMINI-PATCH-LIST:START -->")[1].split(
-        "<!-- GEMINI-PATCH-LIST:END -->")[0]
-    missing = [name for name in names if f"`{name}`" not in block]
-    check(not missing, f"README tags list all patches (missing: {missing})")
-    check(block.count("<details>") == block.count("</details>"), "README <details> tags balanced")
-    check(block.count("<summary>") == block.count("</summary>"), "README <summary> tags balanced")
+    start = "<!-- GEMINI-PATCH-LIST:START -->"
+    end = "<!-- GEMINI-PATCH-LIST:END -->"
+    if start in readme or end in readme:
+        check(start in readme and end in readme, "README catalog markers paired")
+        if start in readme and end in readme:
+            block = readme.split(start)[1].split(end)[0]
+            missing = [name for name in names if f"`{name}`" not in block]
+            check(not missing, f"README tags list all patches (missing: {missing})")
+    else:
+        check("gemini" not in readme.lower(), "Retired Gemini tags absent from YouTube README")
+    check(readme.count("<details>") == readme.count("</details>"), "README <details> tags balanced")
+    check(readme.count("<summary>") == readme.count("</summary>"), "README <summary> tags balanced")
 
     # The vendored snapshot must stay out of the compiled bundle.
     settings = (ROOT / "settings.gradle.kts").read_text(encoding="utf-8")

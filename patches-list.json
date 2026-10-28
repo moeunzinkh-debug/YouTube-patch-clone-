@@ -1,6 +1,6 @@
 {
-  "NOTE": "YouTube-only subset of the upstream Morphe patches v1.48.0 manifest. Includes entries compatible with com.google.android.youtube and generic entries without app-specific targets; Music and Reddit targets are excluded. Compared with v1.47.0 this adds 9 new YouTube patches (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay); 'Custom font' replaces 'Force system font'. YouTube 21.23.492 is marked stable (not experimental), matching upstream v1.49.0-dev.7+, so Manager recommends it instead of 21.20.405.",
-  "version": "1.48.1",
+  "NOTE": "YouTube-only subset of the upstream Morphe patches v1.48.0 manifest. Includes entries compatible with com.google.android.youtube and generic entries without app-specific targets; Music and Reddit targets are excluded. Compared with v1.47.0 this adds 9 new YouTube patches (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay); 'Custom font' replaces 'Force system font'. YouTube 21.23.492 is marked stable (not experimental), matching upstream v1.49.0-dev.7+, so Manager recommends it instead of 21.20.405. Local 1.48.2 adds Audio equalizer; released source descriptor remains pinned to published 1.48.1 until a separate release is published.",
+  "version": "1.48.2",
   "patches": [
     {
       "name": "Add to queue",
@@ -321,6 +321,85 @@
     {
       "name": "Ask flyout menu",
       "description": "Adds a video menu entry that opens Ask for the video and summarizes the video. This patch works with YouTube 21.16.256 and newer.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.google.android.youtube",
+          "name": "YouTube",
+          "description": null,
+          "apkFileType": "APK_REQUIRED",
+          "appIconColor": "#FF0033",
+          "signatures": [
+            "5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6",
+            "3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a"
+          ],
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "21.42.241",
+              "versionCodes": null,
+              "isExperimental": true,
+              "minSdk": 29,
+              "description": null
+            },
+            {
+              "version": "21.41.525",
+              "versionCodes": null,
+              "isExperimental": true,
+              "minSdk": 29,
+              "description": null
+            },
+            {
+              "version": "21.28.208",
+              "versionCodes": null,
+              "isExperimental": true,
+              "minSdk": 29,
+              "description": null
+            },
+            {
+              "version": "21.23.492",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 28,
+              "description": null
+            },
+            {
+              "version": "21.20.405",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 28,
+              "description": null
+            },
+            {
+              "version": "21.16.256",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 28,
+              "description": null
+            },
+            {
+              "version": "20.51.39",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 28,
+              "description": null
+            },
+            {
+              "version": "20.21.37",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 26,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Audio equalizer",
+      "description": "Adds an in-app audio equalizer with device-supported bands, presets and reset.",
       "default": true,
       "category": null,
       "compatiblePackages": [
