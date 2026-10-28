@@ -245,9 +245,10 @@ public final class VOTBottomSheet {
         String[] entries = {
                 str("morphe_vot_service_google"),
                 str("morphe_vot_service_mymemory"),
-                str("morphe_vot_service_openrouter")
+                str("morphe_vot_service_openrouter"),
+                str("morphe_vot_service_sealion")
         };
-        String[] values = { TRANSLATION_SERVICE_GOOGLE, TRANSLATION_SERVICE_MY_MEMORY, TRANSLATION_SERVICE_OPENROUTER };
+        String[] values = { TRANSLATION_SERVICE_GOOGLE, TRANSLATION_SERVICE_MY_MEMORY, TRANSLATION_SERVICE_OPENROUTER, TranscriptTranslator.TRANSLATION_SERVICE_SEALION };
 
         SheetBottomDialog.DraggableLinearLayout pickerRoot =
                 SheetBottomDialog.createMainLayout(context, getDialogBackgroundColor());
@@ -308,6 +309,15 @@ public final class VOTBottomSheet {
             }
 
             row.setOnClickListener(v -> {
+                if (TranscriptTranslator.TRANSLATION_SERVICE_SEALION.equals(value)
+                        && Settings.VOT_SEALION_API_KEY.get().trim().isEmpty()) {
+                    CustomDialog.create(context,
+                                    str("morphe_vot_sealion_not_configured_title"),
+                                    str("morphe_vot_sealion_not_configured_message"),
+                                    null, null, () -> {}, null,
+                                    null, null, false).first.show();
+                    return;
+                }
                 if (isOpenRouter && Settings.VOT_OPENROUTER_API_KEY.get().trim().isEmpty()) {
                     CustomDialog.create(context,
                                     str("morphe_vot_openrouter_not_configured_title"),

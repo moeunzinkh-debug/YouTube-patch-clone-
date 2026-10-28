@@ -72,6 +72,9 @@ public final class TranscriptTranslator {
     public static final String TRANSLATION_SERVICE_MY_MEMORY = "mymemory";
     // Same as arrays.xml value
     public static final String TRANSLATION_SERVICE_OPENROUTER = "openrouter";
+    public static final String TRANSLATION_SERVICE_SEALION = "sealion";
+    static final String SEALION_MODEL = "aisingapore/Gemma-SEA-LION-v4-27B-IT";
+    static final String SEALION_COMPLETIONS_URL = "https://api.sea-lion.ai/v1/chat/completions";
 
     // Set to true at the start of each translate() call so the first batch failure per
     // video is reported via printException (visible to the user), while subsequent batch
@@ -195,9 +198,10 @@ public final class TranscriptTranslator {
 
         String service = Settings.VOT_TRANSLATION_SERVICE.get();
         final boolean isMyMemory = service.equals(TRANSLATION_SERVICE_MY_MEMORY);
-        final boolean isOpenRouter = service.equals(TRANSLATION_SERVICE_OPENROUTER);
+        final boolean isChatCompletion = service.equals(TRANSLATION_SERVICE_OPENROUTER)
+                || service.equals(TRANSLATION_SERVICE_SEALION);
         final int maxBatchChars = isMyMemory ? MYMEMORY_MAX_CHARS
-                : isOpenRouter ? OPENROUTER_MAX_BATCH_CHARS
+                : isChatCompletion ? OPENROUTER_MAX_BATCH_CHARS
                   : GOOGLE_MAX_BATCH_CHARS;
         // Mutable list so the picked batch can be split at the play head on every dispatch,
         // ensuring the streaming model translates the play-head segment first instead of
@@ -218,7 +222,7 @@ public final class TranscriptTranslator {
         for (int i = 0, batchesSize = batches.size(); i < batchesSize; i++) batchDone.add(false);
 
         final int batchDelay = isMyMemory ? MYMEMORY_INTER_BATCH_DELAY_MS
-                : isOpenRouter ? OPENROUTER_INTER_BATCH_DELAY_MS
+                : isChatCompletion ? OPENROUTER_INTER_BATCH_DELAY_MS
                   : GOOGLE_INTER_BATCH_DELAY_MS;
 
         // Publish session state so onSeek()/isAwaitingTranslationAt() can see it. Snapshots
@@ -252,7 +256,7 @@ public final class TranscriptTranslator {
                 if (index < 0) break;
 
                 // Cap the first OpenRouter batch to a small budget; other services run unchanged.
-                if (isOpenRouter && firstBatchAfterReposition) {
+                if (isChatCompletion && firstBatchAfterReposition) {
                     capFirstBatch(batches, batchDone, index);
                 }
                 firstBatchAfterReposition = false;
@@ -533,8 +537,11 @@ public final class TranscriptTranslator {
         if (service.equals(TRANSLATION_SERVICE_MY_MEMORY)) {
             return translateBatchMyMemory(videoId, segments, targetLang);
         }
+        if (service.equals(TRANSLATION_SERVICE_SEALION)) {
+            return translateBatchChatCompletion(videoId, segments, targetLang, onLineStreamed, true);
+        }
         if (service.equals(TRANSLATION_SERVICE_OPENROUTER)) {
-            return translateBatchOpenRouter(videoId, segments, targetLang, onLineStreamed);
+            return translateBatchChatCompletion(videoId, segments, targetLang, onLineStreamed, false);
         }
         return translateBatchGoogle(videoId, segments, targetLang);
     }
@@ -751,18 +758,19 @@ public final class TranscriptTranslator {
                 + (minutesStr != null ? Integer.parseInt(minutesStr) : 0);
     }
 
-    private static List<String> translateBatchOpenRouter(
+    private static List<String> translateBatchChatCompletion(
             String videoId,
             List<TranscriptSegment> segments, String targetLang,
-            @Nullable Consumer<List<String>> onLineStreamed) throws Exception {
+            @Nullable Consumer<List<String>> onLineStreamed, boolean seaLion) throws Exception {
         Utils.verifyOffMainThread();
 
-        String model = Settings.VOT_OPENROUTER_MODEL.get();
+        final String providerName = seaLion ? "SEA-LION" : "OpenRouter";
+        String model = seaLion ? SEALION_MODEL : Settings.VOT_OPENROUTER_MODEL.get();
         final long start = System.currentTimeMillis();
-        Logger.printDebug(() -> "OpenRouter translation starting: " + videoId + " lang: " + targetLang + " model: " + model);
+        Logger.printDebug(() -> providerName + " translation starting: " + videoId + " lang: " + targetLang + " model: " + model);
 
-        String apiKey = Settings.VOT_OPENROUTER_API_KEY.get().trim();
-        if (apiKey.isEmpty()) throw new Exception("OpenRouter API key is not set");
+        String apiKey = (seaLion ? Settings.VOT_SEALION_API_KEY : Settings.VOT_OPENROUTER_API_KEY).get().trim();
+        if (apiKey.isEmpty()) throw new Exception(providerName + " API key is not set");
 
         // Number each line so the model cannot silently merge or skip lines.
         StringBuilder joined = new StringBuilder();
@@ -788,15 +796,23 @@ public final class TranscriptTranslator {
                 .put("model", model)
                 .put("temperature", 0)
                 .put("stream", true)
-                .put("max_tokens", segments.size() * 30)
-                .put("provider", provider)
+                .put("max_tokens", seaLion ? Math.min(4096, Math.max(1024, segments.size() * 100)) : segments.size() * 30)
                 .put("messages", new JSONArray().put(systemMessage).put(userMessage));
 
+        if (seaLion) {
+            // Gemma chat templates do not consistently support a separate system role.
+            body.put("messages", new JSONArray().put(new JSONObject()
+                    .put("role", "user")
+                    .put("content", systemMessage.getString("content") + "\n\n" + joined)));
+        } else {
+            body.put("provider", provider); // OpenRouter-only routing option.
+        }
         byte[] bodyBytes = body.toString().getBytes(StandardCharsets.UTF_8);
 
         HttpURLConnection conn = Requester.openConnection(
-                "https://openrouter.ai/api/v1/chat/completions"
+                seaLion ? SEALION_COMPLETIONS_URL : "https://openrouter.ai/api/v1/chat/completions"
         );
+        conn.setInstanceFollowRedirects(false);
         conn.setRequestMethod("POST");
         conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
         conn.setReadTimeout(OPENROUTER_READ_TIMEOUT_MS);
@@ -805,10 +821,6 @@ public final class TranscriptTranslator {
         conn.setRequestProperty("Accept-Encoding", "identity");
         conn.setDoOutput(true);
         conn.setFixedLengthStreamingMode(bodyBytes.length);
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(bodyBytes);
-        }
-
         List<String> result = new ArrayList<>(segments.size());
         for (TranscriptSegment seg : segments) result.add(seg.text);
         int[] matched = {0};
@@ -817,8 +829,15 @@ public final class TranscriptTranslator {
 
         activeConnection = conn;
         try {
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(bodyBytes);
+            }
             final int code = conn.getResponseCode();
             if (code != 200) {
+                if (seaLion) {
+                    // Never log provider bodies: they may contain credentials or caption text.
+                    throw new Exception("SEA-LION translation failed (HTTP " + code + ")");
+                }
                 String errorBody = readErrorBody(conn);
                 reportNextTranslationError = false; // notifyOpenRouterError shows a specific message
                 VoiceOverTranslationPatch.notifyOpenRouterError(code, errorBody);
@@ -843,8 +862,14 @@ public final class TranscriptTranslator {
                     } catch (Exception ignored) {
                         continue;
                     }
+                    if (seaLion && chunk.has("error")) {
+                        throw new Exception("SEA-LION streaming response reported an error");
+                    }
                     JSONArray choices = chunk.optJSONArray("choices");
                     if (choices == null || choices.length() == 0) continue;
+                    if (seaLion && "length".equals(choices.getJSONObject(0).optString("finish_reason"))) {
+                        throw new Exception("SEA-LION translation exceeded its output token limit");
+                    }
                     JSONObject delta = choices.getJSONObject(0).optJSONObject("delta");
                     if (delta == null) continue;
 
@@ -876,6 +901,7 @@ public final class TranscriptTranslator {
             }
         } finally {
             if (activeConnection == conn) activeConnection = null;
+            conn.disconnect();
         }
 
         final int segmentSize = segments.size();
@@ -888,16 +914,19 @@ public final class TranscriptTranslator {
                 for (int i = 0; i < segmentSize; i++) result.set(i, positional.get(i));
                 matched[0] = segmentSize;
                 if (onLineStreamed != null) onLineStreamed.accept(new ArrayList<>(result));
-                Logger.printDebug(() -> "OpenRouter positional fallback applied: " + segmentSize + " lines");
+                Logger.printDebug(() -> providerName + " positional fallback applied: " + segmentSize + " lines");
             }
         }
 
+        if (seaLion && matched[0] == 0) {
+            throw new Exception("SEA-LION returned no usable translated lines");
+        }
         final int matchedFirst = matched[0];
-        Logger.printDebug(() -> "OpenRouter translation complete: " + targetLang
+        Logger.printDebug(() -> providerName + " translation complete: " + targetLang
                 + " fetchTime: " + (System.currentTimeMillis() - start) + "ms");
 
         if (matchedFirst != segmentSize) {
-            Logger.printDebug(() -> "OpenRouter line mismatch - expected: " + segmentSize
+            Logger.printDebug(() -> providerName + " line mismatch - expected: " + segmentSize
                     + ", got: " + matchedFirst + "; last: " + (segmentSize - matchedFirst)
                     + " segment(s) queued for retry");
             if (matchedFirst > 0) {

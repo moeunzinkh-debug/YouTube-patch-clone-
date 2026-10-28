@@ -708,6 +708,7 @@ public class Settings extends SharedYouTubeSettings {
     public static final IntegerSetting VOT_TTS_PITCH = new IntegerSetting("morphe_vot_tts_pitch", 100, parent(VOT_ENABLED));
     public static final IntegerSetting VOT_MAX_SPEECH_RATE = new IntegerSetting("morphe_vot_max_speech_rate", 15, parent(VOT_ENABLED));
     public static final StringSetting VOT_TRANSLATION_SERVICE = new StringSetting("morphe_vot_translation_service", "google", parent(VOT_ENABLED));
+    public static final StringSetting VOT_SEALION_API_KEY = new StringSetting("morphe_vot_sealion_api_key", "", new app.morphe.extension.youtube.patches.voiceovertranslation.VoiceOverTranslationPatch.SeaLionServiceAvailability());
     public static final StringSetting VOT_OPENROUTER_API_KEY = new StringSetting("morphe_vot_openrouter_api_key", "", new OpenRouterServiceAvailability());
     public static final StringSetting VOT_OPENROUTER_MODEL = new StringSetting("morphe_vot_openrouter_model", "mistralai/mistral-nemo", new OpenRouterServiceAvailability());
     public static final StringSetting VOT_MYMEMORY_EMAIL = new StringSetting("morphe_vot_mymemory_email", "", new MyMemoryServiceAvailability());

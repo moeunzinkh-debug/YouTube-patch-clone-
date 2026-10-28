@@ -1744,4 +1744,11 @@ Automatic recording is optional. It stops in incognito or when the account chang
     <string name="morphe_equalizer_active">Applied to YouTube audio. Positive gain may distort; start at low volume.</string>
     <string name="morphe_equalizer_player_button_title">Show EQ player button</string>
     <string name="morphe_equalizer_player_button_summary">Show the equalizer shortcut in the top player controls. Restart YouTube to apply.</string>
+    <string name="morphe_vot_service_sealion" translatable="false">SEA-LION</string>
+    <string name="morphe_vot_sealion_info_summary">Translate captions using a SEA-LION API key. Model: aisingapore/Gemma-SEA-LION-v4-27B-IT. Endpoint: https://api.sea-lion.ai/v1/. Caption text is sent to SEA-LION when selected.</string>
+    <string name="morphe_vot_sealion_api_key_title">SEA-LION API key</string>
+    <string name="morphe_vot_sealion_api_key_summary">Enter your SEA-LION API key. Keep this key private.</string>
+    <string name="morphe_vot_sealion_not_configured_title">SEA-LION not configured</string>
+    <string name="morphe_vot_sealion_not_configured_message">Enter your SEA-LION API key in Voice-over translation settings before selecting this provider.</string>
+    <string name="morphe_vot_export_provider_key_warning">Your exported settings contain translation-provider API keys. Never share this export: anyone with a key may use your account or credits.</string>
 </resources>
