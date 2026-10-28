@@ -92,6 +92,9 @@ def verify_asset(path: Path) -> dict:
         check("META-INF/MANIFEST.MF" in entries, "Missing bundle manifest")
         check(any(name.endswith(".class") for name in entries), "No compiled patch classes in MPP")
         manifest = archive.read("META-INF/MANIFEST.MF").decode("utf-8", errors="replace")
+        fields = dict(line.split(": ", 1) for line in manifest.splitlines() if ": " in line)
+        check(fields.get("Version") == EXPECTED_VERSION, "Unexpected MPP manifest version")
+        check(fields.get("Patcher-Version") == "1.8.0", "Unexpected upstream patcher version")
     return {"sha256": digest, "size": path.stat().st_size, "zip_entries": len(entries), "manifest": manifest}
 
 
@@ -136,7 +139,9 @@ def main() -> None:
             "vendor_git_tree": EXPECTED_TREE,
             "bundle_sha256": asset["sha256"],
             "bundle_size": asset["size"],
+            "built_for_patcher": "1.8.0",
             "morphe_desktop": "1.19.1",
+            "desktop_patcher": "2.0.1",
             "morphe_desktop_sha256": "a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573",
             "checks": {
                 "upstream_source_tree": "passed",
