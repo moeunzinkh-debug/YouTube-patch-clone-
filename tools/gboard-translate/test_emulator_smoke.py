@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """Offline tests for the emulator UI helper; no Android device required."""
+import base64
+import gzip
+import json
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -41,6 +44,17 @@ class EmulatorSmokeTest(unittest.TestCase):
                "java.lang.VerifyError: private user content\nCaused by: java.lang.IllegalAccessError: private\n")
         self.assertEqual(["java.lang.IllegalAccessError", "java.lang.VerifyError"],
                          emulator_smoke.gboard_crash_types(log))
+
+    def test_ime_inspector_reads_only_encoded_instrumentation_result(self):
+        windows = [{"text": "", "children": [{"description": "Translate", "bounds": "[1,2][3,4]"}]}]
+        payload = base64.b64encode(gzip.compress(json.dumps(windows).encode())).decode()
+        output = "INSTRUMENTATION_RESULT: ime_windows=" + payload + "\nINSTRUMENTATION_CODE: -1"
+        with patch.object(emulator_smoke, "run", return_value=output):
+            self.assertEqual(windows, emulator_smoke.inspect_ime_windows())
+        self.assertEqual(2, len(list(emulator_smoke.flatten_window_nodes(windows))))
+        with patch.object(emulator_smoke, "run", return_value="INSTRUMENTATION_FAILED: private"):
+            with self.assertRaisesRegex(RuntimeError, "did not return"):
+                emulator_smoke.inspect_ime_windows()
 
     def test_search_click_uses_visible_accessibility_bounds(self):
         xml = '<hierarchy><node text="" content-desc="Search settings" bounds="[10,20][50,80]" /></hierarchy>'

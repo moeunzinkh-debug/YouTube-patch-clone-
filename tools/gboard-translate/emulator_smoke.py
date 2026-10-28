@@ -19,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PACKAGE = "dev.jason.com.google.android.inputmethod.latin"
 PROBE_PACKAGE = "dev.arena.gboardprobe"
 PROBE_ACTIVITY = "dev.jason.gboardpatches.extension.directtranslate.AndroidSyntheticActivity"
+INSPECTOR_PACKAGE = "dev.arena.gboardinspector"
+INSPECTOR_RUNNER = "dev.jason.gboardpatches.extension.directtranslate.AndroidWindowInspector"
 
 
 def run(*command: str, timeout: int = 60) -> str:
@@ -125,7 +127,8 @@ def synthetic_http_probe() -> None:
         source = ROOT / "tools/gboard-translate/overlay/extensions/extension/src/main/java/dev/jason/gboardpatches/extension/directtranslate"
         run("javac", "-source", "8", "-target", "8", "-encoding", "UTF-8", "-cp", str(android_jar),
             "-d", str(classes), str(source / "GtxClient.java"), str(source / "TranslateCoordinator.java"),
-            str(ROOT / "tools/gboard-translate/AndroidSyntheticActivity.java"), timeout=90)
+            str(ROOT / "tools/gboard-translate/AndroidSyntheticActivity.java"),
+            str(ROOT / "tools/gboard-translate/AndroidWindowInspector.java"), timeout=90)
         class_files = sorted(map(str, classes.rglob("*.class")))
         if not class_files:
             raise RuntimeError("Probe compilation generated no classes")
@@ -152,6 +155,26 @@ def synthetic_http_probe() -> None:
         run(str(tools / "apksigner"), "sign", "--ks", str(key), "--ks-pass", "pass:android",
             "--key-pass", "pass:android", "--out", str(signed), str(aligned), timeout=45)
         run("adb", "install", "-r", str(signed), timeout=90)
+        # A separate no-activity package lets UiAutomation enumerate the IME
+        # window without restarting the focused synthetic editor app.
+        inspector_manifest = tmp / "inspector-manifest.xml"
+        inspector_manifest.write_text('''<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="dev.arena.gboardinspector">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
+  <application android:label="Gboard synthetic window inspector" />
+  <instrumentation android:name="dev.jason.gboardpatches.extension.directtranslate.AndroidWindowInspector"
+      android:targetPackage="dev.arena.gboardinspector" />
+</manifest>''', encoding="utf-8")
+        inspector_unsigned, inspector_aligned, inspector_signed = (
+            tmp / "inspector-unsigned.apk", tmp / "inspector-aligned.apk", tmp / "inspector.apk")
+        run(str(tools / "aapt"), "package", "-f", "-M", str(inspector_manifest), "-I", str(android_jar),
+            "-F", str(inspector_unsigned))
+        with zipfile.ZipFile(inspector_unsigned, "a") as archive:
+            archive.write(dex / "classes.dex", "classes.dex")
+        run(str(tools / "zipalign"), "-f", "4", str(inspector_unsigned), str(inspector_aligned))
+        run(str(tools / "apksigner"), "sign", "--ks", str(key), "--ks-pass", "pass:android",
+            "--key-pass", "pass:android", "--out", str(inspector_signed), str(inspector_aligned), timeout=45)
+        run("adb", "install", "-r", str(inspector_signed), timeout=90)
         run("adb", "logcat", "-c")
         run("adb", "shell", "am", "start", "-n", f"{PROBE_PACKAGE}/{PROBE_ACTIVITY}")
         expected = {"PASS_EN_KM", "PASS_KM_EN", "PASS_AUTO_KM"}
@@ -166,6 +189,27 @@ def synthetic_http_probe() -> None:
                 raise RuntimeError("Android synthetic HTTPS probe returned " + ",".join(sorted(markers)))
             time.sleep(3)
         raise RuntimeError("Android synthetic HTTPS probe did not finish")
+
+
+def inspect_ime_windows() -> list:
+    result = run("adb", "shell", "am", "instrument", "-w", "-r",
+                 f"{INSPECTOR_PACKAGE}/{INSPECTOR_RUNNER}", timeout=45)
+    match = re.search(r"^INSTRUMENTATION_RESULT: ime_windows=([A-Za-z0-9+/=]+)$", result, re.MULTILINE)
+    if not match:
+        error = re.search(r"^INSTRUMENTATION_RESULT: error=([A-Za-z0-9_]+)$", result, re.MULTILINE)
+        raise RuntimeError("IME window inspector did not return a tree" + (f" [{error.group(1)}]" if error else ""))
+    data = json.loads(gzip.decompress(base64.b64decode(match.group(1))).decode("utf-8"))
+    if not isinstance(data, list):
+        raise RuntimeError("IME window inspector returned an invalid tree")
+    return data
+
+
+def flatten_window_nodes(windows: list):
+    for window in windows:
+        if not isinstance(window, dict):
+            continue
+        yield window
+        yield from flatten_window_nodes(window.get("children", []))
 
 
 def gboard_ime_smoke(apk: Path, report: dict) -> None:
@@ -209,19 +253,28 @@ def gboard_ime_smoke(apk: Path, report: dict) -> None:
     report["ime_process_started"] = "passed"
     ui = dump_ui()
     publish_synthetic_ui(ui, "GBOARD_KEYBOARD_UI")
-    # Opening the Translate UI is attempted only by a visible accessibility
-    # label; failure here is not treated as a successful Translate test.
-    for node in ET.fromstring(ui).iter("node"):
-        label = (node.get("content-desc", "") + " " + node.get("text", "")).lower()
-        if "translate" not in label:
-            continue
-        position = center(node.get("bounds", ""))
-        if position:
-            run("adb", "shell", "input", "tap", str(position[0]), str(position[1]))
-            time.sleep(3)
-            publish_synthetic_ui(dump_ui(), "GBOARD_TRANSLATE_UI")
-            report["translate_button_tapped"] = "attempted; translation not yet asserted"
-            break
+    # uiautomator dump may return only the foreground app, not the separate
+    # keyboard window. The disposable instrumentation enumerates IME windows.
+    try:
+        windows = inspect_ime_windows()
+        report["ime_accessibility_windows"] = len(windows)
+        publish_synthetic_ui(json.dumps(windows, ensure_ascii=False), "GBOARD_IME_WINDOWS")
+        # Opening Translate is attempted only by a visible accessibility
+        # label; a tap is not evidence that translation itself succeeded.
+        for node in flatten_window_nodes(windows):
+            label = (str(node.get("description", "")) + " " + str(node.get("text", ""))).lower()
+            if "translate" not in label:
+                continue
+            position = center(node.get("bounds", ""))
+            if position:
+                run("adb", "shell", "input", "tap", str(position[0]), str(position[1]))
+                time.sleep(3)
+                publish_synthetic_ui(json.dumps(inspect_ime_windows(), ensure_ascii=False), "GBOARD_TRANSLATE_UI")
+                report["translate_button_tapped"] = "attempted; translation not yet asserted"
+                break
+    except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
+        report["ime_inspector_error"] = type(error).__name__
+        print(f"::warning::IME accessibility inspector could not complete: {type(error).__name__}")
     print("::notice::Third-party-derived Gboard fixture installed and its IME process started in an emulator.")
 
 
