@@ -13,7 +13,7 @@ with zipfile.ZipFile(bundle) as archive:
     assert archive.testzip() is None, 'Corrupt archive'
     names = archive.namelist()
     manifest = archive.read('META-INF/MANIFEST.MF').decode().replace('\r', '')
-    assert 'Version: 0.2.0-dev.1\n' in manifest, manifest
+    assert 'Version: 0.3.0-dev.1\n' in manifest, manifest
     assert 'Patcher-Version: 2.0.0\n' in manifest, manifest
     assert 'app/morphe/patches/simsimi/AdGatePatchKt.class' in names
     assert 'app/morphe/patches/simsimi/AdGateTransform.class' in names

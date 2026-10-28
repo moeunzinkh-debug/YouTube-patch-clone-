@@ -9,6 +9,26 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class AdGateTransformTest {
+    @Test fun sixFeatureGatesAreExactAndComposeWithTheExistingPatches() {
+        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+        assertEquals(6, AdGateTransform.featureKeys.size)
+        for (key in AdGateTransform.featureKeys) {
+            val patched = AdGateTransform.patchFeature(source,key)
+            val ranges = AdGateTransform.featureOffsets(key)
+            val changed = (0 until source.size-20).filter { source[it] != patched[it] }
+            assertTrue(changed.isNotEmpty())
+            assertTrue(changed.all { offset -> ranges.any { offset in it } })
+            assertFailsWith<IllegalArgumentException> { AdGateTransform.patchFeature(patched,key) }
+        }
+        val base = AdGateTransform.patchDailyBonus(AdGateTransform.patchMembership(AdGateTransform.patch(source)))
+        val all = AdGateTransform.featureKeys.fold(base) { bytes, key -> AdGateTransform.patchFeature(bytes,key) }
+        val reversedFeatures = AdGateTransform.featureKeys.reversed().fold(source) { bytes, key -> AdGateTransform.patchFeature(bytes,key) }
+        val reversed = AdGateTransform.patch(AdGateTransform.patchMembership(AdGateTransform.patchDailyBonus(reversedFeatures)))
+        assertContentEquals(all,reversed)
+        assertEquals(source.size, all.size)
+        assertContentEquals(MessageDigest.getInstance("SHA-1").digest(all.copyOfRange(0,all.size-20)),all.copyOfRange(all.size-20,all.size))
+        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".features").writeBytes(all) }
+    }
     @Test fun dailyBonusUsesExistingNonVideoFlowAndComposesInEveryOrder() {
         val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
         val daily = AdGateTransform.patchDailyBonus(source)

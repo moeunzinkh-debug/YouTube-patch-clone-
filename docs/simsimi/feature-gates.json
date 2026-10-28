@@ -1,0 +1,104 @@
+{
+  "scope": "Six explicit client entry-gate transforms; not proof of six working server-backed features.",
+  "gates": [
+    {
+      "feature": "conversation_level",
+      "function_id": 26734,
+      "function_name": "updateFreetalkLevelAction",
+      "function_offset": 24125044,
+      "relative_offset": 91,
+      "offset": 24125135,
+      "original": "3605050166",
+      "replacement": "7805080505",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "profile_photo",
+      "function_id": 22281,
+      "function_name": "onSetPhotoProfileAction",
+      "function_offset": 23544907,
+      "relative_offset": 102,
+      "offset": 23545009,
+      "original": "2e010909",
+      "replacement": "78017801",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "group_cover",
+      "function_id": 21153,
+      "function_name": "onOpenSetCustomCoverAction",
+      "function_offset": 23207787,
+      "relative_offset": 52,
+      "offset": 23207839,
+      "original": "3602020388",
+      "replacement": "7802080202",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "group_cover",
+      "function_id": 21158,
+      "function_name": "?anon_0_",
+      "function_offset": 23208283,
+      "relative_offset": 280,
+      "offset": 23208563,
+      "original": "3605050c88",
+      "replacement": "7805080505",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "photo_send",
+      "function_id": 25613,
+      "function_name": "SendChat",
+      "function_offset": 23919735,
+      "relative_offset": 84,
+      "offset": 23919819,
+      "original": "360d000b88",
+      "replacement": "780d080d0d",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "photo_send",
+      "function_id": 30984,
+      "function_name": "GroupChatSendChat",
+      "function_offset": 25253830,
+      "relative_offset": 167,
+      "offset": 25253997,
+      "original": "3602020c88",
+      "replacement": "7802080202",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "read_receipts",
+      "function_id": 25984,
+      "function_name": "OtherReadMyChat",
+      "function_offset": 23982238,
+      "relative_offset": 18,
+      "offset": 23982256,
+      "original": "3601000188",
+      "replacement": "7801080101",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "item_controls",
+      "function_id": 20644,
+      "function_name": "getMembershipStatus",
+      "function_offset": 23121840,
+      "relative_offset": 17,
+      "offset": 23121857,
+      "original": "3602000288",
+      "replacement": "7802080202",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    },
+    {
+      "feature": "item_controls",
+      "function_id": 22160,
+      "function_name": "getMembership",
+      "function_offset": 23523063,
+      "relative_offset": 17,
+      "offset": 23523080,
+      "original": "3602000288",
+      "replacement": "7802080202",
+      "scope": "Client eligibility only; original data, upload, receipt truth, server requests and errors retained."
+    }
+  ]
+}

@@ -68,10 +68,10 @@ jobs:
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
           set -o pipefail
           java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/base.2.apk \
-            -p bundles/simsimi/bundle.mpp -e "MicroG RE service routing (experimental)" -e "Daily bonus without video (client path, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
+            -p bundles/simsimi/bundle.mpp -e "MicroG RE service routing (experimental)" -e "Daily bonus without video (client path, experimental)" -e "Conversation level controls (client only, experimental)" -e "Profile photo controls (client only, experimental)" -e "Custom group cover controls (client only, experimental)" -e "Photo sending controls (client only, experimental)" -e "Read receipt display (client only, experimental)" -e "Membership item controls (client only, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
             -r /tmp/simsimi-input/patch-result.json 2>&1 | tee /tmp/simsimi-patch.log
           python3 -m pip install 'androguard==4.1.3'
-          python3 tools/simsimi/verify_patched_apk.py /tmp/simsimi-input/patched.apk /tmp/simsimi-input/patched.hbc.all bundles/simsimi/morphe-validation.json
+          python3 tools/simsimi/verify_patched_apk.py /tmp/simsimi-input/patched.apk /tmp/simsimi-input/patched.hbc.features bundles/simsimi/morphe-validation.json
       - name: Report Morphe patch errors
         if: failure()
         run: |

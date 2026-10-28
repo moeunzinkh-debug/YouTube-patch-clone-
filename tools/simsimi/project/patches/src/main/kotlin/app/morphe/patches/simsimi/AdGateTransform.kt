@@ -32,7 +32,17 @@ object AdGateTransform {
     internal val originalMembershipEvents = hex("32017c026c00012a0100002a0101023703020163f27600bc4603003702020163f22a0102022902002e02020037020202f7dd2a0103023003390403031a00360304049a370202050bfb5303030402360203067f640101bf1a53010203015c00")
     internal val clientMembershipEvents = hex("32017c026c00012a0100002a0101023703020185c45003030276000802030802022a0102022902002e02020037020202f7dd2a0103023003390403031a00360304049a370202050bfb5303030402360203067f640101bf1a53010203015c00")
     private val membershipEvents = Region(MEMBERSHIP_EVENTS_OFFSET, originalMembershipEvents, clientMembershipEvents)
-    private val regions = listOf(ads, membership, dailyBonus, membershipEvents)
+    // Exact feature-entry gates, not fabricated server balances or message read state.
+    private val featureRegions = linkedMapOf(
+        "conversation_level" to listOf(Region(24125135, hex("3605050166"), hex("7805080505"))),
+        "profile_photo" to listOf(Region(23545009, hex("2e010909"), hex("78017801"))),
+        "group_cover" to listOf(Region(23207839, hex("3602020388"), hex("7802080202")), Region(23208563, hex("3605050c88"), hex("7805080505"))),
+        "photo_send" to listOf(Region(23919819, hex("360d000b88"), hex("780d080d0d")), Region(25253997, hex("3602020c88"), hex("7802080202"))),
+        "read_receipts" to listOf(Region(23982256, hex("3601000188"), hex("7801080101"))),
+        "item_controls" to listOf(Region(23121857, hex("3602000288"), hex("7802080202")), Region(23523080, hex("3602000288"), hex("7802080202")))
+    )
+    internal val featureKeys get() = featureRegions.keys.toList()
+    private val regions = listOf(ads, membership, dailyBonus, membershipEvents) + featureRegions.values.flatten()
     fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }
     private fun checksum(bytes: ByteArray) = MessageDigest.getInstance("SHA-1").digest(bytes.copyOfRange(0, bytes.size-20))
@@ -59,4 +69,9 @@ object AdGateTransform {
     fun patch(original: ByteArray): ByteArray = apply(original,ads)
     fun patchMembership(original: ByteArray): ByteArray = apply(apply(original,membership),membershipEvents)
     fun patchDailyBonus(original: ByteArray): ByteArray = apply(original,dailyBonus)
+    fun patchFeature(original: ByteArray, feature: String): ByteArray =
+        featureRegions.getValue(feature).fold(original) { bytes, region -> apply(bytes,region) }
+    internal fun featureOffsets(feature: String): List<IntRange> = featureRegions.getValue(feature).map {
+        it.offset until it.offset+it.original.size
+    }
 }
