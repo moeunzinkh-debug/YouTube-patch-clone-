@@ -1,6 +1,6 @@
 # SimSimi patches — experimental, separate from YouTube
 
-**Morphe patch bundle:** [`bundle.mpp`](bundle.mpp), **0.2.0-dev.1**, 41,257 bytes.
+**Morphe patch bundle:** [`bundle.mpp`](bundle.mpp), **0.2.0-dev.1**, 41,923 bytes.
 Targets **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, code `1119001`, API 24+).
 Import this separate `.mpp` into Morphe Manager and select the SimSimi APK. These
 are real selectable patches, not a standalone Python APK patcher. Do not replace
@@ -13,10 +13,14 @@ the root YouTube `patch.mpp` with this bundle.
 |---|---|---|
 | Disable ad eligibility (experimental) | On | Changes the shared Hermes `canShowAds` gate to false. Not proof every SDK ad is removed; does not simulate rewarded-video completion. |
 | Unlock membership UI (client only, experimental) | On | Returns a cloned membership status with `hasMembership=true` for local UI gates. Conversation controls, profile/cover images and photo controls may still require server authorization. Does not grant server items, read receipts, billing, or daily rewards. |
-| Pull down to restart chat (experimental) | On | Injects an Activity touch observer and React reload extension. Pull from the top 96dp down at least 160dp; ignores focused text input/scrolled content, cancels multitouch and debounces. Requests home/chat reload, not process termination; unsaved state may be lost. Device behavior untested. |
+| Pull down to restart chat (experimental) | On | Injects an Activity touch observer and React reload extension. Pull from the top 96dp down at least 160dp; ignores focused text input/scrolled content, cancels multitouch and debounces. Enabled only on the **English Conversation list**, identified by its visible heading and room-list section. Disabled inside chat rooms and on unknown screens. Requests React runtime reload, not process termination or a data-only list refresh; unsaved state may be lost. New screen restriction not yet device-tested. |
 | MicroG RE service routing (experimental) | **Off, opt-in** | Routes exact native GMS package literals to `app.revanced.android.gms`; adds package visibility and `EXTENDED_ACCESS`. Requires separately installed compatible MicroG RE. This is partial routing, **not full GMS compatibility** or an implementation of missing APIs. |
 
 </details>
+
+The user reports the existing features working on their device. This does not
+independently verify server entitlements, full GMS coverage or the newly added
+Conversation-only screen restriction.
 
 ## Requested feature status
 
@@ -27,13 +31,13 @@ the root YouTube `patch.mpp` with this bundle.
   fabricated reward callbacks or server credit grants.
 - **MicroG RE:** native routing implemented; sign-in, Firebase App Check,
   signatures, attestation, Billing and other API compatibility remain unverified.
-- **Swipe down:** native gesture/reload hook injected; actual device reload untested.
+- **Swipe down:** corrected to the Conversation list in your screenshot, not inside chat rooms. Screen matching is currently English-only and fails closed for other layouts/languages.
 
 ## Verification — actual MPP application passed
 
-[Actions run 40649985544](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40649985544)
+[Actions run 40653945775](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40653945775)
 built the isolated bundle, ran exact-input Hermes JVM tests and the 12-check Java
-gesture harness, then **applied the actual `.mpp` to the original APK using Morphe
+gesture harness plus 8 Conversation screen checks, then **applied the actual `.mpp` to the original APK using Morphe
 Desktop v1.19.1 / Morphe Patcher**, explicitly enabling the optional MicroG patch.
 Static validation of that output APK confirmed:
 
@@ -49,7 +53,7 @@ See [`morphe-validation.json`](morphe-validation.json) and
 full GMS compatibility test**. No SimSimi release has been published.
 
 Bundle SHA-256:
-`7991819f0f70a04094d4bafd114b60155b98e8fc181102d7a2f44a6729fa7b73`.
+`52980e1bccdcc22b1b146b1f73a9498f404b0c079f494871a871b703aee8ad51`.
 Local archive/checksum verification:
 `python3 tools/simsimi/verify_bundle.py bundles/simsimi/bundle.mpp`.
 

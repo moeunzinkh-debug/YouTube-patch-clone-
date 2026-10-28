@@ -4,9 +4,9 @@
   "package": "com.ismaker.android.simsimi",
   "target_version": "9.2.3",
   "target_version_code": "1119001",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40649985544",
-  "bundle_sha256": "7991819f0f70a04094d4bafd114b60155b98e8fc181102d7a2f44a6729fa7b73",
-  "bundle_bytes": 41257,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40653945775",
+  "bundle_sha256": "52980e1bccdcc22b1b146b1f73a9498f404b0c079f494871a871b703aee8ad51",
+  "bundle_bytes": 41923,
   "implemented_patches": [
     "Disable ad eligibility (experimental)",
     "Unlock membership UI (client only, experimental)",
@@ -21,7 +21,8 @@
     "device_install_and_runtime": "not_run",
     "pull_gesture_java_harness": "passed_12_checks",
     "output_dex_manifest_and_hermes_verification": "passed",
-    "android_manager_ui": "not_run"
+    "android_manager_ui": "not_run",
+    "conversation_screen_java_harness": "passed_8_checks"
   },
   "pending_features": [
     "complete_ad_removal_device_verification",
@@ -32,5 +33,7 @@
   ],
   "input_constraint": "Uploaded base declares splits.required=true and contains no native libraries. Matching split APKs are required for installation testing.",
   "release_published": false,
-  "youtube_bundle_changed": false
+  "youtube_bundle_changed": false,
+  "pull_reload_scope": "English Conversation list only, recognized by visible heading plus room-list section; disabled in chat rooms and unknown screens. React runtime reload, not a data-only refresh.",
+  "user_report": "User reports existing features working; requested reload location corrected to Conversation list. New screen restriction not yet device-tested."
 }
