@@ -301,9 +301,16 @@ def gboard_ime_smoke(apk: Path, report: dict) -> None:
                 windows = inspect_ime_windows()
                 publish_synthetic_ui(json.dumps(windows, ensure_ascii=False), "GBOARD_FEATURE_MENU")
         if tap_ime_label(windows, "translate"):
-            time.sleep(3)
-            publish_synthetic_ui(json.dumps(inspect_ime_windows(), ensure_ascii=False), "GBOARD_TRANSLATE_UI")
+            time.sleep(5)
+            after = inspect_ime_windows()
             report["translate_button_tapped"] = "attempted; translation not yet asserted"
+            report["translate_ime_windows_after_tap"] = len(after)
+            publish_synthetic_ui(json.dumps(after, ensure_ascii=False), "GBOARD_TRANSLATE_UI")
+            publish_synthetic_ui(dump_ui(), "GBOARD_AFTER_TRANSLATE_FOREGROUND")
+            post_crashes = gboard_crash_types(run("adb", "logcat", "-d", "-s", "AndroidRuntime:E", "*:S", timeout=30))
+            if post_crashes:
+                report["gboard_fatal_exception_types_after_translate"] = post_crashes
+                print("::warning::Gboard reported a fatal exception after the Translate tap; see sanitized report.")
     except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
         report["ime_inspector_error"] = type(error).__name__
         print(f"::warning::IME accessibility inspector could not complete: {type(error).__name__}")
