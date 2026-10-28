@@ -1,6 +1,6 @@
 {
-  "created_at": "2026-10-28T04:01:14Z",
-  "description": "Unofficial YouTube-only Morphe patch bundle v1.49.0. Adds the EQ player shortcut and SEA-LION translation provider using aisingapore/Gemma-SEA-LION-v4-27B-IT. 106 YouTube plus 5 generic patches. Recommended YouTube 21.23.492; requires Patcher 2.0. Live SEA-LION and player-layout device validation remain pending.",
+  "created_at": "2026-10-28T04:53:38Z",
+  "description": "Unofficial YouTube-only Morphe patch bundle v1.49.0. Adds the EQ player shortcut and SEA-LION translation provider using aisingapore/Gemma-SEA-LION-v4-27B-IT. 106 YouTube plus 5 generic patches. Recommended YouTube 21.23.492; requires Patcher 2.0. Live SEA-LION and player-layout device validation remain pending. Hotfix: direct Khmer FastAPI multipart synthesis via /api/process-multi; actual Java client returned valid MP3 in live testing.",
   "download_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.49.0/patch.mpp",
   "signature_download_url": "",
   "version": "1.49.0"
