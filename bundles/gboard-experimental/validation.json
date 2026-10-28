@@ -1,0 +1,25 @@
+{
+  "version": "4.0.0-direct-translate-dev.1",
+  "experimental": true,
+  "upstream_commit": "2eb71854accc7e906d3e4f5495b2a54ed1e2af47",
+  "upstream_tree": "b8dc2c76f8a17259c2e3eaa6b9f8565fb19d730b",
+  "sha256": "f4a7b6984071a7b3561eda6f20c4ba4cf3c7abd83b077a8ac7a76e31d626d0e4",
+  "size": 8200796,
+  "morphe_desktop": "1.19.1",
+  "checks": {
+    "upstream_43_metadata_and_default_state": "passed",
+    "experimental_patch_opt_in_and_abi_inventory": "passed",
+    "post_parser_errors_callback_and_cancellation_unit_tests": "passed",
+    "java_synthetic_en_km_auto_post_on_ci_runner": "success",
+    "morphe_application_to_third_party_prepatched_fixture": "passed",
+    "patched_fixture_dex_markers": "passed",
+    "original_google_signed_apk_application": "not tested",
+    "android_device_runtime_and_user_network": "not tested"
+  },
+  "fixture": {
+    "source": "third-party prepatched and renamed Gboard; manifest package changed only for test selection",
+    "input_sha256": "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea",
+    "is_official_stock": false
+  },
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40692287605"
+}
