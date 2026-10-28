@@ -18,7 +18,8 @@
   },
   "ime_accessibility_windows": 1,
   "features_menu_tapped": true,
+  "translate_ime_windows_after_tap": 0,
   "bundle_sha256": "e0c1a903435261959bdbac23c70bc18cea9cd55e53b2a735e03abab0f55dcc33",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40700131760"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40700801310"
 }
