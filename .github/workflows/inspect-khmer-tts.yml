@@ -123,6 +123,26 @@ jobs:
           Path('docs/diagnostics/khmer-tts-synthesis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
           print(json.dumps(report,ensure_ascii=False,indent=2))
           PY
+      - name: Verify actual Java client offline and against live FastAPI
+        run: |
+          sudo apt-get install -y -qq libandroid-json-java
+          bash tools/khmer-tts-tests/run.sh
+          bash tools/khmer-tts-tests/run.sh --live /tmp/khmer-tts-java.mp3
+          ffprobe -v error -show_entries format=format_name,duration:stream=codec_name,sample_rate -of json /tmp/khmer-tts-java.mp3 > /tmp/khmer-tts-java-probe.json
+          python3 - <<'PY'
+          import json, hashlib, os
+          from pathlib import Path
+          audio = Path('/tmp/khmer-tts-java.mp3').read_bytes()
+          probe = json.loads(Path('/tmp/khmer-tts-java-probe.json').read_text())
+          assert len(audio) > 0
+          assert any(s.get('codec_name') == 'mp3' for s in probe['streams'])
+          assert float(probe['format']['duration']) > 0
+          report = {'source_commit': os.environ['GITHUB_SHA'], 'client': 'actual KhmerTtsClient.java',
+                    'received_bytes': len(audio), 'sha256': hashlib.sha256(audio).hexdigest(),
+                    'offline_checks': 'passed', 'audio_probe': probe}
+          Path('docs/diagnostics/khmer-tts-java-client.json').write_text(json.dumps(report, indent=2)+'\n')
+          print(json.dumps(report, indent=2))
+          PY
       - name: Save diagnostic result to this branch
         run: |
           git config user.name 'github-actions[bot]'
