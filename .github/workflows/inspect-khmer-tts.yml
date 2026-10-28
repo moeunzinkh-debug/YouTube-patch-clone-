@@ -32,6 +32,48 @@ jobs:
           Path('docs/diagnostics/khmer-tts-check.json').write_text(json.dumps(report, indent=2) + '\n')
           print(json.dumps(report, indent=2))
           PY
+      - name: Probe direct POST with bounded test requests
+        run: |
+          python3 - <<'PYCODE'
+          import datetime, json, urllib.request, urllib.error
+          from pathlib import Path
+          base = 'https://takumi0002-tts-kh.hf.space'
+          report = {'checked_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'tests': []}
+          probes = [('health', '/api/health', None),
+                    ('post_empty_json', '/api/process-multi', {}),
+                    ('post_text_json', '/api/process-multi', {'text': 'សួស្តី នេះជាការសាកល្បងសំឡេង។'})]
+          for name, path, body in probes:
+              item = {'name': name, 'method': 'GET' if body is None else 'POST', 'url': base + path, 'request_json': body}
+              headers = {'Accept': 'application/json, audio/*', 'User-Agent': 'YouTube-Patch-Clone-Diagnostics/1.0'}
+              data = None
+              if body is not None:
+                  headers['Content-Type'] = 'application/json'
+                  data = json.dumps(body, ensure_ascii=False).encode()
+              try:
+                  req = urllib.request.Request(base + path, data=data, headers=headers, method=item['method'])
+                  try:
+                      response = urllib.request.urlopen(req, timeout=120)
+                  except urllib.error.HTTPError as exc:
+                      response = exc
+                  with response:
+                      item['status'] = response.code
+                      item['content_type'] = response.headers.get('Content-Type', '')
+                      content = response.read(8 * 1024 * 1024 + 1)
+                      item['received_bytes'] = len(content)
+                      item['size_limit_exceeded'] = len(content) > 8 * 1024 * 1024
+                      if 'json' in item['content_type']:
+                          parsed = json.loads(content)
+                          item['response_json'] = parsed if len(content) < 8192 else {'note': 'JSON response too large to record'}
+                      elif not item['content_type'].startswith('audio/'):
+                          item['response_preview'] = content[:1000].decode('utf-8', 'replace')
+                      else:
+                          item['audio_header_hex'] = content[:16].hex()
+              except Exception as exc:
+                  item['error'] = str(exc)
+              report['tests'].append(item)
+              print(json.dumps(item, ensure_ascii=False))
+          Path('docs/diagnostics/khmer-tts-direct-post.json').write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
+          PYCODE
       - name: Save diagnostic result to this branch
         run: |
           git config user.name 'github-actions[bot]'
