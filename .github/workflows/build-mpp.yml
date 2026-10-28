@@ -23,6 +23,7 @@ on:
       - '*.gradle.kts'
       - 'gradle.properties'
       - '.github/workflows/build-mpp.yml'
+      - 'tools/equalizer-tests/**'
 
 permissions:
   contents: write
@@ -46,6 +47,9 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: gradle
+
+      - name: Test equalizer controller behavior
+        run: bash tools/equalizer-tests/run.sh
 
       - name: Show Android SDK
         run: |
