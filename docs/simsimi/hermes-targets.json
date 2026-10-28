@@ -6,6 +6,8 @@
       "name": "reload",
       "offset": 16492664,
       "size": 4,
+      "frame_size": 1,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <Ret>: <Reg8: 0>"
@@ -17,6 +19,8 @@
       "name": "initMemberShipStatus",
       "offset": 17278459,
       "size": 123,
+      "frame_size": 15,
+      "has_exception_handler": true,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 1>",
         "00000002: <LoadConstUndefined>: <Reg8: 0>",
@@ -55,6 +59,9 @@
       "name": "getMembershipObject",
       "offset": 17278582,
       "size": 201,
+      "frame_size": 15,
+      "has_exception_handler": false,
+      "bytecode_hex": "7c003701000163f27602be0e01023701000207c2510101003701000163f2bda200000001023701000163f236010103887803bc0d01032901012e01010d5c0137020004b1b57901be710201300139040105060036020406b2510202043905010506003701000163f237070107d6c736040508c36a040405080804500105026b0404013701040990f451010104aa2c02013b000301b1b53702000a21c53601000bf25403020001033602030c4c3201640101b71a53010203013700000163f25c002900012e00000d5c00",
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 0>",
         "00000002: <GetById>: <Reg8: 1, Reg8: 0, UInt8: 1, string_id: 62051>  # String: 'currentMembershipStatus' (Identifier)",
@@ -110,6 +117,8 @@
       "name": "updateMembershipStatusFromServer",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -128,6 +137,8 @@
       "name": "addMembershipStatusChangeListener",
       "offset": 17279647,
       "size": 128,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadParam>: <Reg8: 3, UInt8: 1>",
         "00000003: <TypeOf>: <Reg8: 1, Reg8: 3>",
@@ -167,6 +178,8 @@
       "name": "removeMembershipStatusChangeListener",
       "offset": 17279775,
       "size": 28,
+      "frame_size": 2,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 0, Reg8: 0, UInt8: 0>",
@@ -183,6 +196,8 @@
       "name": "emitMembershipStatusChangeListener",
       "offset": 17279803,
       "size": 95,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 1>",
         "00000002: <LoadThisNS>: <Reg8: 2>",
@@ -215,6 +230,9 @@
       "name": "canShowAds",
       "offset": 17289945,
       "size": 403,
+      "frame_size": 23,
+      "has_exception_handler": false,
+      "bytecode_hex": "7c013700010104c57602be1900023703010248f073005b4f53000301003b01000104c53700010104c5bd6601000000023700010104c56f04ffffffffbd3d0100000004370001033ff2bd180100000002300039030004060036020305b2510302033702010104c51d030302370201033ff2983c0302390500065b0036030507447302dc025302030502370301085bce73025b4f5402030102043703010953f3730200b353020301028fe7000000370201033ff239040004060036030405b2510303043701010104c51d0103011d0202016f01e80300001a040201390300065b0036020307443907000a12003706070b75bd6f01100e00001b05040153090607053907000a12003705070b75bd1c0604016e013c1b040601530d0507043905000a12003704050b75bd1c010601530b0405013900000c0b003606000d5973105fb0730e3b01730cf801730abb03080f094f0106077300640154000203000179005c003000390200065b00360102074473002c0653000102008e183000390200065b00360102074473009b03530001020078005c00",
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 1>",
         "00000002: <GetById>: <Reg8: 0, Reg8: 1, UInt8: 1, string_id: 50436>  # String: 'checkerInitAdsPreventMs' (Identifier)",
@@ -309,6 +327,8 @@
       "name": "removeAdsPreventStateChangeListener",
       "offset": 17290503,
       "size": 28,
+      "frame_size": 2,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 0, Reg8: 0, UInt8: 0>",
@@ -325,6 +345,8 @@
       "name": "getActiveMembershipInfo",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -343,6 +365,8 @@
       "name": "getMembershipInfoFromStore",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -361,6 +385,8 @@
       "name": "getMembershipInfo",
       "offset": 17511279,
       "size": 10,
+      "frame_size": 1,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 0>",
         "00000002: <GetById>: <Reg8: 0, Reg8: 0, UInt8: 1, string_id: 55976>  # String: 'membershipInfo' (Identifier)",
@@ -373,6 +399,8 @@
       "name": "mixpanel_onShowAd",
       "offset": 21515967,
       "size": 101,
+      "frame_size": 17,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <LoadConstUndefined>: <Reg8: 2>",
@@ -409,6 +437,8 @@
       "name": "GAMInterstitialAd",
       "offset": 16662827,
       "size": 46,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 4>",
         "00000002: <LoadConstUndefined>: <Reg8: 3>",
@@ -431,6 +461,8 @@
       "name": "InterstitialAd",
       "offset": 16507647,
       "size": 46,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 4>",
         "00000002: <LoadConstUndefined>: <Reg8: 3>",
@@ -453,6 +485,8 @@
       "name": "RewardedAd",
       "offset": 16507647,
       "size": 46,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 4>",
         "00000002: <LoadConstUndefined>: <Reg8: 3>",
@@ -475,6 +509,8 @@
       "name": "RewardedInterstitialAd",
       "offset": 16507647,
       "size": 46,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 4>",
         "00000002: <LoadConstUndefined>: <Reg8: 3>",
@@ -497,6 +533,8 @@
       "name": "useInterstitialAd",
       "offset": 21863340,
       "size": 159,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 3>",
         "00000002: <LoadParam>: <Reg8: 7, UInt8: 1>",
@@ -548,6 +586,8 @@
       "name": "useRewardedAd",
       "offset": 21863722,
       "size": 159,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 3>",
         "00000002: <LoadParam>: <Reg8: 7, UInt8: 1>",
@@ -599,6 +639,8 @@
       "name": "useRewardedInterstitialAd",
       "offset": 21864104,
       "size": 159,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 3>",
         "00000002: <LoadParam>: <Reg8: 7, UInt8: 1>",
@@ -650,6 +692,8 @@
       "name": "reloadMainRouteNavigation",
       "offset": 21877404,
       "size": 85,
+      "frame_size": 14,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 2, Reg8: 0, UInt8: 0>",
@@ -682,6 +726,8 @@
       "name": "reloadLastAccessTime",
       "offset": 21892860,
       "size": 74,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetGlobalObject>: <Reg8: 0>",
         "00000002: <TryGetById>: <Reg8: 1, Reg8: 0, UInt8: 1, string_id: 6>  # String: 'Date' (Identifier)",
@@ -709,6 +755,8 @@
       "name": "getMembershipStatus",
       "offset": 21892934,
       "size": 19,
+      "frame_size": 9,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 11>",
@@ -723,6 +771,8 @@
       "name": "showMembershipAfterAD",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -741,6 +791,8 @@
       "name": "getMembershipSeenPassed",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -759,6 +811,8 @@
       "name": "setLastMembershipSeenTime",
       "offset": 21894821,
       "size": 84,
+      "frame_size": 15,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadParam>: <Reg8: 5, UInt8: 1>",
         "00000003: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
@@ -788,6 +842,8 @@
       "name": "updateMembershipSeenTime",
       "offset": 21894905,
       "size": 55,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 2>",
         "00000002: <GetGlobalObject>: <Reg8: 0>",
@@ -811,6 +867,8 @@
       "name": "setReloadReelsPanelData",
       "offset": 22904851,
       "size": 23,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 2, Reg8: 0, UInt8: 43>",
@@ -827,6 +885,8 @@
       "name": "onRefreshAction",
       "offset": 22906269,
       "size": 15,
+      "frame_size": 9,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 42>",
@@ -841,6 +901,8 @@
       "name": "goToMembershipScreenAction",
       "offset": 22920962,
       "size": 117,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 4, Reg8: 0, UInt8: 17>",
@@ -882,6 +944,8 @@
       "name": "reload",
       "offset": 22981989,
       "size": 65,
+      "frame_size": 12,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 1, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 3, Reg8: 1, UInt8: 4>",
@@ -907,6 +971,8 @@
       "name": "reload",
       "offset": 22983631,
       "size": 51,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 2, Reg8: 0, UInt8: 0>",
@@ -929,6 +995,8 @@
       "name": "getMembershipStatus",
       "offset": 23121840,
       "size": 38,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 18>",
@@ -948,6 +1016,8 @@
       "name": "goToMembershipScreen",
       "offset": 23126688,
       "size": 161,
+      "frame_size": 21,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 5, Reg8: 0, UInt8: 18>",
@@ -999,6 +1069,8 @@
       "name": "goToMembershipScreen",
       "offset": 23134107,
       "size": 126,
+      "frame_size": 19,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 5, Reg8: 0, UInt8: 13>",
@@ -1043,6 +1115,8 @@
       "name": "goToMembershipScreen",
       "offset": 23140575,
       "size": 140,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 0>",
@@ -1090,6 +1164,8 @@
       "name": "InterstitialAdsManager",
       "offset": 23164631,
       "size": 311,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 2>",
         "00000002: <LoadThisNS>: <Reg8: 3>",
@@ -1163,6 +1239,8 @@
       "name": "increaseInterstitialAdsCount",
       "offset": 23166785,
       "size": 122,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 0>",
         "00000002: <LoadConstUndefined>: <Reg8: 5>",
@@ -1202,6 +1280,8 @@
       "name": "setInterstitialAdsCount",
       "offset": 23166907,
       "size": 112,
+      "frame_size": 16,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 0>",
         "00000002: <LoadConstUndefined>: <Reg8: 5>",
@@ -1239,6 +1319,8 @@
       "name": "showInterstitialAdsWithSendMessage",
       "offset": 23167019,
       "size": 463,
+      "frame_size": 17,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 1>",
         "00000002: <LoadThisNS>: <Reg8: 2>",
@@ -1342,6 +1424,8 @@
       "name": "showInterstitialAdsForReels",
       "offset": 23169834,
       "size": 340,
+      "frame_size": 15,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 1>",
         "00000002: <LoadParam>: <Reg8: 6, UInt8: 1>",
@@ -1423,6 +1507,8 @@
       "name": "loadInterstitialAdsForReels",
       "offset": 23170233,
       "size": 69,
+      "frame_size": 12,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 1>",
         "00000002: <GetById>: <Reg8: 3, Reg8: 1, UInt8: 1, string_id: 63159>  # String: 'interstitialAdsAdMob' (Identifier)",
@@ -1450,6 +1536,8 @@
       "name": "showInterstitialAds_Temporarily",
       "offset": 23170302,
       "size": 714,
+      "frame_size": 22,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 1>",
         "00000002: <LoadParam>: <Reg8: 5, UInt8: 1>",
@@ -1579,6 +1667,8 @@
       "name": "showInterstitialAdsSimSimi_Temporarily",
       "offset": 23171151,
       "size": 480,
+      "frame_size": 17,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 1>",
         "00000002: <LoadThisNS>: <Reg8: 2>",
@@ -1688,6 +1778,8 @@
       "name": "showMembershipScreen",
       "offset": 23511367,
       "size": 16,
+      "frame_size": 9,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 1>",
         "00000002: <GetById>: <Reg8: 0, Reg8: 1, UInt8: 1, string_id: 52591>  # String: 'goToMembershipScreen' (Identifier)",
@@ -1702,6 +1794,8 @@
       "name": "getMembershipStatus",
       "offset": 23512238,
       "size": 45,
+      "frame_size": 12,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadThisNS>: <Reg8: 2>",
         "00000002: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
@@ -1723,6 +1817,8 @@
       "name": "goToMembershipScreen",
       "offset": 23512283,
       "size": 158,
+      "frame_size": 21,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 10>",
         "00000002: <LoadThisNS>: <Reg8: 0>",
@@ -1773,6 +1869,8 @@
       "name": "getMembershipValue",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -1791,6 +1889,8 @@
       "name": "goToMembershipScreen",
       "offset": 23516168,
       "size": 19,
+      "frame_size": 9,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 0>",
@@ -1805,6 +1905,8 @@
       "name": "showMembershipModal",
       "offset": 23518281,
       "size": 28,
+      "frame_size": 12,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
         "00000003: <LoadFromEnvironment>: <Reg8: 2, Reg8: 0, UInt8: 0>",
@@ -1822,6 +1924,8 @@
       "name": "MembershipPannel",
       "offset": 23518410,
       "size": 945,
+      "frame_size": 34,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 5>",
         "00000002: <LoadParam>: <Reg8: 0, UInt8: 1>",
@@ -1951,6 +2055,8 @@
       "name": "getMembership",
       "offset": 23523063,
       "size": 38,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 18>",
@@ -1970,6 +2076,8 @@
       "name": "goToMembershipScreen",
       "offset": 23526157,
       "size": 174,
+      "frame_size": 22,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 5, Reg8: 0, UInt8: 18>",
@@ -2024,6 +2132,8 @@
       "name": "F_GetMembershipUserCount",
       "offset": 17055794,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -2042,6 +2152,8 @@
       "name": "reload",
       "offset": 17137992,
       "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 0>",
         "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
@@ -2060,6 +2172,8 @@
       "name": "_reload",
       "offset": 23833000,
       "size": 52,
+      "frame_size": 14,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadConstUndefined>: <Reg8: 4>",
         "00000002: <LoadConstUndefined>: <Reg8: 0>",
@@ -2084,6 +2198,8 @@
       "name": "reload",
       "offset": 23837721,
       "size": 47,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 0>",
         "00000002: <LoadThisNS>: <Reg8: 1>",
@@ -2104,6 +2220,8 @@
       "name": "getMembership",
       "offset": 23121840,
       "size": 38,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 18>",
@@ -2123,6 +2241,8 @@
       "name": "getMembership",
       "offset": 23908053,
       "size": 88,
+      "frame_size": 15,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <CreateEnvironment>: <Reg8: 1>",
         "00000002: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
@@ -2153,6 +2273,8 @@
       "name": "goToMembershipScreen",
       "offset": 23938510,
       "size": 126,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 4, Reg8: 0, UInt8: 24>",
@@ -2197,6 +2319,8 @@
       "name": "goToMembershipScreen",
       "offset": 23982497,
       "size": 157,
+      "frame_size": 20,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 4, Reg8: 0, UInt8: 6>",
@@ -2246,6 +2370,8 @@
       "name": "onRefreshAction",
       "offset": 24089197,
       "size": 93,
+      "frame_size": 14,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 1, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 3, Reg8: 1, UInt8: 0>",
@@ -2278,6 +2404,8 @@
       "name": "setHasMembership",
       "offset": 23311149,
       "size": 29,
+      "frame_size": 11,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <LoadParam>: <Reg8: 2, UInt8: 1>",
         "00000003: <GetEnvironment>: <Reg8: 0, UInt8: 0>",
@@ -2295,6 +2423,8 @@
       "name": "getMembership",
       "offset": 24544334,
       "size": 100,
+      "frame_size": 13,
+      "has_exception_handler": true,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 1, Reg8: 0, UInt8: 12>",
@@ -2330,6 +2460,8 @@
       "name": "goToMembershipScreen",
       "offset": 24544434,
       "size": 128,
+      "frame_size": 18,
+      "has_exception_handler": false,
       "disassembly": [
         "00000000: <GetEnvironment>: <Reg8: 0, UInt8: 1>",
         "00000003: <LoadFromEnvironment>: <Reg8: 4, Reg8: 0, UInt8: 12>",
@@ -2373,75 +2505,127 @@
       "function_id": 29309,
       "name": "getMembership",
       "offset": 23523063,
-      "size": 38
+      "size": 38,
+      "frame_size": 11,
+      "has_exception_handler": false
     },
     {
       "function_id": 29366,
       "name": "PushReloadSplash",
       "offset": 24577873,
-      "size": 53
+      "size": 53,
+      "frame_size": 16,
+      "has_exception_handler": false
     },
     {
       "function_id": 29903,
       "name": "MembershipScreen",
       "offset": 25085355,
-      "size": 423
+      "size": 423,
+      "frame_size": 25,
+      "has_exception_handler": false
     },
     {
       "function_id": 29954,
       "name": "initMembershipInfo",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
+      "disassembly": [
+        "00000000: <LoadConstUndefined>: <Reg8: 0>",
+        "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
+        "00000005: <LoadFromEnvironment>: <Reg8: 3, Reg8: 1, UInt8: 0>",
+        "00000009: <GetByIdShort>: <Reg8: 2, Reg8: 3, UInt8: 1, string_id: 65>  # String: 'apply' (Identifier)",
+        "0000000e: <ReifyArguments>: <Reg8: 0>",
+        "00000010: <Mov>: <Reg8: 1, Reg8: 0>",
+        "00000013: <LoadThisNS>: <Reg8: 0>",
+        "00000015: <Call3>: <Reg8: 0, Reg8: 2, Reg8: 3, Reg8: 0, Reg8: 1>",
+        "0000001b: <Ret>: <Reg8: 0>"
+      ],
+      "instruction_count": 9
     },
     {
       "function_id": 29958,
       "name": "getMembershipStatus",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false,
+      "disassembly": [
+        "00000000: <LoadConstUndefined>: <Reg8: 0>",
+        "00000002: <GetEnvironment>: <Reg8: 1, UInt8: 0>",
+        "00000005: <LoadFromEnvironment>: <Reg8: 3, Reg8: 1, UInt8: 0>",
+        "00000009: <GetByIdShort>: <Reg8: 2, Reg8: 3, UInt8: 1, string_id: 65>  # String: 'apply' (Identifier)",
+        "0000000e: <ReifyArguments>: <Reg8: 0>",
+        "00000010: <Mov>: <Reg8: 1, Reg8: 0>",
+        "00000013: <LoadThisNS>: <Reg8: 0>",
+        "00000015: <Call3>: <Reg8: 0, Reg8: 2, Reg8: 3, Reg8: 0, Reg8: 1>",
+        "0000001b: <Ret>: <Reg8: 0>"
+      ],
+      "instruction_count": 9
     },
     {
       "function_id": 29966,
       "name": "buyMembershipApple",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false
     },
     {
       "function_id": 29970,
       "name": "buyMembershipGoogle",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false
     },
     {
       "function_id": 30316,
       "name": "reloadReceivedTab",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false
     },
     {
       "function_id": 30340,
       "name": "reloadSendableTab",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false
     },
     {
       "function_id": 30476,
       "name": "reloadAppcheckToken",
       "offset": 17055794,
-      "size": 29
+      "size": 29,
+      "frame_size": 13,
+      "has_exception_handler": false
     },
     {
       "function_id": 31015,
       "name": "goToMembershipScreen",
       "offset": 25263149,
-      "size": 172
+      "size": 172,
+      "frame_size": 19,
+      "has_exception_handler": false
     },
     {
       "function_id": 31864,
       "name": "goToMembershipScreen",
       "offset": 25415344,
-      "size": 328
+      "size": 328,
+      "frame_size": 20,
+      "has_exception_handler": false
     }
   ],
   "status": "Read-only analysis. No premium entitlements or ad callbacks have been modified.",
+  "membership_recipe": {
+    "Object_id": 26,
+    "assign_id": 67
+  },
   "total_function_count": 36325
 }
