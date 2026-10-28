@@ -1,0 +1,8 @@
+{
+  "engine": "Morphe Desktop v1.19.1",
+  "actual_mpp_applied_to_original_apk": true,
+  "hermes_payload_matches_tested_transform": true,
+  "hermes_sha256": "6aaa8fd03887925c92a60518ef45c9658d3f620094d5eea1fe71171dc05a9a0c",
+  "device_runtime_tested": false,
+  "input": "base only; ABI/config splits are still required for installation"
+}
