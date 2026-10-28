@@ -79,6 +79,37 @@ def tap_search(xml: str) -> bool:
     return False
 
 
+def ime_visibility_flags(dump: str) -> dict[str, bool]:
+    """Keep only known boolean flags; never save arbitrary dumpsys output."""
+    names = ("mInputShown", "isInputViewShown", "mShowRequested", "mShowExplicitlyRequested",
+             "mShowForced", "mInputViewStarted")
+    return {name: value == "true" for name, value in re.findall(
+        r"\b(" + "|".join(names) + r")\s*=\s*(true|false)\b", dump)}
+
+
+def tap_synthetic_editor(xml: str) -> bool:
+    for node in ET.fromstring(xml).iter("node"):
+        if node.get("package") != PROBE_PACKAGE or node.get("class") != "android.widget.EditText":
+            continue
+        position = center(node.get("bounds", ""))
+        if position:
+            run("adb", "shell", "input", "tap", str(position[0]), str(position[1]))
+            return True
+    return False
+
+
+def gboard_crash_types(log: str) -> list[str]:
+    """Return exception class names for Gboard fatal crashes, not their messages."""
+    crashes = []
+    for section in re.split(r"(?=FATAL EXCEPTION:)", log):
+        if "FATAL EXCEPTION:" not in section or not re.search(
+                r"\bProcess:\s*" + re.escape(PACKAGE) + r"(?:\s|,|$)", section):
+            continue
+        crashes.extend(re.findall(
+            r"\b(?:[a-zA-Z_$][\w$]*\.)*[a-zA-Z_$][\w$]*(?:Exception|Error)\b(?=:|\s|$)", section))
+    return sorted(set(crashes))
+
+
 def synthetic_http_probe() -> None:
     sdk = Path(os.environ["ANDROID_HOME"])
     android_jar = sdk / "platforms/android-35/android.jar"
@@ -151,15 +182,31 @@ def gboard_ime_smoke(apk: Path, report: dict) -> None:
     if run("adb", "shell", "settings", "get", "secure", "default_input_method") != ime:
         raise RuntimeError("Gboard was not selected as the emulator IME")
     report["ime_enable_and_select"] = "passed"
+    # The first ARM-translated start can be slow. Explicitly tap the fresh
+    # synthetic editor and allow time for IME initialization before recording
+    # a negative result; do not assume that a running process means visible UI.
+    run("adb", "logcat", "-c")
     run("adb", "shell", "am", "start", "-S", "-n", f"{PROBE_PACKAGE}/{PROBE_ACTIVITY}")
     time.sleep(6)
+    tap_synthetic_editor(dump_ui())
+    deadline = time.monotonic() + 35
+    flags = {}
+    while time.monotonic() < deadline:
+        dump = run("adb", "shell", "dumpsys", "input_method", timeout=30)
+        flags = ime_visibility_flags(dump)
+        if flags.get("mInputShown") or flags.get("isInputViewShown"):
+            break
+        time.sleep(5)
+    report["ime_visibility_flags"] = flags
+    visible = flags.get("mInputShown", False) or flags.get("isInputViewShown", False)
+    report["keyboard_visibility_signal"] = "passed" if visible else "not confirmed"
+    crashes = gboard_crash_types(run("adb", "logcat", "-d", "-s", "AndroidRuntime:E", "*:S", timeout=30))
+    if crashes:
+        report["gboard_fatal_exception_types"] = crashes
     pid = run("adb", "shell", "pidof", PACKAGE)
     if not re.fullmatch(r"[0-9 ]+", pid):
         raise RuntimeError("Gboard process did not start")
     report["ime_process_started"] = "passed"
-    dump = run("adb", "shell", "dumpsys", "input_method", timeout=30)
-    visible = any(marker in dump for marker in ("mInputShown=true", "isInputViewShown=true", "mShowRequested=true"))
-    report["keyboard_visibility_signal"] = "passed" if visible else "not confirmed"
     ui = dump_ui()
     publish_synthetic_ui(ui, "GBOARD_KEYBOARD_UI")
     # Opening the Translate UI is attempted only by a visible accessibility

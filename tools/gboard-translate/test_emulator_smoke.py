@@ -20,6 +20,28 @@ class EmulatorSmokeTest(unittest.TestCase):
         self.assertIn("INSTALL_FAILED_UPDATE_INCOMPATIBLE", str(raised.exception))
         self.assertNotIn("private text", str(raised.exception))
 
+    def test_visibility_flags_exclude_arbitrary_dumpsys_text(self):
+        dump = "mShowRequested=true mInputShown=false text=private isInputViewShown=true"
+        self.assertEqual({"mShowRequested": True, "mInputShown": False, "isInputViewShown": True},
+                         emulator_smoke.ime_visibility_flags(dump))
+        self.assertEqual({}, emulator_smoke.ime_visibility_flags("private text and unknownFlag=true"))
+
+    def test_taps_only_the_synthetic_editor(self):
+        xml = ('<hierarchy><node package="other" class="android.widget.EditText" bounds="[1,1][4,4]" />'
+               '<node package="dev.arena.gboardprobe" class="android.widget.EditText" '
+               'bounds="[10,20][50,80]" /></hierarchy>')
+        with patch.object(emulator_smoke, "run", return_value="") as command:
+            self.assertTrue(emulator_smoke.tap_synthetic_editor(xml))
+            command.assert_called_once_with("adb", "shell", "input", "tap", "30", "50")
+
+    def test_crash_diagnostics_exclude_messages_and_other_processes(self):
+        log = ("FATAL EXCEPTION: main\n Process: other.app, PID: 1\n"
+               "java.lang.IllegalStateException: other\n"
+               "FATAL EXCEPTION: main\n Process: dev.jason.com.google.android.inputmethod.latin, PID: 2\n"
+               "java.lang.VerifyError: private user content\nCaused by: java.lang.IllegalAccessError: private\n")
+        self.assertEqual(["java.lang.IllegalAccessError", "java.lang.VerifyError"],
+                         emulator_smoke.gboard_crash_types(log))
+
     def test_search_click_uses_visible_accessibility_bounds(self):
         xml = '<hierarchy><node text="" content-desc="Search settings" bounds="[10,20][50,80]" /></hierarchy>'
         with patch.object(emulator_smoke, "run", return_value="") as command:
