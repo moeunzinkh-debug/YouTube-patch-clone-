@@ -30,6 +30,7 @@ jobs:
           python tools/simsimi/inspect_apk.py /tmp/simsimi-input/base.2.apk docs/simsimi/apk-inventory.json
           python tools/simsimi/map_targets.py /tmp/simsimi-input/base.2.apk docs/simsimi/target-map.json
           python tools/simsimi/inspect_hermes.py /tmp/simsimi-input/base.2.apk docs/simsimi/hermes-targets.json
+          python tools/simsimi/inspect_membership.py /tmp/simsimi-input/base.2.apk docs/simsimi/membership-targets.json
       - name: Save small inventory only (never commit the APK)
         run: |
           git config user.name 'github-actions[bot]'
