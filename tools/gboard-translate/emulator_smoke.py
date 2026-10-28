@@ -23,9 +23,18 @@ def run(*command: str, timeout: int = 60) -> str:
     result = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             timeout=timeout, check=False)
     if result.returncode:
-        # Commands use synthetic text only. Do not print the full command,
-        # response bodies, or arbitrary emulator logs into public reports.
-        raise RuntimeError(f"{Path(command[0]).name} failed (exit {result.returncode})")
+        # Surface only a stage and a constrained error code/type; never publish
+        # response bodies, emulator logcat, or arbitrary command output.
+        program = Path(command[0]).name
+        stage = program
+        if program == "adb":
+            stage += " " + ("app_process" if "app_process" in command else command[1])
+        code = re.search(r"\bINSTALL_FAILED_[A-Z0-9_]+\b", result.stdout)
+        exception = re.search(r"\b(?:[a-zA-Z_][\w$]*\.)*[a-zA-Z_][\w$]*(?:Exception|Error)\b", result.stdout)
+        compile_error = re.search(r"error: ([A-Za-z0-9_ .-]{1,100})", result.stdout) if program in ("javac", "d8") else None
+        detail = code.group(0) if code else exception.group(0) if exception else compile_error.group(1) if compile_error else None
+        suffix = f" [{detail}]" if detail else ""
+        raise RuntimeError(f"{stage} failed (exit {result.returncode}){suffix}")
     return result.stdout.strip()
 
 
@@ -170,7 +179,8 @@ def main() -> None:
             report["synthetic_android_java_https"] = "passed"
         except (RuntimeError, subprocess.TimeoutExpired, OSError) as error:
             report["synthetic_android_java_https"] = "failed or unavailable"
-            print(f"::warning::Android synthetic client probe failed: {type(error).__name__}")
+            report["synthetic_error"] = str(error)
+            print(f"::warning::Android synthetic client probe failed: {type(error).__name__}: {error}")
             failed = True
         try:
             gboard_ime_smoke(args.fixture_apk, report)

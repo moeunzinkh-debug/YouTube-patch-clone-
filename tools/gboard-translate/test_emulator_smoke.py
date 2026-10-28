@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline tests for the emulator UI helper; no Android device required."""
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 import emulator_smoke
 
@@ -10,6 +11,14 @@ class EmulatorSmokeTest(unittest.TestCase):
         self.assertEqual((25, 45), emulator_smoke.center("[10,20][40,70]"))
         self.assertIsNone(emulator_smoke.center("[10,20][10,70]"))
         self.assertIsNone(emulator_smoke.center("broken"))
+
+    def test_error_reports_only_safe_install_code(self):
+        result = SimpleNamespace(returncode=1, stdout="private text Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE]")
+        with patch.object(emulator_smoke.subprocess, "run", return_value=result):
+            with self.assertRaises(RuntimeError) as raised:
+                emulator_smoke.run("adb", "install", "some.apk")
+        self.assertIn("INSTALL_FAILED_UPDATE_INCOMPATIBLE", str(raised.exception))
+        self.assertNotIn("private text", str(raised.exception))
 
     def test_search_click_uses_visible_accessibility_bounds(self):
         xml = '<hierarchy><node text="" content-desc="Search settings" bounds="[10,20][50,80]" /></hierarchy>'
