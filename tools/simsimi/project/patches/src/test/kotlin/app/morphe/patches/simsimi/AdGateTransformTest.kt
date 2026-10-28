@@ -9,6 +9,11 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class AdGateTransformTest {
+    @Test fun listenerPrefixUsesTheActualHermes96Call1Opcode() {
+        // Call1 is 0x51, not generic Call (0x50). Four bytes: dest, callee, this.
+        assertContentEquals(byteArrayOf(0x51,3,3,2), AdGateTransform.clientMembershipEvents.copyOfRange(0x15,0x19))
+        assertContentEquals(byteArrayOf(0x08,2,3,0x08,2,2), AdGateTransform.clientMembershipEvents.copyOfRange(0x1b,0x21))
+    }
     @Test fun sixFeatureGatesAreExactAndComposeWithTheExistingPatches() {
         val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
         assertEquals(6, AdGateTransform.featureKeys.size)
