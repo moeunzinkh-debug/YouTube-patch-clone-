@@ -40,3 +40,12 @@ class ProfileEvidence(unittest.TestCase):
         result = json.loads((ROOT / 'bundles/gemini/google-validation.json').read_text())
         self.assertEqual(result['microg_permission'], 'app.revanced.android.gms.EXTENDED_ACCESS')
         self.assertFalse(result['device_runtime_tested'])
+
+    def test_only_new_process_strategy_is_selected(self):
+        report = json.loads((ROOT / 'bundles/gemini/google-patch-result.json').read_text())
+        names = {p['name'] for p in report['appliedPatches']}
+        self.assertIn('Google clone process identity (experimental)', names)
+        self.assertNotIn('Process Name Spoofing for Clone Support', names)
+        self.assertFalse((ROOT / 'tools/gemini-apk/overlay/ProcessNameSanitizePatch.kt').exists())
+        prep = (ROOT / 'tools/gemini-apk/prepare_build.py').read_text()
+        self.assertIn('legacy.unlink()', prep)

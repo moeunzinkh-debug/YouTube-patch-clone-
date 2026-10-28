@@ -1,1 +1,0 @@
-{"packageName":"com.google.android.apps.bard","packageVersion":"1.0.995038376","patchingSteps":[{"step":"PATCHING","success":true},{"step":"REBUILDING","success":true}],"appliedPatches":[{"name":"Gemini Redirect to Cloned Google App"},{"name":"Gemini Standalone Support"}],"failedPatches":[]}

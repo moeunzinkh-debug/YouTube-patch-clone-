@@ -49,8 +49,8 @@ Description: クローン版 Google アプリ内の完全一致パッケージ�
 Enabled: true
 
 Index: 10
-Name: Process Name Spoofing for Clone Support
-Description: クローン環境下でプロセス名から .morphe を自動除去し、Dagger DI コンポーネントの初期化クラッシュを防止します。
+Name: Google clone process identity (experimental)
+Description: Keep real process names; rewrite exact process strings and same-method hash literals.
 Enabled: true
 
 Index: 11

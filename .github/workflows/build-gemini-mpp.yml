@@ -1,4 +1,4 @@
-name: Build standalone Gemini target bundle
+name: Build Gemini Google bundle
 on:
   workflow_dispatch:
     inputs:
@@ -9,20 +9,15 @@ on:
   push:
     branches: [main, 'arena/**']
     paths:
+      - 'tools/gemini-apk/**'
       - '.github/workflows/build-gemini-mpp.yml'
-      - 'tools/gemini-apk/overlay/**'
-      - 'tools/gemini-apk/prepare_build.py'
-      - 'tools/gemini-apk/verify_patched.py'
-      - 'tools/gemini-apk/verify_google.py'
-      - 'tools/gemini-apk/VerifyGoogleStartup.kt'
-      - 'tools/gemini-apk/fetch_test_inputs.py'
-      - 'tools/gemini-apk/publish-bundle.sh'
-      - 'tools/gemini-apk/tests/**'
 permissions:
   contents: write
 concurrency:
-  group: gemini-reference-build-${{ github.ref }}
+  group: gemini-google-build-${{ github.ref }}
   cancel-in-progress: false
+env:
+  GEMINI_OUTPUT_DIR: bundles/gemini
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -69,7 +64,7 @@ jobs:
           echo "bfa9b10060a1c0e8a1c3f2b01cd513f74a53b364ab9bdb1bca02ae103de3f7e5  $RUNNER_TEMP/gemini/base.apk" | sha256sum -c -
           cd .gemini-build/build
           set -o pipefail
-          java -Xmx2g -jar ../tools/morphe-desktop.jar patch "$RUNNER_TEMP/gemini/base.apk" -p release/gemini-microg-patches-0.1.4.mpp --unsigned -o "$RUNNER_TEMP/gemini/patched.apk" -r ../../bundles/gemini/patch-result.json 2>&1 | tee "$RUNNER_TEMP/gemini-patch.log"
+          java -Xmx2g -jar ../tools/morphe-desktop.jar patch "$RUNNER_TEMP/gemini/base.apk" -p release/gemini-microg-patches-0.2.0.mpp --unsigned -o "$RUNNER_TEMP/gemini/patched.apk" -r ../../bundles/gemini/patch-result.json 2>&1 | tee "$RUNNER_TEMP/gemini-patch.log"
       - name: Verify patched DEX and manifest
         if: steps.inputs.outputs.available == 'true'
         run: |
@@ -83,29 +78,29 @@ jobs:
           set -euo pipefail
           echo "f9e5d898a8bae360e6d8654f1871b920e1a2774701fe716f4e64bb0c803b7bd9  $RUNNER_TEMP/google/base.apk" | sha256sum -c -
           cd .gemini-build/build
-          java -Xmx5g -jar ../tools/morphe-desktop.jar patch "$RUNNER_TEMP/google/base.apk" -p release/gemini-microg-patches-0.1.4.mpp -p ../tools/patches.mpp -e 'Clone app' -O updatePermissions=true -O updateProviders=true --unsigned -o "$RUNNER_TEMP/google/patched.apk" -r ../../bundles/gemini/google-patch-result.json 2>&1 | tee "$RUNNER_TEMP/google-patch.log"
+          java -Xmx5g -jar ../tools/morphe-desktop.jar patch "$RUNNER_TEMP/google/base.apk" -p release/gemini-microg-patches-0.2.0.mpp -p ../tools/patches.mpp -e 'Clone app' -O updatePermissions=true -O updateProviders=true --unsigned -o "$RUNNER_TEMP/google/patched.apk" -r ../../bundles/gemini/google-patch-result.json 2>&1 | tee "$RUNNER_TEMP/google-patch.log"
       - name: Verify Google patch results and permission
         if: steps.inputs.outputs.available == 'true'
         run: |
           python3 tools/gemini-apk/verify_google.py "$RUNNER_TEMP/google/patched.apk"
-          .gemini-build/tools/kotlinc/bin/kotlinc tools/gemini-apk/VerifyGoogleStartup.kt -cp .gemini-build/tools/morphe-desktop.jar -d "$RUNNER_TEMP/verify-startup.jar"
-          java -cp "$RUNNER_TEMP/verify-startup.jar:.gemini-build/tools/morphe-desktop.jar" VerifyGoogleStartupKt "$RUNNER_TEMP/google/patched.apk"
+          .gemini-build/tools/kotlinc/bin/kotlinc tools/gemini-apk/VerifyProcessIdentity.kt -cp .gemini-build/tools/morphe-desktop.jar -d "$RUNNER_TEMP/verify-process.jar"
+          java -Xmx4g -cp "$RUNNER_TEMP/verify-process.jar:.gemini-build/tools/morphe-desktop.jar" VerifyProcessIdentityKt "$RUNNER_TEMP/google/base.apk" "$RUNNER_TEMP/google/patched.apk" | tee bundles/gemini/process-validation.txt
       - name: Report patch failure
         if: failure()
         run: |
           if test -f "$RUNNER_TEMP/gemini-patch.log"; then
-            tail -25 "$RUNNER_TEMP/gemini-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            grep -E -A 6 "Exception|ERROR|Error:|Caused by:|SEVERE|FAILED" "$RUNNER_TEMP/gemini-patch.log" | head -65 | while IFS= read -r line; do echo "::error::$line"; done
           fi
       - name: Report Google patch failure
         if: failure()
         run: |
           if test -f "$RUNNER_TEMP/google-patch.log"; then
-            tail -35 "$RUNNER_TEMP/google-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            grep -E -A 6 "Exception|ERROR|Error:|Caused by:|SEVERE|FAILED" "$RUNNER_TEMP/google-patch.log" | head -65 | while IFS= read -r line; do echo "::error::$line"; done
           fi
       - name: Collect and verify Gemini-only output
         run: |
           set -euo pipefail
-          cp .gemini-build/build/release/gemini-microg-patches-0.1.4.mpp bundles/gemini/gemini-target.mpp
+          cp .gemini-build/build/release/gemini-microg-patches-0.2.0.mpp bundles/gemini/gemini-target.mpp
           cp .gemini-build/build/mpp-patch-list.txt bundles/gemini/patch-list.txt
           python3 - <<'PY'
           import zipfile
@@ -133,12 +128,30 @@ jobs:
           PYCODE
       - uses: actions/upload-artifact@v4
         with:
-          name: gemini-345-target-mpp-device-testing-pending
+          name: gemini-google-bundle-device-testing-required
           path: |
             bundles/gemini/bundle.mpp
             bundles/gemini/bundle.mpp.sha256
             bundles/gemini/build-status.json
             bundles/gemini/README.md
           retention-days: 14
-      - name: Save standalone build to branch without force pushing
-        run: bash tools/gemini-apk/publish-bundle.sh
+      - name: Save experimental output after synchronizing branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          cp -a bundles/gemini "$RUNNER_TEMP/experimental-output"
+          git restore --staged --worktree bundles/gemini
+          git clean -fd -- bundles/gemini
+          git fetch origin "$GITHUB_REF_NAME"
+          if ! git diff --quiet HEAD FETCH_HEAD -- tools/gemini-apk; then
+            echo '::error::Build source changed during execution; rerun against the latest commit.'
+            exit 1
+          fi
+          git rebase FETCH_HEAD
+          cp -a "$RUNNER_TEMP/experimental-output/." bundles/gemini/
+          git add -f bundles/gemini/
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: isolated experimental Google process identity bundle'
+            git push origin HEAD:"$GITHUB_REF_NAME"
+          fi

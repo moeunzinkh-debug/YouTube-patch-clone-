@@ -1,9 +1,0 @@
-{
-  "package": "com.google.android.googlequicksearchbox.morphe",
-  "version": "17.6.59.ve.arm64",
-  "patch_execution": "passed",
-  "rebuild": "passed",
-  "microg_permission": "app.revanced.android.gms.EXTENDED_ACCESS",
-  "device_runtime_tested": false,
-  "density_split_still_required_for_complete_resources": true
-}

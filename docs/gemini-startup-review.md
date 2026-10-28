@@ -62,3 +62,13 @@ Do not clear accounts or promise full compatibility based solely on CI results.
 
 YouTube source, extension and root patch.mpp are unchanged. The old vendored
 Gemini snapshot is also preserved; startup changes are local build overlays.
+
+## Current implementation supersedes 0.1.4
+
+The active `bundles/gemini/bundle.mpp` is now local 0.2.0. The nullable-provider
+sanitization described above is historical and has been removed from the active
+build. Its replacement keeps the native provider unchanged and rewrites the
+process-name strings/hash comparisons themselves. The separate experimental
+folder/workflow and old reference binaries have been removed; source history is
+retained in Git. This is still an unverified-on-device process experiment, not a
+claim that all GMS support was rewritten or the phone crash is resolved.
