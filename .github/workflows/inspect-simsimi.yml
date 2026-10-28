@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
+        with:
+          repository: P1sec/hermes-dec
+          ref: 2e796663e1fedb93dca51060797ebf3327b3fedb
+          path: .cache/hermes-dec
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -18,11 +24,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python -m pip install 'androguard==4.1.3'
+          python -m pip install 'androguard==4.1.3' ./.cache/hermes-dec
           mkdir -p /tmp/simsimi-input
           gh release download Simsimi --pattern base.2.apk --dir /tmp/simsimi-input
           python tools/simsimi/inspect_apk.py /tmp/simsimi-input/base.2.apk docs/simsimi/apk-inventory.json
           python tools/simsimi/map_targets.py /tmp/simsimi-input/base.2.apk docs/simsimi/target-map.json
+          python tools/simsimi/inspect_hermes.py /tmp/simsimi-input/base.2.apk docs/simsimi/hermes-targets.json
       - name: Save small inventory only (never commit the APK)
         run: |
           git config user.name 'github-actions[bot]'
