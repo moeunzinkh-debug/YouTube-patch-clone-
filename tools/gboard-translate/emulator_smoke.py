@@ -16,7 +16,9 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-PACKAGE = "com.google.android.inputmethod.latin"
+PACKAGE = "dev.jason.com.google.android.inputmethod.latin"
+PROBE_PACKAGE = "dev.arena.gboardprobe"
+PROBE_ACTIVITY = "dev.jason.gboardpatches.extension.directtranslate.AndroidSyntheticActivity"
 
 
 def run(*command: str, timeout: int = 60) -> str:
@@ -80,9 +82,10 @@ def tap_search(xml: str) -> bool:
 def synthetic_http_probe() -> None:
     sdk = Path(os.environ["ANDROID_HOME"])
     android_jar = sdk / "platforms/android-35/android.jar"
-    tools = sorted((sdk / "build-tools").glob("*/d8"), reverse=True)
-    if not android_jar.is_file() or not tools:
-        raise RuntimeError("Required Android SDK platform or D8 not found")
+    candidates = [p for p in (sdk / "build-tools").iterdir() if (p / "d8").is_file()]
+    tools = max(candidates, key=lambda p: tuple(int(n) for n in re.findall(r"\d+", p.name)), default=None)
+    if not android_jar.is_file() or tools is None:
+        raise RuntimeError("Required Android SDK platform or build tools not found")
     with tempfile.TemporaryDirectory(prefix="gboard-android-probe-") as directory:
         tmp = Path(directory)
         classes, dex = tmp / "classes", tmp / "dex"
@@ -91,24 +94,47 @@ def synthetic_http_probe() -> None:
         source = ROOT / "tools/gboard-translate/overlay/extensions/extension/src/main/java/dev/jason/gboardpatches/extension/directtranslate"
         run("javac", "-source", "8", "-target", "8", "-encoding", "UTF-8", "-cp", str(android_jar),
             "-d", str(classes), str(source / "GtxClient.java"), str(source / "TranslateCoordinator.java"),
-            str(ROOT / "tools/gboard-translate/AndroidSyntheticProbe.java"), timeout=90)
+            str(ROOT / "tools/gboard-translate/AndroidSyntheticActivity.java"), timeout=90)
         class_files = sorted(map(str, classes.rglob("*.class")))
         if not class_files:
             raise RuntimeError("Probe compilation generated no classes")
-        run(str(tools[0]), "--min-api", "26", "--lib", str(android_jar), "--output", str(dex),
+        run(str(tools / "d8"), "--min-api", "26", "--lib", str(android_jar), "--output", str(dex),
             *class_files, timeout=90)
-        jar = tmp / "synthetic-probe.jar"
-        with zipfile.ZipFile(jar, "w") as archive:
+        manifest = tmp / "AndroidManifest.xml"
+        manifest.write_text('''<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="dev.arena.gboardprobe">
+  <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <application android:label="Gboard synthetic test">
+    <activity android:name="dev.jason.gboardpatches.extension.directtranslate.AndroidSyntheticActivity" android:exported="true" />
+  </application>
+</manifest>''', encoding="utf-8")
+        unsigned, aligned, signed, key = tmp / "unsigned.apk", tmp / "aligned.apk", tmp / "probe.apk", tmp / "test.keystore"
+        run(str(tools / "aapt"), "package", "-f", "-M", str(manifest), "-I", str(android_jar), "-F", str(unsigned))
+        with zipfile.ZipFile(unsigned, "a") as archive:
             archive.write(dex / "classes.dex", "classes.dex")
-        run("adb", "push", str(jar), "/data/local/tmp/gboard-synthetic-probe.jar")
-        output = run("adb", "shell", "CLASSPATH=/data/local/tmp/gboard-synthetic-probe.jar",
-                     "app_process", "/system/bin",
-                     "dev.jason.gboardpatches.extension.directtranslate.AndroidSyntheticProbe", timeout=90)
-        expected = {"PASS synthetic Android POST en-to-km", "PASS synthetic Android POST km-to-en",
-                    "PASS synthetic Android POST auto-to-km"}
-        if set(output.splitlines()) != expected:
-            raise RuntimeError("Android synthetic probe did not report all three checks")
-        print("::notice::Android emulator Java client passed synthetic POST in both directions and auto mode.")
+        run(str(tools / "zipalign"), "-f", "4", str(unsigned), str(aligned))
+        # Ephemeral local debug keystore; it is not a user credential.
+        run("keytool", "-genkeypair", "-noprompt", "-keystore", str(key), "-storepass", "android",
+            "-keypass", "android", "-alias", "test", "-dname", "CN=Gboard emulator test", "-keyalg", "RSA",
+            "-keysize", "2048", "-validity", "2", timeout=45)
+        run(str(tools / "apksigner"), "sign", "--ks", str(key), "--ks-pass", "pass:android",
+            "--key-pass", "pass:android", "--out", str(signed), str(aligned), timeout=45)
+        run("adb", "install", "-r", str(signed), timeout=90)
+        run("adb", "logcat", "-c")
+        run("adb", "shell", "am", "start", "-n", f"{PROBE_PACKAGE}/{PROBE_ACTIVITY}")
+        expected = {"PASS_EN_KM", "PASS_KM_EN", "PASS_AUTO_KM"}
+        deadline = time.monotonic() + 75
+        while time.monotonic() < deadline:
+            lines = run("adb", "logcat", "-d", "-s", "GboardDirectSmoke:I", "*:S", timeout=15)
+            markers = set(re.findall(r"\b(?:PASS|FAIL)_(?:EN_KM|KM_EN|AUTO_KM)(?:_[A-Za-z]+)?\b", lines))
+            if markers == expected:
+                print("::notice::Android emulator app passed synthetic HTTPS POST in both directions and auto mode.")
+                return
+            if any(item.startswith("FAIL_") for item in markers):
+                raise RuntimeError("Android synthetic HTTPS probe returned " + ",".join(sorted(markers)))
+            time.sleep(3)
+        raise RuntimeError("Android synthetic HTTPS probe did not finish")
 
 
 def gboard_ime_smoke(apk: Path, report: dict) -> None:
@@ -125,13 +151,8 @@ def gboard_ime_smoke(apk: Path, report: dict) -> None:
     if run("adb", "shell", "settings", "get", "secure", "default_input_method") != ime:
         raise RuntimeError("Gboard was not selected as the emulator IME")
     report["ime_enable_and_select"] = "passed"
-    run("adb", "shell", "am", "start", "-a", "android.settings.SETTINGS")
-    time.sleep(4)
-    first = dump_ui()
-    if not tap_search(first):
-        publish_synthetic_ui(first, "GBOARD_SETTINGS_UI")
-        raise RuntimeError("Could not locate the emulator Settings search control")
-    time.sleep(5)
+    run("adb", "shell", "am", "start", "-S", "-n", f"{PROBE_PACKAGE}/{PROBE_ACTIVITY}")
+    time.sleep(6)
     pid = run("adb", "shell", "pidof", PACKAGE)
     if not re.fullmatch(r"[0-9 ]+", pid):
         raise RuntimeError("Gboard process did not start")
@@ -164,7 +185,7 @@ def main() -> None:
     args = parser.parse_args()
     report = {
         "environment": "Android emulator only, not the user's device or network",
-        "apk": "third-party prepatched fixture with test-only manifest package change; not stock",
+        "apk": "third-party prepatched fixture, package restored for emulator isolation and re-signed; not stock",
         "synthetic_android_java_https": "not run", "fixture_install": "not run",
         "ime_enable_and_select": "not run", "ime_process_started": "not run",
         "keyboard_visibility_signal": "not run", "translate_ui_functionality": "not tested",

@@ -68,6 +68,20 @@ jobs:
           assert 'Direct Google Translate (experimental)' in result['appliedPatches']
           PY
           python3 tools/gboard-translate/verify_fixture_apk.py /tmp/gboard-android-output/fixture-patched.apk
+          # The Google APIs emulator has a system-signed Gboard. Restore the
+          # prepatched sample's distinct package name solely for installation,
+          # then align and sign with a throwaway CI key. This is not stock APK.
+          python3 tools/gboard-translate/make_manifest_fixture.py \
+            /tmp/gboard-android-output/fixture-patched.apk /tmp/gboard-android-output/fixture-restored-unsigned.apk --restore
+          tools="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1 | xargs dirname)"
+          "$tools/zipalign" -p -f 4 /tmp/gboard-android-output/fixture-restored-unsigned.apk /tmp/gboard-android-output/fixture-aligned.apk
+          keytool -genkeypair -noprompt -keystore /tmp/gboard-android-output/test.keystore \
+            -storepass android -keypass android -alias test -dname 'CN=Gboard emulator test' \
+            -keyalg RSA -keysize 2048 -validity 2 > /dev/null 2>&1
+          "$tools/apksigner" sign --ks /tmp/gboard-android-output/test.keystore --ks-pass pass:android --key-pass pass:android \
+            --out /tmp/gboard-android-output/fixture-emulator.apk /tmp/gboard-android-output/fixture-aligned.apk
+          "$tools/aapt" dump badging /tmp/gboard-android-output/fixture-emulator.apk | sed -n '1p' \
+            | grep -F "name='dev.jason.com.google.android.inputmethod.latin'"
       - name: Enable emulator acceleration when available
         run: |
           if test -e /dev/kvm; then
@@ -89,7 +103,7 @@ jobs:
           disk-size: 8G
           emulator-boot-timeout: 600
           emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
-          script: python3 tools/gboard-translate/emulator_smoke.py /tmp/gboard-android-output/fixture-patched.apk /tmp/gboard-android-output/android-smoke.json
+          script: python3 tools/gboard-translate/emulator_smoke.py /tmp/gboard-android-output/fixture-emulator.apk /tmp/gboard-android-output/android-smoke.json
       - name: Record the exact emulator outcome without publishing the APK
         if: always()
         env:
