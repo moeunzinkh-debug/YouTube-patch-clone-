@@ -37,8 +37,6 @@ class ManifestFixtureTest(unittest.TestCase):
                 self.assertNotIn(fixture.OLD.encode(encoding), changed)
                 self.assertIn("last".encode(encoding), changed)
                 self.assertEqual(changed[:8], original[:8])
-                restored = fixture.replace_manifest_package(changed, fixture.NEW, fixture.OLD)
-                self.assertEqual(original, restored)
 
     def test_fails_closed_on_missing_duplicate_or_bad_header(self):
         for values in (["not-the-package"], [fixture.OLD, fixture.OLD]):
@@ -46,9 +44,6 @@ class ManifestFixtureTest(unittest.TestCase):
                 fixture.replace_manifest_package(xml_with_pool(True, values))
         with self.assertRaises(ValueError):
             fixture.replace_manifest_package(b"not an apk")
-        # Restoring a longer name must fail if the original slot was not padded.
-        with self.assertRaises(ValueError):
-            fixture.replace_manifest_package(xml_with_pool(True, [fixture.NEW, "next"]), fixture.NEW, fixture.OLD)
 
 
 if __name__ == "__main__":

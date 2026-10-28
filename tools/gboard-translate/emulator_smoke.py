@@ -185,7 +185,7 @@ def main() -> None:
     args = parser.parse_args()
     report = {
         "environment": "Android emulator only, not the user's device or network",
-        "apk": "third-party prepatched fixture, package restored for emulator isolation and re-signed; not stock",
+        "apk": "test hybrid: third-party prepatched resources/renamed manifest plus Morphe-patched DEX; re-signed, not stock",
         "synthetic_android_java_https": "not run", "fixture_install": "not run",
         "ime_enable_and_select": "not run", "ime_process_started": "not run",
         "keyboard_visibility_signal": "not run", "translate_ui_functionality": "not tested",

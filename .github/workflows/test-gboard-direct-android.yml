@@ -37,6 +37,7 @@ jobs:
           (cd bundles/gboard-experimental && sha256sum --check gboard-direct-translate-experimental.mpp.sha256)
           python3 tools/gboard/verify_bundle.py --verify-vendor
           python3 tools/gboard-translate/test_fixture.py
+          python3 tools/gboard-translate/test_emulator_fixture.py
           python3 tools/gboard-translate/test_emulator_smoke.py
       - name: Apply that MPP to a third-party-derived fixture, never stock
         env:
@@ -68,13 +69,13 @@ jobs:
           assert 'Direct Google Translate (experimental)' in result['appliedPatches']
           PY
           python3 tools/gboard-translate/verify_fixture_apk.py /tmp/gboard-android-output/fixture-patched.apk
-          # The Google APIs emulator has a system-signed Gboard. Restore the
-          # prepatched sample's distinct package name solely for installation,
-          # then align and sign with a throwaway CI key. This is not stock APK.
-          python3 tools/gboard-translate/make_manifest_fixture.py \
-            /tmp/gboard-android-output/fixture-patched.apk /tmp/gboard-android-output/fixture-restored-unsigned.apk --restore
+          # Keep the original prepatched sample's renamed manifest/resources,
+          # and copy only the actual Morphe-patched DEX into this test hybrid.
+          # It can coexist with the emulator's system Gboard; it is not stock.
+          python3 tools/gboard-translate/make_emulator_fixture.py "$input" \
+            /tmp/gboard-android-output/fixture-patched.apk /tmp/gboard-android-output/fixture-hybrid-unsigned.apk
           tools="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1 | xargs dirname)"
-          "$tools/zipalign" -p -f 4 /tmp/gboard-android-output/fixture-restored-unsigned.apk /tmp/gboard-android-output/fixture-aligned.apk
+          "$tools/zipalign" -p -f 4 /tmp/gboard-android-output/fixture-hybrid-unsigned.apk /tmp/gboard-android-output/fixture-aligned.apk
           keytool -genkeypair -noprompt -keystore /tmp/gboard-android-output/test.keystore \
             -storepass android -keypass android -alias test -dname 'CN=Gboard emulator test' \
             -keyalg RSA -keysize 2048 -validity 2 > /dev/null 2>&1
@@ -82,6 +83,8 @@ jobs:
             --out /tmp/gboard-android-output/fixture-emulator.apk /tmp/gboard-android-output/fixture-aligned.apk
           "$tools/aapt" dump badging /tmp/gboard-android-output/fixture-emulator.apk | sed -n '1p' \
             | grep -F "name='dev.jason.com.google.android.inputmethod.latin'"
+          python3 tools/gboard-translate/verify_fixture_apk.py /tmp/gboard-android-output/fixture-emulator.apk \
+            --package dev.jason.com.google.android.inputmethod.latin
       - name: Enable emulator acceleration when available
         run: |
           if test -e /dev/kvm; then
