@@ -1,18 +1,10 @@
 {
-  "environment": "Android emulator only, not the user's device or network",
-  "apk": "third-party prepatched fixture with test-only manifest package change; not stock",
-  "synthetic_android_java_https": "failed or unavailable",
+  "environment": "Android emulator only, not the user device or network",
+  "synthetic_android_java_https": "not run",
   "fixture_install": "not run",
-  "ime_enable_and_select": "not run",
   "ime_process_started": "not run",
-  "keyboard_visibility_signal": "not run",
   "translate_ui_functionality": "not tested",
-  "translate_button_tapped": "not located",
-  "android_api": "35",
-  "android_abi_list": "x86_64,arm64-v8a",
-  "synthetic_error": "adb app_process failed (exit 137)",
-  "ime_smoke_error": "adb install failed (exit 1) [INSTALL_FAILED_UPDATE_INCOMPATIBLE]",
   "bundle_sha256": "f4a7b6984071a7b3561eda6f20c4ba4cf3c7abd83b077a8ac7a76e31d626d0e4",
-  "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40693860601"
+  "emulator_action_outcome": "skipped",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40694677850"
 }
