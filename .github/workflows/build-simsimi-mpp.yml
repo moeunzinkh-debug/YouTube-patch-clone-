@@ -44,18 +44,48 @@ jobs:
           cp /tmp/simsimi-build/patches/build/libs/*.mpp bundles/simsimi/bundle.mpp
           cd bundles/simsimi
           sha256sum bundle.mpp > bundle.mpp.sha256
+      - name: Apply the actual MPP using Morphe Patcher on the original APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release download v1.19.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/simsimi-input
+          echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
+          set -o pipefail
+          java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/base.2.apk \
+            -p bundles/simsimi/bundle.mpp --unsigned -o /tmp/simsimi-input/patched.apk \
+            -r /tmp/simsimi-input/patch-result.json 2>&1 | tee /tmp/simsimi-patch.log
+          python3 - <<'PYCODE'
+          import json, hashlib, zipfile
+          from pathlib import Path
+          expected = Path('/tmp/simsimi-input/patched.hbc').read_bytes()
+          with zipfile.ZipFile('/tmp/simsimi-input/patched.apk') as apk:
+              actual = apk.read('assets/index.android.bundle')
+          assert actual == expected, 'Morphe did not write the expected Hermes payload'
+          report = {'engine':'Morphe Desktop v1.19.1', 'actual_mpp_applied_to_original_apk':True,
+                    'hermes_payload_matches_tested_transform':True, 'hermes_sha256':hashlib.sha256(actual).hexdigest(),
+                    'device_runtime_tested':False, 'input':'base only; ABI/config splits are still required for installation'}
+          Path('bundles/simsimi/morphe-validation.json').write_text(json.dumps(report, indent=2)+'\n')
+          PYCODE
+      - name: Report Morphe patch errors
+        if: failure()
+        run: |
+          if test -f /tmp/simsimi-patch.log; then
+            grep -E -A 8 'Exception|ERROR|Error:|Caused by:|SEVERE|FAILED|failed' /tmp/simsimi-patch.log | tail -65 | while IFS= read -r line; do echo "::error::$line"; done || true
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: simsimi-experimental
           path: |
             bundles/simsimi/bundle.mpp
             bundles/simsimi/bundle.mpp.sha256
+            bundles/simsimi/morphe-validation.json
             /tmp/simsimi-build/patches/build/test-results/test/*.xml
       - name: Save isolated bundle (leave YouTube untouched)
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f bundles/simsimi/bundle.mpp bundles/simsimi/bundle.mpp.sha256
+          git add -f bundles/simsimi/bundle.mpp bundles/simsimi/bundle.mpp.sha256 bundles/simsimi/morphe-validation.json
           git diff --cached --quiet && exit 0
           git commit -m 'build: experimental SimSimi-only ad eligibility bundle [skip ci]'
           git pull --rebase origin "$GITHUB_REF_NAME"
