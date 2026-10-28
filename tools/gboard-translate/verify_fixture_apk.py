@@ -60,9 +60,9 @@ def main() -> None:
                     )
     if set(bodies) != TARGETS or classes != {RUNTIME, CLIENT}:
         raise SystemExit("Expected patched methods or extension classes are missing")
+    print(f"::notice::Reviewed native wrapper cloud field access: {wrapper_field_access or 'package-private'}")
     if wrapper_field_access is None or "private" in wrapper_field_access.split():
         raise SystemExit("Cloud-provider field cannot be accessed from the native readiness hook")
-    print(f"::notice::Reviewed native wrapper cloud field access: {wrapper_field_access or 'package-private'}")
     checks = {
         ("Lkkp;", "e", "(Lklg;Lkkc;)V"): [RUNTIME + "->tryDispatch(", "Lkkp;->a(Lklg;)Lxqp;"],
         ("Lkka;", "d", "(Lklg;Lkkc;)V"): ["Lkli;", "Lkka;->fLkkd;", "Lkjx;", "Lkkd;->d(Lklg;Lkkc;)V"],
