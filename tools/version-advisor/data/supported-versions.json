@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-28T03:36:01Z",
+  "generatedAt": "2026-10-28T04:01:26Z",
   "generator": "youtube-version-advisor/1.0.0",
   "youtubePackage": "com.google.android.youtube",
   "local": {
     "label": "This repository (checked-in patch sources)",
     "source": "patches-list.json",
-    "patchVersion": "1.48.3",
+    "patchVersion": "1.49.0",
     "patchCount": 111,
     "versions": [
       {
@@ -66,7 +66,7 @@
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-10-28T03:36:01Z"
+    "checkedAt": "2026-10-28T04:01:26Z"
   },
   "upstream": {
     "label": "Upstream Morphe patch bundle (latest)",
@@ -131,7 +131,7 @@
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-10-28T03:36:01Z",
+    "checkedAt": "2026-10-28T04:01:26Z",
     "commitSha": "a5662d30d37e09d3c7dac04cfd1915d573cc0c3d",
     "url": "https://github.com/MorpheApp/morphe-patches/blob/main/patches-list.json",
     "etag": "\"a5662d30d37e09d3c7dac04cfd1915d573cc0c3d\"",
