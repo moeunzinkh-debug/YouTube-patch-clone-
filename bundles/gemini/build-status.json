@@ -1,7 +1,7 @@
 {
   "compiled": true,
-  "apk_tests": "not-run-inputs-missing",
+  "apk_tests": "passed",
   "device_runtime_tested": false,
-  "run_id": "40523207660",
-  "source_commit": "f887447d86b6c13e0d5d5b476c96c41bd552a3d8"
+  "run_id": "40617235873",
+  "source_commit": "65ba31a6d9d5630a71341271aae29686049935cd"
 }
