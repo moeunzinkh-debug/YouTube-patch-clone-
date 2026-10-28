@@ -1,0 +1,206 @@
+name: Publish experimental Gboard Direct Translate release
+
+on:
+  push:
+    branches:
+      - arena/69154a0c-youtube-patch-clone
+    paths:
+      - .github/workflows/publish-gboard-direct-release.yml
+      - bundles/gboard-experimental/RELEASE_NOTES.md
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gboard-direct-release-dev2
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Publishing requires this explicit, user-approved marker on this branch.
+    # Other pushes and ordinary pull-request updates cannot create a release.
+    if: contains(github.event.head_commit.message, '[gboard-direct-release]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: Gboard-Direct-Translate-v4.0.0-dev.2
+      EXPECTED_SHA256: e0c1a903435261959bdbac23c70bc18cea9cd55e53b2a735e03abab0f55dcc33
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verify the pinned original and experimental artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/gboard/verify_bundle.py --verify-vendor --mpp bundles/gboard/gboard-patches-4.0.0.mpp
+          (cd bundles/gboard-experimental && sha256sum --check gboard-direct-translate-experimental.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import zipfile
+
+          root = Path('bundles/gboard-experimental')
+          asset = root / 'gboard-direct-translate-experimental.mpp'
+          upstream = json.loads(Path('bundles/gboard/patches-list.json').read_text())['patches']
+          fork = json.loads((root / 'patches-list.json').read_text())
+          report = json.loads((root / 'validation.json').read_text())
+          digest = hashlib.sha256(asset.read_bytes()).hexdigest()
+          if digest != os.environ['EXPECTED_SHA256'] or asset.stat().st_size != 8201400:
+              raise SystemExit('Unexpected experimental MPP bytes')
+          if fork['version'] != '4.0.0-direct-translate-dev.2' or report['version'] != fork['version']:
+              raise SystemExit('Unexpected experimental version')
+          if report['sha256'] != digest or not report['experimental']:
+              raise SystemExit('Validation report does not describe this experimental bundle')
+          if report['checks']['morphe_application_to_third_party_prepatched_fixture'] != 'passed':
+              raise SystemExit('Expected the prior fixture application check to pass')
+          if report['checks']['original_google_signed_apk_application'] != 'not tested' or report['checks']['android_device_runtime_and_user_network'] != 'not tested':
+              raise SystemExit('Stock/device test claims are inconsistent with the evidence')
+          patches = fork['patches']
+          name = 'Direct Google Translate (experimental)'
+          added = [patch for patch in patches if patch['name'] == name]
+          if len(patches) != 44 or len(added) != 1 or added[0]['use'] is not False:
+              raise SystemExit('Experimental patch must be opt-in alongside 43 upstream patches')
+          if [patch for patch in patches if patch['name'] != name] != upstream:
+              raise SystemExit('Upstream patch metadata was changed')
+          if added[0]['compatiblePackages'] != {'com.google.android.inputmethod.latin': ['18.5.4.993608717-release-arm64-v8a']}:
+              raise SystemExit('Unexpected supported package or version')
+          with zipfile.ZipFile(asset) as archive:
+              if archive.testzip() is not None or not {'META-INF/MANIFEST.MF', 'classes.dex', 'extensions/gboard-patches.rve'}.issubset(archive.namelist()):
+                  raise SystemExit('Experimental MPP is corrupted or incomplete')
+              manifest = archive.read('META-INF/MANIFEST.MF').decode().replace('\r\n ', '')
+              if not all(s in manifest for s in ('4.0.0-direct-translate-dev.2', 'experimental fork', 'Jason Wu', 'GPLv3')):
+                  raise SystemExit('Experimental MPP is missing version or provenance')
+          print('Verified the exact experimental dev.2 bundle and honest validation report')
+          PY
+
+      - name: Refuse existing tags and prepare exact assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F69154a0c-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to release an older commit.'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/$RELEASE_TAG" --jq '.[].ref' > "$RUNNER_TEMP/existing-tags.txt"
+          if grep -Fxq "refs/tags/$RELEASE_TAG" "$RUNNER_TEMP/existing-tags.txt"; then
+            echo '::error::Tag already exists; refusing to reuse it.'; exit 1
+          fi
+          # A previous run uploaded the assets but could not look up the draft
+          # by tag. Only its known, still-unpublished draft may be resumed.
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate \
+            --jq '.[] | select(.tag_name == env.RELEASE_TAG) | .id' > "$RUNNER_TEMP/existing-release-id.txt"
+          if test -s "$RUNNER_TEMP/existing-release-id.txt"; then
+            test "$(cat "$RUNNER_TEMP/existing-release-id.txt")" = '427283922' || {
+              echo '::error::Unexpected release already exists; refusing to modify it.'; exit 1;
+            }
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name' > "$RUNNER_TEMP/latest-before.txt"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/Gboard-v4.0.0" --jq '[.assets[] | {id, name, size}] | sort_by(.name)' > "$RUNNER_TEMP/upstream-before.json"
+          mkdir -p "$RUNNER_TEMP/gboard-release"
+          cp bundles/gboard-experimental/gboard-direct-translate-experimental.mpp "$RUNNER_TEMP/gboard-release/bundle.mpp"
+          cp bundles/gboard-experimental/validation.json "$RUNNER_TEMP/gboard-release/validation.json"
+          cp extras/gboard-patches/LICENSE extras/gboard-patches/NOTICE "$RUNNER_TEMP/gboard-release/"
+          (cd "$RUNNER_TEMP/gboard-release" && sha256sum bundle.mpp > bundle.mpp.sha256)
+
+      - name: Create or safely resume the experimental draft
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -s "$RUNNER_TEMP/existing-release-id.txt"; then
+            release_id="$(cat "$RUNNER_TEMP/existing-release-id.txt")"
+            gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > "$RUNNER_TEMP/prior-draft.json"
+            python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          release = json.loads((Path(os.environ['RUNNER_TEMP']) / 'prior-draft.json').read_text())
+          notes = Path('bundles/gboard-experimental/RELEASE_NOTES.md').read_text()
+          if (release['id'] != 427283922 or not release['draft'] or not release['prerelease']
+                  or release['tag_name'] != os.environ['RELEASE_TAG']
+                  or release['name'] != 'Gboard Direct Translate dev.2 (Experimental)'
+                  or release['body'].strip() != notes.strip()):
+              raise SystemExit('Existing draft is not the previously created experimental release')
+          if release['target_commitish'] not in (
+                  'a12b1157efa3945243b12ecc5cea45b867ce8d20',
+                  '0450b35bb51bcf8675de9b6ef3c518eca7bb3a05', os.environ['GITHUB_SHA']):
+              raise SystemExit('Existing draft has an unexpected target')
+          PY
+            # Draft updates must explicitly preserve the requested tag name;
+            # otherwise the GitHub API can substitute an untagged placeholder.
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" \
+              -f tag_name="$RELEASE_TAG" -f target_commitish="$GITHUB_SHA" \
+              -F draft=true -F prerelease=true > /dev/null
+          else
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" \
+              --title 'Gboard Direct Translate dev.2 (Experimental)' \
+              --notes-file bundles/gboard-experimental/RELEASE_NOTES.md \
+              --draft --prerelease --latest=false
+            gh release upload "$RELEASE_TAG" \
+              "$RUNNER_TEMP/gboard-release/bundle.mpp" \
+              "$RUNNER_TEMP/gboard-release/bundle.mpp.sha256" \
+              "$RUNNER_TEMP/gboard-release/validation.json" \
+              "$RUNNER_TEMP/gboard-release/LICENSE" \
+              "$RUNNER_TEMP/gboard-release/NOTICE"
+            gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate \
+              --jq '.[] | select(.tag_name == env.RELEASE_TAG) | .id' > "$RUNNER_TEMP/existing-release-id.txt"
+          fi
+          test -s "$RUNNER_TEMP/existing-release-id.txt"
+
+      - name: Verify uploaded bytes before publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="$(cat "$RUNNER_TEMP/existing-release-id.txt")"
+          # Drafts do not yet have a public tag endpoint. Query by release ID.
+          gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > "$RUNNER_TEMP/gboard-draft.json"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          release = json.loads((temp / 'gboard-draft.json').read_text())
+          expected = {'bundle.mpp', 'bundle.mpp.sha256', 'validation.json', 'LICENSE', 'NOTICE'}
+          assets = {asset['name']: asset for asset in release['assets']}
+          if (not release['draft'] or not release['prerelease'] or set(assets) != expected
+                  or release['tag_name'] != os.environ['RELEASE_TAG']
+                  or release['target_commitish'] != os.environ['GITHUB_SHA']):
+              raise SystemExit('Unexpected release state or asset set; keeping it as a draft')
+          for name, asset in assets.items():
+              local = temp / 'gboard-release' / name
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if asset['state'] != 'uploaded' or asset['size'] != local.stat().st_size or asset.get('digest') != digest:
+                  raise SystemExit(f'Unexpected server-side size or digest for {name}; keeping it as a draft')
+          print('GitHub-reported SHA-256 and size match all five local assets')
+          PY
+
+      - name: Publish pre-release and confirm original release is unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="$(cat "$RUNNER_TEMP/existing-release-id.txt")"
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" \
+            -f tag_name="$RELEASE_TAG" -f target_commitish="$GITHUB_SHA" \
+            -F draft=false -F prerelease=true -f make_latest=false > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/gboard-published.json"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          release = json.loads((Path(os.environ['RUNNER_TEMP']) / 'gboard-published.json').read_text())
+          if release['draft'] or not release['prerelease'] or release['tag_name'] != os.environ['RELEASE_TAG']:
+              raise SystemExit('Published release state is not experimental pre-release')
+          print('Published:', release['html_url'])
+          PY
+          tag_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --jq '.object.sha')"
+          test "$tag_sha" = "$GITHUB_SHA" || { echo '::error::Release tag points to an unexpected commit.'; exit 1; }
+          mkdir -p "$RUNNER_TEMP/gboard-download"
+          gh release download "$RELEASE_TAG" --pattern 'bundle.mpp' --pattern 'bundle.mpp.sha256' --dir "$RUNNER_TEMP/gboard-download"
+          (cd "$RUNNER_TEMP/gboard-download" && sha256sum --check bundle.mpp.sha256)
+          echo "$EXPECTED_SHA256  $RUNNER_TEMP/gboard-download/bundle.mpp" | sha256sum --check
+          gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name' > "$RUNNER_TEMP/latest-after.txt"
+          cmp "$RUNNER_TEMP/latest-before.txt" "$RUNNER_TEMP/latest-after.txt"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/Gboard-v4.0.0" --jq '[.assets[] | {id, name, size}] | sort_by(.name)' > "$RUNNER_TEMP/upstream-after.json"
+          cmp "$RUNNER_TEMP/upstream-before.json" "$RUNNER_TEMP/upstream-after.json"
+          echo 'Verified uploaded bundle, release tag, unchanged latest, and original Gboard assets.'

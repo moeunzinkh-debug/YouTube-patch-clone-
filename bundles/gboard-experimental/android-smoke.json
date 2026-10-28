@@ -1,0 +1,10 @@
+{
+  "environment": "Android emulator only, not the user device or network",
+  "synthetic_android_java_https": "not run",
+  "fixture_install": "not run",
+  "ime_process_started": "not run",
+  "translate_ui_functionality": "not tested",
+  "bundle_sha256": "e0c1a903435261959bdbac23c70bc18cea9cd55e53b2a735e03abab0f55dcc33",
+  "emulator_action_outcome": "failure",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40701426020"
+}
