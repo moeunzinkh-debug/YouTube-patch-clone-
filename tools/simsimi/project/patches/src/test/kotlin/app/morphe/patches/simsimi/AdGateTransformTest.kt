@@ -9,6 +9,19 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class AdGateTransformTest {
+    @Test fun membershipIsComposableAndDoesNotRewriteOtherCode() {
+        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+        val membership = AdGateTransform.patchMembership(source)
+        val both = AdGateTransform.patch(membership)
+        assertContentEquals(both, AdGateTransform.patchMembership(AdGateTransform.patch(source)))
+        assertContentEquals(AdGateTransform.clientMembership, membership.copyOfRange(AdGateTransform.MEMBERSHIP_OFFSET, AdGateTransform.MEMBERSHIP_OFFSET+201))
+        assertEquals(source.size, both.size)
+        val changed = (0 until source.size-20).filter { source[it] != both[it] }
+        assertTrue(changed.all { it == AdGateTransform.GATE_OFFSET || it in AdGateTransform.MEMBERSHIP_OFFSET until AdGateTransform.MEMBERSHIP_OFFSET+201 })
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patchMembership(membership) }
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(both) }
+        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".combined").writeBytes(both) }
+    }
     @Test fun rejectsUnexpectedPayload() {
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(byteArrayOf()) }
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(ByteArray(AdGateTransform.EXPECTED_SIZE)) }
