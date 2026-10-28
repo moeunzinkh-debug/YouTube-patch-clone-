@@ -1,0 +1,21 @@
+{
+  "upstream_tag": "v4.0.0",
+  "upstream_commit": "2eb71854accc7e906d3e4f5495b2a54ed1e2af47",
+  "vendor_git_tree": "b8dc2c76f8a17259c2e3eaa6b9f8565fb19d730b",
+  "bundle_sha256": "fadf54bea20f337a03baddf2bd294c86d254a744456c6e53ee13f4ad25a58716",
+  "bundle_size": 8186810,
+  "built_for_patcher": "1.8.0",
+  "morphe_desktop": "1.19.1",
+  "desktop_patcher": "2.0.1",
+  "morphe_desktop_sha256": "a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573",
+  "checks": {
+    "upstream_source_tree": "passed",
+    "release_asset_sha256_and_zip": "passed",
+    "catalog_matches_upstream": "passed",
+    "desktop_patch_listing": "passed",
+    "actual_gboard_apk_patch": "not tested",
+    "android_device_runtime": "not tested",
+    "khmer_language_features": "not tested"
+  },
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40683640379"
+}
