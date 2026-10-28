@@ -83,6 +83,8 @@ jobs:
         if: steps.inputs.outputs.available == 'true'
         run: |
           python3 tools/gemini-apk/verify_google.py "$RUNNER_TEMP/google/patched.apk"
+          .gemini-build/tools/kotlinc/bin/kotlinc tools/gemini-experimental/VerifyProcessIdentity.kt -cp .gemini-build/tools/morphe-desktop.jar -d "$RUNNER_TEMP/verify-process.jar"
+          java -Xmx4g -cp "$RUNNER_TEMP/verify-process.jar:.gemini-build/tools/morphe-desktop.jar" VerifyProcessIdentityKt "$RUNNER_TEMP/google/base.apk" "$RUNNER_TEMP/google/patched.apk" | tee bundles/gemini-experimental/process-validation.txt
       - name: Report patch failure
         if: failure()
         run: |
