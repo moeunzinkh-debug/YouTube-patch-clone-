@@ -18,8 +18,9 @@ result = {'status': 'Analysis only; individual feature functionality is not esta
 for text in reader.strings:
     if text.startswith('/') and pattern.search(text):
         result['api_paths'].append(text)
-ids = [reader.strings.index(text) for text in ('hasMembership', 'getMembershipObject')]
+ids = [reader.strings.index(text) for text in ('hasMembership', 'getMembershipObject', 'checkDailyPhotoSendUsage')]
 needles = [index.to_bytes(length, 'little') for index in ids for length in (2, 4)]
+needles += [index.to_bytes(1, 'little') for index in ids if index < 256]
 for fid, header in enumerate(reader.function_headers):
     name = reader.strings[header.functionName]
     entry = {'function_id': fid, 'name': name, 'offset': header.offset,
@@ -35,7 +36,7 @@ for fid, header in enumerate(reader.function_headers):
         continue
     disassembly = [repr(ins) for ins in parse_hbc_bytecode(header, reader)]
     refs = [index for index, line in enumerate(disassembly)
-            if "# String: 'hasMembership'" in line or "# String: 'getMembershipObject'" in line]
+            if "# String: 'hasMembership'" in line or "# String: 'getMembershipObject'" in line or "# String: 'checkDailyPhotoSendUsage'" in line]
     if not refs:
         continue
     selected = set()
