@@ -81,7 +81,7 @@ jobs:
           from pathlib import Path
           base = 'https://takumi0002-tts-kh.hf.space'
           report = {}
-          for path in ('/',):
+          for path in ('/', '/script.js'):
               try:
                   with urllib.request.urlopen(base + path, timeout=60) as r:
                       report[path] = {'status': r.status, 'content': r.read(100000).decode('utf-8', 'replace')}
