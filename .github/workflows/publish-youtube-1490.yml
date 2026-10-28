@@ -1,0 +1,49 @@
+name: Publish YouTube bundle v1.49.0
+on:
+  push:
+    branches: [arena/0c8d70a1-youtube-patch-clone]
+    paths: ['.github/workflows/publish-youtube-1490.yml']
+permissions:
+  contents: write
+concurrency:
+  group: release-youtube-v1.49.0
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate exact release inputs
+        run: |
+          python3 .github/scripts/verify-mpp.py
+          python3 - <<'PY'
+          import json, zipfile
+          from pathlib import Path
+          version = '1.49.0'
+          assert f'version = {version}' in Path('gradle.properties').read_text().splitlines()
+          for filename in ('patches-bundle.json', 'patches-list.json'):
+              assert json.loads(Path(filename).read_text())['version'] == version
+          with zipfile.ZipFile('patch.mpp') as archive:
+              manifest = archive.read('META-INF/MANIFEST.MF').decode().replace('\r', '')
+              assert f'\nVersion: {version}\n' in manifest
+              dex = archive.read('extensions/youtube.mpe')
+              for symbol in (b'EqualizerPlayerButton', b'EqualizerDialog',
+                             b'https://api.sea-lion.ai/v1/chat/completions',
+                             b'aisingapore/Gemma-SEA-LION-v4-27B-IT'):
+                  assert symbol in dex, symbol
+          PY
+      - name: Upload complete assets before publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.49.0 > /dev/null 2>&1; then
+            draft="$(gh release view v1.49.0 --json isDraft --jq .isDraft)"
+            test "$draft" = true || { echo 'Refusing to replace an already published release'; exit 1; }
+          else
+            gh release create v1.49.0 --draft --target "$GITHUB_SHA" \
+              --title 'YouTube patches v1.49.0' --notes-file docs/releases/v1.49.0.md
+          fi
+          gh release upload v1.49.0 patch.mpp patch.mpp.sha256 patches-bundle.json --clobber
+          gh release edit v1.49.0 --draft=false --latest
+          gh release view v1.49.0 --json tagName,isDraft,isPrerelease,url,assets
