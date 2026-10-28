@@ -1,5 +1,18 @@
 # YouTube Patch Clone (unofficial source subset)
 
+
+## Active Google / Gemini bundle
+
+Use [`bundles/gemini/bundle.mpp`](bundles/gemini/bundle.mpp), local **0.2.0**.
+The new process identity patch replaces the old process-name spoofing patch in
+this build. Old 0.1.x binaries and the duplicate experimental workflow have been
+removed. The upstream catalog below is **legacy reference material**, not the
+active bundle's compatibility list. Supporting GMS/manifest patches are retained;
+this is not an entirely rewritten GMS implementation. Google/Gemini APK patch and
+rebuild tests pass, but device launch/login/chat are **not verified**.
+See [current bundle instructions](bundles/gemini/README.md). YouTube is separate.
+
+
 This repository contains a **YouTube-focused source subset** of [MorpheApp/morphe-patches](https://github.com/MorpheApp/morphe-patches), with an additional Khmer voice-over TTS integration. It is a patch-source project, **not** a YouTube app or a ready-to-install APK.
 
 > **Scope:** the compiled `patch.mpp` contains **only the YouTube patch set**. Shared support code is retained where the YouTube patches need it; the separate YouTube Music and Reddit patch sets are not included. A **separate, non-compiled** Gemini/MicroG RE patch source is vendored under `extras/gemini-microg-patches/` for reference (see the Gemini patch tags below).
