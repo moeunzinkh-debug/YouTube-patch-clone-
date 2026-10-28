@@ -70,7 +70,8 @@ def main():
     text = trace(sys.argv[1])
     # Annotations are intentionally transient; no copyrighted APK/DEX is checked in.
     encoded = base64.b64encode(gzip.compress(text.encode("utf-8"), mtime=0)).decode("ascii")
-    chunks = [encoded[index:index + 6000] for index in range(0, len(encoded), 6000)]
+    # GitHub check annotations cap messages at 4096 characters.
+    chunks = [encoded[index:index + 3000] for index in range(0, len(encoded), 3000)]
     for index, chunk in enumerate(chunks):
         print(f"::notice title=Redacted Translate trace {index + 1}/{len(chunks)}::{chunk}")
 
