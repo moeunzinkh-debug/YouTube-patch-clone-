@@ -121,11 +121,16 @@ jobs:
                   or release['name'] != 'Gboard Direct Translate dev.2 (Experimental)'
                   or release['body'].strip() != notes.strip()):
               raise SystemExit('Existing draft is not the previously created experimental release')
-          if release['target_commitish'] not in ('a12b1157efa3945243b12ecc5cea45b867ce8d20', os.environ['GITHUB_SHA']):
+          if release['target_commitish'] not in (
+                  'a12b1157efa3945243b12ecc5cea45b867ce8d20',
+                  '0450b35bb51bcf8675de9b6ef3c518eca7bb3a05', os.environ['GITHUB_SHA']):
               raise SystemExit('Existing draft has an unexpected target')
           PY
-            # The draft has no tag yet; update only its target to this fixed workflow commit.
-            gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" -f target_commitish="$GITHUB_SHA" > /dev/null
+            # Draft updates must explicitly preserve the requested tag name;
+            # otherwise the GitHub API can substitute an untagged placeholder.
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" \
+              -f tag_name="$RELEASE_TAG" -f target_commitish="$GITHUB_SHA" \
+              -F draft=true -F prerelease=true > /dev/null
           else
             gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" \
               --title 'Gboard Direct Translate dev.2 (Experimental)' \
@@ -176,6 +181,7 @@ jobs:
           set -euo pipefail
           release_id="$(cat "$RUNNER_TEMP/existing-release-id.txt")"
           gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$release_id" \
+            -f tag_name="$RELEASE_TAG" -f target_commitish="$GITHUB_SHA" \
             -F draft=false -F prerelease=true -f make_latest=false > /dev/null
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/gboard-published.json"
           python3 - <<'PY'
