@@ -1,7 +1,7 @@
 {
   "environment": "Android emulator only, not the user's device or network",
   "apk": "test hybrid: third-party prepatched resources/renamed manifest plus Morphe-patched DEX; re-signed, not stock",
-  "synthetic_android_java_https": "passed",
+  "synthetic_android_java_https": "failed or unavailable",
   "fixture_install": "passed",
   "ime_enable_and_select": "passed",
   "ime_process_started": "passed",
@@ -10,12 +10,14 @@
   "translate_button_tapped": "not located",
   "android_api": "35",
   "android_abi_list": "x86_64,arm64-v8a",
+  "synthetic_error": "aapt failed (exit 1)",
   "ime_visibility_flags": {
     "mShowForced": false,
     "mInputShown": true,
     "mInputViewStarted": true
   },
+  "ime_inspector_error": "RuntimeError",
   "bundle_sha256": "e0c1a903435261959bdbac23c70bc18cea9cd55e53b2a735e03abab0f55dcc33",
-  "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40697619249"
+  "emulator_action_outcome": "failure",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40698373084"
 }
