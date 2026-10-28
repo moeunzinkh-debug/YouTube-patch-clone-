@@ -1,0 +1,23 @@
+{
+  "endpoint": "https://translate.googleapis.com/translate_a/single",
+  "client": "gtx",
+  "api_status": "undocumented and unsupported; availability and rate limits may change",
+  "input": "fixed synthetic test phrases only; no user data",
+  "environment": "GitHub Actions runner; not the user's Android device",
+  "results": [
+    {
+      "source": "en",
+      "target": "km",
+      "status": "ok",
+      "http_status": 200,
+      "sample_translation": "សួស្តីពិភពលោក"
+    },
+    {
+      "source": "km",
+      "target": "en",
+      "status": "ok",
+      "http_status": 200,
+      "sample_translation": "Hello"
+    }
+  ]
+}
