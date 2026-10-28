@@ -25,7 +25,7 @@ for fid, header in enumerate(reader.function_headers):
         entry['bytecode_hex'] = payload[header.offset:header.offset+header.bytecodeSizeInBytes].hex()
     if len(result['functions']) < 65 or re.search(r'daily|bonus', name, re.I) or fid in (26538, 29954, 29958):
         instructions = list(parse_hbc_bytecode(header, reader))
-        entry['disassembly'] = [repr(ins) for ins in instructions[:500] if re.search(r'daily|bonus', name, re.I) else instructions[:120]]
+        entry['disassembly'] = [repr(ins) for ins in (instructions[:500] if re.search(r'daily|bonus', name, re.I) else instructions[:120])]
         entry['instruction_count'] = len(instructions)
     result['functions'].append(entry)
 result['total_function_count'] = len(reader.function_headers)
