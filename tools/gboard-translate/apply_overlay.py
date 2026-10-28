@@ -11,7 +11,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 UPSTREAM = ROOT / "extras/gboard-patches"
 OVERLAY = ROOT / "tools/gboard-translate/overlay"
-VERSION = "4.0.0-direct-translate-dev.1"
+VERSION = "4.0.0-direct-translate-dev.2"
 PATCH_NAME = "Direct Google Translate (experimental)"
 
 

@@ -2,6 +2,8 @@
 
 នេះជា **fork សាកល្បង** ពី [Gboard-patches v4.0.0 របស់ jasonwu1994](https://github.com/jasonwu1994/Gboard-patches) មិនមែន bundle ដើម ឬ release ថ្មីទេ។ មុខងារ upstream 43 ត្រូវរក្សាទុក ហើយមាន patch បន្ថែមមួយឈ្មោះ **Direct Google Translate (experimental)** ដែលត្រូវជ្រើសដោយខ្លួនឯង។ Source, អាជ្ញាបណ្ណ និងកម្រិតបច្ចេកទេស៖ [`tools/gboard-translate`](../../tools/gboard-translate/README.md)។
 
+**កុំប្រើ fork `4.0.0-direct-translate-dev.1`**៖ ការត្រួតពិនិត្យបន្ថែមបានរកឃើញការចូលប្រើ private field ខុសពី class មួយទៀត។ វាត្រូវបានដកចេញ ហើយ `dev.2` ត្រូវឆ្លងកាត់ការសាកល្បងឡើងវិញមុនប្រើ។
+
 ## ការប្រើប្រាស់ បើ CI បានបង្កើតឯកសារ `.mpp` រួច
 
 1. ទាញយក `gboard-direct-translate-experimental.mpp` ពីថតនេះ ហើយក្នុង Morphe Manager ជ្រើស **Sources → Add patch source → Local**។ ដើម្បីជៀសវាង patches ស្ទួន កុំបើក Gboard source ដើម និង fork នេះជាមួយគ្នា។

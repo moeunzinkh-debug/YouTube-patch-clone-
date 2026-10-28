@@ -10,7 +10,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 NAME = "Direct Google Translate (experimental)"
-VERSION = "4.0.0-direct-translate-dev.1"
+VERSION = "4.0.0-direct-translate-dev.2"
 PACKAGE = "com.google.android.inputmethod.latin"
 TARGET = "18.5.4.993608717-release-arm64-v8a"
 

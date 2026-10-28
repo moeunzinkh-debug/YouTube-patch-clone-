@@ -13,6 +13,7 @@ CLIENT = "Ldev/jason/gboardpatches/extension/directtranslate/GtxClient;"
 TARGETS = {
     ("Lkkp;", "e", "(Lklg;Lkkc;)V"),
     ("Lkka;", "d", "(Lklg;Lkkc;)V"),
+    ("Lkka;", "morpheDirectTranslateCloudProvider", "()Lkkd;"),
     ("Lklo;", "ap", "()Z"),
     ("Lklo;", "al", "(Ljava/lang/String;)V"),
     ("Lklo;", "fL", "()V"),
@@ -61,16 +62,20 @@ def main() -> None:
     if set(bodies) != TARGETS or classes != {RUNTIME, CLIENT}:
         raise SystemExit("Expected patched methods or extension classes are missing")
     print(f"::notice::Reviewed native wrapper cloud field access: {wrapper_field_access or 'package-private'}")
-    if wrapper_field_access is None or "private" in wrapper_field_access.split():
-        raise SystemExit("Cloud-provider field cannot be accessed from the native readiness hook")
+    if wrapper_field_access is None:
+        raise SystemExit("Cloud-provider field is missing")
     checks = {
         ("Lkkp;", "e", "(Lklg;Lkkc;)V"): [RUNTIME + "->tryDispatch(", "Lkkp;->a(Lklg;)Lxqp;"],
         ("Lkka;", "d", "(Lklg;Lkkc;)V"): ["Lkli;", "Lkka;->fLkkd;", "Lkjx;", "Lkkd;->d(Lklg;Lkkc;)V"],
-        ("Lklo;", "ap", "()Z"): ["Lkko;->cZ", "Lklo;->pLkkd;", "Lkjx;", "Lkko;->a(I)I"],
+        ("Lkka;", "morpheDirectTranslateCloudProvider", "()Lkkd;"): ["Lkka;->fLkkd;", "return-object"],
+        ("Lklo;", "ap", "()Z"): ["Lkko;->cZ", "Lklo;->pLkkd;", "Lkjx;", "Lkko;->a(I)I",
+                                       "Lkka;->morpheDirectTranslateCloudProvider()Lkkd;"],
     }
     for key, markers in checks.items():
         if not all(marker in bodies[key] for marker in markers):
             raise SystemExit(f"Patched control flow marker missing for {key}")
+    if "Lkka;->fLkkd;" in bodies[("Lklo;", "ap", "()Z")]:
+        raise SystemExit("Readiness hook must not directly read the wrapper's private field")
     for key in TARGETS - set(checks):
         if RUNTIME + "->cancel()V" not in bodies[key]:
             raise SystemExit(f"Missing lifecycle/input cancellation for {key}")

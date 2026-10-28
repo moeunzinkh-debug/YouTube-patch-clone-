@@ -89,7 +89,7 @@ jobs:
           gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
             --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/gboard-direct-input
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/gboard-direct-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
-          mpp=/tmp/gboard-direct-source/patches/build/libs/patches-4.0.0-direct-translate-dev.1.mpp
+          mpp=/tmp/gboard-direct-source/patches/build/libs/patches-4.0.0-direct-translate-dev.2.mpp
           test -s "$mpp" || { echo '::error::The binary MPP was not produced (do not use the sources MPP).'; exit 1; }
           echo "::notice::Built MPP: $mpp"
           cp "$mpp" /tmp/gboard-direct-output/gboard-direct-translate-experimental.mpp
@@ -149,7 +149,7 @@ jobs:
           digest = hashlib.sha256(asset.read_bytes()).hexdigest()
           (output / (asset.name + '.sha256')).write_text(f'{digest}  {asset.name}\n')
           report = {
-              'version': '4.0.0-direct-translate-dev.1', 'experimental': True,
+              'version': '4.0.0-direct-translate-dev.2', 'experimental': True,
               'upstream_commit': '2eb71854accc7e906d3e4f5495b2a54ed1e2af47',
               'upstream_tree': 'b8dc2c76f8a17259c2e3eaa6b9f8565fb19d730b',
               'sha256': digest, 'size': asset.stat().st_size,

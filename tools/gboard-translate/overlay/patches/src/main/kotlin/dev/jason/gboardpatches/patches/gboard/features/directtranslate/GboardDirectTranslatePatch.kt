@@ -6,7 +6,9 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLa
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.smali.ExternalLabel
+import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
+import dev.jason.gboardpatches.patches.gboard.shared.addHelperMethodIfMissing
 import dev.jason.gboardpatches.patches.gboard.shared.findMutableMethodOrThrow
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesExtensionCarrierPatch
 import dev.jason.gboardpatches.patches.gboard.shared.isMethodReference
@@ -45,6 +47,9 @@ internal val gboardDirectGoogleTranslatePatch = bytecodePatch(
         field("Lklo;", "u", "Lkko;")
         field("Lkko;", "c", "Z")
         field("Lkka;", "f", "Lkkd;")
+        check(mutableClass("Lkka;").methods.none { it.name == "morpheDirectTranslateCloudProvider" }) {
+            "Direct Translate accessor already exists"
+        }
         findMutableMethodOrThrow("Labxb;", "<init>", "V", listOf("Ljava/lang/String;"))
         findMutableMethodOrThrow("Labxb;", "<init>", "V", listOf("I"))
         findMutableMethodOrThrow("Lkli;", "a", "V", listOf("Labxb;"))
@@ -87,6 +92,21 @@ internal val gboardDirectGoogleTranslatePatch = bytecodePatch(
         check(inputInvoke.registerCount == 3) { "Unexpected native Translate dispatch registers" }
         val requestRegister = inputInvoke.registerD
         val callbackRegister = inputInvoke.registerE
+
+        // Lkka.f is private. Keep it private and expose only a narrow accessor
+        // on its own class; Lklo must never directly access another class's
+        // private field, which would fail Android verification at runtime.
+        mutableClass("Lkka;").addHelperMethodIfMissing(
+            name = "morpheDirectTranslateCloudProvider",
+            parameterTypes = emptyList(),
+            returnType = "Lkkd;",
+            accessFlags = AccessFlags.PUBLIC.value or AccessFlags.FINAL.value,
+            registerCount = 2,
+            body = """
+                iget-object v0, p0, Lkka;->f:Lkkd;
+                return-object v0
+            """,
+        )
 
         // Keep Gboard's throttle and all non-UI/health callbacks. The Java
         // bridge additionally checks the exact native provider and callback.
@@ -139,7 +159,8 @@ internal val gboardDirectGoogleTranslatePatch = bytecodePatch(
             instance-of v1, v0, Lkka;
             if-eqz v1, :original_ready
             check-cast v0, Lkka;
-            iget-object v0, v0, Lkka;->f:Lkkd;
+            invoke-virtual {v0}, Lkka;->morpheDirectTranslateCloudProvider()Lkkd;
+            move-result-object v0
             instance-of v1, v0, Lkjx;
             if-eqz v1, :original_ready
             :direct_ready
