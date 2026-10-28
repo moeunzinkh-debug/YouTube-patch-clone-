@@ -62,6 +62,17 @@ class EmulatorSmokeTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "did not return"):
                 emulator_smoke.inspect_ime_windows()
 
+    def test_consent_is_tapped_only_for_the_synthetic_gboard_dialog(self):
+        xml = ('<hierarchy><node package="dev.jason.com.google.android.inputmethod.latin" '
+               'text="Using Google Translate" /><node package="dev.jason.com.google.android.inputmethod.latin" '
+               'class="android.widget.Button" text="OK" clickable="true" bounds="[10,20][50,80]" /></hierarchy>')
+        with patch.object(emulator_smoke, "run", return_value="") as command:
+            self.assertTrue(emulator_smoke.accept_synthetic_translate_consent(xml))
+            command.assert_called_once_with("adb", "shell", "input", "tap", "30", "50")
+        with patch.object(emulator_smoke, "run") as command:
+            self.assertFalse(emulator_smoke.accept_synthetic_translate_consent(xml.replace("Using Google Translate", "Other dialog")))
+            command.assert_not_called()
+
     def test_search_click_uses_visible_accessibility_bounds(self):
         xml = '<hierarchy><node text="" content-desc="Search settings" bounds="[10,20][50,80]" /></hierarchy>'
         with patch.object(emulator_smoke, "run", return_value="") as command:

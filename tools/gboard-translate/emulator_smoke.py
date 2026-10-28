@@ -116,6 +116,21 @@ def gboard_crash_types(log: str) -> list[str]:
     return sorted(set(crashes))
 
 
+def accept_synthetic_translate_consent(xml: str) -> bool:
+    """Accept the Google Translate notice only in this disposable emulator."""
+    nodes = list(ET.fromstring(xml).iter("node"))
+    if not any(node.get("package") == PACKAGE and node.get("text") == "Using Google Translate" for node in nodes):
+        return False
+    for node in nodes:
+        if (node.get("package") == PACKAGE and node.get("class") == "android.widget.Button"
+                and node.get("text") == "OK" and node.get("clickable") == "true"):
+            position = center(node.get("bounds", ""))
+            if position:
+                run("adb", "shell", "input", "tap", str(position[0]), str(position[1]))
+                return True
+    return False
+
+
 def synthetic_http_probe() -> None:
     sdk = Path(os.environ["ANDROID_HOME"])
     android_jar = sdk / "platforms/android-35/android.jar"
@@ -306,7 +321,15 @@ def gboard_ime_smoke(apk: Path, report: dict) -> None:
             report["translate_button_tapped"] = "attempted; translation not yet asserted"
             report["translate_ime_windows_after_tap"] = len(after)
             publish_synthetic_ui(json.dumps(after, ensure_ascii=False), "GBOARD_TRANSLATE_UI")
-            publish_synthetic_ui(dump_ui(), "GBOARD_AFTER_TRANSLATE_FOREGROUND")
+            foreground = dump_ui()
+            publish_synthetic_ui(foreground, "GBOARD_AFTER_TRANSLATE_FOREGROUND")
+            if accept_synthetic_translate_consent(foreground):
+                report["synthetic_translate_consent"] = "accepted in disposable emulator"
+                time.sleep(5)
+                after_consent = inspect_ime_windows()
+                report["translate_ime_windows_after_consent"] = len(after_consent)
+                publish_synthetic_ui(json.dumps(after_consent, ensure_ascii=False), "GBOARD_TRANSLATE_AFTER_CONSENT")
+                publish_synthetic_ui(dump_ui(), "GBOARD_FOREGROUND_AFTER_CONSENT")
             post_crashes = gboard_crash_types(run("adb", "logcat", "-d", "-s", "AndroidRuntime:E", "*:S", timeout=30))
             if post_crashes:
                 report["gboard_fatal_exception_types_after_translate"] = post_crashes
