@@ -7,6 +7,8 @@ patches {
         description = "Separate exact-build SimSimi experiments. No claim of server entitlement unlocks."
         source = "https://github.com/moeunzinkh-debug/YouTube-patch-clone-"
         author = "YouTube Patch Clone contributors"
+        contact = "na"
+        website = "https://github.com/moeunzinkh-debug/YouTube-patch-clone-"
         license = "GNU General Public License v3.0"
     }
 }
