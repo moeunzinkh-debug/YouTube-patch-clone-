@@ -9,6 +9,22 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class AdGateTransformTest {
+    @Test fun dailyBonusUsesExistingNonVideoFlowAndComposesInEveryOrder() {
+        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+        val daily = AdGateTransform.patchDailyBonus(source)
+        val offset = AdGateTransform.DAILY_BONUS_OFFSET
+        assertContentEquals(byteArrayOf(120,1,118,1,120,1), daily.copyOfRange(offset,offset+6))
+        assertTrue((0 until source.size-20).filter { source[it] != daily[it] }.all { it in offset until offset+6 })
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patchDailyBonus(daily) }
+        val transforms: List<(ByteArray) -> ByteArray> = listOf(AdGateTransform::patch, AdGateTransform::patchMembership, AdGateTransform::patchDailyBonus)
+        val expected = transforms.fold(source) { bytes, transform -> transform(bytes) }
+        for (order in listOf(listOf(0,1,2),listOf(0,2,1),listOf(1,0,2),listOf(1,2,0),listOf(2,0,1),listOf(2,1,0))) {
+            assertContentEquals(expected, order.fold(source) { bytes, index -> transforms[index](bytes) })
+        }
+        assertEquals(source.size, expected.size)
+        assertContentEquals(MessageDigest.getInstance("SHA-1").digest(expected.copyOfRange(0, expected.size-20)), expected.copyOfRange(expected.size-20,expected.size))
+        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".all").writeBytes(expected) }
+    }
     @Test fun membershipIsComposableAndDoesNotRewriteOtherCode() {
         val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
         val membership = AdGateTransform.patchMembership(source)

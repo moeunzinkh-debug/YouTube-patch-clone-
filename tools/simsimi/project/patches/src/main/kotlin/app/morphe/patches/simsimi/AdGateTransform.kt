@@ -21,7 +21,12 @@ object AdGateTransform {
     private data class Region(val offset: Int, val original: ByteArray, val replacement: ByteArray)
     private val ads = Region(GATE_OFFSET, byteArrayOf(120,0,92,0), byteArrayOf(121,0,92,0))
     private val membership = Region(MEMBERSHIP_OFFSET, originalMembership, clientMembership)
-    private val regions = listOf(ads, membership)
+    // #22097: replace only the membershipStatus read with true/undefined/true
+    // in the same register (three valid 2-byte instructions, no offsets moved).
+    // Existing loadMembershipAdmob still fetches server state and preserves errors.
+    const val DAILY_BONUS_OFFSET = 23509822 + 0x13
+    private val dailyBonus = Region(DAILY_BONUS_OFFSET, hex("3701010243f4"), hex("780176017801"))
+    private val regions = listOf(ads, membership, dailyBonus)
     fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes).joinToString("") { "%02x".format(it.toInt() and 255) }
     private fun checksum(bytes: ByteArray) = MessageDigest.getInstance("SHA-1").digest(bytes.copyOfRange(0, bytes.size-20))
@@ -47,4 +52,5 @@ object AdGateTransform {
     }
     fun patch(original: ByteArray): ByteArray = apply(original,ads)
     fun patchMembership(original: ByteArray): ByteArray = apply(original,membership)
+    fun patchDailyBonus(original: ByteArray): ByteArray = apply(original,dailyBonus)
 }
