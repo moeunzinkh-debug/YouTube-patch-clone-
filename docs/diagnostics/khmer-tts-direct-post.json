@@ -1,0 +1,53 @@
+{
+  "checked_at": "2026-10-28T04:39:07.492132+00:00",
+  "tests": [
+    {
+      "name": "health",
+      "method": "GET",
+      "url": "https://takumi0002-tts-kh.hf.space/api/health",
+      "request_json": null,
+      "status": 200,
+      "content_type": "application/json",
+      "received_bytes": 173,
+      "size_limit_exceeded": false,
+      "response_json": {
+        "status": "ok",
+        "ffmpeg": "/usr/bin/ffmpeg",
+        "voices": {
+          "piseth": "km-KH-PisethNeural",
+          "sreymom": "km-KH-SreymomNeural",
+          "mina": "km-KH-SreymomNeural",
+          "visal": "km-KH-PisethNeural"
+        }
+      }
+    },
+    {
+      "name": "post_empty_json",
+      "method": "POST",
+      "url": "https://takumi0002-tts-kh.hf.space/api/process-multi",
+      "request_json": {},
+      "status": 400,
+      "content_type": "application/json",
+      "received_bytes": 29,
+      "size_limit_exceeded": false,
+      "response_json": {
+        "detail": "No data provided"
+      }
+    },
+    {
+      "name": "post_text_json",
+      "method": "POST",
+      "url": "https://takumi0002-tts-kh.hf.space/api/process-multi",
+      "request_json": {
+        "text": "សួស្តី នេះជាការសាកល្បងសំឡេង។"
+      },
+      "status": 400,
+      "content_type": "application/json",
+      "received_bytes": 29,
+      "size_limit_exceeded": false,
+      "response_json": {
+        "detail": "No data provided"
+      }
+    }
+  ]
+}
