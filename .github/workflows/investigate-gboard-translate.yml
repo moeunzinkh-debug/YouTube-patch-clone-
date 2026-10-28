@@ -8,6 +8,7 @@ on:
       - 'tools/gboard/investigate_translate.py'
       - 'tools/gboard/probe_google_translate.py'
       - 'tools/gboard/test_translate_investigation.py'
+      - 'tools/gboard/trace_translate_methods.py'
       - '.github/workflows/investigate-gboard-translate.yml'
 
 permissions:
@@ -95,6 +96,8 @@ jobs:
             exit 1
           fi
           cat /tmp/gboard-inventory.log
+      - name: Trace selected request and callback methods with literals redacted
+        run: python tools/gboard/trace_translate_methods.py "$apk"
       - name: Publish only sanitized diagnostic reports to this session branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/arena/69154a0c-youtube-patch-clone'
         run: |
@@ -102,7 +105,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git pull --rebase origin "$GITHUB_REF_NAME"
-          for path in tools/gboard/investigate_translate.py tools/gboard/probe_google_translate.py tools/gboard/test_translate_investigation.py .github/workflows/investigate-gboard-translate.yml; do
+          for path in tools/gboard/investigate_translate.py tools/gboard/probe_google_translate.py tools/gboard/test_translate_investigation.py tools/gboard/trace_translate_methods.py .github/workflows/investigate-gboard-translate.yml; do
             if [ "$(git rev-parse "$GITHUB_SHA:$path")" != "$(git rev-parse "HEAD:$path")" ]; then
               echo 'Diagnostic inputs changed; not publishing stale reports.'
               exit 0

@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 import investigate_translate as inventory
 import probe_google_translate as probe
+import trace_translate_methods as tracer
 
 
 class Response(io.BytesIO):
@@ -61,6 +62,18 @@ class TranslateInvestigationTest(unittest.TestCase):
             self.assertIsNotNone(inventory.DEX_NAME.fullmatch(name))
         for name in ('classes1.dex', 'classes0.dex', 'some/classes.dex', 'classes.dex.txt'):
             self.assertIsNone(inventory.DEX_NAME.fullmatch(name))
+
+    def test_method_trace_redacts_unapproved_string_literals(self):
+        root = Path(__file__).resolve().parents[2]
+        previous = tracer.TARGETS
+        try:
+            tracer.TARGETS = {'Lcom/google/gson/FieldNamingPolicy;': {'<clinit>'}}
+            output = tracer.trace(root / 'bundles/gboard/gboard-patches-4.0.0.mpp')
+        finally:
+            tracer.TARGETS = previous
+        constants = [line for line in output.splitlines() if 'const-string' in line]
+        self.assertTrue(constants)
+        self.assertTrue(all(line.endswith('<redacted>') for line in constants))
 
     def test_real_dex_const_string_reference(self):
         root = Path(__file__).resolve().parents[2]
