@@ -30,6 +30,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Resolve tag and version
         id: meta
@@ -50,7 +51,20 @@ jobs:
           echo "Releasing $tag (bundle version $version)"
 
       - name: Verify the compiled bundle
-        run: python3 .github/scripts/verify-mpp.py
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          python3 .github/scripts/verify-mpp.py
+          python3 - <<'PYCODE'
+          import json, os, zipfile
+          from pathlib import Path
+          version = os.environ['VERSION']
+          assert f'version = {version}' in Path('gradle.properties').read_text().splitlines()
+          assert json.loads(Path('patches-list.json').read_text())['version'] == version
+          with zipfile.ZipFile('patch.mpp') as archive:
+              manifest = archive.read('META-INF/MANIFEST.MF').decode().replace('\r', '')
+              assert f'\nVersion: {version}\n' in manifest
+          PYCODE
 
       - name: Generate patches-bundle.json for this tag
         env:
@@ -91,6 +105,7 @@ jobs:
           if gh release view "$TAG" > /dev/null 2>&1; then
             echo "Release $TAG already exists; replacing assets."
             gh release upload "$TAG" "${assets[@]}" --clobber
+            gh release edit "$TAG" --draft=false --latest
           else
             echo "Creating release $TAG."
             gh release create "$TAG" "${assets[@]}" \
