@@ -52,6 +52,12 @@ class EmulatorSmokeTest(unittest.TestCase):
         with patch.object(emulator_smoke, "run", return_value=output):
             self.assertEqual(windows, emulator_smoke.inspect_ime_windows())
         self.assertEqual(2, len(list(emulator_smoke.flatten_window_nodes(windows))))
+        with patch.object(emulator_smoke, "run", return_value="") as command:
+            self.assertTrue(emulator_smoke.tap_ime_label(windows, "translate"))
+            command.assert_called_once_with("adb", "shell", "input", "tap", "2", "3")
+        with patch.object(emulator_smoke, "run") as command:
+            self.assertFalse(emulator_smoke.tap_ime_label(windows, "missing"))
+            command.assert_not_called()
         with patch.object(emulator_smoke, "run", return_value="INSTRUMENTATION_FAILED: private"):
             with self.assertRaisesRegex(RuntimeError, "did not return"):
                 emulator_smoke.inspect_ime_windows()

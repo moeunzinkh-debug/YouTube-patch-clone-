@@ -222,6 +222,18 @@ def flatten_window_nodes(windows: list):
         yield from flatten_window_nodes(window.get("children", []))
 
 
+def tap_ime_label(windows: list, label: str) -> bool:
+    for node in flatten_window_nodes(windows):
+        description = (str(node.get("description", "")) + " " + str(node.get("text", ""))).lower()
+        if label.lower() not in description:
+            continue
+        position = center(node.get("bounds", ""))
+        if position:
+            run("adb", "shell", "input", "tap", str(position[0]), str(position[1]))
+            return True
+    return False
+
+
 def gboard_ime_smoke(apk: Path, report: dict) -> None:
     run("adb", "install", "-r", str(apk), timeout=180)
     report["fixture_install"] = "passed"
@@ -278,19 +290,20 @@ def gboard_ime_smoke(apk: Path, report: dict) -> None:
         windows = inspect_ime_windows()
         report["ime_accessibility_windows"] = len(windows)
         publish_synthetic_ui(json.dumps(windows, ensure_ascii=False), "GBOARD_IME_WINDOWS")
-        # Opening Translate is attempted only by a visible accessibility
-        # label; a tap is not evidence that translation itself succeeded.
-        for node in flatten_window_nodes(windows):
-            label = (str(node.get("description", "")) + " " + str(node.get("text", ""))).lower()
-            if "translate" not in label:
-                continue
-            position = center(node.get("bounds", ""))
-            if position:
-                run("adb", "shell", "input", "tap", str(position[0]), str(position[1]))
+        # Translate can be tucked into the features menu instead of the
+        # initial toolbar. Tap only known accessibility labels in this fresh
+        # emulator; tapping is not evidence that translation itself succeeded.
+        if not any("translate" in (str(n.get("description", "")) + " " + str(n.get("text", ""))).lower()
+                   for n in flatten_window_nodes(windows)):
+            if tap_ime_label(windows, "open features menu"):
+                report["features_menu_tapped"] = True
                 time.sleep(3)
-                publish_synthetic_ui(json.dumps(inspect_ime_windows(), ensure_ascii=False), "GBOARD_TRANSLATE_UI")
-                report["translate_button_tapped"] = "attempted; translation not yet asserted"
-                break
+                windows = inspect_ime_windows()
+                publish_synthetic_ui(json.dumps(windows, ensure_ascii=False), "GBOARD_FEATURE_MENU")
+        if tap_ime_label(windows, "translate"):
+            time.sleep(3)
+            publish_synthetic_ui(json.dumps(inspect_ime_windows(), ensure_ascii=False), "GBOARD_TRANSLATE_UI")
+            report["translate_button_tapped"] = "attempted; translation not yet asserted"
     except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
         report["ime_inspector_error"] = type(error).__name__
         print(f"::warning::IME accessibility inspector could not complete: {type(error).__name__}")
