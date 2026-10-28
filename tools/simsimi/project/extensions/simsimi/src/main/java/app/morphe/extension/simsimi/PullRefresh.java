@@ -5,6 +5,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.graphics.Rect;
 import android.widget.Toast;
 import android.util.Log;
 import java.lang.reflect.Method;
@@ -25,13 +27,17 @@ public final class PullRefresh {
                 case MotionEvent.ACTION_DOWN:
                     View root = activity.getWindow().getDecorView();
                     View focused = activity.getCurrentFocus();
-                    boolean allowed = !(focused instanceof EditText)
+                    boolean allowed = isConversationScreen(root)
+                            && !(focused instanceof EditText)
                             && !scrollableAt(root, event.getRawX(), event.getRawY());
                     state.down(event.getX(), event.getY(), event.getEventTime(), density, allowed);
                     break;
                 case MotionEvent.ACTION_UP:
-                    if (state.up(event.getX(), event.getY(), event.getEventTime(), density)) {
-                        activity.getWindow().getDecorView().post(() -> reload(activity));
+                    if (state.up(event.getX(), event.getY(), event.getEventTime(), density)
+                            && isConversationScreen(activity.getWindow().getDecorView())) {
+                        activity.getWindow().getDecorView().post(() -> {
+                            if (isConversationScreen(activity.getWindow().getDecorView())) reload(activity);
+                        });
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
@@ -43,6 +49,25 @@ public final class PullRefresh {
         } catch (Exception error) {
             Log.w("SimSimiPatch", "Pull-to-reload gesture failed", error);
         }
+    }
+    private static boolean isConversationScreen(View root) {
+        return ConversationScreen.allows(screenFlags(root));
+    }
+    private static int screenFlags(View view) {
+        Rect visible = new Rect();
+        if (!view.isShown() || !view.getGlobalVisibleRect(visible)) return 0;
+        int flags = 0;
+        if (view instanceof TextView text) {
+            float density = view.getResources().getDisplayMetrics().density;
+            flags |= ConversationScreen.flags(text.getText(), visible.top / density);
+        }
+        if (view instanceof ViewGroup group) {
+            for (int index = 0; index < group.getChildCount(); index++) {
+                flags |= screenFlags(group.getChildAt(index));
+                if (ConversationScreen.allows(flags)) break;
+            }
+        }
+        return flags;
     }
     private static boolean scrollableAt(View view, float x, float y) {
         if (view.getVisibility() != View.VISIBLE) return false;
@@ -72,7 +97,7 @@ public final class PullRefresh {
                 Method reload = host.getClass().getMethod("reload", String.class);
                 reload.invoke(host, "SimSimi pull-to-reload patch");
             }
-            Toast.makeText(activity, "Reloading SimSimi…", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Reloading Conversation…", Toast.LENGTH_SHORT).show();
         } catch (Exception error) {
             Log.w("SimSimiPatch", "React reload unavailable", error);
             Toast.makeText(activity, "Cannot reload this SimSimi build", Toast.LENGTH_SHORT).show();

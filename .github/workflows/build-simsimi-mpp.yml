@@ -33,6 +33,8 @@ jobs:
           mkdir -p /tmp/gesture-tests
           javac -d /tmp/gesture-tests tools/simsimi/project/extensions/simsimi/src/main/java/app/morphe/extension/simsimi/PullGesture.java tools/simsimi/tests/PullGestureTest.java
           java -cp /tmp/gesture-tests PullGestureTest
+          javac -d /tmp/gesture-tests tools/simsimi/project/extensions/simsimi/src/main/java/app/morphe/extension/simsimi/ConversationScreen.java tools/simsimi/tests/ConversationScreenTest.java
+          java -cp /tmp/gesture-tests ConversationScreenTest
       - name: Compile independent bundle and test exact payload transformation
         env:
           GITHUB_TOKEN: ${{ github.token }}

@@ -13,7 +13,7 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 @Suppress("unused")
 val pullRefreshPatch = bytecodePatch(
     name = "Pull down to restart chat (experimental)",
-    description = "Pull down at least 160dp from the top 96dp to request a React chat/home reload. Does not kill the app. Skips focused text input and scrolled content. Reload can discard unsaved screen state; device testing required."
+    description = "Pull down at least 160dp from the top 96dp on the English Conversation list to request a React reload. Disabled inside chat rooms and on unrecognized screens. Does not kill the app. Skips focused text input and scrolled content. Reload can discard unsaved screen state; device testing required."
 ) {
     compatibleWith(Compatibility(
         name = "SimSimi", packageName = "com.ismaker.android.simsimi",
