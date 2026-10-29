@@ -39,7 +39,6 @@ report = {
     },
     'upstream_patch_defaults': 'All 15 selectable patches default on; Disable analytics targets Telegram Plus only.',
     'scope': 'Telegram, Telegram Web and Telegram Plus only; generic helpers are anonymous dependencies.',
-    'release_published': False,
 }
 (folder / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
 print('Wrote Telegram build report:', smoke['status'])

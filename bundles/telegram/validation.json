@@ -28,6 +28,5 @@
     "server_side_premium_or_download_speed": "not_verified"
   },
   "upstream_patch_defaults": "All 15 selectable patches default on; Disable analytics targets Telegram Plus only.",
-  "scope": "Telegram, Telegram Web and Telegram Plus only; generic helpers are anonymous dependencies.",
-  "release_published": false
+  "scope": "Telegram, Telegram Web and Telegram Plus only; generic helpers are anonymous dependencies."
 }

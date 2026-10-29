@@ -14,9 +14,11 @@ Bundle នេះជាការជ្រើសយក **តែ Telegram** ពី 
 
 ## របៀបប្រើ
 
-1. ទាញយក [`bundle.mpp`](bundle.mpp) ទៅទូរស័ព្ទ។ ក្នុង **Morphe Manager** ចូល **Sources → + → Local** ហើយជ្រើសឯកសារ `.mpp` នោះ។ វាជា patch bundle ដាច់ដោយឡែក មិនមែន APK ដែលអាចដំឡើងដោយផ្ទាល់ទេ។ Local source មិន update ស្វ័យប្រវត្តិទេ។
+1. ទាញយក `bundle.mpp` ពី [GitHub Release (pre-release)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Telegram-v1.23.1-tg.1) ឬពី [repository](bundle.mpp) ទៅទូរស័ព្ទ។ ក្នុង **Morphe Manager** ចូល **Sources → + → Local** ហើយជ្រើសឯកសារ `.mpp` នោះ។ វាជា patch bundle ដាច់ដោយឡែក មិនមែន APK ដែលអាចដំឡើងដោយផ្ទាល់ទេ។ Local source មិន update ស្វ័យប្រវត្តិទេ។
 2. ជ្រើស **APK ដើម** និង package/version ដូចតារាង។ មុន patch សូមពិនិត្យ selectors៖ **upstream បើកទាំងអស់ជាមុន** រួមទាំងមុខងារប៉ះពាល់ឯកជនភាព និង `Disable auto-update`។ ដកជម្រើសដែលអ្នកមិនចង់ប្រើ។
 3. Patch និង sign តាម Manager។ Android ទាមទារ signature ដូចគ្នាដើម្បី update app ដែលមានស្រាប់; APK ដែល patch ហើយជាទូទៅមាន key ខុសពី Telegram ដើម។ **កុំលុប app ដើមដោយមិនត្រៀមទុកទិន្នន័យ**៖ Secret Chats និងទិន្នន័យក្នុងឧបករណ៍អាចបាត់។ សម្រាប់ split packages ត្រូវឱ្យ base និង splits ត្រូវកំណែ/ABI និងចុះហត្ថលេខាដូចគ្នា។
+
+**បញ្ហាដែលបានរាយការណ៍៖** លើ `org.telegram.messenger` 12.10.1 មាន log ថា `Disable auto-update` មិន match fingerprint។ បើជួបកំហុសនេះ អាចដក selector នោះជាបណ្ដោះអាសន្ន ហើយសាកម្ដងទៀត។ វាមិនមែនជាការជួសជុល និងមិនធានាថា patches ផ្សេងទៀតនឹងដំណើរការទេ។
 
 <details>
 <summary>📨 Telegram • 15 patches (14 សម្រាប់ Telegram ដើម)</summary>

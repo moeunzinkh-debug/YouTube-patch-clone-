@@ -112,7 +112,7 @@ OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភ
 
 ប្រភព៖ [rushiranpise/morphe-patches v1.23.1](https://github.com/rushiranpise/morphe-patches/releases/tag/v1.23.1)។
 នេះជា bundle ដែល build ឡើងវិញពី **Telegram subset ប៉ុណ្ណោះ** មិនមែន upstream bundle ដែលមាន app ផ្សេងៗទេ។
-[ទាញយក `bundle.mpp`](bundles/telegram/bundle.mpp) · [របៀបប្រើ និងការព្រមាន](bundles/telegram/README.md) · [ប្រភព/អាជ្ញាបណ្ណ](docs/telegram/upstream.md)
+[GitHub Release (pre-release)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Telegram-v1.23.1-tg.1) · [ទាញយក `bundle.mpp` ពី repository](bundles/telegram/bundle.mpp) · [របៀបប្រើ និងការព្រមាន](bundles/telegram/README.md) · [ប្រភព/អាជ្ញាបណ្ណ](docs/telegram/upstream.md)
 
 កំណែដែល upstream រាយ៖ Telegram `org.telegram.messenger` **12.10.1 (70382)**, Telegram Web Android package `org.telegram.messenger.web` **12.10.1 (70389)** និង Telegram Plus `org.telegram.plus` **12.10.1.1 (22510)**។ Telegram និង Telegram Web មាន 14 selectors; `Disable analytics` បន្ថែមសម្រាប់ Telegram Plus ប៉ុណ្ណោះ។ **Selectors ទាំងអស់បើកជាមុន** ដូច upstream; ពិនិត្យ និងដកអ្វីដែលមិនចង់ប្រើមុន patch។
 
