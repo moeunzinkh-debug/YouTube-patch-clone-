@@ -10,6 +10,11 @@ import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
 
+// Share one extension across independently selectable native features.
+internal val simSimiExtensionPatch = bytecodePatch {
+    extendWith("extensions/simsimi.mpe")
+}
+
 @Suppress("unused")
 val pullRefreshPatch = bytecodePatch(
     name = "Pull down to restart chat (experimental)",
@@ -19,7 +24,7 @@ val pullRefreshPatch = bytecodePatch(
         name = "SimSimi", packageName = "com.ismaker.android.simsimi",
         targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
     ))
-    extendWith("extensions/simsimi.mpe")
+    dependsOn(simSimiExtensionPatch)
     execute {
         val activity = mutableClassDefBy("Lcom/ismaker/android/simsimi/MainActivity;")
         require(activity.superclass == "Lcom/reactnativenavigation/NavigationActivity;") { "Unsupported SimSimi activity base" }
