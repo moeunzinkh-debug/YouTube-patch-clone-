@@ -7,24 +7,42 @@
       "fixture": "original_telegram_signed",
       "install": "passed",
       "launcher": "org.telegram.messenger.web/org.telegram.messenger.DefaultIcon",
+      "activity_manager_start_status": "ok",
       "process_alive_after_12_seconds": true,
-      "telegram_in_focused_window": false,
+      "telegram_reported_focused_or_resumed": true,
+      "focus_or_resume_diagnostics": [
+        "topResumedActivity=ActivityRecord{67afb2 u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon t8}",
+        "mCurrentFocus=Window{b3a7c4 u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon}",
+        "mFocusedApp=ActivityRecord{67afb2 u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon t8}"
+      ],
       "fatal_exception": null
     },
     {
       "fixture": "remove_ads_test_signed",
       "install": "passed",
       "launcher": "org.telegram.messenger.web/org.telegram.messenger.DefaultIcon",
+      "activity_manager_start_status": "ok",
       "process_alive_after_12_seconds": true,
-      "telegram_in_focused_window": false,
+      "telegram_reported_focused_or_resumed": true,
+      "focus_or_resume_diagnostics": [
+        "topResumedActivity=ActivityRecord{11a9789 u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon t9}",
+        "mCurrentFocus=Window{d44ab1b u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon}",
+        "mFocusedApp=ActivityRecord{11a9789 u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon t9}"
+      ],
       "fatal_exception": null
     },
     {
       "fixture": "all_14_default_test_signed",
       "install": "passed",
       "launcher": "org.telegram.messenger.web/org.telegram.messenger.DefaultIcon",
+      "activity_manager_start_status": "ok",
       "process_alive_after_12_seconds": true,
-      "telegram_in_focused_window": false,
+      "telegram_reported_focused_or_resumed": true,
+      "focus_or_resume_diagnostics": [
+        "topResumedActivity=ActivityRecord{2804bef u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon t10}",
+        "mCurrentFocus=Window{64bbd4a u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon}",
+        "mFocusedApp=ActivityRecord{2804bef u0 org.telegram.messenger.web/org.telegram.messenger.DefaultIcon t10}"
+      ],
       "fatal_exception": null
     }
   ],
@@ -34,5 +52,5 @@
   "outcome": "passed_launcher_process_smoke",
   "bundle_sha256": "c3fd498bff06cd6acaabadcec696cf571480e0212f3d530e4f9e425ca7573cbb",
   "emulator_action_outcome": "success",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40835029849"
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40835478116"
 }
