@@ -102,7 +102,7 @@ def main() -> None:
     adb('shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-t', 'application/vnd.ms-project',
         '--grant-read-uri-permission', '-d', f'content://media/external/file/{bundle_id}',
         '-n', 'app.morphe.manager/.MainActivity')
-    nodes, _ = wait_for('Add source', 45)
+    nodes, _ = wait_for('Do you want to add this patch source to Morphe?', 45)
     announce('source confirmation', nodes)
     tap('Add', exact=True)
     time.sleep(12)
