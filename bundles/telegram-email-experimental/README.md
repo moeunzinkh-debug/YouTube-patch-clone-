@@ -25,4 +25,8 @@
 
 ការសាកប្រើលេខ និង challenge hash ដែល app បានទទួល ដើម្បីស្នើទៅ Telegram តាម API ដើម; patch មិនបន្ថែមសេវាភាគីទីបី ឬកត់ត្រាព័ត៌មានទាំងនេះទេ។ ការចុះហត្ថលេខាថ្មីធ្វើឱ្យ APK មិនអាច update app ដើមដែលប្រើ key ផ្សេង។ **កុំលុប Telegram ដែលនៅ login ដោយមិនត្រៀមទិន្នន័យជាមុន**; Secret Chats និងទិន្នន័យមូលដ្ឋានអាចបាត់។
 
-`validation.json` និង `android-smoke.json` នៅថតនេះត្រូវបានបង្កើតដោយ CI បន្ទាប់ពីការត្រួតពិនិត្យឆ្លង។ ការសាកជាមួយទិន្នន័យសំយោគ ឬ APK Telegram Web **មិនមែន** ជាភស្តុតាងថា OTP ឬការជៀសថ្លៃដំណើរការលើ server, Google Play APK ឬទូរសព្ទពិតរបស់អ្នកទេ។
+## អ្វីដែលបាន និងមិនទាន់សាក
+
+- [CI សាក Morphe Manager 2.2.0](manager-smoke.json) បាន import bundle នេះ ជ្រើស patch សាកល្បងតែមួយ ហើយ Manager បង្ហាញ **Patched · 1 patch** សម្រាប់ APK Telegram Web 12.10.1 ពិតលើ Android 15 emulator។ មិនបានពិនិត្យ DEX ឬបើក APK ដែល Manager បង្កើតក្នុងការសាកនោះទេ។
+- [CI build ដំបូង](validation.json) បានប្រើ Morphe Desktop patch Telegram Web ទាំងជ្រើស patch សាកល្បងតែមួយ និងជ្រើសជាមួយ upstream defaults; វាបានពិនិត្យ hooks ក្នុង DEX ហើយសាក UI ជាមួយទិន្នន័យសំយោគនៅលើ [emulator](android-smoke.json)។ `validation.json` រាយថា Manager មិនទាន់សាក **ក្នុង run ដំបូងនោះ**; ការសាក Manager ខាងលើធ្វើឡើងបន្ទាប់មក។
+- **មិនទាន់សាក** login/signup ជាមួយគណនីដែលជួបបញ្ហា, ការឆ្លើយតប `next_type`/resend ពិត, APK Google Play ឬទូរសព្ទពិត។ ដូច្នេះ មិនមានភស្តុតាងថាអាចទទួល OTP ដោយមិនគិតថ្លៃ ឬជៀស SMS Fee បានទេ។

@@ -145,7 +145,7 @@ Morphe Desktop បាន patch និង rebuild APK Telegram Web 12.10.1 ដែ
 
 [ទាញយក `bundle.mpp` សាកល្បង](bundles/telegram-email-experimental/bundle.mpp) · [របៀបប្រើ និងកម្រិតកំណត់](bundles/telegram-email-experimental/README.md) · [លទ្ធផល CI](bundles/telegram-email-experimental/validation.json)
 
-Bundle នេះមាន Telegram upstream 15 selectors និង selector សាកល្បងមួយ; វាមិនជំនួស bundle ដើមទេ។ CI បាន patch APK Telegram **Web** 12.10.1 ពិតដោយ Morphe Desktop និងសាក UI សំយោគលើ emulator។ មិនទាន់សាក login/signup លើ server ពិត, APK Google Play ឬទូរសព្ទពិតទេ។
+Bundle នេះមាន Telegram upstream 15 selectors និង selector សាកល្បងមួយ; វាមិនជំនួស bundle ដើមទេ។ CI បានជ្រើស patch នេះតែមួយ និង patch APK Telegram **Web** 12.10.1 ពិតក្នុង [Morphe Manager 2.2.0](bundles/telegram-email-experimental/manager-smoke.json)។ Desktop និង UI សំយោគលើ emulator ក៏បានសាកដែរ។ មិនទាន់សាក login/signup លើ server ពិត, APK Google Play ឬទូរសព្ទពិតទេ។
 
 </details>
 
