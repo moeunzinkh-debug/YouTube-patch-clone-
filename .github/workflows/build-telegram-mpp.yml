@@ -130,14 +130,20 @@ jobs:
             tail -n 20 /tmp/telegram-single.log | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
+          echo '::notice::Single Remove ads patch command completed'
           if ! java -Xmx4g -jar "$desktop" patch "$input" -p /tmp/telegram-output/bundle.mpp \
             --unsigned -o /tmp/telegram-output/all-default.apk -r /tmp/telegram-output/all-default.json \
             >/tmp/telegram-all.log 2>&1; then
             tail -n 20 /tmp/telegram-all.log | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
-          python3 tools/telegram/verify_patching.py "$input" /tmp/telegram-output/remove-ads.json \
-            /tmp/telegram-output/all-default.json "$smoke" --package "$package"
+          echo '::notice::All-default patch command completed'
+          if ! python3 tools/telegram/verify_patching.py "$input" /tmp/telegram-output/remove-ads.json \
+            /tmp/telegram-output/all-default.json "$smoke" --package "$package" > /tmp/telegram-results.log 2>&1; then
+            tail -n 8 /tmp/telegram-results.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat /tmp/telegram-results.log
       - name: Record validation and save only the separate bundle
         run: |
           set -euo pipefail
