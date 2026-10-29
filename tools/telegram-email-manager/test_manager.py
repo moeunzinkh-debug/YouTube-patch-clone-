@@ -6,6 +6,7 @@ phone number, OTP, or external Telegram request is made by this test.
 """
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -16,6 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 INPUTS = Path('/tmp/telegram-email-manager')
 SELECTOR = 'Try another login method (experimental)'
+MANAGER_VERSION = os.environ.get('TELEGRAM_TEST_MANAGER_VERSION', '2.2.0')
 LAST_STAGE = 'startup'
 
 
@@ -84,7 +86,7 @@ def media_id(name: str) -> str:
 
 def main() -> None:
     global LAST_STAGE
-    manager = INPUTS / 'morphe-manager-2.2.0.apk'
+    manager = INPUTS / f'morphe-manager-{MANAGER_VERSION}.apk'
     telegram = INPUTS / 'Telegram-12.10.1.apk'
     bundle = ROOT / 'bundles/telegram-email-experimental/bundle.mpp'
     adb('install', '-r', str(manager), timeout=180)
@@ -156,7 +158,7 @@ def main() -> None:
               and any(matches(n, 'Telegram Patch Clone - Email Experiment 1.23.1-tg.email-exp.1') for n in nodes)
               and any(matches(n, 'Save', exact=True) for n in nodes)):
             announce('Manager patching succeeded', nodes)
-            print('Morphe Manager 2.2.0 applied the selected experiment to stock Telegram Web 12.10.1.', flush=True)
+            print(f'Morphe Manager {MANAGER_VERSION} applied the selected experiment to stock Telegram Web 12.10.1.', flush=True)
             return
         elif any(matches(n, 'Oops! Something went wrong') or matches(n, 'Patching failed') for n in nodes):
             raise RuntimeError('Manager reported that patching failed')

@@ -47,3 +47,38 @@ jobs:
           if test -f /tmp/telegram-compat/standard.apk; then
             python3 tools/telegram-compat/check_desktop.py /tmp/telegram-compat/standard.apk org.telegram.messenger
           fi
+  manager-android10:
+    if: contains(github.event.head_commit.message, '[telegram-compat]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fetch and verify the user's exact Manager release and the Web fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/telegram-email-manager
+          gh release download v2.3.0-dev.3 --repo MorpheApp/morphe-manager --pattern morphe-manager-2.3.0-dev.3.apk --dir /tmp/telegram-email-manager
+          gh release download android-12.10.1 --repo LOVECHEN/telegram-release --pattern Telegram-12.10.1.apk --dir /tmp/telegram-email-manager
+          echo '9b9cbd8d3e0c4394f87c1a5675db6ff2e473233e316bf2915f6fe447347e5d96  /tmp/telegram-email-manager/morphe-manager-2.3.0-dev.3.apk' | sha256sum -c
+          echo 'f5e1192725772960cc94b83e54ffd8939f876b2b6e5f21d4a8537eb6fcba50e6  /tmp/telegram-email-manager/Telegram-12.10.1.apk' | sha256sum -c
+          (cd bundles/telegram-email-experimental && sha256sum -c bundle.mpp.sha256)
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Test only the email experiment in Manager on Android 10
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TELEGRAM_TEST_MANAGER_VERSION: 2.3.0-dev.3
+        with:
+          api-level: 29
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 4096M
+          heap-size: 1024M
+          disk-size: 8G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/telegram-email-manager/test_manager.py
