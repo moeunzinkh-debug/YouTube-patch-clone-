@@ -23,21 +23,29 @@ if (apk.get_package(), apk.get_androidversion_name(), apk.get_androidversion_cod
     raise SystemExit('Unexpected SimSimi package/version')
 
 matches = re.compile(r'(?:reactnativenavigation/.{0,100}bottomtabs|bottomnavigation|navigationbar|'
-                     r'react/views/scroll/ReactScrollView|/recyclerview/widget/RecyclerView;)', re.I)
+                     r'react/views/scroll/ReactScrollView|/recyclerview/widget/RecyclerView;|'
+                     r'reactnativenavigation/viewcontrollers/(?:viewcontroller/ViewController|stack/StackController|parent/ParentController);)', re.I)
 classes = []
 for dex_bytes in apk.get_all_dex():
     for cls in DEX(dex_bytes).get_classes():
         name = cls.get_name()
         if not matches.search(name):
             continue
+        methods = []
+        for method in cls.get_methods():
+            item = {'name': method.get_name(), 'descriptor': method.get_descriptor(),
+                    'access': method.get_access_flags_string()}
+            if name.endswith('/BottomTabsController;') and method.get_name() == 'onTabSelected' and method.get_code():
+                item['instructions'] = [instruction.get_name() + ' ' + instruction.get_output()
+                                        for instruction in method.get_instructions()]
+            methods.append(item)
         classes.append({
             'name': name,
             'superclass': cls.get_superclassname(),
             'interfaces': cls.get_interfaces(),
             'fields': [{'name': field.get_name(), 'type': field.get_descriptor(),
                         'access': field.get_access_flags_string()} for field in cls.get_fields()],
-            'methods': [{'name': method.get_name(), 'descriptor': method.get_descriptor(),
-                         'access': method.get_access_flags_string()} for method in cls.get_methods()],
+            'methods': methods,
         })
 classes.sort(key=lambda item: item['name'])
 if not classes or not any('bottom' in cls['name'].lower() for cls in classes):
