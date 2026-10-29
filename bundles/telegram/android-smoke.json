@@ -1,0 +1,38 @@
+{
+  "scope": "Ephemeral Android emulator, no account or messages; only install and launcher process survival.",
+  "package": "org.telegram.messenger.web",
+  "api_level": "35",
+  "cases": [
+    {
+      "fixture": "original_telegram_signed",
+      "install": "passed",
+      "launcher": "org.telegram.messenger.web/org.telegram.messenger.DefaultIcon",
+      "process_alive_after_12_seconds": true,
+      "telegram_in_focused_window": false,
+      "fatal_exception": null
+    },
+    {
+      "fixture": "remove_ads_test_signed",
+      "install": "passed",
+      "launcher": "org.telegram.messenger.web/org.telegram.messenger.DefaultIcon",
+      "process_alive_after_12_seconds": true,
+      "telegram_in_focused_window": false,
+      "fatal_exception": null
+    },
+    {
+      "fixture": "all_14_default_test_signed",
+      "install": "passed",
+      "launcher": "org.telegram.messenger.web/org.telegram.messenger.DefaultIcon",
+      "process_alive_after_12_seconds": true,
+      "telegram_in_focused_window": false,
+      "fatal_exception": null
+    }
+  ],
+  "feature_behavior_login_push_and_real_device": "not_tested",
+  "wifi_disable_command": true,
+  "mobile_data_disable_command": true,
+  "outcome": "passed_launcher_process_smoke",
+  "bundle_sha256": "c3fd498bff06cd6acaabadcec696cf571480e0212f3d530e4f9e425ca7573cbb",
+  "emulator_action_outcome": "success",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40835029849"
+}
