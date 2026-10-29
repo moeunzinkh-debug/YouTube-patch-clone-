@@ -20,10 +20,11 @@
       "original_signer_sha256": "49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1",
       "single_remove_ads": "passed_morphe_patching_and_rebuild",
       "fourteen_default_telegram_selectors": "passed_morphe_patching_and_rebuild",
-      "device_runtime": "not_tested"
+      "physical_device_runtime": "not_tested"
     },
     "android_manager_ui": "not_tested",
-    "android_device_runtime_login_notifications": "not_tested",
+    "android_emulator_launch": "See android-smoke.json when its bundle SHA-256 matches; launch smoke only.",
+    "physical_device_runtime_login_notifications": "not_tested",
     "server_side_premium_or_download_speed": "not_verified"
   },
   "upstream_patch_defaults": "All 15 selectable patches default on; Disable analytics targets Telegram Plus only.",

@@ -50,7 +50,7 @@ def main() -> None:
         'original_signer_sha256': '49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1',
         'single_remove_ads': 'passed_morphe_patching_and_rebuild',
         'fourteen_default_telegram_selectors': 'passed_morphe_patching_and_rebuild',
-        'device_runtime': 'not_tested',
+        'physical_device_runtime': 'not_tested',
     }
     args.output.write_text(json.dumps(report, indent=2) + '\n')
     print('Morphe applied the MPP alone and with all 14 default Telegram selectors to the original signed input')

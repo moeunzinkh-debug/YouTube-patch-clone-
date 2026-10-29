@@ -108,6 +108,37 @@ OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភ
 <!-- GBOARD-PATCH-LIST:END -->
 
 <details>
+<summary>✈️ Telegram • 15 patches (bundle ដាច់ដោយឡែក)</summary>
+
+ប្រភព៖ [rushiranpise/morphe-patches v1.23.1](https://github.com/rushiranpise/morphe-patches/releases/tag/v1.23.1)។
+នេះជា bundle ដែល build ឡើងវិញពី **Telegram subset ប៉ុណ្ណោះ** មិនមែន upstream bundle ដែលមាន app ផ្សេងៗទេ។
+[ទាញយក `bundle.mpp`](bundles/telegram/bundle.mpp) · [របៀបប្រើ និងការព្រមាន](bundles/telegram/README.md) · [ប្រភព/អាជ្ញាបណ្ណ](docs/telegram/upstream.md)
+
+កំណែដែល upstream រាយ៖ Telegram `org.telegram.messenger` **12.10.1 (70382)**, Telegram Web Android package `org.telegram.messenger.web` **12.10.1 (70389)** និង Telegram Plus `org.telegram.plus` **12.10.1.1 (22510)**។ Telegram និង Telegram Web មាន 14 selectors; `Disable analytics` បន្ថែមសម្រាប់ Telegram Plus ប៉ុណ្ណោះ។ **Selectors ទាំងអស់បើកជាមុន** ដូច upstream; ពិនិត្យ និងដកអ្វីដែលមិនចង់ប្រើមុន patch។
+
+Morphe Desktop បាន patch និង rebuild APK Telegram Web 12.10.1 ដែលផ្ទៀងផ្ទាត់ហត្ថលេខាដើមរួច ដោយជ្រើស `Remove ads` តែមួយ និងជ្រើសទាំង 14 ដាច់ដោយឡែក។ APK ទាំងពីរ (test-signed) ក៏បានបើកនៅ Android 15 emulator ដោយគ្មានគណនី ប៉ុន្តែមិនទាន់សាកមុខងារជាក់ស្ដែងទេ។ Telegram ដើម និង Plus មិនទាន់សាក patch ជាមួយ APK នៅទីនេះទេ; សូមមើល [លទ្ធផល Desktop](bundles/telegram/validation.json) និង [emulator](bundles/telegram/android-smoke.json)។
+
+- `Anti-delete messages` — ព្យាយាមរក្សាសារដែលអ្នកផ្សេងលុបនៅក្នុងឧបករណ៍។
+- `Anti-disappearing media` — ព្យាយាមរក្សា view-once media; ប៉ះពាល់ឯកជនភាព និងផ្លូវផ្ទុក secret media។
+- `Anti-screenshot notification` — ព្យាយាមមិនផ្ញើការជូនដំណឹង screenshot។
+- `Bypass channel restrictions` — ព្យាយាមរំលងការកំណត់មាតិកា channel ខាង app។
+- `Bypass content restrictions` — ព្យាយាមអនុញ្ញាត save/forward ដែល client ទប់។
+- `Bypass integrity check` — spoof លទ្ធផលត្រួតពិនិត្យខាង app; មិនធានា login ឬ hardware/server attestation។
+- `Disable analytics` — ទប់ analytics ខ្លះក្នុង Telegram Plus ប៉ុណ្ណោះ; push មិនទាន់បញ្ជាក់។
+- `Disable auto-update` — ទប់ការឆែក update របស់ app; ត្រូវតាមដាន security updates ដោយខ្លួនឯង។
+- `Disable channel switching` — បិទ gesture ប្ដូរទៅ channel បន្ទាប់។
+- `Download speed boost` — ប្ដូរប៉ារ៉ាម៉ែត្រទាញយក; ល្បឿនពិតមិនត្រូវបានធានា។
+- `Hide typing indicator` — ព្យាយាមលាក់សញ្ញាកំពុងវាយ។
+- `Remove ads` — ព្យាយាមទប់ sponsored messages និង video ads។
+- `Unlock Premium` — ប្ដូរតែការត្រួតពិនិត្យក្នុង client; **មិនបង្កើត Telegram Premium subscription ឬសិទ្ធិលើ server**។
+- `Use normal paste` — ប្រើ paste ធម្មតាជំនួស Rich HTML paste។
+- `Voice to music` — ព្យាយាមចាក់ voice note ក្នុង music player; ក៏អាចប៉ះពាល់ voice-once ផងដែរ។
+
+**ប្រយ័ត្ន៖** ការរក្សាសារ/view-once និងការលាក់ screenshot notification អាចប៉ះពាល់ឯកជនភាពរបស់អ្នកដទៃ។ Patching/signing ជាទូទៅប្រើ key ខុសពី app ដើម; កុំលុប app ដើមដោយមិនត្រៀមទិន្នន័យ ព្រោះ Secret Chats និងទិន្នន័យក្នុងឧបករណ៍អាចបាត់។ [ស្ថានភាពសាកល្បង](bundles/telegram/validation.json) រាយអ្វីដែលបាន និងមិនបានសាក។
+
+</details>
+
+<details>
 <summary>🗨️ SimSimi • 12 experimental patches (separate bundle)</summary>
 
 For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
