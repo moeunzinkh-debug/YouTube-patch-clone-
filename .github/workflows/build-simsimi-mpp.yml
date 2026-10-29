@@ -85,7 +85,7 @@ jobs:
           gh release download v1.19.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/simsimi-input
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
           java -Xmx2g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar list-patches \
-            --patches bundles/simsimi/bundle.mpp --with-packages --with-versions --out /tmp/simsimi-input/patches.txt \
+            --patches bundles/simsimi/bundle.mpp --with-packages --with-versions --include-experimental --out /tmp/simsimi-input/patches.txt \
             2>&1 | tee /tmp/simsimi-list.log
           if ! python3 tools/simsimi/verify_listing.py /tmp/simsimi-input/patches.txt > /tmp/simsimi-list-check.log 2>&1; then
             while IFS= read -r line; do echo "::error::$line"; done < /tmp/simsimi-list-check.log
