@@ -118,7 +118,7 @@ into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
 - **Pull down to restart chat (experimental)** — English Conversation list only, not inside chat rooms; requests React runtime reload.
 - **Quick return: double-tap Chat (experimental)** — opt-in; double-tap the selected bottom Chat tab to scroll the English Conversation list to the top, without reloading. Normal tab clicks continue unchanged.
 - **Daily bonus without video (client path, experimental)** — opt-in existing non-video flow; server reward is not guaranteed.
-- **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility.
+- **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility. It does not fix FCM push; the inspected RE 7.3.0-dev.2 APK has action/permission mismatches ([diagnosis](docs/simsimi/huawei-notifications.md)).
 - **Conversation level controls (client only, experimental)** — opt-in member slider path; server level/topic handling remains authoritative.
 - **Profile photo controls (client only, experimental)** — opt-in profile picker path; server upload still required.
 - **Custom group cover controls (client only, experimental)** — opt-in cover picker; no group ownership or server upload rights are granted.

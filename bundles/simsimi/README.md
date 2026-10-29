@@ -21,7 +21,7 @@
 | Unlock membership UI (client only, experimental) | On | ផ្ដល់ `hasMembership=true` ក្នុង client UI និង listener ដោយ clone ស្ថានភាព។ មិនបង្កើតការជាវ ឬសិទ្ធិនៅម៉ាស៊ីនមេ។ |
 | Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ មិនមែនក្នុងបន្ទប់ឆាត។ វា reload React runtime ទាំងមូល មិនសម្លាប់ app និងមិនមែន refresh តែទិន្នន័យបញ្ជីទេ។ |
 | Quick return: double-tap Chat (experimental) | Off | ចុច Chat ខាងក្រោមពីរដង នៅបញ្ជី Conversation ដើម្បីអូសបញ្ជីទៅដើមភ្លាមៗ ដោយមិន reload។ ចុចតែមួយនៅតែប្រើផ្លូវដើម; ការប្រើលើទូរសព្ទមិនទាន់សាកល្បង។ |
-| MicroG RE service routing (experimental) | Off | ប្ដូរផ្លូវ native GMS ទៅ `app.revanced.android.gms`; ត្រូវដំឡើង MicroG RE ដាច់ដោយឡែក ហើយមិនមែន GMS support ពេញលេញ។ |
+| MicroG RE service routing (experimental) | Off | ប្ដូរផ្លូវ native GMS ទៅ `app.revanced.android.gms`; ត្រូវដំឡើង MicroG RE ដាច់ដោយឡែក។ វា **មិនជួសជុល FCM push ទេ**៖ action និង permission មិនត្រូវនឹង RE 7.3.0-dev.2 ដែលបានពិនិត្យ។ [ព័ត៌មានលម្អិត](../../docs/simsimi/huawei-notifications.md)។ |
 | Daily bonus without video (client path, experimental) | Off | ជ្រើសផ្លូវ membership ដែលមានស្រាប់ដោយមិនផ្ទុកវីដេអូ។ Server reward និង error នៅដដែល; មិនធានាការទទួលរង្វាន់។ |
 | Conversation level controls (client only, experimental) | Off | ជ្រើស member branch ក្នុងសកម្មភាពប្ដូរ Freetalk level និងទុកសំណើរក្សាទុកកម្រិតទៅ server ដដែល។ មិនធានាប្រធានបទដែល server ផ្ដល់។ |
 | Profile photo controls (client only, experimental) | Off | ជ្រើសផ្លូវបើក photo picker ជំនួសអេក្រង់ជាវ; ការផ្ទុក និងរក្សាទុករូបអាស្រ័យលើ server។ |
