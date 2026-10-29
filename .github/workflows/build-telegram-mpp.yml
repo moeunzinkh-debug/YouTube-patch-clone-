@@ -147,7 +147,7 @@ jobs:
               path = Path('/tmp/telegram-output') / (label + '.json')
               if path.exists():
                   d = json.loads(path.read_text())
-                  info = {key: d.get(key) for key in ('packageName', 'packageVersion', 'patchingSteps', 'failedPatches', 'appliedPatches')}
+                  info = {key: d.get(key) for key in ('packageName', 'packageVersion', 'success', 'stepResults', 'failedPatches', 'appliedPatches')}
                   print('::error::' + label + ' patch report ' + json.dumps(info, separators=(',', ':'))[:3500])
           PY
             for log in /tmp/telegram-single.log /tmp/telegram-all.log; do

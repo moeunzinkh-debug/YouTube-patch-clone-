@@ -3,6 +3,7 @@
 import json
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -47,12 +48,21 @@ class TelegramSubsetTest(unittest.TestCase):
     def test_patch_report_rejects_partial_success(self):
         with tempfile.TemporaryDirectory(prefix='telegram-report-test-') as tmp:
             path = Path(tmp) / 'report.json'
-            report = {'packageName': 'org.telegram.messenger', 'packageVersion': '12.10.1',
-                      'patchingSteps': [{'step': 'PATCHING', 'success': True}],
-                      'appliedPatches': [{'name': 'Remove ads'}], 'failedPatches': []}
+            apk = Path(tmp) / 'output.apk'
+            with zipfile.ZipFile(apk, 'w') as archive:
+                archive.writestr('classes.dex', b'fixture')
+            report = {'success': True, 'outputPath': str(apk), 'packageName': 'org.telegram.messenger',
+                      'packageVersion': '12.10.1',
+                      'stepResults': [{'step': 'PATCHING', 'success': True}, {'step': 'REBUILDING', 'success': True}],
+                      'appliedPatches': ['Remove ads'], 'failedPatches': []}
             path.write_text(json.dumps(report))
             verify_patching.verify_report(path, {'Remove ads'})
             report['failedPatches'] = [{'name': 'Remove ads'}]
+            path.write_text(json.dumps(report))
+            with self.assertRaises(ValueError):
+                verify_patching.verify_report(path, {'Remove ads'})
+            report['failedPatches'] = []
+            report['stepResults'] = [{'step': 'PATCHING', 'success': True}]
             path.write_text(json.dumps(report))
             with self.assertRaises(ValueError):
                 verify_patching.verify_report(path, {'Remove ads'})

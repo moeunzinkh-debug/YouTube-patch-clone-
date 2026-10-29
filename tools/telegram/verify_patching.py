@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import zipfile
 from pathlib import Path
 
 from verify_bundle import NAMES
@@ -12,13 +13,17 @@ def verify_report(path: Path, expected: set[str], package: str = 'org.telegram.m
     result = json.loads(path.read_text())
     if result.get('packageName') != package or result.get('packageVersion') != '12.10.1':
         raise ValueError('Unexpected APK identity in patch report')
-    if result.get('failedPatches'):
-        raise ValueError('Morphe reported failed patches')
-    if not result.get('patchingSteps') or any(not item.get('success') for item in result['patchingSteps']):
-        raise ValueError('A patch or rebuild step failed')
-    applied = {item['name'] for item in result.get('appliedPatches', [])}
+    if result.get('success') is not True or result.get('failedPatches'):
+        raise ValueError('Morphe reported an unsuccessful run or failed patches')
+    steps = result.get('stepResults') or []
+    if not {'PATCHING', 'REBUILDING'}.issubset({item.get('step') for item in steps}) or any(item.get('success') is not True for item in steps):
+        raise ValueError('A patch or rebuild step failed or was missing')
+    applied = set(result.get('appliedPatches', []))
     if applied != expected:
         raise ValueError(f'Unexpected applied selectors: {sorted(applied ^ expected)}')
+    output = Path(result.get('outputPath', ''))
+    if not output.is_file() or output.stat().st_size == 0 or not zipfile.is_zipfile(output):
+        raise ValueError('Morphe did not create the rebuilt APK')
 
 
 def main() -> None:
