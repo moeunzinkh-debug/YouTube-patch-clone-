@@ -89,12 +89,18 @@ jobs:
             exit 1
           fi
           echo '::notice::Mirrored Telegram APK SHA-256 verified'
-          bt=$(find "${ANDROID_HOME:?}/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          if [ -z "${ANDROID_HOME:-}" ]; then
+            echo '::error::ANDROID_HOME is not set on the runner'
+            exit 1
+          fi
+          bt=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          echo "::notice::Android build tools: $bt"
           if ! "$bt/apksigner" verify --verbose --print-certs "$input" > /tmp/telegram-signature.txt 2>&1; then
             tail -n 8 /tmp/telegram-signature.txt | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
-          grep -E '^Signer #[0-9]* certificate SHA-(1|256) digest:' /tmp/telegram-signature.txt | while IFS= read -r line; do echo "::notice::$line"; done
+          echo "::notice::APK signer output: $(head -n 12 /tmp/telegram-signature.txt | tr '\n' ' ' | cut -c 1-2000)"
+          grep -E '^Signer #[0-9]* certificate SHA-(1|256) digest:' /tmp/telegram-signature.txt | while IFS= read -r line; do echo "::notice::$line"; done || true
           if ! grep -i -q '^Signer #1 certificate SHA-256 digest: 49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1$' /tmp/telegram-signature.txt; then
             echo '::error::Mirrored APK signer does not match the expected Telegram signing certificate'
             exit 1
