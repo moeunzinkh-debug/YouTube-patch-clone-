@@ -1,0 +1,24 @@
+{
+  "fork_version": "1.23.1-tg.1",
+  "upstream_tag": "v1.23.1",
+  "upstream_commit": "92c0fca0ae103a419c7fc61f9c5b8b38b7d6b82a",
+  "bundle_sha256": "acd58e23ba2e1681f3ce270d1a148728de7e50c4fdf1fb3795f1c13dd14de8b4",
+  "bundle_bytes": 776014,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40832598121",
+  "tests": {
+    "upstream_source_blob_verification": "passed",
+    "isolated_mpp_compile": "passed",
+    "mpp_zip_checksum_and_telegram_only_classes": "passed",
+    "morphe_desktop_1_19_1_listing_and_targets": "passed_15_selectors",
+    "actual_apk_application": {
+      "status": "not_tested_apk_download_unavailable",
+      "reason": "Exact-version public APK mirror could not be downloaded; no APK was applied."
+    },
+    "android_manager_ui": "not_tested",
+    "android_device_runtime_login_notifications": "not_tested",
+    "server_side_premium_or_download_speed": "not_verified"
+  },
+  "upstream_patch_defaults": "All 15 selectable patches default on; Disable analytics targets Telegram Plus only.",
+  "scope": "Telegram, Telegram Web and Telegram Plus only; generic helpers are anonymous dependencies.",
+  "release_published": false
+}
