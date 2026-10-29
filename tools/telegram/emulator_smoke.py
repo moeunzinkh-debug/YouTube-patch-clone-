@@ -88,8 +88,8 @@ def test_one(label: str, apk: Path) -> dict:
         'focus_or_resume_diagnostics': focus_lines,
         'fatal_exception': crash,
     }
-    if not result['process_alive_after_12_seconds'] or crash:
-        raise RuntimeError('Telegram process did not survive: ' + json.dumps(result))
+    if not result['process_alive_after_12_seconds'] or not result['telegram_reported_focused_or_resumed'] or crash:
+        raise RuntimeError('Telegram did not remain running in the foreground: ' + json.dumps(result))
     return result
 
 
