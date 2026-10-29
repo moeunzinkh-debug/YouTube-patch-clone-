@@ -18,6 +18,11 @@ class EmulatorSmokeTest(unittest.TestCase):
         self.assertFalse(smoke.parse_pid(''))
         self.assertFalse(smoke.parse_pid('pidof: not found'))
 
+    def test_start_status(self):
+        self.assertEqual(smoke.parse_start_status('Starting: Intent {}\r\nStatus: ok\r\n'), 'ok')
+        self.assertEqual(smoke.parse_start_status('Status: timeout\n'), 'timeout')
+        self.assertEqual(smoke.parse_start_status('no status'), 'unknown')
+
     def test_crash_filter(self):
         log = ('E AndroidRuntime: FATAL EXCEPTION: main\n'
                'E AndroidRuntime: Process: org.telegram.messenger.web, PID: 123\n'

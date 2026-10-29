@@ -35,6 +35,11 @@ def parse_pid(output: str) -> bool:
     return bool(re.fullmatch(r'\s*\d+(?:\s+\d+)*\s*', output))
 
 
+def parse_start_status(output: str) -> str:
+    match = re.search(r'^Status:\s*(\S+)', output, re.MULTILINE)
+    return match.group(1).lower() if match else 'unknown'
+
+
 def relevant_crash(log: str) -> str | None:
     lines = log.splitlines()
     for index, line in enumerate(lines):
@@ -61,21 +66,26 @@ def test_one(label: str, apk: Path) -> dict:
                   '-a', 'android.intent.action.MAIN', '-c', 'android.intent.category.LAUNCHER', PACKAGE)
     launcher = parse_launcher(resolve.stdout)
     start = run('adb', 'shell', 'am', 'start', '-W', '-n', launcher, timeout=90)
-    if 'Error:' in start.stdout or 'Exception' in start.stdout:
-        raise RuntimeError('Could not start launcher: ' + start.stdout[-1200:])
+    status = parse_start_status(start.stdout)
+    if start.returncode or status != 'ok' or 'Error:' in start.stdout or 'Exception' in start.stdout:
+        raise RuntimeError('Could not confirm launcher start: ' + start.stdout[-1200:])
     time.sleep(12)
     process = run('adb', 'shell', 'pidof', PACKAGE, required=False)
     logs = run('adb', 'logcat', '-d', '-s', 'AndroidRuntime:E', '*:S', required=False).stdout
     crash = relevant_crash(logs)
-    focused = run('adb', 'shell', 'dumpsys', 'window', 'windows', timeout=60, required=False).stdout
-    focus_lines = [line.strip() for line in focused.splitlines()
-                   if ('mCurrentFocus=' in line or 'mFocusedApp=' in line)]
+    window = run('adb', 'shell', 'dumpsys', 'window', 'windows', timeout=60, required=False).stdout
+    activities = run('adb', 'shell', 'dumpsys', 'activity', 'activities', timeout=60, required=False).stdout
+    focus_lines = [line.strip()[:350] for line in (window + '\n' + activities).splitlines()
+                   if any(marker in line for marker in
+                          ('mCurrentFocus=', 'mFocusedApp=', 'mResumedActivity:', 'topResumedActivity='))][:8]
     result = {
         'fixture': label,
         'install': 'passed',
         'launcher': launcher,
+        'activity_manager_start_status': status,
         'process_alive_after_12_seconds': parse_pid(process.stdout),
-        'telegram_in_focused_window': any(PACKAGE in line for line in focus_lines),
+        'telegram_reported_focused_or_resumed': any(PACKAGE in line for line in focus_lines),
+        'focus_or_resume_diagnostics': focus_lines,
         'fatal_exception': crash,
     }
     if not result['process_alive_after_12_seconds'] or crash:
