@@ -13,16 +13,19 @@ with zipfile.ZipFile(bundle) as archive:
     assert archive.testzip() is None, 'Corrupt archive'
     names = archive.namelist()
     manifest = archive.read('META-INF/MANIFEST.MF').decode().replace('\r', '')
-    assert 'Version: 0.3.0-dev.1\n' in manifest, manifest
+    assert 'Version: 0.4.0-dev.1\n' in manifest, manifest
     assert 'Patcher-Version: 2.0.0\n' in manifest, manifest
     assert 'app/morphe/patches/simsimi/AdGatePatchKt.class' in names
     assert 'app/morphe/patches/simsimi/AdGateTransform.class' in names
     assert not any(n.startswith(('app/morphe/patches/youtube/', 'app/morphe/patches/gemini/', 'app/morphe/patches/google/')) for n in names)
     assert 'app/morphe/patches/simsimi/PullRefreshPatchKt.class' in names
+    quick_class = archive.read('app/morphe/patches/simsimi/QuickReturnPatchKt.class')
+    assert b'Quick return: double-tap Chat (experimental)' in quick_class, 'Missing Quick Return selector'
     assert 'app/morphe/patches/simsimi/MicroGServicePatchKt.class' in names
     extension = archive.read('extensions/simsimi.mpe')
     assert extension.startswith(b'dex\n') and b'PullRefresh' in extension and b'PullGesture' in extension
     assert b'ConversationScreen' in extension, 'Missing Conversation-only screen guard'
+    assert b'QuickReturn' in extension and b'ChatTabDoubleTap' in extension, 'Missing Quick Return runtime'
     assert any(b'Daily bonus without video (client path, experimental)' in archive.read(name) for name in names if name.endswith('.class')), 'Missing daily bonus selector'
     feature_class = archive.read('app/morphe/patches/simsimi/MembershipFeaturePatchesKt.class')
     for label in (

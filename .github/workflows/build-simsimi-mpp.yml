@@ -1,8 +1,8 @@
 name: Build experimental SimSimi-only patch bundle
 on:
   push:
-    branches: [arena/e2b734f8-youtube-patch-clone]
-    paths: ['tools/simsimi/project/**', 'tools/simsimi/tests/**', 'tools/simsimi/prepare_build.py', 'tools/simsimi/verify_bundle.py', 'tools/simsimi/verify_feature_hbc.py', 'tools/simsimi/verify_patched_apk.py', 'docs/simsimi/feature-gates.json', '.github/workflows/build-simsimi-mpp.yml']
+    branches: [arena/0b9fd265-youtube-patch-clone]
+    paths: ['tools/simsimi/project/**', 'tools/simsimi/tests/**', 'tools/simsimi/prepare_build.py', 'tools/simsimi/verify_bundle.py', 'tools/simsimi/verify_listing.py', 'tools/simsimi/verify_feature_hbc.py', 'tools/simsimi/verify_patched_apk.py', 'tools/simsimi/verify_quick_apk.py', 'tools/simsimi/write_build_status.py', 'docs/simsimi/feature-gates.json', '.github/workflows/build-simsimi-mpp.yml']
 concurrency:
   group: simsimi-build-${{ github.ref }}
   cancel-in-progress: false
@@ -12,7 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
@@ -28,13 +28,21 @@ jobs:
           echo 'f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70  /tmp/simsimi-input/base.2.apk' | sha256sum --check
           unzip -p /tmp/simsimi-input/base.2.apk assets/index.android.bundle > /tmp/simsimi-input/original.hbc
           python3 tools/simsimi/prepare_build.py /tmp/simsimi-build
-      - name: Test pull gesture thresholds without consuming touch events
+      - name: Test existing pull gesture and Quick Return without consuming tab events
         run: |
+          set -euo pipefail
           mkdir -p /tmp/gesture-tests
-          javac -d /tmp/gesture-tests tools/simsimi/project/extensions/simsimi/src/main/java/app/morphe/extension/simsimi/PullGesture.java tools/simsimi/tests/PullGestureTest.java
+          source=tools/simsimi/project/extensions/simsimi/src/main/java/app/morphe/extension/simsimi
+          javac -d /tmp/gesture-tests "$source/PullGesture.java" tools/simsimi/tests/PullGestureTest.java
           java -cp /tmp/gesture-tests PullGestureTest
-          javac -d /tmp/gesture-tests tools/simsimi/project/extensions/simsimi/src/main/java/app/morphe/extension/simsimi/ConversationScreen.java tools/simsimi/tests/ConversationScreenTest.java
+          javac -d /tmp/gesture-tests "$source/ConversationScreen.java" tools/simsimi/tests/ConversationScreenTest.java
           java -cp /tmp/gesture-tests ConversationScreenTest
+          javac -d /tmp/gesture-tests "$source/ChatTabDoubleTap.java" tools/simsimi/tests/ChatTabDoubleTapTest.java
+          java -cp /tmp/gesture-tests ChatTabDoubleTapTest
+          javac -d /tmp/gesture-tests $(find tools/simsimi/tests/android-stubs -name '*.java' | sort) \
+            "$source/QuickReturn.java" "$source/ChatTabDoubleTap.java" "$source/ConversationScreen.java" tools/simsimi/tests/QuickReturnTest.java
+          java -cp /tmp/gesture-tests QuickReturnTest
+          python3 tools/simsimi/tests/verify_quick_apk_test.py
       - name: Compile independent bundle and test exact payload transformation
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -76,12 +84,48 @@ jobs:
           set -euo pipefail
           gh release download v1.19.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/simsimi-input
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
-          set -o pipefail
+          java -Xmx2g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar list-patches \
+            --patches bundles/simsimi/bundle.mpp --with-packages --with-versions --include-experimental --out /tmp/simsimi-input/patches.txt \
+            2>&1 | tee /tmp/simsimi-list.log
+          if ! python3 tools/simsimi/verify_listing.py /tmp/simsimi-input/patches.txt > /tmp/simsimi-list-check.log 2>&1; then
+            while IFS= read -r line; do echo "::error::$line"; done < /tmp/simsimi-list-check.log
+            exit 1
+          fi
           java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/base.2.apk \
-            -p bundles/simsimi/bundle.mpp -e "MicroG RE service routing (experimental)" -e "Daily bonus without video (client path, experimental)" -e "Conversation level controls (client only, experimental)" -e "Profile photo controls (client only, experimental)" -e "Custom group cover controls (client only, experimental)" -e "Photo sending controls (client only, experimental)" -e "Read receipt display (client only, experimental)" -e "Membership item controls (client only, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
+            -p bundles/simsimi/bundle.mpp -e "Quick return: double-tap Chat (experimental)" -e "MicroG RE service routing (experimental)" -e "Daily bonus without video (client path, experimental)" -e "Conversation level controls (client only, experimental)" -e "Profile photo controls (client only, experimental)" -e "Custom group cover controls (client only, experimental)" -e "Photo sending controls (client only, experimental)" -e "Read receipt display (client only, experimental)" -e "Membership item controls (client only, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
             -r /tmp/simsimi-input/patch-result.json 2>&1 | tee /tmp/simsimi-patch.log
           python3 -m pip install 'androguard==4.1.3'
-          python3 tools/simsimi/verify_patched_apk.py /tmp/simsimi-input/patched.apk /tmp/simsimi-input/patched.hbc.features bundles/simsimi/morphe-validation.json
+          if ! python3 tools/simsimi/verify_patched_apk.py /tmp/simsimi-input/patched.apk /tmp/simsimi-input/patched.hbc.features bundles/simsimi/morphe-validation.json > /tmp/simsimi-output-check.log 2>&1; then
+            tail -n 20 /tmp/simsimi-output-check.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+      - name: Apply Quick Return and Pull Refresh independently
+        run: |
+          set -euo pipefail
+          desktop=/tmp/simsimi-input/morphe-desktop-1.19.1-all.jar
+          base=/tmp/simsimi-input/base.2.apk
+          for mode in quick pull; do
+            if [ "$mode" = quick ]; then
+              selector='Quick return: double-tap Chat (experimental)'
+            else
+              selector='Pull down to restart chat (experimental)'
+            fi
+            if ! java -Xmx4g -jar "$desktop" patch "$base" -p bundles/simsimi/bundle.mpp \
+              -e "$selector" --exclusive --unsigned -o "/tmp/simsimi-input/${mode}-only.apk" \
+              > "/tmp/simsimi-${mode}-patch.log" 2>&1; then
+              tail -n 20 "/tmp/simsimi-${mode}-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+              echo "::error::Morphe $mode-only patch application failed"
+              exit 1
+            fi
+            tail -n 8 "/tmp/simsimi-${mode}-patch.log"
+          done
+          if ! python3 tools/simsimi/verify_quick_apk.py "$base" /tmp/simsimi-input/patched.apk \
+            /tmp/simsimi-input/quick-only.apk /tmp/simsimi-input/pull-only.apk bundles/simsimi/quick-validation.json > /tmp/simsimi-quick-check.log 2>&1; then
+            tail -n 20 /tmp/simsimi-quick-check.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat /tmp/simsimi-quick-check.log
+          python3 tools/simsimi/write_build_status.py
       - name: Report Morphe patch errors
         if: failure()
         run: |
@@ -95,6 +139,8 @@ jobs:
             bundles/simsimi/bundle.mpp
             bundles/simsimi/bundle.mpp.sha256
             bundles/simsimi/morphe-validation.json
+            bundles/simsimi/quick-validation.json
+            bundles/simsimi/build-status.json
             /tmp/simsimi-build/patches/build/test-results/test/*.xml
       - name: Save isolated bundle (leave YouTube untouched)
         run: |
@@ -105,18 +151,23 @@ jobs:
           # this run's checkout. Save our output, update cleanly, then copy it
           # back: rebasing two independently-built binary commits conflicts.
           mkdir -p /tmp/simsimi-output
-          cp bundles/simsimi/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json} /tmp/simsimi-output/
-          git restore --worktree --staged bundles/simsimi/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json}
+          cp bundles/simsimi/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json,quick-validation.json,build-status.json} /tmp/simsimi-output/
+          git restore --worktree --staged bundles/simsimi/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json,build-status.json}
+          if git ls-files --error-unmatch bundles/simsimi/quick-validation.json >/dev/null 2>&1; then
+            git restore --worktree --staged bundles/simsimi/quick-validation.json
+          else
+            rm -f bundles/simsimi/quick-validation.json
+          fi
           git pull --rebase origin "$GITHUB_REF_NAME"
           # Do not publish an old job's output over newer patch sources.
-          for source in tools/simsimi/project tools/simsimi/prepare_build.py; do
+          for source in tools/simsimi/project tools/simsimi/tests tools/simsimi/prepare_build.py tools/simsimi/verify_bundle.py tools/simsimi/verify_listing.py tools/simsimi/verify_feature_hbc.py tools/simsimi/verify_patched_apk.py tools/simsimi/verify_quick_apk.py tools/simsimi/write_build_status.py .github/workflows/build-simsimi-mpp.yml; do
             if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
               echo "Patch sources changed after this job started; leaving newer build to publish."
               exit 0
             fi
           done
-          cp /tmp/simsimi-output/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json} bundles/simsimi/
-          git add -f bundles/simsimi/bundle.mpp bundles/simsimi/bundle.mpp.sha256 bundles/simsimi/morphe-validation.json
+          cp /tmp/simsimi-output/{bundle.mpp,bundle.mpp.sha256,morphe-validation.json,quick-validation.json,build-status.json} bundles/simsimi/
+          git add -f bundles/simsimi/bundle.mpp bundles/simsimi/bundle.mpp.sha256 bundles/simsimi/morphe-validation.json bundles/simsimi/quick-validation.json bundles/simsimi/build-status.json
           git diff --cached --quiet && exit 0
           git commit -m 'build: experimental SimSimi-only bundle [skip ci]'
           git pull --rebase origin "$GITHUB_REF_NAME"

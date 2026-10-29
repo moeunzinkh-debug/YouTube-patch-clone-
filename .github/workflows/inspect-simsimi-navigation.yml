@@ -1,0 +1,37 @@
+name: Inspect SimSimi navigation ABI
+on:
+  push:
+    branches: [arena/0b9fd265-youtube-patch-clone]
+    paths: ['tools/simsimi/inspect_navigation.py', '.github/workflows/inspect-simsimi-navigation.yml']
+permissions:
+  contents: read
+jobs:
+  inspect:
+    if: contains(github.event.head_commit.message, '[simsimi-nav-inspect]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Inspect the already-uploaded exact-version APK without publishing it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          mkdir -p /tmp/simsimi-navigation
+          gh release download Simsimi --pattern base.2.apk --dir /tmp/simsimi-navigation
+          python tools/simsimi/inspect_navigation.py /tmp/simsimi-navigation/base.2.apk /tmp/simsimi-navigation/report.json
+          python - <<'PY'
+          import base64, gzip
+          from pathlib import Path
+          data = base64.b64encode(gzip.compress(Path('/tmp/simsimi-navigation/report.json').read_bytes())).decode('ascii')
+          # GitHub permits at most ten notices per step and truncates each at 4096 characters.
+          chunks = [data[i:i + 3900] for i in range(0, len(data), 3900)]
+          if len(chunks) > 10:
+              raise SystemExit('Navigation report too large for sanitized annotations')
+          for i, chunk in enumerate(chunks, 1):
+              print(f'::notice::SIMSIMI_NAV_ABI {i}/{len(chunks)} {chunk}')
+          PY

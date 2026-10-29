@@ -29,6 +29,8 @@ with zipfile.ZipFile(patched) as z:
     report['six_client_feature_gate_bytes_match'] = True
     report['hermes_sha256'] = hashlib.sha256(actual).hexdigest()
     hook_found = runtime_found = False
+    quick_hooks_found = set()
+    quick_runtime_found = quick_timing_found = False
     routes = 0
     for name in z.namelist():
         if not name.startswith('classes') or not name.endswith('.dex'):
@@ -37,6 +39,10 @@ with zipfile.ZipFile(patched) as z:
         for cls in dex.get_classes():
             if cls.get_name() == 'Lapp/morphe/extension/simsimi/PullRefresh;':
                 runtime_found = True
+            if cls.get_name() == 'Lapp/morphe/extension/simsimi/QuickReturn;':
+                quick_runtime_found = True
+            if cls.get_name() == 'Lapp/morphe/extension/simsimi/ChatTabDoubleTap;':
+                quick_timing_found = True
             for method in cls.get_methods():
                 if not method.get_code():
                     continue
@@ -47,8 +53,14 @@ with zipfile.ZipFile(patched) as z:
                     if cls.get_name() == 'Lcom/ismaker/android/simsimi/MainActivity;' and method.get_name() == 'dispatchTouchEvent':
                         if 'Lapp/morphe/extension/simsimi/PullRefresh;->onTouch(' in text:
                             hook_found = True
+                    if cls.get_name() == 'Lcom/aurelhubert/ahbottomnavigation/i;' and method.get_name() in ('lambda$createClassicItems$5', 'lambda$createSmallItems$6'):
+                        if 'Lapp/morphe/extension/simsimi/QuickReturn;->onTabClicked(' in text:
+                            quick_hooks_found.add(method.get_name())
     assert hook_found and runtime_found, 'Missing native touch hook or runtime extension'
+    assert quick_hooks_found == {'lambda$createClassicItems$5', 'lambda$createSmallItems$6'} and quick_runtime_found and quick_timing_found, 'Missing optional Quick Return click hooks or runtime'
     assert routes > 0, 'No GMS package literals routed to MicroG RE'
-    report.update(injected_main_activity_dispatch_hook=True, injected_pull_refresh_runtime=True, native_microg_routed_literals=routes)
+    report.update(injected_main_activity_dispatch_hook=True, injected_pull_refresh_runtime=True,
+                  injected_quick_return_click_hooks=True, quick_return_runtime_present=True,
+                  native_microg_routed_literals=routes)
 output.write_text(json.dumps(report, indent=2)+'\n')
 print(json.dumps(report, indent=2))

@@ -1,0 +1,242 @@
+{
+  "package": "com.ismaker.android.simsimi",
+  "version": "9.2.3",
+  "version_code": "1119001",
+  "source_sha256": "f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70",
+  "method_inspection_ci": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40798041687",
+  "click_dispatch": "The exact APK routes View.OnClickListener handlers through static bridges into two lambda click handlers. Programmatic setCurrentItem calls updateItems/updateSmallItems directly, bypassing these lambda handlers.",
+  "screen_mapping": "The second bottom tab and English Conversation heading are from the user screenshots; the currently visible scroll view has not been inspected on a real device.",
+  "scope": "Static APK method signatures and callback instructions only; not proof of device behavior.",
+  "classes": [
+    {
+      "name": "Lcom/aurelhubert/ahbottomnavigation/a;",
+      "superclass": "Ljava/lang/Object;",
+      "interfaces": [
+        "Landroid/view/View$OnClickListener;"
+      ],
+      "methods": [
+        {
+          "name": "onClick",
+          "descriptor": "(Landroid/view/View;)V",
+          "access": "public final",
+          "instructions": [
+            "iget-object v0, v2, Lcom/aurelhubert/ahbottomnavigation/a;->a Lcom/aurelhubert/ahbottomnavigation/i;",
+            "iget v1, v2, Lcom/aurelhubert/ahbottomnavigation/a;->b I",
+            "invoke-static v0, v1, v3, Lcom/aurelhubert/ahbottomnavigation/i;->b(Lcom/aurelhubert/ahbottomnavigation/i; I Landroid/view/View;)V",
+            "return-void "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lcom/aurelhubert/ahbottomnavigation/b;",
+      "superclass": "Ljava/lang/Object;",
+      "interfaces": [
+        "Landroid/view/View$OnClickListener;"
+      ],
+      "methods": [
+        {
+          "name": "onClick",
+          "descriptor": "(Landroid/view/View;)V",
+          "access": "public final",
+          "instructions": [
+            "iget-object v0, v2, Lcom/aurelhubert/ahbottomnavigation/b;->a Lcom/aurelhubert/ahbottomnavigation/i;",
+            "iget v1, v2, Lcom/aurelhubert/ahbottomnavigation/b;->b I",
+            "invoke-static v0, v1, v3, Lcom/aurelhubert/ahbottomnavigation/i;->f(Lcom/aurelhubert/ahbottomnavigation/i; I Landroid/view/View;)V",
+            "return-void "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lcom/aurelhubert/ahbottomnavigation/i;",
+      "superclass": "Landroid/widget/FrameLayout;",
+      "interfaces": [],
+      "methods": [
+        {
+          "name": "b",
+          "descriptor": "(Lcom/aurelhubert/ahbottomnavigation/i; I Landroid/view/View;)V",
+          "access": "public static synthetic",
+          "instructions": [
+            "invoke-direct v0, v1, v2, Lcom/aurelhubert/ahbottomnavigation/i;->lambda$createClassicItems$5(I Landroid/view/View;)V",
+            "return-void "
+          ]
+        },
+        {
+          "name": "f",
+          "descriptor": "(Lcom/aurelhubert/ahbottomnavigation/i; I Landroid/view/View;)V",
+          "access": "public static synthetic",
+          "instructions": [
+            "invoke-direct v0, v1, v2, Lcom/aurelhubert/ahbottomnavigation/i;->lambda$createSmallItems$6(I Landroid/view/View;)V",
+            "return-void "
+          ]
+        },
+        {
+          "name": "lambda$createClassicItems$5",
+          "descriptor": "(I Landroid/view/View;)V",
+          "access": "private synthetic",
+          "instructions": [
+            "const/4 v2, 1",
+            "invoke-direct v0, v1, v2, Lcom/aurelhubert/ahbottomnavigation/i;->updateItems(I Z)V",
+            "return-void "
+          ]
+        },
+        {
+          "name": "lambda$createSmallItems$6",
+          "descriptor": "(I Landroid/view/View;)V",
+          "access": "private synthetic",
+          "instructions": [
+            "const/4 v2, 1",
+            "invoke-direct v0, v1, v2, Lcom/aurelhubert/ahbottomnavigation/i;->updateSmallItems(I Z)V",
+            "return-void "
+          ]
+        },
+        {
+          "name": "getCurrentItem",
+          "descriptor": "()I",
+          "access": "public"
+        },
+        {
+          "name": "getItemsCount",
+          "descriptor": "()I",
+          "access": "public"
+        },
+        {
+          "name": "getViewAtPosition",
+          "descriptor": "(I)Landroid/view/View;",
+          "access": "public"
+        },
+        {
+          "name": "setCurrentItem",
+          "descriptor": "(I)V",
+          "access": "public",
+          "instructions": [
+            "const/4 v0, 1",
+            "invoke-virtual v1, v2, v0, Lcom/aurelhubert/ahbottomnavigation/i;->setCurrentItem(I Z)V",
+            "return-void "
+          ]
+        },
+        {
+          "name": "setCurrentItem",
+          "descriptor": "(I Z)V",
+          "access": "public",
+          "instructions": [
+            "iget-object v0, v1, Lcom/aurelhubert/ahbottomnavigation/i;->items Ljava/util/ArrayList;",
+            "invoke-virtual v0, Ljava/util/ArrayList;->size()I",
+            "move-result v0",
+            "if-lt v2, v0, +024h",
+            "sget-object v2, Lcom/aurelhubert/ahbottomnavigation/i;->TAG Ljava/lang/String;",
+            "new-instance v3, Ljava/lang/StringBuilder;",
+            "invoke-direct v3, Ljava/lang/StringBuilder;-><init>()V",
+            "const-string v0, \"The position is out of bounds of the items (\"",
+            "invoke-virtual v3, v0, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+            "iget-object v0, v1, Lcom/aurelhubert/ahbottomnavigation/i;->items Ljava/util/ArrayList;",
+            "invoke-virtual v0, Ljava/util/ArrayList;->size()I",
+            "move-result v0",
+            "invoke-virtual v3, v0, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;",
+            "const-string v0, \" elements)\"",
+            "invoke-virtual v3, v0, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;",
+            "invoke-virtual v3, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;",
+            "move-result-object v3",
+            "invoke-static v2, v3, Landroid/util/Log;->w(Ljava/lang/String; Ljava/lang/String;)I",
+            "return-void ",
+            "invoke-direct v1, Lcom/aurelhubert/ahbottomnavigation/i;->isClassic()Z",
+            "move-result v0",
+            "if-eqz v0, +006h",
+            "invoke-direct v1, v2, v3, Lcom/aurelhubert/ahbottomnavigation/i;->updateItems(I Z)V",
+            "return-void ",
+            "invoke-direct v1, v2, v3, Lcom/aurelhubert/ahbottomnavigation/i;->updateSmallItems(I Z)V",
+            "return-void "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lcom/facebook/react/views/scroll/ReactScrollView;",
+      "superclass": "Landroid/widget/ScrollView;",
+      "interfaces": [
+        "Lcom/facebook/react/uimanager/ReactClippingViewGroup;",
+        "Landroid/view/ViewGroup$OnHierarchyChangeListener;",
+        "Landroid/view/View$OnLayoutChangeListener;",
+        "Lcom/facebook/react/views/scroll/ReactAccessibleScrollView;",
+        "Lcom/facebook/react/uimanager/ReactOverflowViewWithInset;",
+        "Lcom/facebook/react/views/scroll/ReactScrollViewHelper$HasScrollState;",
+        "Lcom/facebook/react/views/scroll/ReactScrollViewHelper$HasStateWrapper;",
+        "Lcom/facebook/react/views/scroll/ReactScrollViewHelper$HasFlingAnimator;",
+        "Lcom/facebook/react/views/scroll/ReactScrollViewHelper$HasScrollEventThrottle;",
+        "Lcom/facebook/react/views/scroll/ReactScrollViewHelper$HasSmoothScroll;"
+      ],
+      "methods": [
+        {
+          "name": "scrollTo",
+          "descriptor": "(I I)V",
+          "access": "public"
+        }
+      ]
+    },
+    {
+      "name": "Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;",
+      "superclass": "Lcom/reactnativenavigation/viewcontrollers/parent/ParentController;",
+      "interfaces": [
+        "Lcom/aurelhubert/ahbottomnavigation/i$e;",
+        "Lcom/reactnativenavigation/viewcontrollers/bottomtabs/TabSelector;"
+      ],
+      "methods": [
+        {
+          "name": "getSelectedIndex",
+          "descriptor": "()I",
+          "access": "public"
+        },
+        {
+          "name": "onTabSelected",
+          "descriptor": "(I Z)Z",
+          "access": "public",
+          "instructions": [
+            "iget-object v0, v4, Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;->tabs Ljava/util/List;",
+            "invoke-interface v0, v5, Ljava/util/List;->get(I)Ljava/lang/Object;",
+            "move-result-object v0",
+            "check-cast v0, Lcom/reactnativenavigation/viewcontrollers/viewcontroller/ViewController;",
+            "invoke-virtual v0, Lcom/reactnativenavigation/viewcontrollers/viewcontroller/ViewController;->resolveCurrentOptions()Lcom/reactnativenavigation/options/Options;",
+            "move-result-object v1",
+            "iget-object v1, v1, Lcom/reactnativenavigation/options/Options;->bottomTabOptions Lcom/reactnativenavigation/options/BottomTabOptions;",
+            "iget-object v2, v4, Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;->eventEmitter Lcom/reactnativenavigation/react/events/EventEmitter;",
+            "invoke-virtual v2, v5, Lcom/reactnativenavigation/react/events/EventEmitter;->emitBottomTabPressed(I)V",
+            "iget-object v2, v1, Lcom/reactnativenavigation/options/BottomTabOptions;->selectTabOnPress Lcom/reactnativenavigation/options/params/Bool;",
+            "sget-object v3, Ljava/lang/Boolean;->TRUE Ljava/lang/Boolean;",
+            "invoke-virtual v2, v3, Lcom/reactnativenavigation/options/params/Param;->get(Ljava/lang/Object;)Ljava/lang/Object;",
+            "move-result-object v2",
+            "check-cast v2, Ljava/lang/Boolean;",
+            "invoke-virtual v2, Ljava/lang/Boolean;->booleanValue()Z",
+            "move-result v2",
+            "if-eqz v2, +012h",
+            "iget-object v2, v4, Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;->eventEmitter Lcom/reactnativenavigation/react/events/EventEmitter;",
+            "iget-object v3, v4, Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;->bottomTabs Lcom/reactnativenavigation/views/bottomtabs/BottomTabs;",
+            "invoke-virtual v3, Lcom/aurelhubert/ahbottomnavigation/i;->getCurrentItem()I",
+            "move-result v3",
+            "invoke-virtual v2, v3, v5, Lcom/reactnativenavigation/react/events/EventEmitter;->emitBottomTabSelected(I I)V",
+            "if-nez v6, +005h",
+            "invoke-virtual v4, v5, Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;->selectTab(I)V",
+            "iget-object v5, v1, Lcom/reactnativenavigation/options/BottomTabOptions;->popToRoot Lcom/reactnativenavigation/options/params/Bool;",
+            "sget-object v1, Ljava/lang/Boolean;->FALSE Ljava/lang/Boolean;",
+            "invoke-virtual v5, v1, Lcom/reactnativenavigation/options/params/Param;->get(Ljava/lang/Object;)Ljava/lang/Object;",
+            "move-result-object v5",
+            "check-cast v5, Ljava/lang/Boolean;",
+            "invoke-virtual v5, Ljava/lang/Boolean;->booleanValue()Z",
+            "move-result v5",
+            "if-eqz v5, +014h",
+            "if-eqz v6, +012h",
+            "instance-of v5, v0, Lcom/reactnativenavigation/viewcontrollers/stack/StackController;",
+            "if-eqz v5, +00eh",
+            "check-cast v0, Lcom/reactnativenavigation/viewcontrollers/stack/StackController;",
+            "sget-object v5, Lcom/reactnativenavigation/options/Options;->EMPTY Lcom/reactnativenavigation/options/Options;",
+            "new-instance v6, Lcom/reactnativenavigation/react/CommandListenerAdapter;",
+            "invoke-direct v6, Lcom/reactnativenavigation/react/CommandListenerAdapter;-><init>()V",
+            "invoke-virtual v0, v5, v6, Lcom/reactnativenavigation/viewcontrollers/stack/StackController;->popToRoot(Lcom/reactnativenavigation/options/Options; Lcom/reactnativenavigation/react/CommandListener;)V",
+            "const/4 v5, 0",
+            "return v5"
+          ]
+        }
+      ]
+    }
+  ]
+}
