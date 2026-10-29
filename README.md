@@ -139,17 +139,6 @@ Morphe Desktop បាន patch និង rebuild APK Telegram Web 12.10.1 ដែ
 </details>
 
 <details>
-<summary>🧪 Telegram Add Email • 1 patch សាកល្បង (bundle ដាច់ដោយឡែក)</summary>
-
-[`Try another login method (experimental)`](bundles/telegram-email-experimental/README.md) **បិទជាស្រេច**។ វាសាកស្នើ SMS/call តែម្តង ក្រោយ timeout និងបន្ទាប់ពីអ្នកចុចបញ្ជាក់ ប៉ុន្តែបានតែពេល Telegram server ផ្ដល់ជម្រើសនោះប៉ុណ្ណោះ។ បើគ្មានជម្រើស ផ្ទាំង Add Email នៅដដែល។ វា **មិនធានា OTP ឥតគិតថ្លៃ ឬការជៀស SMS Fee** ទេ។
-
-[ទាញយក `bundle.mpp` សាកល្បង](bundles/telegram-email-experimental/bundle.mpp) · [របៀបប្រើ និងកម្រិតកំណត់](bundles/telegram-email-experimental/README.md) · [លទ្ធផល CI](bundles/telegram-email-experimental/validation.json)
-
-Bundle នេះមាន Telegram upstream 15 selectors និង selector សាកល្បងមួយ; វាមិនជំនួស bundle ដើមទេ។ CI បានជ្រើស patch នេះតែមួយ និង patch APK Telegram **Web** 12.10.1 ពិតក្នុង [Morphe Manager 2.2.0](bundles/telegram-email-experimental/manager-smoke.json)។ Desktop និង UI សំយោគលើ emulator ក៏បានសាកដែរ។ មិនទាន់សាក login/signup លើ server ពិត, APK Google Play ឬទូរសព្ទពិតទេ។
-
-</details>
-
-<details>
 <summary>🗨️ SimSimi • 12 experimental patches (separate bundle)</summary>
 
 For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
