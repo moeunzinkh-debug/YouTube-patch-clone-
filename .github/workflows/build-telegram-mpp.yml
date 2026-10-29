@@ -1,0 +1,188 @@
+name: Build Telegram-only patch bundle
+on:
+  push:
+    branches: [arena/cbe2e9a9-youtube-patch-clone]
+    paths:
+      - 'extras/telegram-upstream/**'
+      - 'tools/telegram/**'
+      - 'bundles/telegram/upstream-patches.json'
+      - '.github/workflows/build-telegram-mpp.yml'
+permissions:
+  contents: write
+  packages: read
+concurrency:
+  group: telegram-build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[telegram-build]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify pinned source and prepare isolated project
+        run: |
+          set -euo pipefail
+          python3 tools/telegram/test_telegram_subset.py
+          python3 tools/telegram/verify_bundle.py
+          python3 tools/telegram/prepare_build.py /tmp/telegram-build
+      - name: Build the Telegram-only Morphe bundle
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+        run: |
+          set -o pipefail
+          cd /tmp/telegram-build
+          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/telegram-build.log
+      - name: Report build errors
+        if: failure()
+        run: |
+          if test -f /tmp/telegram-build.log; then
+            grep -E -A 5 '^e:|^error:|What went wrong|Execution failed|Could not|FAILURE:|Exception' /tmp/telegram-build.log | tail -40 | while IFS= read -r line; do echo "::error::$line"; done || true
+          fi
+      - name: Verify archive and actual Morphe Desktop catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/telegram-output
+          mapfile -t bundles < <(find /tmp/telegram-build/patches/build/libs -maxdepth 1 -name '*.mpp' -type f)
+          test "${#bundles[@]}" -eq 1
+          cp "${bundles[0]}" /tmp/telegram-output/bundle.mpp
+          (cd /tmp/telegram-output && sha256sum bundle.mpp > bundle.mpp.sha256)
+          gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
+            --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/telegram-output
+          echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/telegram-output/morphe-desktop-1.19.1-all.jar' | sha256sum --check
+          java -Xmx2g -jar /tmp/telegram-output/morphe-desktop-1.19.1-all.jar list-patches \
+            --patches /tmp/telegram-output/bundle.mpp --with-packages --with-versions --include-experimental \
+            --out /tmp/telegram-output/patches.txt
+          if ! python3 tools/telegram/verify_bundle.py --mpp /tmp/telegram-output/bundle.mpp \
+            --listing /tmp/telegram-output/patches.txt >/tmp/telegram-verify.log 2>&1; then
+            tail -n 15 /tmp/telegram-verify.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat /tmp/telegram-verify.log
+      - name: Try actual Telegram 12.10.1 APK application
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          input=/tmp/telegram-output/Telegram-12.10.1.apk
+          smoke=/tmp/telegram-output/apk-smoke.json
+          # Third-party GitHub mirror of a Telegram-signed APK. Check both the
+          # pinned file SHA-256 and the original signing certificate before use.
+          if ! gh release download android-12.10.1 --repo LOVECHEN/telegram-release \
+            --pattern Telegram-12.10.1.apk --dir /tmp/telegram-output; then
+            printf '%s\n' '{"status":"not_tested_apk_download_unavailable","reason":"Exact-version public APK mirror could not be downloaded; no APK was applied."}' > "$smoke"
+            echo '::notice::Exact-version Telegram APK was unavailable; APK application is not tested.'
+            exit 0
+          fi
+          if ! echo 'f5e1192725772960cc94b83e54ffd8939f876b2b6e5f21d4a8537eb6fcba50e6  '"$input" | sha256sum --check; then
+            echo '::error::Mirrored Telegram APK SHA-256 mismatch'
+            exit 1
+          fi
+          echo '::notice::Mirrored Telegram APK SHA-256 verified'
+          if [ -z "${ANDROID_HOME:-}" ]; then
+            echo '::error::ANDROID_HOME is not set on the runner'
+            exit 1
+          fi
+          bt=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          echo "::notice::Android build tools: $bt"
+          if ! "$bt/apksigner" verify --verbose --print-certs "$input" > /tmp/telegram-signature.txt 2>&1; then
+            tail -n 8 /tmp/telegram-signature.txt | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo "::notice::APK signer output: $(head -n 12 /tmp/telegram-signature.txt | tr '\n' ' ' | cut -c 1-2000)"
+          grep -E '^(Signer #[0-9]+|V[1-4] Signer): certificate SHA-(1|256) digest:' /tmp/telegram-signature.txt | while IFS= read -r line; do echo "::notice::$line"; done || true
+          if ! grep -Eiq '^(Signer #1|V[1-4] Signer): certificate SHA-256 digest: 49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1$' /tmp/telegram-signature.txt; then
+            echo '::error::Mirrored APK signer does not match the expected Telegram signing certificate'
+            exit 1
+          fi
+          if ! grep -q '^Number of signers: 1$' /tmp/telegram-signature.txt; then
+            echo '::error::Expected exactly one verified APK signer'
+            exit 1
+          fi
+          "$bt/aapt" dump badging "$input" > /tmp/telegram-badging.txt
+          grep '^package:' /tmp/telegram-badging.txt | while IFS= read -r line; do echo "::notice::Telegram APK identity: $line"; done
+          package=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path('/tmp/telegram-badging.txt').read_text()
+          m = re.search(r"package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'", text)
+          if not m or (m.group(1), m.group(2), m.group(3)) not in {
+                  ('org.telegram.messenger', '70382', '12.10.1'),
+                  ('org.telegram.messenger.web', '70389', '12.10.1')}:
+              raise SystemExit('Mirrored APK is not an exact supported Telegram build')
+          print(m.group(1))
+          PY
+          )
+          desktop=/tmp/telegram-output/morphe-desktop-1.19.1-all.jar
+          if ! java -Xmx4g -jar "$desktop" patch "$input" -p /tmp/telegram-output/bundle.mpp \
+            -e 'Remove ads' --exclusive --unsigned -o /tmp/telegram-output/remove-ads.apk \
+            -r /tmp/telegram-output/remove-ads.json >/tmp/telegram-single.log 2>&1; then
+            tail -n 20 /tmp/telegram-single.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo '::notice::Single Remove ads patch command completed'
+          if ! java -Xmx4g -jar "$desktop" patch "$input" -p /tmp/telegram-output/bundle.mpp \
+            --unsigned -o /tmp/telegram-output/all-default.apk -r /tmp/telegram-output/all-default.json \
+            >/tmp/telegram-all.log 2>&1; then
+            tail -n 20 /tmp/telegram-all.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo '::notice::All-default patch command completed'
+          if ! python3 tools/telegram/verify_patching.py "$input" /tmp/telegram-output/remove-ads.json \
+            /tmp/telegram-output/all-default.json "$smoke" --package "$package" > /tmp/telegram-results.log 2>&1; then
+            python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for label in ('remove-ads', 'all-default'):
+              path = Path('/tmp/telegram-output') / (label + '.json')
+              if path.exists():
+                  d = json.loads(path.read_text())
+                  info = {key: d.get(key) for key in ('packageName', 'packageVersion', 'success', 'stepResults', 'failedPatches', 'appliedPatches')}
+                  print('::error::' + label + ' patch report ' + json.dumps(info, separators=(',', ':'))[:3500])
+          PY
+            for log in /tmp/telegram-single.log /tmp/telegram-all.log; do
+              grep -E -i 'error|failed|exception|unable|cannot|incompatible' "$log" | tail -n 3 | while IFS= read -r line; do echo "::error::$line"; done || true
+            done
+            tail -n 4 /tmp/telegram-results.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat /tmp/telegram-results.log
+      - name: Record validation and save only the separate bundle
+        run: |
+          set -euo pipefail
+          cp /tmp/telegram-output/bundle.mpp /tmp/telegram-output/bundle.mpp.sha256 bundles/telegram/
+          python3 tools/telegram/write_validation.py /tmp/telegram-output/apk-smoke.json
+          cp bundles/telegram/validation.json /tmp/telegram-output/validation.json
+          for path in bundles/telegram/bundle.mpp bundles/telegram/bundle.mpp.sha256 bundles/telegram/validation.json; do
+            if git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
+              git restore --worktree --staged "$path"
+            else
+              rm -f "$path"
+            fi
+          done
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          for path in extras/telegram-upstream tools/telegram bundles/telegram/upstream-patches.json .github/workflows/build-telegram-mpp.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$path")" != "$(git rev-parse "HEAD:$path")" ]; then
+              echo 'Telegram inputs changed during this run; a newer build must publish.'
+              exit 0
+            fi
+          done
+          test "$GITHUB_REF_NAME" = 'arena/cbe2e9a9-youtube-patch-clone'
+          cp /tmp/telegram-output/bundle.mpp /tmp/telegram-output/bundle.mpp.sha256 /tmp/telegram-output/validation.json bundles/telegram/
+          git add -f bundles/telegram/bundle.mpp bundles/telegram/bundle.mpp.sha256 bundles/telegram/validation.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'build: Telegram-only Morphe bundle [skip ci]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "$GITHUB_REF_NAME"

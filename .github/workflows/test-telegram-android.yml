@@ -1,0 +1,142 @@
+name: Telegram Android emulator launch smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/cbe2e9a9-youtube-patch-clone]
+    paths:
+      - 'tools/telegram/emulator_smoke.py'
+      - 'tools/telegram/test_emulator_smoke.py'
+      - '.github/workflows/test-telegram-android.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: telegram-android-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  emulator:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[telegram-android-ci]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Test emulator report helpers and the committed MPP
+        run: |
+          set -euo pipefail
+          python3 tools/telegram/test_emulator_smoke.py -v
+          (cd bundles/telegram && sha256sum --check bundle.mpp.sha256)
+          python3 tools/telegram/verify_bundle.py --mpp bundles/telegram/bundle.mpp
+      - name: Verify stock APK and rebuild two test-signed fixtures
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          trap 'status=$?; echo "::error::Telegram fixture preparation failed at line $LINENO (exit $status)"; for log in /tmp/telegram-android-single.log /tmp/telegram-android-all.log; do if test -f "$log"; then tail -4 "$log" | while IFS= read -r line; do echo "::error::$line"; done; fi; done' ERR
+          mkdir -p /tmp/telegram-android
+          gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
+            --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/telegram-android
+          echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/telegram-android/morphe-desktop-1.19.1-all.jar' | sha256sum --check
+          gh release download android-12.10.1 --repo LOVECHEN/telegram-release \
+            --pattern 'Telegram-12.10.1.apk' --dir /tmp/telegram-android
+          input=/tmp/telegram-android/Telegram-12.10.1.apk
+          echo "f5e1192725772960cc94b83e54ffd8939f876b2b6e5f21d4a8537eb6fcba50e6  $input" | sha256sum --check
+          tools="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1 | xargs dirname)"
+          "$tools/apksigner" verify --verbose --print-certs "$input" > /tmp/telegram-android/signer.txt
+          grep -Fq 'Number of signers: 1' /tmp/telegram-android/signer.txt
+          grep -Fiq 'certificate SHA-256 digest: 49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1' /tmp/telegram-android/signer.txt
+          "$tools/aapt" dump badging "$input" > /tmp/telegram-android/identity.txt
+          grep -Fq "name='org.telegram.messenger.web' versionCode='70389' versionName='12.10.1'" /tmp/telegram-android/identity.txt
+          desktop=/tmp/telegram-android/morphe-desktop-1.19.1-all.jar
+          java -Xmx4g -jar "$desktop" patch "$input" -p bundles/telegram/bundle.mpp \
+            --exclusive -e 'Remove ads' --unsigned -o /tmp/telegram-android/single-unsigned.apk \
+            -r /tmp/telegram-android/single.json > /tmp/telegram-android-single.log 2>&1
+          java -Xmx4g -jar "$desktop" patch "$input" -p bundles/telegram/bundle.mpp \
+            --unsigned -o /tmp/telegram-android/all-unsigned.apk \
+            -r /tmp/telegram-android/all.json > /tmp/telegram-android-all.log 2>&1
+          python3 tools/telegram/verify_patching.py "$input" /tmp/telegram-android/single.json \
+            /tmp/telegram-android/all.json /tmp/telegram-android/patch-check.json \
+            --package org.telegram.messenger.web
+          # Temporary test-only signature; never publish APKs or this disposable key.
+          keytool -genkeypair -noprompt -keystore /tmp/telegram-android/test.keystore \
+            -storepass android -keypass android -alias test -dname 'CN=Telegram emulator test' \
+            -keyalg RSA -keysize 2048 -validity 2 > /dev/null 2>&1
+          for fixture in single all; do
+            "$tools/zipalign" -p -f 4 "/tmp/telegram-android/$fixture-unsigned.apk" "/tmp/telegram-android/$fixture-aligned.apk"
+            "$tools/apksigner" sign --ks /tmp/telegram-android/test.keystore --ks-pass pass:android --key-pass pass:android \
+              --out "/tmp/telegram-android/$fixture-test.apk" "/tmp/telegram-android/$fixture-aligned.apk"
+            "$tools/apksigner" verify "/tmp/telegram-android/$fixture-test.apk"
+          done
+      - name: Enable emulator acceleration when available
+        run: |
+          if test -e /dev/kvm; then
+            sudo chmod 666 /dev/kvm
+          else
+            echo '::warning::KVM unavailable; emulator may fail to start.'
+          fi
+      - name: Launch stock and patched apps without an account
+        id: emulator
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 8G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/telegram/emulator_smoke.py /tmp/telegram-android/Telegram-12.10.1.apk /tmp/telegram-android/single-test.apk /tmp/telegram-android/all-test.apk /tmp/telegram-android/smoke.json
+      - name: Save only the sanitized outcome
+        if: always()
+        env:
+          EMULATOR_OUTCOME: ${{ steps.emulator.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/telegram-android
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          report_path = Path('/tmp/telegram-android/smoke.json')
+          report = json.loads(report_path.read_text()) if report_path.exists() else {
+              'outcome': 'not_run_or_infrastructure_failure', 'cases': [],
+              'feature_behavior_login_push_and_real_device': 'not_tested',
+          }
+          bundle = Path('bundles/telegram/bundle.mpp')
+          report['bundle_sha256'] = hashlib.sha256(bundle.read_bytes()).hexdigest() if bundle.exists() else None
+          report['emulator_action_outcome'] = os.environ.get('EMULATOR_OUTCOME') or 'not_run'
+          report['ci_run'] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          report_path.write_text(json.dumps(report, indent=2) + '\n')
+          print('::notice::Telegram emulator report: ' + json.dumps(report, separators=(',', ':'))[:3500])
+          PY
+          if [ "${{ github.event_name }}" = push ] && [ "${{ github.ref }}" = refs/heads/arena/cbe2e9a9-youtube-patch-clone ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            for path in bundles/telegram/bundle.mpp tools/telegram/emulator_smoke.py .github/workflows/test-telegram-android.yml; do
+              if [ "$(git rev-parse "$GITHUB_SHA:$path")" != "$(git rev-parse "HEAD:$path")" ]; then
+                echo 'Emulator inputs changed during the run; refusing to publish an outdated report.'
+                exit 0
+              fi
+            done
+            cp /tmp/telegram-android/smoke.json bundles/telegram/android-smoke.json
+            git add bundles/telegram/android-smoke.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'test: record Telegram emulator smoke [skip ci]'
+              git pull --rebase origin "$GITHUB_REF_NAME"
+              git push origin "$GITHUB_REF_NAME"
+            fi
+          fi
+      - name: Fail if the emulator test did not complete
+        if: always() && steps.emulator.outcome != 'success'
+        run: exit 1
