@@ -108,7 +108,7 @@ OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភ
 <!-- GBOARD-PATCH-LIST:END -->
 
 <details>
-<summary>🗨️ SimSimi • 11 experimental patches (separate bundle)</summary>
+<summary>🗨️ SimSimi • 12 experimental patches (separate bundle)</summary>
 
 For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
 into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
@@ -116,6 +116,7 @@ into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
 - **Disable ad eligibility (experimental)** — shared ad gate, not proven complete SDK removal.
 - **Unlock membership UI (client only, experimental)** — client UI status only, not a server subscription.
 - **Pull down to restart chat (experimental)** — English Conversation list only, not inside chat rooms; requests React runtime reload.
+- **Quick return: double-tap Chat (experimental)** — opt-in; double-tap the selected bottom Chat tab to scroll the English Conversation list to the top, without reloading. Normal tab clicks continue unchanged.
 - **Daily bonus without video (client path, experimental)** — opt-in existing non-video flow; server reward is not guaranteed.
 - **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility.
 - **Conversation level controls (client only, experimental)** — opt-in member slider path; server level/topic handling remains authoritative.
@@ -125,13 +126,14 @@ into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
 - **Read receipt display (client only, experimental)** — opt-in display of the real supplied read flag; no receipt is fabricated.
 - **Membership item controls (client only, experimental)** — opt-in member UI only; does **not** grant free or unlimited server items, even if the UI says unlimited.
 
-The six individual feature patches are **off by default** and require the membership UI patch.
-The actual `.mpp` was applied to the original APK using Morphe's engine
-([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40658603472));
-all six client gates, output Hermes, native hook, 66 routed literals and manifest checks passed.
-**The new feature patches are not device-tested, and server acceptance is unverified.**
-Matching splits are required for installation. See the
-[full catalog and limitations](bundles/simsimi/README.md). No SimSimi release published.
+Quick Return is **off by default** and independent of Pull Refresh. The six individual
+membership feature patches are also off by default and require the membership UI patch.
+The actual `.mpp` was applied to the original APK using Morphe Desktop; Quick Return was
+checked both alone and together with Pull Refresh
+([CI proof](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40799144878)).
+**Quick Return and the six membership features have not been device-tested; server acceptance is unverified.**
+Matching, identically signed splits are required for installation. See the
+[full catalog and limitations](bundles/simsimi/README.md). No new SimSimi bundle release was published.
 
 </details>
 
