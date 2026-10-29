@@ -13,5 +13,7 @@
   "hermes_sha256": "97bbf6a26444dd5755173800eae31579e972df1d1e54777d4dd68be7f7c89892",
   "injected_main_activity_dispatch_hook": true,
   "injected_pull_refresh_runtime": true,
+  "injected_quick_return_click_hooks": true,
+  "quick_return_runtime_present": true,
   "native_microg_routed_literals": 66
 }

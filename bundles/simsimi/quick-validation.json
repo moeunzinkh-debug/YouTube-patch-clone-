@@ -1,0 +1,14 @@
+{
+  "engine": "Morphe Desktop v1.19.1",
+  "input": "Original uploaded SimSimi 9.2.3 base APK; matching split APKs are required for installation.",
+  "quick_return_with_pull_reload": "passed_static_apk_inspection",
+  "quick_return_without_pull_reload": "passed_static_apk_inspection",
+  "pull_reload_without_quick_return": "passed_static_apk_inspection",
+  "classic_and_small_tab_click_handlers_hooked": true,
+  "original_click_handlers_continued_unchanged": true,
+  "programmatic_set_current_item_unchanged": true,
+  "original_tab_callback_preserved": true,
+  "standalone_hermes_unchanged": true,
+  "simsimi_device_runtime": "not tested",
+  "morphe_manager_android_ui": "not tested"
+}
