@@ -70,29 +70,39 @@ jobs:
           fi
           cat /tmp/telegram-verify.log
       - name: Try actual Telegram 12.10.1 APK application
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          input=/tmp/telegram-output/telegram-original.apk
+          input=/tmp/telegram-output/Telegram-12.10.1.apk
           smoke=/tmp/telegram-output/apk-smoke.json
-          # Public mirror, exact version code and upstream-published SHA-1; the
-          # official signer is independently checked before any APK is used.
-          if ! curl --fail --location --silent --show-error --retry 1 --max-time 180 --max-filesize 180000000 \
-            -A 'Mozilla/5.0' -o "$input" 'https://d.apkpure.com/b/APK/org.telegram.messenger?versionCode=70382'; then
+          # Third-party GitHub mirror of a Telegram-signed APK. Check both the
+          # pinned file SHA-256 and the original signing certificate before use.
+          if ! gh release download android-12.10.1 --repo LOVECHEN/telegram-release \
+            --pattern Telegram-12.10.1.apk --dir /tmp/telegram-output; then
             printf '%s\n' '{"status":"not_tested_apk_download_unavailable","reason":"Exact-version public APK mirror could not be downloaded; no APK was applied."}' > "$smoke"
             echo '::notice::Exact-version Telegram APK was unavailable; APK application is not tested.'
             exit 0
           fi
-          if ! echo '054376665aa676e898fd8fb84cf9c5ac7f2fa07a  '"$input" | sha1sum --check; then
-            printf '%s\n' '{"status":"not_tested_apk_download_unavailable","reason":"Downloaded file did not match the pinned Telegram APK; it was not used."}' > "$smoke"
-            echo '::warning::Downloaded Telegram file did not match the expected hash; APK application is not tested.'
-            exit 0
-          fi
+          echo 'f5e1192725772960cc94b83e54ffd8939f876b2b6e5f21d4a8537eb6fcba50e6  '"$input" | sha256sum --check
           bt=$(find "${ANDROID_HOME:?}/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
           "$bt/apksigner" verify --verbose --print-certs "$input" > /tmp/telegram-signature.txt
           grep -i -q '^Signer #1 certificate SHA-256 digest: 49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1$' /tmp/telegram-signature.txt
           test "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' /tmp/telegram-signature.txt)" -eq 1
           "$bt/aapt" dump badging "$input" > /tmp/telegram-badging.txt
-          grep -q "package: name='org.telegram.messenger' versionCode='70382' versionName='12.10.1'" /tmp/telegram-badging.txt
+          grep '^package:' /tmp/telegram-badging.txt | while IFS= read -r line; do echo "::notice::Telegram APK identity: $line"; done
+          package=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path('/tmp/telegram-badging.txt').read_text()
+          m = re.search(r"package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'", text)
+          if not m or (m.group(1), m.group(2), m.group(3)) not in {
+                  ('org.telegram.messenger', '70382', '12.10.1'),
+                  ('org.telegram.messenger.web', '70389', '12.10.1')}:
+              raise SystemExit('Mirrored APK is not an exact supported Telegram build')
+          print(m.group(1))
+          PY
+          )
           desktop=/tmp/telegram-output/morphe-desktop-1.19.1-all.jar
           if ! java -Xmx4g -jar "$desktop" patch "$input" -p /tmp/telegram-output/bundle.mpp \
             -e 'Remove ads' --exclusive --unsigned -o /tmp/telegram-output/remove-ads.apk \
@@ -107,7 +117,7 @@ jobs:
             exit 1
           fi
           python3 tools/telegram/verify_patching.py "$input" /tmp/telegram-output/remove-ads.json \
-            /tmp/telegram-output/all-default.json "$smoke"
+            /tmp/telegram-output/all-default.json "$smoke" --package "$package"
       - name: Record validation and save only the separate bundle
         run: |
           set -euo pipefail

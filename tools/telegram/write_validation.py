@@ -15,7 +15,7 @@ archive = verify_archive(bundle)
 if hashlib.sha256(bundle.read_bytes()).hexdigest() != archive['sha256']:
     raise SystemExit('Bundle changed after verification')
 smoke = json.loads(Path(sys.argv[1]).read_text())
-if smoke.get('status') not in {'passed_actual_mpp_on_original_signed_telegram_apk', 'not_tested_apk_download_unavailable'}:
+if smoke.get('status') not in {'passed_actual_mpp_on_telegram_signed_apk', 'not_tested_apk_download_unavailable'}:
     raise SystemExit('Unexpected actual-APK test status')
 repo = os.environ['GITHUB_REPOSITORY']
 run = os.environ['GITHUB_RUN_ID']

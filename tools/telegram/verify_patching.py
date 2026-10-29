@@ -8,9 +8,9 @@ from pathlib import Path
 from verify_bundle import NAMES
 
 
-def verify_report(path: Path, expected: set[str]) -> None:
+def verify_report(path: Path, expected: set[str], package: str = 'org.telegram.messenger') -> None:
     result = json.loads(path.read_text())
-    if result.get('packageName') != 'org.telegram.messenger' or result.get('packageVersion') != '12.10.1':
+    if result.get('packageName') != package or result.get('packageVersion') != '12.10.1':
         raise ValueError('Unexpected APK identity in patch report')
     if result.get('failedPatches'):
         raise ValueError('Morphe reported failed patches')
@@ -27,16 +27,20 @@ def main() -> None:
     parser.add_argument('single_report', type=Path)
     parser.add_argument('all_report', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--package', required=True, choices=('org.telegram.messenger', 'org.telegram.messenger.web'))
     args = parser.parse_args()
-    verify_report(args.single_report, {'Remove ads'})
-    verify_report(args.all_report, NAMES - {'Disable analytics'})
+    verify_report(args.single_report, {'Remove ads'}, args.package)
+    verify_report(args.all_report, NAMES - {'Disable analytics'}, args.package)
     sha = hashlib.sha256()
     with args.apk.open('rb') as stream:
         for data in iter(lambda: stream.read(1024 * 1024), b''):
             sha.update(data)
     report = {
-        'status': 'passed_actual_mpp_on_original_signed_telegram_apk',
-        'source': 'APKPure Telegram 12.10.1 version code 70382; signature and file SHA-1 verified',
+        'status': 'passed_actual_mpp_on_telegram_signed_apk',
+        'source': 'LOVECHEN/telegram-release android-12.10.1 APK mirror; pinned SHA-256 and Telegram signer verified',
+        'package': args.package,
+        'version': '12.10.1',
+        'version_code': 70389 if args.package.endswith('.web') else 70382,
         'original_apk_sha256': sha.hexdigest(),
         'original_signer_sha256': '49c1522548ebacd46ce322b6fd47f6092bb745d0f88082145caf35e14dcc38e1',
         'single_remove_ads': 'passed_morphe_patching_and_rebuild',
