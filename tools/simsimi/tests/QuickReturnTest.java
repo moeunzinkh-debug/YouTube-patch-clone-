@@ -72,7 +72,10 @@ public final class QuickReturnTest {
         check(d.list.scrollY == 1800, "changing screen before the posted action cancels it");
 
         Fixture e = new Fixture();
-        e.root.focus = new EditText("private text is never read");
+        EditText focusedEditor = new EditText("private text is never read");
+        focusedEditor.bounds(0, 700, 400, 780);
+        e.root.addView(focusedEditor);
+        e.root.focus = focusedEditor;
         e.click(4000, 1); e.click(4200, 1); View.runAll();
         check(e.list.scrollY == 1800, "visible focused editor blocks quick return");
 
@@ -99,6 +102,21 @@ public final class QuickReturnTest {
         i.bar.selected = 1;
         i.click(10100, 1); View.runAll();
         check(i.list.scrollY == 1800, "switching into Chat is not counted as a selected-tab click");
+
+        Fixture j = new Fixture();
+        EditText roomEditor = new EditText("conversation text is never read");
+        roomEditor.bounds(0, 700, 400, 780);
+        j.root.addView(roomEditor); // not focused, as in a room with its keyboard hidden
+        j.click(11000, 1); j.click(11100, 1); View.runAll();
+        check(j.list.scrollY == 1800, "an unfocused visible room editor also blocks quick return");
+
+        Fixture k = new Fixture();
+        EditText hiddenEditor = new EditText("hidden text is never read");
+        hiddenEditor.bounds(0, 700, 400, 780);
+        hiddenEditor.shown = false;
+        k.root.addView(hiddenEditor);
+        k.click(12000, 1); k.click(12100, 1); View.runAll();
+        check(k.list.scrollY == 0, "a hidden editor does not block the Conversation list");
 
         System.out.println(checks + " Quick Return view/click contract checks passed (JVM stubs)");
     }

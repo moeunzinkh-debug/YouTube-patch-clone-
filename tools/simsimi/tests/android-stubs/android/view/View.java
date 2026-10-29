@@ -15,7 +15,6 @@ public class View {
     public boolean isShown() { return shown; }
     public boolean isAttachedToWindow() { return attached; }
     public View getRootView() { return parent == null ? this : parent.getRootView(); }
-    public View findFocus() { return focus; }
     public boolean getGlobalVisibleRect(Rect rect) { if (!shown || r<=l || b<=t) return false; rect.set(l,t,r,b); return true; }
     public Resources getResources() { return resources; }
     public boolean canScrollVertically(int direction) { return false; }

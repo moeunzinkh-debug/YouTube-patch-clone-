@@ -31,7 +31,7 @@ public final class QuickReturn {
             }
             View root = validRoot(bottomBar);
             boolean conversation = root != null && isConversationHeaderVisible(root)
-                    && !hasVisibleFocusedEditor(root);
+                    && !hasVisibleEditor(root);
             if (!taps.tap(index, true, conversation, SystemClock.uptimeMillis())) return;
             WeakReference<View> barRef = new WeakReference<>(bottomBar);
             root.postDelayed(() -> returnToTop(barRef.get()), SETTLE_DELAY_MS);
@@ -44,7 +44,7 @@ public final class QuickReturn {
         try {
             View root = validRoot(bottomBar);
             if (root == null || selectedIndex(bottomBar) != ChatTabDoubleTap.CHAT_INDEX
-                    || hasVisibleFocusedEditor(root) || !isConversationHeaderVisible(root)) return;
+                    || hasVisibleEditor(root) || !isConversationHeaderVisible(root)) return;
             Rect rootBounds = new Rect();
             if (!root.getGlobalVisibleRect(rootBounds) || rootBounds.width() <= 0 || rootBounds.height() <= 0) return;
             ScrollCandidate best = new ScrollCandidate();
@@ -66,9 +66,18 @@ public final class QuickReturn {
         return root != null && root.isAttachedToWindow() && root.isShown() ? root : null;
     }
 
-    private static boolean hasVisibleFocusedEditor(View root) {
-        View focus = root.findFocus();
-        return focus instanceof EditText && focus.isShown();
+    /** Chat rooms normally have an editor even when the keyboard is hidden. Never inspect its text. */
+    private static boolean hasVisibleEditor(View view) {
+        if (!view.isShown()) return false;
+        Rect visible = new Rect();
+        if (!view.getGlobalVisibleRect(visible)) return false;
+        if (view instanceof EditText) return true;
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int index = 0; index < group.getChildCount(); index++)
+                if (hasVisibleEditor(group.getChildAt(index))) return true;
+        }
+        return false;
     }
 
     private static boolean isConversationHeaderVisible(View view) {

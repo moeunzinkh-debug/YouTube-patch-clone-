@@ -27,7 +27,7 @@ status.update({
 status['tests'].update({
     'morphe_selector_names_defaults_and_compatibility': 'passed_12_selectors_quick_return_opt_in',
     'quick_return_double_tap_host_harness': 'passed_20_checks',
-    'quick_return_android_stubs_host_harness': 'passed_13_checks_not_android_runtime',
+    'quick_return_android_stubs_host_harness': 'passed_15_checks_not_android_runtime',
     'quick_return_apk_comparator_unit_tests': 'passed_7_tests_on_synthetic_methods',
     'quick_return_morphe_application_matrix': 'passed_combined_quick_only_pull_only_static_output',
     'quick_return_device_runtime': 'not_run',
