@@ -22,6 +22,7 @@ logger.remove()
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 ORIGINAL_SHA = 'f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70'
 RE_SHA = 'b650b0325de4d80606597003d64ac7b358489c4e5eba6b76dfdc0008e0ca47e4'
+HW_SHA = 'a8c5f8cd1845394f77d657ffdbff843bfb3ad86dcd1cc4afdac75cf098b46709'
 TOKENS = (
     'com.google.android.gms', 'app.revanced.android.gms',
     'com.google.iid.TOKEN_REQUEST', 'app.revanced.iid.TOKEN_REQUEST',
@@ -32,6 +33,13 @@ TOKENS = (
 )
 RELEVANT_CALLS = ('->checkPermission(', '->queryBroadcastReceivers(', '->queryIntentServices(',
                   '->sendBroadcast(', '->startService(', '->setPackage(')
+TRACE_METHODS = {
+    ('Lcom/google/android/gms/cloudmessaging/zzw;', 'zzb'),
+    ('Lcom/google/android/gms/cloudmessaging/Rpc;', 'zze'),
+    ('Lcom/google/android/gms/cloudmessaging/zzp;', 'zzg'),
+    ('Lcom/google/firebase/iid/Metadata;', 'getIidImplementation'),
+    ('Lcom/google/firebase/messaging/i0;', 'e'),
+}
 
 
 def sha256(path: Path) -> str:
@@ -83,6 +91,7 @@ def manifest(path: Path, package: str) -> dict:
 def dex_references(path: Path) -> dict:
     refs = {token: [] for token in TOKENS}
     totals = {token: 0 for token in TOKENS}
+    traces = []
     with zipfile.ZipFile(path) as archive:
         for dex_name in archive.namelist():
             if not re.fullmatch(r'classes\d*\.dex', dex_name):
@@ -115,29 +124,49 @@ def dex_references(path: Path) -> dict:
                                 'dex': dex_name, 'class': cls.get_name(), 'method': method.get_name(),
                                 'descriptor': method.get_descriptor(), 'relevant_calls': sorted(calls),
                             })
+                    if (cls.get_name(), method.get_name()) in TRACE_METHODS:
+                        selected = []
+                        for instruction in instructions:
+                            opcode = instruction.get_name()
+                            text = instruction.get_output()
+                            if opcode.startswith('const-string'):
+                                keep = any('"' + token + '"' in text for token in TOKENS)
+                            elif opcode.startswith('invoke-'):
+                                keep = any(call in text for call in RELEVANT_CALLS + ('-><init>(Ljava/lang/String;',))
+                            else:
+                                keep = opcode.startswith(('move', 'const', 'if-', 'goto', 'return'))
+                            if keep:
+                                selected.append({'opcode': opcode, 'operands': text})
+                        traces.append({'dex': dex_name, 'class': cls.get_name(), 'method': method.get_name(),
+                                       'descriptor': method.get_descriptor(), 'instructions': selected})
             del dex, data
             gc.collect()
-    return {token: {'method_count': totals[token], 'sample_methods': refs[token]} for token in TOKENS}
+    return {'tokens': {token: {'method_count': totals[token], 'sample_methods': refs[token]} for token in TOKENS},
+            'selected_flow_traces': traces}
 
 
 def main() -> None:
-    if len(sys.argv) != 5:
-        raise SystemExit('usage: inspect_push_compat.py original.apk patched.apk microg-re.apk report.json')
-    original, patched, microg, output = map(Path, sys.argv[1:])
-    if sha256(original) != ORIGINAL_SHA or sha256(microg) != RE_SHA:
+    if len(sys.argv) != 6:
+        raise SystemExit('usage: inspect_push_compat.py original.apk patched.apk microg-re.apk microg-hw.apk report.json')
+    original, patched, microg_re, microg_hw, output = map(Path, sys.argv[1:])
+    if (sha256(original), sha256(microg_re), sha256(microg_hw)) != (ORIGINAL_SHA, RE_SHA, HW_SHA):
         raise SystemExit('Input hash differs from the pinned public release asset')
     stock_manifest = manifest(original, 'com.ismaker.android.simsimi')
     patched_manifest = manifest(patched, 'com.ismaker.android.simsimi')
-    re_manifest = manifest(microg, 'app.revanced.android.gms')
-    if (stock_manifest['version'], stock_manifest['version_code'], re_manifest['version']) != ('9.2.3', '1119001', '7.3.0-dev.2'):
+    re_manifest = manifest(microg_re, 'app.revanced.android.gms')
+    hw_manifest = manifest(microg_hw, 'com.google.android.gms')
+    if (stock_manifest['version'], stock_manifest['version_code'], re_manifest['version'], hw_manifest['version']) != (
+            '9.2.3', '1119001', '7.3.0-dev.2', '0.3.17.255070'):
         raise SystemExit('Unexpected release version; refusing to compare')
     result = {
         'scope': 'Static inspection of public APK artifacts; no Android device or live push delivery tested.',
         'microg_re_release_sha256': RE_SHA,
+        'microg_hw_release_sha256': HW_SHA,
         'simsimi_original_sha256': ORIGINAL_SHA,
         'simsimi_stock': stock_manifest,
         'simsimi_patched_microg_only': patched_manifest,
         'microg_re': re_manifest,
+        'microg_original_hw': hw_manifest,
         'stock_dex_references': dex_references(original),
         'patched_dex_references': dex_references(patched),
     }
