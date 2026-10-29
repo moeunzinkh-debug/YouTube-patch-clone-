@@ -128,6 +128,8 @@ def main() -> None:
     LAST_STAGE = 'select the experimental patch'
     nodes, _ = wait_for('Disable all', 90)
     announce('initial patch selection', nodes)
+    if not any(matches(node, '14/15', exact=True) for node in nodes):
+        raise RuntimeError('Unexpected default selection for the Telegram source')
     tap('Disable all', exact=True)
     nodes, _ = wait_for('0/15', 40)
     tap('Search patches', exact=True)
@@ -149,7 +151,10 @@ def main() -> None:
         nodes = dump()
         if any(matches(n, 'Background patching protection') for n in nodes):
             tap('Not now', exact=True)
-        elif any(matches(n, 'Patching complete!') or matches(n, 'Patching succeeded') for n in nodes):
+        elif (any(matches(n, 'Patched', exact=True) for n in nodes)
+              and any(matches(n, '1 patch', exact=True) for n in nodes)
+              and any(matches(n, 'Telegram Patch Clone - Email Experiment 1.23.1-tg.email-exp.1') for n in nodes)
+              and any(matches(n, 'Save', exact=True) for n in nodes)):
             announce('Manager patching succeeded', nodes)
             print('Morphe Manager 2.2.0 applied the selected experiment to stock Telegram Web 12.10.1.', flush=True)
             return
