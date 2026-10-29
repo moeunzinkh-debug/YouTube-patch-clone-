@@ -1,0 +1,2 @@
+# Preserve verbatim upstream Git blobs, including their original CRLF files.
+extras/telegram-upstream/** -text whitespace=cr-at-eol

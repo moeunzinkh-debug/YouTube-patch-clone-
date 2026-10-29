@@ -1,0 +1,151 @@
+{
+  "repository": "https://github.com/rushiranpise/morphe-patches",
+  "tag": "v1.23.1",
+  "commit": "92c0fca0ae103a419c7fc61f9c5b8b38b7d6b82a",
+  "files": {
+    "LICENSE": {
+      "git_blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+      "mode": "100644"
+    },
+    "NOTICE": {
+      "git_blob": "340889b2de93e82f733f71b6075c751191fade1a",
+      "mode": "100644"
+    },
+    "extensions/extension/build.gradle.kts": {
+      "git_blob": "29cd9bc9f4a57fe37c9b4f342ddf905a1aead4f7",
+      "mode": "100644"
+    },
+    "extensions/extension/src/main/AndroidManifest.xml": {
+      "git_blob": "9b65eb06cff68464b3002060558a2ffb482f343c",
+      "mode": "100644"
+    },
+    "extensions/extension/src/main/java/app/template/extension/extension/InstallSourceHelper.java": {
+      "git_blob": "457f63e63054cc7cdc56dcfe280ae725ed23c3df",
+      "mode": "100644"
+    },
+    "extensions/extension/src/main/java/app/template/extension/extension/SignatureHookApp.java": {
+      "git_blob": "cfc1bc489f765cb2434c6aa5fd6d9024497e6ac2",
+      "mode": "100644"
+    },
+    "gradle.properties": {
+      "git_blob": "005a8aad4bc89168e0e85bfb80031250acdee10e",
+      "mode": "100644"
+    },
+    "gradle/libs.versions.toml": {
+      "git_blob": "ae5cec2cd2fd16584c5a430c81fcdd1b98e30bc3",
+      "mode": "100644"
+    },
+    "gradle/wrapper/gradle-wrapper.jar": {
+      "git_blob": "eddabd2eef8d94a5437d6168ff9c87a78ff725b3",
+      "mode": "100644"
+    },
+    "gradle/wrapper/gradle-wrapper.properties": {
+      "git_blob": "84c5a9c661af8d862f3be4e1a593ce90a6c5b1fe",
+      "mode": "100644"
+    },
+    "gradlew": {
+      "git_blob": "249efbb032ce46a80c687c0723eb172e85f6a136",
+      "mode": "100755"
+    },
+    "gradlew.bat": {
+      "git_blob": "a51ec4f5886d3bb106b26724ee4507addbbe3fa8",
+      "mode": "100644"
+    },
+    "patches/build.gradle.kts": {
+      "git_blob": "e75bad1ec1de1e6e5d98b5ebd9e0b539113b5c2d",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/shared/Constants.kt": {
+      "git_blob": "5452fe466e19c59ed0a8f1816a631ded5d646ce0",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/shared/cert/CertExtractor.kt": {
+      "git_blob": "e8c3603d534c0bd0a8a571c631e6cf7178e0be4f",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/shared/firebase/SpoofFirebaseCertHashPatch.kt": {
+      "git_blob": "5f6c6fc31e2f83694613e8a69512ad044bea6215",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/shared/installer/SpoofInstallSourcePatch.kt": {
+      "git_blob": "ac9fabba5c1e142a23d2472e49767568bd8f0847",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/shared/signature/SpoofSignatureVerificationPatch.kt": {
+      "git_blob": "e8e6db6aa6ec24922a406ff105acffa20441c6b4",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/TelegramFingerprints.kt": {
+      "git_blob": "e1d359ee71f3561cdda298774307e5a2ac08866d",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/ads/TelegramDisableAnalyticsPatch.kt": {
+      "git_blob": "1a84a3f73a8299b5aa80662543e73f40fc4cdcb9",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/ads/TelegramDisableAutoUpdatePatch.kt": {
+      "git_blob": "4ff8a8b75450b79e43b4ae17fcca24c69f311484",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/ads/TelegramRemoveAdsPatch.kt": {
+      "git_blob": "70f554ee959d7027a0e5feab8f77bf83af700d0c",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramAntiDeletePatch.kt": {
+      "git_blob": "93ee5adf269580360c6ecf69ffc9521a34fd97a6",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramAntiDisappearingMediaPatch.kt": {
+      "git_blob": "d4a66f551092f88591e645a7cf552f076ae52d03",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramAntiScreenshotNotificationPatch.kt": {
+      "git_blob": "10eb5d3a942a47d5d70ee8dd105d5d9a0888c470",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramBypassChannelRestrictionsPatch.kt": {
+      "git_blob": "7d597134511e067a2935f5f7439e5d678a1cb005",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramBypassContentRestrictionsPatch.kt": {
+      "git_blob": "ba1ae2ad2d9c0ddd0c1d07f3c64a404f1b432a66",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramDisableChannelSwitchingPatch.kt": {
+      "git_blob": "b0fe0159c377b0a4fac2e875f86c0765833bee00",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramDisableRichHtmlPastePatch.kt": {
+      "git_blob": "b3f669b5286343b154bb8f62bb8d5dc7bed51000",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramDownloadBoostPatch.kt": {
+      "git_blob": "aae53696085a1c9a4f5746b3cd1aec7078c99f9a",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/content/TelegramVoiceToMusicPatch.kt": {
+      "git_blob": "085412024688ae4245a3da663c76b80a057aece5",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/ghost/TelegramHideTypingPatch.kt": {
+      "git_blob": "6f2b84abaa1a2b4aeae8edea6453d3199c67794e",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/premium/TelegramBypassIntegrityPatch.kt": {
+      "git_blob": "9682bd6acd3a6d2fba9d6d7a639755488c1bcf82",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/premium/TelegramPremiumPatch.kt": {
+      "git_blob": "c9f075a80495e3ec3a917699da685618b7e0b81a",
+      "mode": "100644"
+    },
+    "patches/src/main/kotlin/app/template/patches/telegram/signature/TelegramCertSeedPatch.kt": {
+      "git_blob": "92dd12f3a74f0a0cf5b2985ad00847b7aef463b0",
+      "mode": "100644"
+    },
+    "settings.gradle.kts": {
+      "git_blob": "3cd469d8ecb2c617a5d364fec70fc9f349024d54",
+      "mode": "100644"
+    }
+  }
+}

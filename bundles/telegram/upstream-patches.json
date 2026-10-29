@@ -1,0 +1,1114 @@
+{
+  "upstream_tag": "v1.23.1",
+  "upstream_commit": "92c0fca0ae103a419c7fc61f9c5b8b38b7d6b82a",
+  "patches": [
+    {
+      "name": "Anti-delete messages",
+      "description": "Prevents messages deleted by other users from being removed locally.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Anti-disappearing media",
+      "description": "Keeps view-once photos, videos and voice messages viewable indefinitely.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Anti-screenshot notification",
+      "description": "Blocks screenshot notifications from being sent to the other user.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Bypass channel restrictions",
+      "description": "Allows opening, viewing, saving and forwarding content from restricted, sensitive, and copyright-restricted channels.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Bypass content restrictions",
+      "description": "Allows saving and forwarding content from restricted channels, chats, and users.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Bypass integrity check",
+      "description": "Spoofs certificate fingerprint and SafetyNet results so login works on patched APK.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch",
+        "ResourcePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable analytics",
+      "description": "Blocks Firebase analytics and event tracking in Telegram Plus. FirebaseApp.initializeApp() is preserved so push notifications keep working.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable auto-update",
+      "description": "Disables automatic app update checks, the blocking update screen, and the proxy sponsor channel insertion. On Telegram Plus also disables the Plus-specific updater and update settings flag.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Disable channel switching",
+      "description": "Disables the pull-down gesture that switches to the next unread channel.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Download speed boost",
+      "description": "Increases download chunk size to 1 MB and max concurrent requests to 12.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Hide typing indicator",
+      "description": "Hides your typing indicator from other users in all chats. On Telegram Plus also silences the controller-level sendTyping dispatcher.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Remove ads",
+      "description": "Removes sponsored messages and video ads from all chats and channels. On Telegram Plus also blocks native banner and inline ads.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Unlock Premium",
+      "description": "Unlocks Telegram Premium features for the current account.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Use normal paste",
+      "description": "Skips Telegram's Rich HTML paste handler and falls back to the normal paste path.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Voice to music",
+      "description": "Plays voice notes in the full music player with seek bar and background playback.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "org.telegram.messenger",
+          "name": "Telegram",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70382,
+                "ARMEABI_V7A": 70382,
+                "X86_64": 70382,
+                "X86": 70382
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.messenger.web",
+          "name": "Telegram Web",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1",
+              "versionCodes": {
+                "ARM64_V8A": 70389,
+                "ARMEABI_V7A": 70389,
+                "X86_64": 70389,
+                "X86": 70389
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "org.telegram.plus",
+          "name": "Telegram Plus",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#2CA5E0",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "12.10.1.1",
+              "versionCodes": {
+                "ARM64_V8A": 22510,
+                "ARMEABI_V7A": 22510,
+                "X86_64": 22510,
+                "X86": 22510
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    }
+  ]
+}
