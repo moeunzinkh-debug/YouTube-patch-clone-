@@ -1,0 +1,180 @@
+name: Publish Telegram patch bundle release
+
+on:
+  push:
+    branches:
+      - arena/cbe2e9a9-youtube-patch-clone
+    paths:
+      - .github/workflows/publish-telegram-release.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: telegram-release-v1-23-1-tg-1
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # This one-time publication is limited to the user's approved branch,
+    # explicit commit marker, and already-created draft release ID.
+    if: contains(github.event.head_commit.message, '[telegram-release]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: Telegram-v1.23.1-tg.1
+      DRAFT_RELEASE_ID: '427738498'
+      EXPECTED_SHA256: c3fd498bff06cd6acaabadcec696cf571480e0212f3d530e4f9e425ca7573cbb
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verify the unchanged original Telegram bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/telegram/test_telegram_subset.py -v
+          python3 tools/telegram/test_emulator_smoke.py -v
+          python3 tools/telegram/verify_bundle.py --mpp bundles/telegram/bundle.mpp
+          (cd bundles/telegram && sha256sum --check bundle.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path('bundles/telegram')
+          data = (root / 'bundle.mpp').read_bytes()
+          report = json.loads((root / 'validation.json').read_text())
+          smoke = json.loads((root / 'android-smoke.json').read_text())
+          digest = hashlib.sha256(data).hexdigest()
+          if digest != os.environ['EXPECTED_SHA256'] or len(data) != 776015:
+              raise SystemExit('Unexpected Telegram bundle bytes; refusing to publish')
+          if report['bundle_sha256'] != digest or smoke['bundle_sha256'] != digest:
+              raise SystemExit('Validation reports refer to different bundle bytes')
+          if report['fork_version'] != '1.23.1-tg.1':
+              raise SystemExit('Unexpected Telegram bundle version')
+          if report['tests']['actual_apk_application']['package'] != 'org.telegram.messenger.web':
+              raise SystemExit('Unexpected APK fixture in the validation report')
+          print('::notice::Verified the original Telegram-only MPP and the Web-only test reports')
+          PY
+
+      - name: Check the authorized draft and prepare assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Fcbe2e9a9-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to release an older commit'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/$RELEASE_TAG" --jq '.[].ref' > "$RUNNER_TEMP/existing-tags.txt"
+          if grep -Fxq "refs/tags/$RELEASE_TAG" "$RUNNER_TEMP/existing-tags.txt"; then
+            echo '::error::Tag already exists; refusing to reuse it'; exit 1
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name' > "$RUNNER_TEMP/latest-before.txt"
+          gh api "repos/$GITHUB_REPOSITORY/releases/$DRAFT_RELEASE_ID" > "$RUNNER_TEMP/telegram-draft.json"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          draft = json.loads((Path(os.environ['RUNNER_TEMP']) / 'telegram-draft.json').read_text())
+          notes = Path('bundles/telegram/RELEASE_NOTES.md').read_text()
+          allowed_targets = {'6cea806f0ffccb297ad489ac96d26d2a983dddb1', os.environ['GITHUB_SHA']}
+          if (draft['id'] != int(os.environ['DRAFT_RELEASE_ID']) or not draft['draft']
+                  or not draft['prerelease'] or draft['tag_name'] != os.environ['RELEASE_TAG']
+                  or draft['name'] != 'Telegram Patch Clone v1.23.1-tg.1'
+                  or draft['body'].strip() != notes.strip()
+                  or draft['target_commitish'] not in allowed_targets):
+              raise SystemExit('Unexpected draft release; refusing to modify it')
+          print('::notice::Confirmed the requested Telegram draft and exact release notes')
+          PY
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$DRAFT_RELEASE_ID" \
+            -f tag_name="$RELEASE_TAG" -f target_commitish="$GITHUB_SHA" \
+            -F draft=true -F prerelease=true -f make_latest=false > /dev/null
+          mkdir -p "$RUNNER_TEMP/telegram-release"
+          cp bundles/telegram/bundle.mpp bundles/telegram/bundle.mpp.sha256 \
+            bundles/telegram/validation.json bundles/telegram/android-smoke.json \
+            extras/telegram-upstream/LICENSE extras/telegram-upstream/NOTICE \
+            docs/telegram/hiddenapibypass-LICENSE.txt "$RUNNER_TEMP/telegram-release/"
+
+      - name: Upload and verify exact draft assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$DRAFT_RELEASE_ID" > "$RUNNER_TEMP/telegram-draft.json"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          tmp = Path(os.environ['RUNNER_TEMP'])
+          draft = json.loads((tmp / 'telegram-draft.json').read_text())
+          asset_dir = tmp / 'telegram-release'
+          expected = {p.name: p for p in asset_dir.iterdir() if p.is_file()}
+          if set(expected) != {'bundle.mpp', 'bundle.mpp.sha256', 'validation.json', 'android-smoke.json', 'LICENSE', 'NOTICE', 'hiddenapibypass-LICENSE.txt'}:
+              raise SystemExit('Unexpected local asset set')
+          assets = {asset['name']: asset for asset in draft['assets']}
+          if len(assets) != len(draft['assets']) or set(assets) - set(expected):
+              raise SystemExit('Unexpected existing draft assets; refusing to replace anything')
+          for name, asset in assets.items():
+              local = expected[name]
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if asset['state'] != 'uploaded' or asset['size'] != local.stat().st_size or asset.get('digest') != digest:
+                  raise SystemExit(f'Existing asset mismatch: {name}; refusing to overwrite')
+          missing = sorted(set(expected) - set(assets))
+          (tmp / 'telegram-missing.txt').write_text(''.join(name + '\n' for name in missing))
+          print('Assets to upload:', ', '.join(missing) or '(none)')
+          PY
+          while IFS= read -r asset; do
+            gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/telegram-release/$asset"
+          done < "$RUNNER_TEMP/telegram-missing.txt"
+          gh api "repos/$GITHUB_REPOSITORY/releases/$DRAFT_RELEASE_ID" > "$RUNNER_TEMP/telegram-draft.json"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          tmp = Path(os.environ['RUNNER_TEMP'])
+          draft = json.loads((tmp / 'telegram-draft.json').read_text())
+          expected = {p.name: p for p in (tmp / 'telegram-release').iterdir() if p.is_file()}
+          assets = {asset['name']: asset for asset in draft['assets']}
+          if (not draft['draft'] or not draft['prerelease']
+                  or draft['tag_name'] != os.environ['RELEASE_TAG']
+                  or draft['target_commitish'] != os.environ['GITHUB_SHA']
+                  or len(assets) != len(draft['assets']) or set(assets) != set(expected)):
+              raise SystemExit('Draft state or uploaded asset set differs from expectation')
+          for name, local in expected.items():
+              asset = assets[name]
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if asset['state'] != 'uploaded' or asset['size'] != local.stat().st_size or asset.get('digest') != digest:
+                  raise SystemExit(f'GitHub-reported digest or size mismatch for {name}')
+          print('::notice::All seven uploaded asset sizes and SHA-256 digests match')
+          PY
+
+      - name: Publish and verify the pre-release
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$DRAFT_RELEASE_ID" \
+            -f tag_name="$RELEASE_TAG" -f target_commitish="$GITHUB_SHA" \
+            -F draft=false -F prerelease=true -f make_latest=false > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/telegram-published.json"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          release = json.loads((Path(os.environ['RUNNER_TEMP']) / 'telegram-published.json').read_text())
+          if release['draft'] or not release['prerelease'] or release['tag_name'] != os.environ['RELEASE_TAG']:
+              raise SystemExit('Published release is not the expected pre-release')
+          print('::notice::Published ' + release['html_url'])
+          PY
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --jq '.object.sha')" = "$GITHUB_SHA"
+          mkdir -p "$RUNNER_TEMP/telegram-download"
+          gh release download "$RELEASE_TAG" --pattern bundle.mpp --pattern bundle.mpp.sha256 --dir "$RUNNER_TEMP/telegram-download"
+          (cd "$RUNNER_TEMP/telegram-download" && sha256sum --check bundle.mpp.sha256)
+          echo "$EXPECTED_SHA256  $RUNNER_TEMP/telegram-download/bundle.mpp" | sha256sum --check
+          gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name' > "$RUNNER_TEMP/latest-after.txt"
+          cmp "$RUNNER_TEMP/latest-before.txt" "$RUNNER_TEMP/latest-after.txt"
+          echo '::notice::Release tag, downloaded bundle and unchanged latest release verified'
