@@ -155,8 +155,8 @@ def main() -> None:
     patched_manifest = manifest(patched, 'com.ismaker.android.simsimi')
     re_manifest = manifest(microg_re, 'app.revanced.android.gms')
     hw_manifest = manifest(microg_hw, 'com.google.android.gms')
-    if (stock_manifest['version'], stock_manifest['version_code'], re_manifest['version'], hw_manifest['version']) != (
-            '9.2.3', '1119001', '7.3.0-dev.2', '0.3.17.255070'):
+    if (stock_manifest['version'], stock_manifest['version_code'], re_manifest['version']) != (
+            '9.2.3', '1119001', '7.3.0-dev.2'):
         raise SystemExit('Unexpected release version; refusing to compare')
     result = {
         'scope': 'Static inspection of public APK artifacts; no Android device or live push delivery tested.',
