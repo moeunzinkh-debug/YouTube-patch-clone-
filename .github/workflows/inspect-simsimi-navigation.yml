@@ -28,8 +28,9 @@ jobs:
           import base64, gzip
           from pathlib import Path
           data = base64.b64encode(gzip.compress(Path('/tmp/simsimi-navigation/report.json').read_bytes())).decode('ascii')
-          chunks = [data[i:i + 3000] for i in range(0, len(data), 3000)]
-          if len(chunks) > 40:
+          # GitHub permits at most ten notice annotations from one step.
+          chunks = [data[i:i + 5000] for i in range(0, len(data), 5000)]
+          if len(chunks) > 10:
               raise SystemExit('Navigation report too large for sanitized annotations')
           for i, chunk in enumerate(chunks, 1):
               print(f'::notice::SIMSIMI_NAV_ABI {i}/{len(chunks)} {chunk}')
