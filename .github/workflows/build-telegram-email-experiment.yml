@@ -36,7 +36,11 @@ jobs:
           set -euo pipefail
           python3 tools/telegram/test_telegram_subset.py
           python3 tools/telegram-email/test_experiment.py -v
-          bash tools/telegram-email/test_bridge.sh
+          if ! bash tools/telegram-email/test_bridge.sh > /tmp/telegram-email-jvm.log 2>&1; then
+            tail -n 30 /tmp/telegram-email-jvm.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat /tmp/telegram-email-jvm.log
           (cd bundles/telegram && sha256sum --check bundle.mpp.sha256)
           python3 tools/telegram-email/prepare_build.py /tmp/telegram-email-build
       - name: Build the separate experimental Morphe bundle

@@ -16,5 +16,7 @@ public class LoginActivity {
     public LoginActivitySetupEmail(){super(parent);}
     public void setParams(Bundle params){EmailAlternative.install(this,params);if(params!=null)currentParams=params;}
     public boolean busy(){return nextPressed;} public void busy(boolean value){nextPressed=value;}
+    // Real Telegram's non-static view uses the outer instance throughout.
+    public int parentPage(){return LoginActivity.this.currentViewNum;}
   }
 }

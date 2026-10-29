@@ -177,7 +177,9 @@ public final class EmailAlternativeTest {
         check(busy.login.manager.sends == 0 && busy.screen.busy(), "existing email request is not overwritten");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        check(LoginActivity.LoginActivitySetupEmail.class.getDeclaredField("this$0") != null,
+                "test stub must preserve the real view's outer-instance field");
         noOfferTests(); offerAndErrorTests(); serverResponseTests(); lifecycleTests();
         System.out.println("EmailAlternative synthetic JVM checks passed: " + checks);
     }
