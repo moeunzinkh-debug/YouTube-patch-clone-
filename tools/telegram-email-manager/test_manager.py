@@ -121,10 +121,42 @@ def main() -> None:
     LAST_STAGE = 'open Telegram patch flow'
     adb('shell', 'am', 'start', '-a', 'app.morphe.manager.action.PATCH_APP',
         '--es', 'patch_package', 'org.telegram.messenger.web', '-n', 'app.morphe.manager/.MainActivity')
-    time.sleep(8)
-    announce('patch dialog', dump())
-    # Subsequent steps are driven by the exact Manager screen hierarchy.
-    raise RuntimeError('Manager patch flow inspection is not yet complete')
+    nodes, _ = wait_for('Use installed APK', 45)
+    announce('patch dialog', nodes)
+    tap('Use installed APK')
+
+    LAST_STAGE = 'select the experimental patch'
+    nodes, _ = wait_for('Disable all', 90)
+    announce('initial patch selection', nodes)
+    tap('Disable all', exact=True)
+    nodes, _ = wait_for('0/15', 40)
+    tap('Search patches', exact=True)
+    adb('shell', 'input', 'text', 'Try%sanother%slogin%smethod')
+    nodes, _ = wait_for(SELECTOR, 40)
+    announce('experimental selector before enabling', nodes)
+    if not any(matches(node, SELECTOR) and 'Disabled' in node.get('content-desc', '') for node in nodes):
+        raise RuntimeError('The experimental patch was not shown as disabled')
+    tap(SELECTOR)
+    nodes, _ = wait_for(SELECTOR + ', Enabled', 30)
+    announce('experimental selector enabled', nodes)
+    adb('shell', 'input', 'keyevent', 'KEYCODE_BACK')  # Close keyboard, not the patch list.
+    wait_for('1/15', 30)
+    tap('Patch', exact=True)
+
+    LAST_STAGE = 'patch in Morphe Manager'
+    end = time.monotonic() + 420
+    while time.monotonic() < end:
+        nodes = dump()
+        if any(matches(n, 'Background patching protection') for n in nodes):
+            tap('Not now', exact=True)
+        elif any(matches(n, 'Patching complete!') or matches(n, 'Patching succeeded') for n in nodes):
+            announce('Manager patching succeeded', nodes)
+            print('Morphe Manager 2.2.0 applied the selected experiment to stock Telegram Web 12.10.1.', flush=True)
+            return
+        elif any(matches(n, 'Oops! Something went wrong') or matches(n, 'Patching failed') for n in nodes):
+            raise RuntimeError('Manager reported that patching failed')
+        time.sleep(3)
+    raise RuntimeError('Manager patching did not complete before the deadline')
 
 
 if __name__ == '__main__':
