@@ -35,7 +35,10 @@ for dex_bytes in apk.get_all_dex():
         for method in cls.get_methods():
             item = {'name': method.get_name(), 'descriptor': method.get_descriptor(),
                     'access': method.get_access_flags_string()}
-            if name.endswith('/BottomTabsController;') and method.get_name() == 'onTabSelected' and method.get_code():
+            inspect_callback = name.endswith('/BottomTabsController;') and method.get_name() == 'onTabSelected'
+            inspect_click = name == 'Lcom/aurelhubert/ahbottomnavigation/i;' and method.get_name() in (
+                'lambda$createClassicItems$5', 'lambda$createSmallItems$6', 'setCurrentItem')
+            if (inspect_callback or inspect_click) and method.get_code():
                 item['instructions'] = [instruction.get_name() + ' ' + instruction.get_output()
                                         for instruction in method.get_instructions()]
             methods.append(item)
