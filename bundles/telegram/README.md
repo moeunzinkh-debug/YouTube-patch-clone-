@@ -50,4 +50,4 @@ Bundle នេះជាការជ្រើសយក **តែ Telegram** ពី 
 - លើ Android 15 emulator គ្មានគណនី ការដំឡើង និងបើក APK ដើម ព្រមទាំង APK ដែល patch ទាំងពីរ (ចុះហត្ថលេខាដោយ test key) បានដំណើរការ; process និង foreground activity នៅបន្តក្រោយ 12 វិនាទី។ នេះគ្រាន់តែជា launch smoke test ប៉ុណ្ណោះ។
 - **មិនទាន់សាក** APK សម្រាប់ `org.telegram.messenger` ឬ Telegram Plus, UI របស់ Morphe Manager នៅ Android, login, notification, មុខងារនីមួយៗលើឧបករណ៍ពិត ឬសិទ្ធិ Premium លើ server ទេ។ ការសាក Desktop/emulator មិនធានាលទ្ធផលទាំងនោះឡើយ។
 
-[ប្រភព អាជ្ញាបណ្ណ និងវិធី build](../../docs/telegram/upstream.md) · [លទ្ធផល Desktop](validation.json) · [លទ្ធផល emulator](android-smoke.json) · [SHA-256](bundle.mpp.sha256) · [ការពិនិត្យ SMS Fee ពេល login](../../docs/telegram/sms-fee-investigation.md)
+[ប្រភព អាជ្ញាបណ្ណ និងវិធី build](../../docs/telegram/upstream.md) · [លទ្ធផល Desktop](validation.json) · [លទ្ធផល emulator](android-smoke.json) · [SHA-256](bundle.mpp.sha256) · [ការពិនិត្យ email និង SMS Fee ពេល login](../../docs/telegram/sms-fee-investigation.md)
