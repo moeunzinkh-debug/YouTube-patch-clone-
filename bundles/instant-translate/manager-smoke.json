@@ -1,0 +1,20 @@
+{
+  "manager": "2.3.0-dev.3",
+  "package": "com.spaceship.screen.textcopy",
+  "version": "v7.5.00300",
+  "version_code": 50342,
+  "input_sha256": "f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c",
+  "bundle_sha256": "0fc40a4c52f8b4807a41a8e42f0198f7e3566eb0fed702fc6bfdb11de3589b66",
+  "selector": "Translation fallback (Google, experimental)",
+  "selector_default_enabled": false,
+  "local_source_imported": true,
+  "experimental_app_versions_enabled": true,
+  "fallback_explicitly_selected": true,
+  "manager_patch_and_save": "passed",
+  "expected_dex_hooks": "passed",
+  "native_arm64_libraries_unchanged": true,
+  "original_publisher_signing_provenance": "not established",
+  "app_installed_or_launched_by_manager_test": false,
+  "translation_runtime": "not established by this Manager patch test",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41074061125"
+}
