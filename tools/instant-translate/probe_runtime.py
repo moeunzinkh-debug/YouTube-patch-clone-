@@ -129,6 +129,8 @@ def main() -> None:
                                 time.sleep(2)
                                 report['screens'].append({'stage': 'fixture_entered', 'nodes': snapshot(dump()),
                                                           'routine_button_clicked': None})
+                                screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
+                                (OUTPUT.parent / 'instant-screen.png').write_bytes(screen.stdout)
                                 adb('shell', 'input', 'keyevent', 'KEYCODE_ENTER')
                                 report['fixture_submitted'] = True
                                 time.sleep(20)

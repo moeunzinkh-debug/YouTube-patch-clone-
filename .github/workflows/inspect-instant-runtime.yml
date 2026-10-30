@@ -62,6 +62,28 @@ jobs:
               for i, chunk in enumerate(chunks, 1):
                   print(f'::notice::INSTANT_RUNTIME {i}/{len(chunks)} {chunk}')
           PY
+      - name: Report disposable fixture-screen preview
+        if: always()
+        run: |
+          python3 -m pip install --disable-pip-version-check Pillow
+          python3 - <<'PY'
+          import base64, io, os
+          from pathlib import Path
+          from PIL import Image
+          p = Path(os.environ['RUNNER_TEMP']) / 'instant-screen.png'
+          if p.exists():
+              image = Image.open(p).convert('RGB')
+              image.thumbnail((320, 640))
+              data = io.BytesIO()
+              image.save(data, format='JPEG', quality=30, optimize=True)
+              encoded = base64.b64encode(data.getvalue()).decode()
+              chunks = [encoded[i:i+3900] for i in range(0, len(encoded), 3900)]
+              if len(chunks) <= 9:
+                  for i, chunk in enumerate(chunks, 1):
+                      print(f'::notice::INSTANT_SCREEN {i}/{len(chunks)} {chunk}')
+              else:
+                  print('::warning::Screen preview exceeds safe annotation capacity')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
