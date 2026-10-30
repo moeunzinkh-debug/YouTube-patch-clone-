@@ -37,6 +37,12 @@ class TraceTests(unittest.TestCase):
                 return FakeResources()
         self.assertEqual(tracer.collect_resource_ids(FakeApk())['translate_failed'], 0x7f120123)
 
+    def test_focused_body_keeps_register_not_secret(self):
+        inst = FakeInstruction('const-string', 'v4, "https://translate.sapiens8.com/key?token=secret"')
+        self.assertEqual(tracer.sanitize_focused_instruction(inst)['value'], 'v4,<host:translate.sapiens8.com>')
+        inst = FakeInstruction('const-string', 'v5, "secret-password"')
+        self.assertEqual(tracer.sanitize_focused_instruction(inst)['value'], 'v5,<redacted>')
+
     def test_instruction_string_and_url_redacted(self):
         self.assertEqual(tracer.sanitize_instruction(FakeInstruction('const-string', 'v0, https://x.y/key?api=secret'))['value'], '<redacted>')
         self.assertEqual(tracer.sanitize_instruction(FakeInstruction('const-string', 'v0, Translation failed plus private'))['value'], 'Translation failed')

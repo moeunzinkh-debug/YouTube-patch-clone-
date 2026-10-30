@@ -36,6 +36,18 @@ RESOURCE_NAMES = (
 TRANSLATE = re.compile(r'translat|deepl|bing|microsofttranslator', re.I)
 SAFE_HOST = re.compile(r'(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}\Z')
 URL = re.compile(r'https?://[^\s<>"\']+', re.I)
+# Follow only translation result and request methods discovered in the first trace.
+FOCUS_METHODS = frozenset({
+    'Lkb9;->R(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lqc8;Lmx1;)Ljava/lang/Object;',
+    'Lxm;->D(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Leh7;Lmx1;)Ljava/lang/Object;',
+    'Lxm;->E(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/lang/Object;',
+    'Lkpa;->P(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/lang/Object;',
+    'Lct9;->call()Ljava/lang/Object;',
+    'Lqu;->emit(Ljava/lang/Object;Llx1;)Ljava/lang/Object;',
+    'Lu66;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+})
+FOCUS_FIELD_CLASSES = frozenset({'Lir9;', 'Ld19;', 'Lqc8;', 'Lyp0;', 'Leh7;'})
+FOCUS_HOSTS = frozenset({'translate.sapiens8.com', 'translate.google.com'})
 
 
 def output_host(value: str) -> str | None:
@@ -69,6 +81,20 @@ def sanitize_instruction(inst) -> dict[str, str]:
     if len(raw) > 500 or not raw.isprintable():
         return {'op': op, 'value': '<redacted>'}
     return {'op': op, 'value': re.sub(r'\s+', '', raw)}
+
+
+def sanitize_focused_instruction(inst) -> dict[str, str]:
+    """Keep the register for literals, but never the literal itself except vetted anchors/hosts."""
+    result = sanitize_instruction(inst)
+    if result['op'].startswith('const-string'):
+        raw = inst.get_output()
+        register = raw.split(',', 1)[0].strip()
+        if not re.fullmatch(r'v\d+', register):
+            register = '<register>'
+        host = output_host(raw)
+        value = f'<host:{host}>' if host in FOCUS_HOSTS else result['value']
+        result['value'] = register + ',' + value
+    return result
 
 
 def method_id(cls, method) -> str:
@@ -110,6 +136,10 @@ def trace(path: Path) -> dict:
     public_hosts = Counter()
     strings_found = Counter()
     interesting_classes = set()
+    focused_methods = []
+    focused_fields = {}
+    focused_host_references = []
+    focused_caller_windows = defaultdict(list)
     app_namespace = 'Lcom/spaceship/screen/translate/'
     methods_seen = 0
     with zipfile.ZipFile(path) as archive:
@@ -129,17 +159,38 @@ def trace(path: Path) -> dict:
                 # Exclude the common application package, which itself ends in "translate".
                 if name.startswith(app_namespace) and TRANSLATE.search(name.removeprefix(app_namespace)):
                     interesting_classes.add(name)
+                if name in FOCUS_FIELD_CLASSES:
+                    focused_fields[name] = [
+                        {'name': field.get_name(), 'type': ''.join(field.get_descriptor().split()),
+                         'access': field.get_access_flags_string()}
+                        for field in cls.get_fields()
+                    ]
                 for method in cls.get_methods():
                     code = method.get_code()
                     if code is None:
                         continue
                     methods_seen += 1
                     instructions = list(method.get_instructions())
+                    identifier = method_id(cls, method)
+                    if identifier in FOCUS_METHODS:
+                        focused_methods.append({
+                            'dex': dex_name, 'method': identifier,
+                            'registers': code.get_registers_size(), 'incoming_registers': code.get_ins_size(),
+                            'instructions': [sanitize_focused_instruction(item) for item in instructions],
+                        })
                     matched = []
                     for i, ins in enumerate(instructions):
                         op = ins.get_name()
                         if op.startswith('const-string'):
                             out = ins.get_output()
+                            host = output_host(out)
+                            if host in FOCUS_HOSTS:
+                                focused_host_references.append({
+                                    'host': host, 'method': identifier, 'dex': dex_name,
+                                    'instruction_index': i,
+                                    'instructions': [sanitize_focused_instruction(item) for item in
+                                                     instructions[max(0, i-7):min(len(instructions), i+11)]],
+                                })
                             for anchor in ANCHORS:
                                 if anchor in out:
                                     matched.append((i, anchor))
@@ -156,7 +207,7 @@ def trace(path: Path) -> dict:
                         hits.append({'dex': dex_name, 'method': method_id(cls, method), 'windows': windows})
             del dex
             gc.collect()
-        wanted = {item['method'] for item in hits}
+        wanted = {item['method'] for item in hits} | FOCUS_METHODS
         callers = defaultdict(set)
         if wanted:
             # Only exact method reference identifiers are recorded, never literal strings.
@@ -166,14 +217,22 @@ def trace(path: Path) -> dict:
                     for method in cls.get_methods():
                         if method.get_code() is None:
                             continue
-                        for ins in method.get_instructions():
+                        instructions = list(method.get_instructions())
+                        for index, ins in enumerate(instructions):
                             if not ins.get_name().startswith('invoke-'):
                                 continue
                             out = ''.join(ins.get_output().split())
                             # Method references contain no comma; registers appear before it.
                             target = out.rsplit(',', 1)[-1]
+                            identifier = method_id(cls, method)
                             if target in wanted and len(callers[target]) < 30:
-                                callers[target].add(method_id(cls, method))
+                                callers[target].add(identifier)
+                            if target in FOCUS_METHODS and len(focused_caller_windows[target]) < 20:
+                                focused_caller_windows[target].append({
+                                    'method': identifier, 'dex': dex_name, 'instruction_index': index,
+                                    'instructions': [sanitize_focused_instruction(item) for item in
+                                                     instructions[max(0, index-9):min(len(instructions), index+8)]],
+                                })
                 del dex
                 gc.collect()
     return {
@@ -185,6 +244,10 @@ def trace(path: Path) -> dict:
         'anchor_string_occurrences': dict(sorted(strings_found.items())),
         'translation_related_app_classes': sorted(interesting_classes)[:160],
         'methods_scanned': methods_seen, 'matches': hits[:100],
+        'focused_method_bodies': focused_methods,
+        'focused_fields': focused_fields,
+        'focused_host_references': focused_host_references[:50],
+        'focused_caller_windows': dict(focused_caller_windows),
         'direct_callers': {key: sorted(values) for key, values in sorted(callers.items())},
         'note': 'Hostname/string presence does not prove the user\'s active engine, a request or root cause.',
     }

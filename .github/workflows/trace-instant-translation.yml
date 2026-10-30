@@ -56,7 +56,7 @@ jobs:
           raw = (Path(os.environ['RUNNER_TEMP']) / 'instant-trace.json').read_bytes()
           data = base64.b64encode(gzip.compress(raw)).decode('ascii')
           chunks = [data[i:i + 3900] for i in range(0, len(data), 3900)]
-          if len(chunks) > 9:
+          if len(chunks) > 20:
               raise SystemExit('Sanitized trace exceeds annotation capacity')
           for i, chunk in enumerate(chunks, 1):
               print(f'::notice::INSTANT_TRACE {i}/{len(chunks)} {chunk}')
