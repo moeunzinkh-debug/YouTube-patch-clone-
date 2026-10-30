@@ -102,8 +102,26 @@ def main() -> None:
                 if y1 > 450:
                     adb('shell', 'input', 'tap', str((x1+x2)//2), str((y1+y2)//2))
                     time.sleep(5)
-                    report['screens'].append({'stage': 'translate_tab', 'nodes': snapshot(dump()),
+                    nodes = dump()
+                    report['screens'].append({'stage': 'translate_tab', 'nodes': snapshot(nodes),
                                               'routine_button_clicked': 'Translate tab'})
+                    # Use only a synthetic Spanish fixture. No user account, screen
+                    # capture, clipboard or personal text is involved.
+                    for entry in nodes:
+                        if (safe_label(entry.get('text', '')) == 'Enter text' and
+                                re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', entry.get('bounds', ''))):
+                            a, b, c, d = map(int, re.findall(r'\d+', entry['bounds']))
+                            adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
+                            time.sleep(4)
+                            editing = dump()
+                            report['screens'].append({'stage': 'text_entry', 'nodes': snapshot(editing),
+                                                      'routine_button_clicked': 'Enter text'})
+                            if any(n.get('class') == 'android.widget.EditText' for n in editing):
+                                adb('shell', 'input', 'text', 'hola')
+                                time.sleep(2)
+                                report['screens'].append({'stage': 'fixture_entered', 'nodes': snapshot(dump()),
+                                                          'routine_button_clicked': None})
+                            break
                     break
         report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
     finally:

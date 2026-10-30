@@ -50,6 +50,7 @@ FOCUS_METHODS = frozenset({
     'Lsg0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
     'Lm82;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
     'Lwx8;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lbe4;->g0(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/lang/Object;',
     'Lnr0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
     'Lmr0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
     'Lqy8;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
