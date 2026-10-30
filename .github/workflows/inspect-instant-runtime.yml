@@ -70,7 +70,7 @@ jobs:
           import base64, io, os
           from pathlib import Path
           from PIL import Image
-          p = Path(os.environ['RUNNER_TEMP']) / 'instant-result-screen.png'
+          p = Path(os.environ['RUNNER_TEMP']) / 'instant-source-screen.png'
           if p.exists():
               image = Image.open(p).convert('RGB')
               image.thumbnail((320, 640))

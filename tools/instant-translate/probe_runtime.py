@@ -113,8 +113,42 @@ def main() -> None:
                     nodes = dump()
                     report['screens'].append({'stage': 'translate_tab', 'nodes': snapshot(nodes),
                                               'routine_button_clicked': 'Translate tab'})
-                    # Use only a synthetic Spanish fixture. No user account, screen
-                    # capture, clipboard or personal text is involved.
+                    # Select a known source language rather than depending on an
+                    # unrelated language-detection model for the synthetic test.
+                    source = next((n for n in nodes if safe_label(n.get('text', '')) == 'Detect Language'), None)
+                    if source:
+                        a, b, c, d = map(int, re.findall(r'\d+', source['bounds']))
+                        adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
+                        time.sleep(3)
+                        picker = dump()
+                        report['screens'].append({'stage': 'source_picker', 'nodes': snapshot(picker),
+                                                  'routine_button_clicked': 'Detect Language'})
+                        screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
+                        (OUTPUT.parent / 'instant-source-screen.png').write_bytes(screen.stdout)
+                        spanish = next((n for n in picker if safe_label(n.get('text', '')) == 'Spanish'), None)
+                        if not spanish:
+                            edit = next((n for n in picker if n.get('class') == 'android.widget.EditText'), None)
+                            if edit:
+                                a, b, c, d = map(int, re.findall(r'\d+', edit['bounds']))
+                                adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
+                                adb('shell', 'input', 'text', 'Spanish')
+                                time.sleep(3)
+                                picker = dump()
+                                report['screens'].append({'stage': 'source_search', 'nodes': snapshot(picker),
+                                                          'routine_button_clicked': None})
+                                spanish = next((n for n in picker if safe_label(n.get('text', '')) == 'Spanish'), None)
+                        if spanish:
+                            a, b, c, d = map(int, re.findall(r'\d+', spanish['bounds']))
+                            adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
+                            time.sleep(3)
+                        else:
+                            adb('shell', 'input', 'keyevent', 'KEYCODE_BACK')
+                            time.sleep(2)
+                        nodes = dump()
+                        report['screens'].append({'stage': 'source_selected', 'nodes': snapshot(nodes),
+                                                  'routine_button_clicked': 'Spanish' if spanish else None})
+                    # Use only a synthetic Spanish fixture. No user account,
+                    # clipboard or personal text is involved.
                     for entry in nodes:
                         if (safe_label(entry.get('text', '')) == 'Enter text' and
                                 re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', entry.get('bounds', ''))):
