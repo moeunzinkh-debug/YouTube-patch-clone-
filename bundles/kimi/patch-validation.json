@@ -1,0 +1,15 @@
+{
+  "status": "passed_actual_mpp_patch_and_dex_inspection",
+  "source": "Kimi release asset 690272677, supplied already re-signed APKS; base APK only",
+  "package": "com.moonshot.kimichat",
+  "version": "3.1.5",
+  "version_code": "381",
+  "input_base_sha256": "b7a5a412ed6958823da4b513523a22da2b032578f651fd9f9d4d08e4fc0ff85d",
+  "selector": "Remove license check",
+  "two_pairip_entrypoints_have_early_return": true,
+  "original_entrypoint_bodies_preserved_after_return": true,
+  "application_and_provider_call_sites_unchanged": true,
+  "tencent_license_method_unchanged": true,
+  "split_merge_manager_and_runtime": "not tested by this Desktop/base-APK check",
+  "live_login_server_attestation_and_paid_features": "not tested"
+}
