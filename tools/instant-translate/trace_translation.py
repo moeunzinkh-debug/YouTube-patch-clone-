@@ -80,10 +80,15 @@ def collect_resource_ids(apk) -> dict[str, int]:
     if resources is None:
         return {}
     result = {}
-    for name in RESOURCE_NAMES:
-        value = resources.get_res_id_by_key(EXPECTED_PACKAGE, 'string', name)
-        if isinstance(value, int):
-            result[name] = value
+    for package in resources.get_packages_names():
+        # ARSCParser fills resource_keys lazily only after it analyzes the table.
+        resources.get_string_resources(package)
+        for name in RESOURCE_NAMES:
+            value = resources.get_res_id_by_key(package, 'string', name)
+            if isinstance(value, int):
+                if name in result and result[name] != value:
+                    raise ValueError('Ambiguous resource ID: ' + name)
+                result[name] = value
     return result
 
 

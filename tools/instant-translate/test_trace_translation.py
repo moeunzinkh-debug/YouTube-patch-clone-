@@ -23,6 +23,20 @@ class TraceTests(unittest.TestCase):
         self.assertIsNone(tracer.output_host('https://[invalid/translate'))
         self.assertIsNone(tracer.output_host('no endpoint'))
 
+    def test_resource_lookup_initializes_lazy_resource_table(self):
+        class FakeResources:
+            ready = False
+            def get_packages_names(self):
+                return ['com.spaceship.screen.translate']
+            def get_string_resources(self, package):
+                self.ready = True
+            def get_res_id_by_key(self, package, kind, name):
+                return 0x7f120123 if self.ready and name == 'translate_failed' else None
+        class FakeApk:
+            def get_android_resources(self):
+                return FakeResources()
+        self.assertEqual(tracer.collect_resource_ids(FakeApk())['translate_failed'], 0x7f120123)
+
     def test_instruction_string_and_url_redacted(self):
         self.assertEqual(tracer.sanitize_instruction(FakeInstruction('const-string', 'v0, https://x.y/key?api=secret'))['value'], '<redacted>')
         self.assertEqual(tracer.sanitize_instruction(FakeInstruction('const-string', 'v0, Translation failed plus private'))['value'], 'Translation failed')
