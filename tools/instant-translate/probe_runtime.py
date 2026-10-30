@@ -131,11 +131,16 @@ def main() -> None:
                                                           'routine_button_clicked': None})
                                 screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
                                 (OUTPUT.parent / 'instant-screen.png').write_bytes(screen.stdout)
-                                adb('shell', 'input', 'keyevent', 'KEYCODE_ENTER')
+                                # The emulator's IME has an action arrow at the
+                                # bottom-right. KEYCODE_ENTER inserts a newline
+                                # instead, so tap the visible IME action.
+                                adb('shell', 'input', 'tap', '294', '590')
                                 report['fixture_submitted'] = True
                                 time.sleep(20)
                                 report['screens'].append({'stage': 'fixture_submitted', 'nodes': snapshot(dump()),
-                                                          'routine_button_clicked': 'keyboard Enter'})
+                                                          'routine_button_clicked': 'keyboard action arrow'})
+                                screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
+                                (OUTPUT.parent / 'instant-result-screen.png').write_bytes(screen.stdout)
                             break
                     break
         report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
