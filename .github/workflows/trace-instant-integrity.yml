@@ -1,0 +1,48 @@
+name: Inspect Instant Translate startup integrity check
+
+on:
+  push:
+    branches: [arena/b6e2f975-youtube-patch-clone]
+    paths:
+      - .github/workflows/trace-instant-integrity.yml
+      - tools/instant-translate/trace_integrity.py
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    if: contains(github.event.head_commit.message, '[instant-integrity]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect only pinned APK and redact literals
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          mkdir -p "$RUNNER_TEMP/instant-input"
+          filename='Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk'
+          gh release download Instant-translate --pattern "$filename" --dir "$RUNNER_TEMP/instant-input"
+          echo "f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c  $RUNNER_TEMP/instant-input/$filename" | sha256sum --check
+          if ! python3 tools/instant-translate/trace_integrity.py "$RUNNER_TEMP/instant-input/$filename" "$RUNNER_TEMP/instant-integrity.json" > "$RUNNER_TEMP/instant-integrity.log" 2>&1; then
+            tail -n 15 "$RUNNER_TEMP/instant-integrity.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+      - name: Report sanitized integrity trace
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, os
+          from pathlib import Path
+          data = base64.b64encode(gzip.compress((Path(os.environ['RUNNER_TEMP']) / 'instant-integrity.json').read_bytes())).decode()
+          chunks = [data[i:i+3900] for i in range(0, len(data), 3900)]
+          if len(chunks) > 15: raise SystemExit('Sanitized trace exceeds annotation capacity')
+          for i, chunk in enumerate(chunks, 1):
+              print(f'::notice::INSTANT_INTEGRITY {i}/{len(chunks)} {chunk}')
+          PY
