@@ -182,6 +182,12 @@ def main() -> None:
     tap('No, I already have it', exact=True)
     time.sleep(4)
     nodes = dump()
+    if any(matches(n, 'Allow access to manage all files') for n in nodes):
+        announce('Manager file access prompt', nodes)
+        tap('Allow access to manage all files', exact=True)
+        adb('shell', 'input', 'keyevent', 'KEYCODE_BACK')
+        time.sleep(5)
+        nodes = dump()
     announce('Android APK picker', nodes)
     if not any(matches(n, 'kimi-input.apks') for n in nodes):
         # The system picker may start in Recent instead of Downloads.
