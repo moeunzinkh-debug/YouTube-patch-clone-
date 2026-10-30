@@ -51,7 +51,7 @@ jobs:
           echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/instant-fallback/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
           python3 tools/instant-translate/prepare_build.py "$RUNNER_TEMP/instant-ci-only"
           src="$RUNNER_TEMP/instant-ci-only/patches/src/main/kotlin/app/morphe/patches/instanttranslate"
-          rm "$src/TranslationFallbackPatch.kt"
+          rm "$src/TranslationFallbackPatch.kt" "$src/SettingsPatch.kt"
           cp tools/instant-translate/ForceOriginalFailure.kt "$src/ForceOriginalFailure.kt"
       - name: Build the CI-only failure-injection patch (never distribute)
         shell: bash

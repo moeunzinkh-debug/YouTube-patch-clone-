@@ -87,11 +87,22 @@ jobs:
           fi
           python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
           if ! python3 tools/instant-translate/verify_patched.py "$input" "$RUNNER_TEMP/instant-input/patched.apk" \
-            "$RUNNER_TEMP/instant-input/patch-result.json" "$RUNNER_TEMP/instant-output/patch-validation.json" > "$RUNNER_TEMP/instant-dex-check.log" 2>&1; then
+            "$RUNNER_TEMP/instant-input/patch-result.json" "$RUNNER_TEMP/instant-output/fallback-validation.json" > "$RUNNER_TEMP/instant-dex-check.log" 2>&1; then
             tail -n 20 "$RUNNER_TEMP/instant-dex-check.log" | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
-          echo '::notice::Opt-in Instant Translate MPP listed and applied; DEX verified. Device runtime is not implied.'
+          if ! java -Xmx4g -jar "$desktop" patch "$input" -p "$RUNNER_TEMP/instant-output/bundle.mpp" \
+            --exclusive -e 'Translation fallback (Google, experimental)' -e 'Settings Patch (SEA-LION, experimental)' --unsigned \
+            -o "$RUNNER_TEMP/instant-input/settings-patched.apk" -r "$RUNNER_TEMP/instant-input/settings-result.json" > "$RUNNER_TEMP/instant-settings-patch.log" 2>&1; then
+            tail -n 30 "$RUNNER_TEMP/instant-settings-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          if ! python3 tools/instant-translate/verify_patched.py --settings "$input" "$RUNNER_TEMP/instant-input/settings-patched.apk" \
+            "$RUNNER_TEMP/instant-input/settings-result.json" "$RUNNER_TEMP/instant-output/patch-validation.json" > "$RUNNER_TEMP/instant-settings-check.log" 2>&1; then
+            tail -n 20 "$RUNNER_TEMP/instant-settings-check.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo '::notice::Both opt-in Instant Translate patches listed and applied; DEX and preserved integrity check verified. Device runtime is not implied.'
       - uses: actions/upload-artifact@v4
         with:
           name: instant-translate-experimental-mpp

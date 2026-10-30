@@ -11,6 +11,7 @@ from pathlib import Path
 from prepare_build import VERSION
 
 NAME = 'Translation fallback (Google, experimental)'
+SETTINGS_NAME = 'Settings Patch (SEA-LION, experimental)'
 PACKAGE = 'com.spaceship.screen.textcopy'
 VERSION_NAME = 'v7.5.00300'
 
@@ -29,11 +30,12 @@ def verify_bundle(bundle: Path) -> dict:
             if value not in manifest:
                 raise ValueError('Unexpected MPP metadata: ' + value)
         required = 'app/morphe/patches/instanttranslate/TranslationFallbackPatchKt.class'
-        for entry in ('classes.dex', 'extensions/instanttranslate.mpe', required):
+        settings = 'app/morphe/patches/instanttranslate/SettingsPatchKt.class'
+        for entry in ('classes.dex', 'extensions/instanttranslate.mpe', required, settings):
             if entry not in names:
                 raise ValueError('Missing bundle entry: ' + entry)
-        if NAME.encode() not in archive.read(required):
-            raise ValueError('Missing opt-in translation selector')
+        if NAME.encode() not in archive.read(required) or SETTINGS_NAME.encode() not in archive.read(settings):
+            raise ValueError('Missing an opt-in selector')
         classes = [name for name in names if name.startswith('app/morphe/patches/') and name.endswith('.class')]
         if not classes or any(not name.startswith('app/morphe/patches/instanttranslate/') for name in classes):
             raise ValueError('Unrelated app patches present in standalone bundle')
@@ -44,9 +46,10 @@ def verify_listing(text: str) -> None:
     names = re.findall(r'^Name: (.+)$', text, flags=re.MULTILINE)
     enabled = re.findall(r'^Enabled: (true|false)$', text, flags=re.MULTILINE | re.IGNORECASE)
     packages = re.findall(r'^\s*Package name: (\S+)', text, flags=re.MULTILINE)
-    if names != [NAME] or [value.lower() for value in enabled] != ['false']:
-        raise ValueError('Unexpected patch selector or opt-in default')
-    if packages != [PACKAGE] or not re.search(r'^\s*v7\.5\.00300\s*$', text, flags=re.MULTILINE):
+    if len(names) != 2 or set(names) != {NAME, SETTINGS_NAME} or [value.lower() for value in enabled] != ['false', 'false']:
+        raise ValueError('Unexpected patch selectors or opt-in defaults')
+    versions = re.findall(r'^\s*v7\.5\.00300\s*$', text, flags=re.MULTILINE)
+    if packages != [PACKAGE, PACKAGE] or len(versions) != 2:
         raise ValueError('Unexpected app package or version target')
 
 
@@ -58,7 +61,7 @@ def main() -> None:
     print('Verified Instant Translate-only bundle:', verify_bundle(args.mpp))
     if args.listing:
         verify_listing(args.listing.read_text())
-        print('Morphe lists exactly the opt-in selector for the reviewed version')
+        print('Morphe lists both opt-in selectors for the reviewed version')
 
 
 if __name__ == '__main__':
