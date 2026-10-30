@@ -20,7 +20,7 @@ OUTPUT = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'instant-runtime.json'
 PACKAGE = 'com.spaceship.screen.textcopy'
 ACTIVITY = 'com.spaceship.screen.translate.page.SplashActivity'
 SAFE_LABEL = re.compile(r"[\w\s.,!?()'&+:/–—\-]{1,90}\Z", re.UNICODE)
-ROUTINE = {'continue', 'get started', 'get start', 'start', 'next', 'skip', 'not now',
+ROUTINE = {'continue', 'get started', 'get start', 'next', 'skip', 'not now',
            'allow', 'allow notifications', 'got it', 'ok', 'agree', 'i agree'}
 
 
@@ -92,10 +92,23 @@ def main() -> None:
             if not clicked:
                 break
             time.sleep(4)
+        # The bottom Translate tab opens a direct text-translation screen; do not
+        # click Home's Start control, which launches the overlay-permission flow.
+        nodes = dump()
+        for node in nodes:
+            if (safe_label(node.get('text') or node.get('content-desc') or '') == 'Translate' and
+                    re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', node.get('bounds', ''))):
+                x1, y1, x2, y2 = map(int, re.findall(r'\d+', node['bounds']))
+                if y1 > 450:
+                    adb('shell', 'input', 'tap', str((x1+x2)//2), str((y1+y2)//2))
+                    time.sleep(5)
+                    report['screens'].append({'stage': 'translate_tab', 'nodes': snapshot(dump()),
+                                              'routine_button_clicked': 'Translate tab'})
+                    break
         report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
     finally:
         OUTPUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
-    if report['install'] != 'Success' or not report['process_alive']:
+    if 'Success' not in (report['install'] or '').splitlines() or not report['process_alive']:
         raise RuntimeError('APK did not remain running; see sanitized runtime report')
     print('APK installed and launched in disposable emulator; no translation was tested')
 
