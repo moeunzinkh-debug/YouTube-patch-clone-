@@ -1,0 +1,98 @@
+{
+  "scope": "Static inspection of the user-supplied Kimi Release archive, not an authenticity or malware audit.",
+  "inventory_ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40980834585",
+  "pairip_ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40980834695",
+  "source": {
+    "release_tag": "Kimi",
+    "asset_id": 690272677,
+    "filename": "Kimi.v.3.1.5.b.381.minSDK26.MultiPatch.apks",
+    "sha256": "7000c991b9e745ccd1d1ecffaff71c2295094cb4a7fce213d3ce1d3310050304",
+    "bytes": 37729191
+  },
+  "components": [
+    {
+      "filename": "base.apk",
+      "bytes": 45682937,
+      "sha256": "b7a5a412ed6958823da4b513523a22da2b032578f651fd9f9d4d08e4fc0ff85d",
+      "package": "com.moonshot.kimichat",
+      "version_name": "3.1.5",
+      "version_code": "381",
+      "split": null,
+      "min_sdk": "26",
+      "target_sdk": "36",
+      "signature": {
+        "verified": true,
+        "signer_sha256": [
+          "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc"
+        ],
+        "signer_sha1": [
+          "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
+        ]
+      }
+    },
+    {
+      "filename": "split_config.arm64_v8a.apk",
+      "bytes": 26437515,
+      "sha256": "944dac06695a48222f6fe22c03b69b746d679133f752902d9bee656bb2b255c6",
+      "package": "com.moonshot.kimichat",
+      "version_name": null,
+      "version_code": "381",
+      "split": "config.arm64_v8a",
+      "min_sdk": null,
+      "target_sdk": null,
+      "signature": {
+        "verified": true,
+        "signer_sha256": [
+          "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc"
+        ],
+        "signer_sha1": [
+          "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
+        ]
+      }
+    },
+    {
+      "filename": "split_config.xxhdpi.apk",
+      "bytes": 79407,
+      "sha256": "875fabe69f79c15deab0e3b3d130676a4a85b9a9c189ebf127c64d2ac583023b",
+      "package": "com.moonshot.kimichat",
+      "version_name": null,
+      "version_code": "381",
+      "split": "config.xxhdpi",
+      "min_sdk": null,
+      "target_sdk": null,
+      "signature": {
+        "verified": true,
+        "signer_sha256": [
+          "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc"
+        ],
+        "signer_sha1": [
+          "61ed377e85d386a8dfee6b864bd85b0bfaa5af81"
+        ]
+      }
+    }
+  ],
+  "split_consistency": {
+    "same_package": true,
+    "same_version_code": true,
+    "explicit_version_names_match": true,
+    "same_signers": true,
+    "all_signatures_verified": true
+  },
+  "signer_interpretation": {
+    "name": "Public Android AOSP test key, not proof of publisher authenticity",
+    "sha256": "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc",
+    "aosp_certificate": "https://github.com/aosp-mirror/platform_build/blob/master/target/product/security/testkey.x509.pem",
+    "aosp_warning": "https://github.com/aosp-mirror/platform_build/blob/master/target/product/security/README",
+    "code_integrity_and_provenance": "unknown"
+  },
+  "reviewed_local_license_check": {
+    "application": "com.pairip.application.Application",
+    "startup_call": "LicenseClient.checkLicense(Context)",
+    "other_reviewed_method": "LicenseClient.initializeLicenseCheck()",
+    "pairip_manifest_components": [
+      "com.pairip.licensecheck.LicenseActivity"
+    ],
+    "pairip_native_or_vm_assets_found": false,
+    "server_attestation_or_entitlement_tested": false
+  }
+}

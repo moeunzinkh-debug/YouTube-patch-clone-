@@ -1,0 +1,26 @@
+{
+  "bundle_version": "0.1.0-dev.1",
+  "bundle_sha256": "829ba0f34c76130ead69483f3da7c11ec3c3df7402601843a7473be27cf3c145",
+  "bundle_bytes": 13370,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40981249799",
+  "input_apks_sha256": "7000c991b9e745ccd1d1ecffaff71c2295094cb4a7fce213d3ce1d3310050304",
+  "input_base_sha256": "b7a5a412ed6958823da4b513523a22da2b032578f651fd9f9d4d08e4fc0ff85d",
+  "input_signer_sha256": "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc",
+  "input_trust": "User-supplied APKS was signed with a public Android test key; not verified as an unmodified Moonshot APK.",
+  "package": "com.moonshot.kimichat",
+  "version": "3.1.5",
+  "version_code": 381,
+  "patch": "Remove license check",
+  "patch_default": true,
+  "tests": {
+    "build_and_metadata": "passed",
+    "morphe_desktop_listing": "passed",
+    "morphe_desktop_patch_base_apk": "passed",
+    "two_pairip_dex_early_returns": "passed",
+    "other_checked_methods_unchanged": "passed",
+    "manager_apks_merge_and_patch": "not tested by this Desktop CI run; see manager-smoke.json for any later Manager test",
+    "android_runtime": "not tested",
+    "live_login_server_attestation_and_paid_features": "not tested"
+  },
+  "scope": "Disables reviewed local PairIP license entry points; no server entitlement or integrity verdict is changed."
+}

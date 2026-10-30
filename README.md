@@ -17,6 +17,21 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Verify patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/verify-mpp.yml)
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
+<details>
+<summary>🌙 Kimi AI • 1 experimental patch (bundle ដាច់ដោយឡែក)</summary>
+
+កំណែដែលបានពិនិត្យ៖ `com.moonshot.kimichat` **3.1.5 (381)**, Android 8.0+ និង arm64។
+
+- `Remove license check` — រារាំងចំណុចចាប់ផ្ដើម PairIP license check ពីរ **ខាង client**; បើកជាមុន។ វាមិនផ្ដល់ subscription ឬផ្លាស់ប្ដូរការផ្ទៀងផ្ទាត់ខាង server ទេ ហើយការដំណើរការជាក់ស្ដែងមិនទាន់បញ្ជាក់ទេ។
+
+Morphe Manager 2.3.0-dev.3 បានរួម និង patch `.apks` នេះក្នុង Android emulator; DEX លទ្ធផលត្រូវបានពិនិត្យ។ App ផ្ទាល់មិនបានដំឡើង ឬបើកទេ។ [លទ្ធផល Manager](bundles/kimi/manager-smoke.json)។
+
+[ទាញយក Kimi `bundle.mpp` ពី Release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/Kimi/bundle.mpp) · [ច្បាប់ចម្លងក្នុង repository](bundles/kimi/bundle.mpp) · [របៀបប្រើ និងលទ្ធផលតេស្ត](bundles/kimi/README.md) · [SHA-256](bundles/kimi/bundle.mpp.sha256)
+
+**ប្រយ័ត្ន៖** `.apks` នៅ Release `Kimi` មានហត្ថលេខា Android test key សាធារណៈ មិនអាចបញ្ជាក់ថាជា APK ផ្លូវការ ឬមានសុវត្ថិភាពបានទេ។ កុំបញ្ចូលពាក្យសម្ងាត់ ឬទិន្នន័យឯកជនក្នុង APK ដែលមិនទាន់ទុកចិត្ត។
+
+</details>
+
 <!-- GBOARD-PATCH-LIST:START -->
 <a id="gboard-patches"></a>
 <details>

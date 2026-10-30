@@ -1,0 +1,130 @@
+name: Build Kimi license-check patch
+
+on:
+  push:
+    branches: [arena/008b2974-youtube-patch-clone]
+    paths:
+      - 'tools/kimi/project/**'
+      - 'tools/kimi/prepare_build.py'
+      - 'tools/kimi/verify_bundle.py'
+      - 'tools/kimi/verify_patched.py'
+      - 'tools/kimi/write_validation.py'
+      - 'tools/kimi/test_patch_tools.py'
+      - '.github/workflows/build-kimi-mpp.yml'
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: kimi-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[kimi-build]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test isolated build and verification guards
+        run: |
+          set -euo pipefail
+          python3 tools/kimi/test_inspect_apks.py -v
+          python3 tools/kimi/test_inspect_license.py -v
+          python3 tools/kimi/test_patch_tools.py -v
+          python3 tools/kimi/prepare_build.py "$RUNNER_TEMP/kimi-build"
+      - name: Build standalone Morphe bundle
+        shell: bash
+        run: |
+          set -o pipefail
+          cd "$RUNNER_TEMP/kimi-build"
+          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/kimi-build.log"
+      - name: Surface build diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          if test -f "$RUNNER_TEMP/kimi-build.log"; then
+            grep -E -A 4 '^e:|^error:|What went wrong|Execution failed|Could not|FAILURE:' "$RUNNER_TEMP/kimi-build.log" | tail -30 | while IFS= read -r line; do echo "::error::$line"; done || true
+          fi
+      - name: Verify bundle listing and apply it to the supplied base APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/kimi-output" "$RUNNER_TEMP/kimi-input"
+          mapfile -t candidates < <(find "$RUNNER_TEMP/kimi-build/patches/build/libs" -maxdepth 1 -name '*.mpp' -type f)
+          test "${#candidates[@]}" -eq 1
+          cp "${candidates[0]}" "$RUNNER_TEMP/kimi-output/bundle.mpp"
+          (cd "$RUNNER_TEMP/kimi-output" && sha256sum bundle.mpp > bundle.mpp.sha256)
+          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$RUNNER_TEMP/kimi-input"
+          gh release download Kimi --pattern 'Kimi.v.3.1.5.b.381.minSDK26.MultiPatch.apks' --dir "$RUNNER_TEMP/kimi-input"
+          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/kimi-input/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
+          echo '7000c991b9e745ccd1d1ecffaff71c2295094cb4a7fce213d3ce1d3310050304  '"$RUNNER_TEMP/kimi-input/Kimi.v.3.1.5.b.381.minSDK26.MultiPatch.apks" | sha256sum --check
+          unzip -p "$RUNNER_TEMP/kimi-input/Kimi.v.3.1.5.b.381.minSDK26.MultiPatch.apks" base.apk > "$RUNNER_TEMP/kimi-input/base.apk"
+          echo 'b7a5a412ed6958823da4b513523a22da2b032578f651fd9f9d4d08e4fc0ff85d  '"$RUNNER_TEMP/kimi-input/base.apk" | sha256sum --check
+          desktop="$RUNNER_TEMP/kimi-input/morphe-desktop-1.20.0-dev.1-all.jar"
+          java -Xmx2g -jar "$desktop" list-patches --patches "$RUNNER_TEMP/kimi-output/bundle.mpp" \
+            --with-packages --with-versions --include-experimental --out "$RUNNER_TEMP/kimi-output/patches.txt"
+          if ! python3 tools/kimi/verify_bundle.py --mpp "$RUNNER_TEMP/kimi-output/bundle.mpp" \
+            --listing "$RUNNER_TEMP/kimi-output/patches.txt" > "$RUNNER_TEMP/kimi-list-check.log" 2>&1; then
+            tail -n 12 "$RUNNER_TEMP/kimi-list-check.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          if ! java -Xmx4g -jar "$desktop" patch "$RUNNER_TEMP/kimi-input/base.apk" \
+            -p "$RUNNER_TEMP/kimi-output/bundle.mpp" --exclusive -e 'Remove license check' \
+            --unsigned -o "$RUNNER_TEMP/kimi-input/patched-base.apk" \
+            -r "$RUNNER_TEMP/kimi-input/patch-result.json" > "$RUNNER_TEMP/kimi-patch.log" 2>&1; then
+            tail -n 22 "$RUNNER_TEMP/kimi-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          if ! python3 tools/kimi/verify_patched.py "$RUNNER_TEMP/kimi-input/base.apk" \
+            "$RUNNER_TEMP/kimi-input/patched-base.apk" "$RUNNER_TEMP/kimi-input/patch-result.json" \
+            "$RUNNER_TEMP/kimi-output/patch-validation.json" > "$RUNNER_TEMP/kimi-dex-check.log" 2>&1; then
+            tail -n 16 "$RUNNER_TEMP/kimi-dex-check.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          python3 tools/kimi/write_validation.py --mpp "$RUNNER_TEMP/kimi-output/bundle.mpp" \
+            --dex-report "$RUNNER_TEMP/kimi-output/patch-validation.json" --output "$RUNNER_TEMP/kimi-output/validation.json"
+          echo '::notice::Kimi-only MPP listed and patched the reviewed base APK; both PairIP early returns verified'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kimi-morphe-bundle
+          path: |
+            ${{ runner.temp }}/kimi-output/bundle.mpp
+            ${{ runner.temp }}/kimi-output/bundle.mpp.sha256
+            ${{ runner.temp }}/kimi-output/patch-validation.json
+            ${{ runner.temp }}/kimi-output/validation.json
+            ${{ runner.temp }}/kimi-output/patches.txt
+      - name: Save only the small MPP and validation reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          for source in tools/kimi/project tools/kimi/prepare_build.py tools/kimi/verify_bundle.py tools/kimi/verify_patched.py tools/kimi/write_validation.py tools/kimi/test_patch_tools.py .github/workflows/build-kimi-mpp.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
+              echo '::warning::Kimi build sources changed after this run; not saving stale artifacts.'
+              exit 0
+            fi
+          done
+          mkdir -p bundles/kimi
+          cp "$RUNNER_TEMP/kimi-output/"{bundle.mpp,bundle.mpp.sha256,patch-validation.json,validation.json} bundles/kimi/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f bundles/kimi/bundle.mpp bundles/kimi/bundle.mpp.sha256 bundles/kimi/patch-validation.json bundles/kimi/validation.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'build: Kimi-only license-check patch [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"

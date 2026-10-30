@@ -1,0 +1,23 @@
+{
+  "manager": "2.3.0-dev.3",
+  "patcher": "2.1.0-dev.1",
+  "android_emulator": "API 35 x86_64",
+  "input": "user-supplied Kimi split APKS, SHA-256 7000c991b9e745ccd1d1ecffaff71c2295094cb4a7fce213d3ce1d3310050304",
+  "input_trust": "already re-signed with the public Android test key; original publisher authenticity not verified",
+  "package": "com.moonshot.kimichat",
+  "version": "3.1.5",
+  "version_code": 381,
+  "bundle_version": "0.1.0-dev.1",
+  "bundle_sha256": "829ba0f34c76130ead69483f3da7c11ec3c3df7402601843a7473be27cf3c145",
+  "imported_local_source": true,
+  "experimental_app_versions_enabled": true,
+  "selected_patch": "Remove license check",
+  "manager_patch_and_split_merge": "passed",
+  "saved_output_pairip_early_returns_and_other_checked_methods": "passed",
+  "saved_output_contains_arm64_libraries": true,
+  "arm64_libraries_count": 21,
+  "patched_apk_sha256_for_test": "9d75fd5141dd150cd72f04175a8eff4ddd4f88ab7ccf847b6fdef5111c219196",
+  "app_installed_or_launched": false,
+  "live_login_server_attestation_and_paid_features": "not tested",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/40984792665"
+}
