@@ -23,7 +23,7 @@ Patch កំណត់គោលដៅតែ package **`com.moonshot.kimichat`**, 
 
 ## របៀបប្រើ
 
-1. ទាញយក [`bundle.mpp`](bundle.mpp) ទៅទូរស័ព្ទ។ ក្នុង **Morphe Manager → Sources → + → Local**, ជ្រើស `.mpp` ហើយចុច Add។ នេះជាប្រភព local មិនមែន release ថ្មីទេ។
+1. ទាញយក [`bundle.mpp` ពី Kimi Release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/Kimi/bundle.mpp) ឬពី [repository](bundle.mpp) ទៅទូរស័ព្ទ។ ក្នុង **Morphe Manager → Sources → + → Local**, ជ្រើស `.mpp` ហើយចុច Add។ Local source មិន update ដោយស្វ័យប្រវត្តិទេ។
 2. នៅ **Sources**, បើក card **Kimi patches (experimental)** ហើយបើក **Experimental app versions** សម្រាប់ source នេះ។ បើចង់ពិនិត្យ patch ជាក់លាក់ សូមបើក **Settings → Expert mode** ផងដែរ។
 3. នៅ **Apps → Kimi AI**, ជ្រើស 3.1.5 និង **No, I already have it**, រួចជ្រើសឯកសារ `.apks` ពេញ។ Manager 2.3.0-dev.3 រួម split archive មុន patch; កុំប្រើ `base.apk` តែឯងសម្រាប់ការដំឡើង ព្រោះវាខ្វះ arm64 libraries និង config split។ File picker ខ្លះអាចស្នើសិទ្ធិចូលឯកសារ។ ប្រសិនបើ Manager ព្រមានពី version ឬ signature សូមពិនិត្យការព្រមាន មិនគួរបន្តប្រសិនបើអ្នកមិនទុកចិត្ត APK។
 4. ក្នុង patch list ពិនិត្យថា **Remove license check** ត្រូវបានជ្រើស រួចចុច **Patch** និងរក្សាទុក/ដំឡើងលទ្ធផលតាម Manager។
