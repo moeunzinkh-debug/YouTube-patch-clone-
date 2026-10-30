@@ -43,7 +43,7 @@ def trace(path):
                 if EXACT_UI.fullmatch(text) or name in FOCUS_NAMES:
                     anchors[identifier] = name
             entries.append(entry)
-    classes, references, bodies = [], defaultdict(list), {}
+    classes, references, bodies, lifecycle = [], defaultdict(list), {}, {}
     with zipfile.ZipFile(path) as archive:
         for info in archive.infolist():
             if not DEX_NAME.fullmatch(info.filename): continue
@@ -56,6 +56,14 @@ def trace(path):
                 for method in cls.get_methods():
                     if method.get_code() is None: continue
                     ins = list(method.get_instructions())
+                    if name in {'Lcom/spaceship/screen/translate/SSApplication;',
+                                'Lcom/spaceship/screen/translate/ui/MainActivity;'}:
+                        code = method.get_code()
+                        entry = {'dex': info.filename, 'method': method_id(cls, method),
+                                 'registers': code.get_registers_size(), 'incoming_registers': code.get_ins_size()}
+                        if method.get_name() in ('onCreate', 'attachBaseContext') and len(ins) <= 3000:
+                            entry['instructions'] = [sanitize_focused_instruction(x) for x in ins]
+                        lifecycle[entry['method']] = entry
                     for index, inst in enumerate(ins):
                         if not inst.get_name().startswith('const'): continue
                         for literal in inst.get_literals():
@@ -75,7 +83,8 @@ def trace(path):
             gc.collect()
     return {'scope': 'Pinned APK settings metadata only; literal strings and private data redacted',
             'resources': entries, 'anchor_ids': {str(k): v for k,v in anchors.items()},
-            'settings_classes': classes, 'anchor_references': dict(references), 'settings_row_bodies': bodies}
+            'settings_classes': classes, 'anchor_references': dict(references),
+            'settings_row_bodies': bodies, 'lifecycle': lifecycle}
 
 
 def main():
