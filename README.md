@@ -18,16 +18,17 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
-<summary>🌐 Instant Translate • 1 experimental patch (bundle ដាច់ដោយឡែក)</summary>
+<summary>🌐 Instant Translate • 2 experimental patches (bundle ដាច់ដោយឡែក)</summary>
 
 កំណែដែលបានពិនិត្យ៖ `com.spaceship.screen.textcopy` **v7.5.00300 (50342)**, Android 10+ និង arm64។
 
-**មិនទាន់រួចរាល់សម្រាប់ប្រើ៖** APK ដែល patch/sign ដោយ Desktop បើកមិនឡើងក្នុង emulator នៅការត្រួតពិនិត្យ `verifyIntegrity`។ មិនទាន់បានសាកបើក APK លទ្ធផលពី Manager ឬបញ្ជាក់ការបកប្រែ។
+**មិនទាន់រួចរាល់សម្រាប់ប្រើ៖** APK ដែល re-sign/patch ពីមុនបើកមិនឡើងក្នុង emulator នៅ `verifyIntegrity`។ Bundle ថ្មីនៅតែរក្សា check នេះ; មិនទាន់បញ្ជាក់ការបើក app ឬការបកប្រែជាក់ស្ដែង។
 
-- `Translation fallback (Google, experimental)` — **បិទជាមុន**។ រក្សាការបកប្រែដើម ហើយសាក Google នៅចំណុចបរាជ័យដែលបានពិនិត្យ។ នេះមិនមែនជាការជួសជុល offline/model ដើមទេ ហើយគ្រប់ផ្នែក និងភាសាមិនទាន់បញ្ជាក់។
-- Fallback អាចផ្ញើអត្ថបទលើអេក្រង់ទៅ `translate.googleapis.com`; ត្រូវការ internet។ Endpoint នេះក្រៅផ្លូវការ និងអាច rate-limit ឬឈប់ដំណើរការ។
+- `Translation fallback (Google, experimental)` — បិទជាមុន; សាកផ្លូវដើមមុន បន្ទាប់មក provider ដែលបានជ្រើស។
+- `Settings Patch (SEA-LION, experimental)` — បិទជាមុន; បន្ថែម Settings Patch ជាមួយ dropdown និង **Name, URL, Model, Key** សម្រាប់ SEA-LION។ ផ្លូវ Settings ក្នុង APK ពិតមិនទាន់បានសាកបើក។
+- អត្ថបទដែលបរាជ័យអាចត្រូវបានផ្ញើទៅ Google ឬ SEA-LION/HTTPS host ដែលអ្នកជ្រើស។ SEA-LION ត្រូវការ API key និង internet; model អាចមិនមានសម្រាប់ key របស់អ្នក។ វាមិនជួសជុល offline/model ដើមទេ។
 
-Morphe Manager បាននាំចូល ជ្រើស និង patch APK ដែលបានផ្ដល់; ការសាក Manager មិនធានាថាការបកប្រែជាក់ស្ដែងដំណើរការទេ។ [របៀបប្រើ សុវត្ថិភាព និងលទ្ធផលតេស្ត](bundles/instant-translate/README.md) · [Local `bundle.mpp`](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256)។
+[របៀបប្រើ សុវត្ថិភាព និងលទ្ធផលតេស្ត](bundles/instant-translate/README.md) · [Local `bundle.mpp`](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256)។
 
 **ប្រយ័ត្ន៖** មិនទាន់បញ្ជាក់ប្រភព signer របស់ APK នៅ pre-release ថាជាអ្នកបង្កើតផ្លូវការទេ។ ប្រើតែ APK ដែលទុកចិត្ត មុនផ្ដល់សិទ្ធិអានអេក្រង់ ឬបញ្ចូលទិន្នន័យឯកជន។
 

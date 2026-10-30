@@ -215,17 +215,25 @@ def main() -> None:
     announce('Instant Translate patch selection', nodes)
     names = ('Translation fallback (Google, experimental)', 'Settings Patch (SEA-LION, experimental)')
     for name in names:
-        for attempt in range(4):
+        for attempt in range(6):
             nodes = dump()
-            if any(matches(n, name) for n in nodes): break
-            start, end = ('220', '500') if attempt == 0 else ('500', '220')
+            card = next((n for n in nodes if name in n.get('content-desc', '') and
+                         any(state in n.get('content-desc', '') for state in ('Disabled', 'Enabled'))), None)
+            if card:
+                bounds = [int(x) for x in re.findall(r'\d+', card.get('bounds', ''))]
+                if len(bounds) == 4 and bounds[1] >= 120 and bounds[3] <= 560: break
+                # A partly clipped card cannot be reliably tapped behind the footer.
+                start, end = ('500', '220') if len(bounds) == 4 and bounds[3] > 560 else ('220', '500')
+            else:
+                start, end = ('220', '500') if attempt == 0 else ('500', '220')
             adb('shell', 'input', 'swipe', '160', start, '160', end, '400')
             time.sleep(1)
         else:
-            raise RuntimeError('Patch selector not visible: ' + name)
-        if any(matches(n, name) and 'Enabled' in n.get('content-desc', '') for n in nodes):
+            raise RuntimeError('Patch selector not fully visible: ' + name + ' ' + snapshot(nodes)[:1000])
+        if 'Enabled' in card.get('content-desc', ''):
             raise RuntimeError('Privacy-sensitive patch should be off by default: ' + name)
-        tap(name)
+        x1, y1, x2, y2 = bounds
+        adb('shell', 'input', 'tap', str((x1 + x2) // 2), str((y1 + y2) // 2))
         time.sleep(2)
         nodes = dump()
         if not any(matches(n, name) and 'Enabled' in n.get('content-desc', '') for n in nodes):

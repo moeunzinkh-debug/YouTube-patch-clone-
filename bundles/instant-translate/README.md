@@ -1,45 +1,58 @@
-# Instant Translate — experimental Morphe patch
+# Instant Translate — experimental Morphe patches
 
-នេះជា **bundle ដាច់ដោយឡែក** សម្រាប់ Morphe Manager មិនមែន APK និងមិនប្ដូរ YouTube ឬ bundle ផ្សេងៗ។ កំណែនេះជា **ការសាកល្បង**៖ មិនទាន់បញ្ជាក់ថាគ្រប់ផ្នែក គ្រប់គូភាសា ឬគ្រប់ model ដំណើរការទេ។
+> **មិនទាន់រួចរាល់សម្រាប់ដំឡើងប្រើប្រាស់។** APK ដែលបាន patch/sign ដោយ Morphe Desktop ពីមុន បើកធ្លាក់ក្នុង emulator នៅ `bin.edisaputra.protector.LicenseActivity.verifyIntegrity`។ ការសាក re-sign និង align APK ដើមដោយមិនកែ DEX ឬ native libraries ក៏ជួប stack trace ដូចគ្នា។ Bundle ថ្មី **រក្សា check ដើម**; កូដក្នុង check នេះជា native ហើយមុខងារខាងក្នុងមិនទាន់ដឹងទាំងអស់។ មិនទាន់បញ្ជាក់ថា APK ដែល patch ដោយ bundle ថ្មីអាចបើក ឬបកប្រែបានទេ។
 
-> **កុំទាន់ដំឡើងសម្រាប់ប្រើប្រាស់៖** APK ដែលបាន patch និង sign ថ្មីដោយ Morphe Desktop បើកមិនឡើងក្នុង emulator; stack trace ឈប់នៅ `bin.edisaputra.protector.LicenseActivity.verifyIntegrity`។ ការសាក fallback មិនទាន់ឈានដល់ការបកប្រែទេ។ Manager អាច patch និង Save បាន ប៉ុន្តែ APK ដែល Manager បង្កើត **មិនទាន់សាកបើក**។ ការសាកដោយ re-sign និង align APK ដើម (មិនកែ DEX ឬ native libraries) ក៏ជួប stack trace ដូចគ្នា។ កូដក្នុង `verifyIntegrity` ជា native ដូច្នេះមិនទាន់បញ្ជាក់មុខងារខាងក្នុងទាំងអស់។
+នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK ហើយមិនកែ YouTube ឬ bundle ផ្សេងៗ។ គោលដៅដែលបានពិនិត្យតែ `com.spaceship.screen.textcopy` **v7.5.00300 (50342)**, Android 10+ (minSdk 29); APK មាន native libraries សម្រាប់ arm64-v8a តែប៉ុណ្ណោះ។ រចនាសម្ព័ន្ធ DEX ត្រូវបានពិនិត្យមុន patch។
 
 ## Patch list
 
 <details>
-<summary>🌐 Instant Translate • 1 patch (ជ្រើសដោយខ្លួនឯង)</summary>
+<summary>🌐 Instant Translate • 2 experimental patches (បិទជាមុន)</summary>
 
-| ឈ្មោះក្នុង Manager | ជម្រើសដើម | មុខងារ |
-|---|---|---|
-| `Translation fallback (Google, experimental)` | **បិទ** | រក្សាផ្លូវបកប្រែដើម ហើយព្យាយាមប្រើ Google ជំនួស នៅចំណុចលទ្ធផលទទេ ឬធាតុដែលបរាជ័យដែលបានពិនិត្យ។ វាមិនផ្លាស់ប្ដូរលទ្ធផលដែលជោគជ័យ ហើយមិនធានាថា error ឬការព្យួរគ្រប់ប្រភេទនឹងត្រូវបានចាប់ទេ។ |
+| ឈ្មោះក្នុង Morphe Manager | មុខងារ |
+|---|---|
+| `Translation fallback (Google, experimental)` | សាកការបកប្រែដើមមុន; នៅចំណុចលទ្ធផលទទេ ឬធាតុបរាជ័យដែលបានពិនិត្យ សាក provider ដែលបានជ្រើស។ ជម្រើសដើមគឺ Google; មិនធានាថាចាប់ exception ឬការព្យួរគ្រប់ប្រភេទទេ។ |
+| `Settings Patch (SEA-LION, experimental)` | បន្ថែម **Settings → Settings Patch >** និង dropdown **Original only / Google fallback / Sea-Lion Translate Ai**។ បើក patch ទីមួយជាអាស្រ័យ។ Settings មានប្រអប់ Name, URL, Model និង Key។ UI ក្នុង APK ពិតមិនទាន់បានសាកបើក។ |
 
 </details>
 
-គោលដៅតែ `com.spaceship.screen.textcopy` **v7.5.00300 (50342)**, Android 10+ (minSdk 29)។ បណ្ណាល័យ native ក្នុង APK ដែលបានពិនិត្យមានតែ **arm64-v8a**។ Patch ពិនិត្យរចនាសម្ព័ន្ធ DEX មុនកែ និងបដិសេធប្រសិនបើមិនត្រូវនឹង build ដែលបានពិនិត្យ។
+**SEA-LION defaults**
 
-## ឯកជនភាព និងដែនកំណត់
+| Field | Default |
+|---|---|
+| Name | `Sea-Lion Translate Ai` |
+| URL | `https://api.sea-lion.ai/v1/` |
+| Model | `aisingapore/Gemma-SEA-LION-v4-27B-IT` |
+| Key | ទទេ — អ្នកបញ្ចូល API key ផ្ទាល់លើឧបករណ៍ |
 
-- ពេល fallback ត្រូវបានប្រើ អត្ថបទដែលបរាជ័យ **រួមទាំងអត្ថបទលើអេក្រង់** ត្រូវបានផ្ញើតាម HTTPS ទៅ `translate.googleapis.com`។ អត្ថបទស្ថិតក្នុង POST body មិនមែន URL; extension មិនសរសេរអត្ថបទ ឬ response ក្នុង log ទេ។ Google និង OS/បណ្ដាញនៅតែអាចដំណើរការ ឬកត់ត្រាទិន្នន័យ។ កុំប្រើជាមួយអត្ថបទសម្ងាត់ បើអ្នកមិនចង់ចែករំលែកវា។
-- Google endpoint `client=gtx` **មិនមានឯកសារគាំទ្រផ្លូវការ** និងមិនប្រើ API key។ វាត្រូវការ internet អាចឆ្លើយតប 429, ប្ដូរ ឬឈប់ដំណើរការ។ បើ fallback បរាជ័យ វារក្សាផ្លូវបរាជ័យដើម ជំនួសការក្លែងលទ្ធផល។
-- នេះ **មិនជួសជុល offline model ឬ online model ដើមនីមួយៗទេ**។ ប្រសិនបើផ្លូវ offline ទៅដល់ចំណុច fallback ដែលបាន patch ការសាកជំនួសនឹងប្រើ internet; បើគ្មាន internet វាមិនអាចផ្ដល់ Google result បាន។ មិនទាន់បញ្ជាក់ថាផ្នែក offline និងគ្រប់ផ្នែកប្រើចំណុច fallback នេះទេ។
-- ដែនកំណត់ការសាកជំនួស៖ អត្ថបទមួយមិនលើស 8,192 តួ; batch ដែលអាចត្រួតពិនិត្យលំដាប់បានមិនលើស 24 ធាតុ។ មាន timeout និង queue កំណត់; សំណើដែលមិនត្រូវលក្ខខណ្ឌរក្សាផ្លូវដើម។ ភាសាដែល Google មិនគាំទ្រអាចបរាជ័យ។
+នៅពេលជ្រើស **Sea-Lion Translate Ai**, Settings ត្រូវសុំការបញ្ជាក់មុនរក្សាទុក។ SEA-LION ជា **fallback** បន្ទាប់ពីផ្លូវដើមបរាជ័យ មិនមែនជំនួសរាល់លទ្ធផលជោគជ័យដើមទេ។ ជ្រើស **Original only** ដើម្បីមិនប្រើ fallback ឬ **Google fallback** ដើម្បីត្រឡប់ទៅ Google។ បើ SEA-LION បរាជ័យ វាមិនប្ដូរទៅ Google ដោយស្វ័យប្រវត្តិទេ។
+
+## API និងឯកជនភាព
+
+- បង្កើត key តាម [SEA-LION API documentation](https://docs.sea-lion.ai/guides/inferencing/api) រួចបញ្ចូលក្នុង app; **កុំផ្ញើ key ក្នុង chat ឬ commit ទៅ repository**។ ឯកសារផ្លូវការបង្ហាញ OpenAI-compatible `POST /v1/chat/completions` និង `Authorization: Bearer …`។ Model ដែលអ្នកស្នើត្រូវបានកំណត់ជាលំនាំដើម ប៉ុន្តែ **មិនទាន់បញ្ជាក់ថាមានសម្រាប់ key របស់អ្នក**; អាចកែ Model ក្នុង Settings បាន។ មិនបានសាក API ពិតដោយ key របស់អ្នកទេ។
+- ពេល fallback ត្រូវបានប្រើ អត្ថបទដែលបរាជ័យ (រួមទាំងអត្ថបទលើអេក្រង់) ត្រូវបានផ្ញើទៅ provider ដែលបានជ្រើស។ សម្រាប់ SEA-LION, API key ផ្ញើជា Authorization header ទៅ host ក្នុង URL។ URL ត្រូវជា HTTPS; app បង្ហាញ host សម្រាប់បញ្ជាក់ ហើយមិនបន្ត redirect ដោយស្វ័យប្រវត្តិ។ **ប្ដូរ URL តែទៅ host ដែលអ្នកទុកចិត្ត**។ សូមពិនិត្យ [លក្ខខណ្ឌ និងគោលការណ៍ឯកជនភាព SEA-LION](https://docs.sea-lion.ai/guides/inferencing/api) ហើយកុំផ្ញើអត្ថបទសម្ងាត់បើមិនចង់ចែករំលែក។
+- Key ត្រូវបានបាំងក្នុងប្រអប់ និងរក្សាទុកជាទិន្នន័យអ៊ិនគ្រីប AES-GCM ដោយ Android Keystore ក្នុង `noBackupFilesDir`។ Key មិនត្រូវបានដាក់ក្នុង URL ឬ log ដោយ extension ទេ; **Clear key** លុប key ក្នុងឧបករណ៍ និងប្ដូរទៅ Original only ប្រសិនបើ SEA-LION ត្រូវបានជ្រើស។ វាមិនការពារពីឧបករណ៍ដែលត្រូវបាន root ឬ APK ដែលមិនគួរឱ្យទុកចិត្តទេ។
+- SEA-LION ត្រូវការ internet; កូតា តម្លៃ និង model អាស្រ័យលើគណនី និង provider។ Extension កំណត់អតិបរមា 9 សំណើក្នុងមួយនាទីក្នុង process មួយ; server អាចបដិសេធមុននេះ ឬឆ្លើយ 429។ AI អាចបកប្រែខុស ឬបង្កើតចម្លើយមិនត្រឹមត្រូវ។ លទ្ធផលដែលត្រូវកាត់ដោយ token limit ត្រូវបានបដិសេធ មិនបង្ហាញជាការបកប្រែពេញលេញទេ។
+- Google `client=gtx` ជា endpoint ក្រៅផ្លូវការ មិនប្រើ key; វាអាច rate-limit ប្ដូរ ឬឈប់ដំណើរការ។ សម្រាប់ provider ទាំងពីរ fallback បរាជ័យនឹងរក្សាផ្លូវបរាជ័យដើម។ នេះ **មិនជួសជុល offline model ឬ model ដើម** ហើយមិនទាន់បញ្ជាក់ការគ្របដណ្ដប់គ្រប់ផ្នែក ឧបករណ៍ និងគូភាសា។
+- ដែនកំណត់៖ អត្ថបទមួយមិនលើស 8,192 UTF-16 code units; batch ដែលអាចផ្ទៀងផ្ទាត់លំដាប់បានមិនលើស 24 ធាតុ។ មាន timeout និង queue កំណត់។
 
 ## APK ដែលបានពិនិត្យ
 
-[Pre-release `Instant-translate`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate) មាន `Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk`, SHA-256 `f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c`។ APK signature ផ្ទៀងផ្ទាត់ថាឯកសារត្រូវនឹង signer ខ្លួនវា (certificate SHA-256 `a3f608b5c58f687d8768c378fea8e2f06426715a36194656beaddd39400ede8d`) ប៉ុន្តែ **មិនបញ្ជាក់ថាជា APK ផ្លូវការរបស់អ្នកបង្កើត** ទេ។ ត្រូវប្រើ APK ពីប្រភពដែលអ្នកទុកចិត្ត មុនផ្ដល់សិទ្ធិ overlay/screen capture ឬបញ្ចូលទិន្នន័យឯកជន។ ការ patch/sign ថ្មីមិនធ្វើឱ្យប្រភព APK មានសុវត្ថិភាពដោយស្វ័យប្រវត្តិឡើយ។
+[Pre-release `Instant-translate`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate) មាន `Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk`, SHA-256 `f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c`។ Signature របស់ APK បានផ្ទៀងផ្ទាត់ (certificate SHA-256 `a3f608b5c58f687d8768c378fea8e2f06426715a36194656beaddd39400ede8d`) ប៉ុន្តែ **មិនបញ្ជាក់ថា signer ជាអ្នកបង្កើតផ្លូវការ** ទេ។ ប្រើតែ APK ដែលអ្នកទុកចិត្ត មុនផ្ដល់សិទ្ធិ overlay/screen capture ឬបញ្ចូល key និងព័ត៌មានឯកជន។
 
-## របៀបប្រើ
+## ការជ្រើសក្នុង Manager (នៅពេលបញ្ហាបើក app ត្រូវបានដោះស្រាយ)
 
-1. ទាញយក [`bundle.mpp`](bundle.mpp) និងពិនិត្យ [SHA-256](bundle.mpp.sha256) ប្រសិនបើចង់។ ក្នុង **Morphe Manager → Sources → + → Local**, ជ្រើស `.mpp` ហើយចុច Add។ នេះជា local source មិន update ដោយស្វ័យប្រវត្តិ។
-2. ក្នុង **Sources**, បើក **Instant Translate patches (experimental)** ហើយបើក **Experimental app versions**។ នៅ **Settings**, បើក **Expert mode** ដើម្បីជ្រើស patch ដែលបិទជាមុន។
-3. នៅ **Apps → Instant Translate**, ជ្រើស `v7.5.00300`, ចុច **No, I already have it** ហើយជ្រើស APK ពេញពី pre-release ខាងលើ។ ពិនិត្យការព្រមានអំពី version និងប្រភព មុនបន្ត។
-4. ក្នុង patch list បើក **Translation fallback (Google, experimental)** ដោយខ្លួនឯង បន្ទាប់ពីយល់ពីការផ្ញើអត្ថបទទៅ Google រួចចុច **Patch** និង Save/Install តាម Manager។
-5. APK ដែល Manager sign ថ្មីអាចមិនអាច update ពី app ចាស់ដែលមាន signing key ខុស។ ប្រសិនបើត្រូវលុប app ចាស់ សូមបម្រុងទុកទិន្នន័យជាមុន ព្រោះការលុបអាចលបទិន្នន័យក្នុងឧបករណ៍។
+1. Import [`bundle.mpp`](bundle.mpp) ជា **Local source** ក្នុង Morphe Manager; វាមិន update ដោយស្វ័យប្រវត្តិ។ បើក **Experimental app versions** និង **Expert mode**។
+2. ជ្រើស `Instant Translate` v7.5.00300 និង APK ដែល hash ត្រូវខាងលើ។ បើក patch ទាំងពីរដោយខ្លួនឯង បន្ទាប់ពីយល់ពីការផ្ញើអត្ថបទ និង key ទៅ provider រួចចុច Patch/Save។
+3. ក្នុង app, **Settings → Settings Patch > → Sea-Lion Translate Ai**; ពិនិត្យ Name/URL/Model, បញ្ចូល key ផ្ទាល់ និងបញ្ជាក់ host។ កុំទាន់អនុវត្តរហូតដល់បញ្ហា integrity ខាងលើត្រូវបានដោះស្រាយ។
+4. APK ដែល Manager sign ថ្មីប្រហែលមិនអាច update app ចាស់ដែលមាន signing key ខុស។ បើត្រូវលុប app ចាស់ សូមបម្រុងទុកទិន្នន័យជាមុន។
 
 ## អ្វីដែលបានសាក
 
-- [Actions 41073349766](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41073349766) build `.mpp` និងបានប្រើ **Morphe Desktop 1.20.0-dev.1** ជ្រើស patch លើ APK ដែល hash ត្រូវនឹងខាងលើ។ [លទ្ធផល DEX](patch-validation.json) បង្ហាញ hooks បី និងថា native retry/result-combiner ដែលបានពិនិត្យនៅដដែល។
-- [Actions 41074061125](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41074061125) នាំចូល bundle ក្នុង **Morphe Manager 2.3.0-dev.3** លើ Android 15 emulator, បើក experimental versions និងជ្រើស patch ដែលបិទជាមុន។ Manager patch និង Save បានជោគជ័យ; signature, hooks និង arm64 libraries ក្នុង APK លទ្ធផលត្រូវបានពិនិត្យ។ [លទ្ធផល Manager](manager-smoke.json)។ តេស្តនេះមិនបានបើក app ឬបញ្ជាក់ការបកប្រែទេ។
-- APK ដើមបានបើកលើ Android 15 x86_64 emulator ដែលមាន `libndk_translation` សម្រាប់ arm64។ [ការសាក patched APK 41078192479](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41078192479) បង្ហាញ crash នៅ `verifyIntegrity`; [ការសាក re-sign ដោយមិនកែ DEX/native libraries 41079548999](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41079548999) បង្ហាញ crash ដូចគ្នា។ លទ្ធផលលើ emulator មិនអាចជំនួសការសាកលើទូរសព្ទរបស់អ្នកបានទេ។ មូលហេតុដើមនៃ “Translation failed” មិនទាន់បញ្ជាក់។
+- [Actions 41145411759](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41145411759)៖ 15 offline unit tests លើ transport, provider routing និង fallback; គ្មាន API key ពិត ឬ live SEA-LION request។
+- [Actions 41146254914](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41146254914)៖ សាក dialog ដាច់ដោយឡែកក្នុង Android emulator ដោយ key ក្លែងក្លាយ; ពិនិត្យ dropdown, defaults, ការរក្សាទុក encrypted និងលុប key និង routing ទៅ provider ក្លែងក្លាយ។ តេស្តនេះ **មិនមែន** ជាការបើក Settings ក្នុង APK ពិត ឬ request ទៅ SEA-LION ទេ។
+- [Actions 41145922892](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41145922892) build bundle, list patch ទាំងពីរ និងប្រើ Morphe Desktop patch APK ដែលបាន pin; [លទ្ធផល DEX](patch-validation.json) បញ្ជាក់ hooks និងថា integrity call ដើមនៅដដែល។ Static checks **មិនបញ្ជាក់ runtime** ទេ។
+- [Actions 41074061125](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41074061125) បានសាក import/patch/save bundle **ចាស់** (SHA `0fc40a4c…`) ក្នុង Morphe Manager; [របាយការណ៍ចាស់](manager-smoke.json) មិនមែនភស្តុតាងសម្រាប់ bundle ថ្មីទេ។
+- APK ដើមបើកលើ Android 15 x86_64 emulator ដែលមាន ARM64 translation។ [ការសាក patched APK មុន](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41078192479) និង [ការសាក re-sign ដោយមិនកែ DEX/native libraries](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41079548999) បានជួប `verifyIntegrity` crash។ មូលហេតុដើមនៃ “Translation failed” មិនទាន់បញ្ជាក់។
 
-Bundle SHA-256: `0fc40a4c52f8b4807a41a8e42f0198f7e3566eb0fed702fc6bfdb11de3589b66`។ ប្រភព patch នៅ [`tools/instant-translate/project`](../../tools/instant-translate/project/) និង workflow build នៅ [`.github/workflows/build-instant-translate-mpp.yml`](../../.github/workflows/build-instant-translate-mpp.yml)។ មិនបានបង្កើត release ថ្មី ឬបន្ថែម bundle ទៅ pre-release ទេ។
+Bundle SHA-256: `d419454a99ee5997044c1ecac4af21ea51737be155aa22e5c9b7474b5a6dec08`។ ប្រភពនៅ [`tools/instant-translate/project`](../../tools/instant-translate/project/)។ មិនបានបង្កើត release ថ្មី ឬបន្ថែម bundle ទៅ pre-release ទេ។
