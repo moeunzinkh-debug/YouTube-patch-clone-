@@ -2,7 +2,7 @@
 
 នេះជា **bundle ដាច់ដោយឡែក** សម្រាប់ Morphe Manager មិនមែន APK និងមិនប្ដូរ YouTube ឬ bundle ផ្សេងៗ។ កំណែនេះជា **ការសាកល្បង**៖ មិនទាន់បញ្ជាក់ថាគ្រប់ផ្នែក គ្រប់គូភាសា ឬគ្រប់ model ដំណើរការទេ។
 
-> **កុំទាន់ដំឡើងសម្រាប់ប្រើប្រាស់៖** APK ដែលបាន patch និង sign ថ្មីដោយ Morphe Desktop បើកមិនឡើងក្នុង emulator; stack trace ឈប់នៅ `bin.edisaputra.protector.LicenseActivity.verifyIntegrity`។ ការសាក fallback មិនទាន់ឈានដល់ការបកប្រែទេ។ Manager អាច patch និង Save បាន ប៉ុន្តែ APK ដែល Manager បង្កើត **មិនទាន់សាកបើក**។ មូលហេតុ និងវិធីដោះស្រាយកំពុងពិនិត្យ។
+> **កុំទាន់ដំឡើងសម្រាប់ប្រើប្រាស់៖** APK ដែលបាន patch និង sign ថ្មីដោយ Morphe Desktop បើកមិនឡើងក្នុង emulator; stack trace ឈប់នៅ `bin.edisaputra.protector.LicenseActivity.verifyIntegrity`។ ការសាក fallback មិនទាន់ឈានដល់ការបកប្រែទេ។ Manager អាច patch និង Save បាន ប៉ុន្តែ APK ដែល Manager បង្កើត **មិនទាន់សាកបើក**។ ការសាកដោយ re-sign និង align APK ដើម (មិនកែ DEX ឬ native libraries) ក៏ជួប stack trace ដូចគ្នា។ កូដក្នុង `verifyIntegrity` ជា native ដូច្នេះមិនទាន់បញ្ជាក់មុខងារខាងក្នុងទាំងអស់។
 
 ## Patch list
 
@@ -40,6 +40,6 @@
 
 - [Actions 41073349766](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41073349766) build `.mpp` និងបានប្រើ **Morphe Desktop 1.20.0-dev.1** ជ្រើស patch លើ APK ដែល hash ត្រូវនឹងខាងលើ។ [លទ្ធផល DEX](patch-validation.json) បង្ហាញ hooks បី និងថា native retry/result-combiner ដែលបានពិនិត្យនៅដដែល។
 - [Actions 41074061125](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41074061125) នាំចូល bundle ក្នុង **Morphe Manager 2.3.0-dev.3** លើ Android 15 emulator, បើក experimental versions និងជ្រើស patch ដែលបិទជាមុន។ Manager patch និង Save បានជោគជ័យ; signature, hooks និង arm64 libraries ក្នុង APK លទ្ធផលត្រូវបានពិនិត្យ។ [លទ្ធផល Manager](manager-smoke.json)។ តេស្តនេះមិនបានបើក app ឬបញ្ជាក់ការបកប្រែទេ។
-- APK ដើមបានបើកលើ Android 15 x86_64 emulator ដែលមាន `libndk_translation` សម្រាប់ arm64។ លទ្ធផលលើ emulator មិនអាចជំនួសការសាកលើទូរសព្ទរបស់អ្នកបានទេ។ មូលហេតុដើមនៃ “Translation failed” មិនទាន់បញ្ជាក់។
+- APK ដើមបានបើកលើ Android 15 x86_64 emulator ដែលមាន `libndk_translation` សម្រាប់ arm64។ [ការសាក patched APK 41078192479](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41078192479) បង្ហាញ crash នៅ `verifyIntegrity`; [ការសាក re-sign ដោយមិនកែ DEX/native libraries 41079548999](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41079548999) បង្ហាញ crash ដូចគ្នា។ លទ្ធផលលើ emulator មិនអាចជំនួសការសាកលើទូរសព្ទរបស់អ្នកបានទេ។ មូលហេតុដើមនៃ “Translation failed” មិនទាន់បញ្ជាក់។
 
 Bundle SHA-256: `0fc40a4c52f8b4807a41a8e42f0198f7e3566eb0fed702fc6bfdb11de3589b66`។ ប្រភព patch នៅ [`tools/instant-translate/project`](../../tools/instant-translate/project/) និង workflow build នៅ [`.github/workflows/build-instant-translate-mpp.yml`](../../.github/workflows/build-instant-translate-mpp.yml)។ មិនបានបង្កើត release ថ្មី ឬបន្ថែម bundle ទៅ pre-release ទេ។
