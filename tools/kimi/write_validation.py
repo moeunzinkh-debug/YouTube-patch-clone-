@@ -32,7 +32,7 @@ def main() -> None:
             'build_and_metadata': 'passed', 'morphe_desktop_listing': 'passed',
             'morphe_desktop_patch_base_apk': 'passed', 'two_pairip_dex_early_returns': 'passed',
             'other_checked_methods_unchanged': 'passed',
-            'manager_apks_merge_and_patch': 'not yet tested', 'android_runtime': 'not tested',
+            'manager_apks_merge_and_patch': 'not tested by this Desktop CI run; see manager-smoke.json for any later Manager test', 'android_runtime': 'not tested',
             'live_login_server_attestation_and_paid_features': 'not tested',
         },
         'scope': 'Disables reviewed local PairIP license entry points; no server entitlement or integrity verdict is changed.',
