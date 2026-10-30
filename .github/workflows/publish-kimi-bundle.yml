@@ -1,0 +1,142 @@
+name: Add Kimi patch bundle to the existing release
+
+on:
+  push:
+    branches:
+      - arena/008b2974-youtube-patch-clone
+    paths:
+      - .github/workflows/publish-kimi-bundle.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kimi-existing-release-bundle
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    # One-time upload to the user's existing Kimi pre-release only.
+    if: contains(github.event.head_commit.message, '[kimi-release]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: '428502656'
+      RELEASE_TAG: Kimi
+      EXPECTED_BUNDLE_SHA256: 829ba0f34c76130ead69483f3da7c11ec3c3df7402601843a7473be27cf3c145
+      EXPECTED_APKS_SHA256: 7000c991b9e745ccd1d1ecffaff71c2295094cb4a7fce213d3ce1d3310050304
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify the exact tested bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/kimi/verify_bundle.py --mpp bundles/kimi/bundle.mpp
+          (cd bundles/kimi && sha256sum --check bundle.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path('bundles/kimi')
+          bundle = root / 'bundle.mpp'
+          sha = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          desktop = json.loads((root / 'validation.json').read_text())
+          manager = json.loads((root / 'manager-smoke.json').read_text())
+          if sha != os.environ['EXPECTED_BUNDLE_SHA256'] or bundle.stat().st_size != 13370:
+              raise SystemExit('Unexpected Kimi bundle bytes; refusing to upload')
+          if (desktop['bundle_sha256'] != sha or manager['bundle_sha256'] != sha
+                  or manager['manager_patch_and_split_merge'] != 'passed'
+                  or manager['saved_output_pairip_early_returns_and_other_checked_methods'] != 'passed'):
+              raise SystemExit('Validation reports do not match the tested bundle')
+          print('::notice::Verified the exact Manager-tested Kimi-only bundle')
+          PY
+      - name: Check existing release and identify missing assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F008b2974-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to upload a stale bundle'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/kimi-release-before.json"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          tmp = Path(os.environ['RUNNER_TEMP'])
+          release = json.loads((tmp / 'kimi-release-before.json').read_text())
+          if (release['id'] != int(os.environ['RELEASE_ID']) or release['tag_name'] != os.environ['RELEASE_TAG']
+                  or release['draft'] or not release['prerelease'] or release['name'] != 'Kimi K 2.8'):
+              raise SystemExit('Existing Kimi release identity or state changed; refusing to modify it')
+          assets = {asset['name']: asset for asset in release['assets']}
+          if len(assets) != len(release['assets']):
+              raise SystemExit('Duplicate asset names; refusing to modify the release')
+          original = assets.get('Kimi.v.3.1.5.b.381.minSDK26.MultiPatch.apks')
+          if (not original or original['id'] != 690272677 or original['size'] != 37729191
+                  or original['state'] != 'uploaded'
+                  or original.get('digest') != 'sha256:' + os.environ['EXPECTED_APKS_SHA256']):
+              raise SystemExit('Original supplied APKS asset differs; refusing to modify the release')
+          files = [Path('bundles/kimi/bundle.mpp'), Path('bundles/kimi/bundle.mpp.sha256')]
+          missing = []
+          for local in files:
+              remote = assets.get(local.name)
+              if remote is None:
+                  missing.append(str(local))
+                  continue
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if remote['state'] != 'uploaded' or remote['size'] != local.stat().st_size or remote.get('digest') != digest:
+                  raise SystemExit('An existing asset differs; refusing to overwrite ' + local.name)
+          (tmp / 'kimi-missing.txt').write_text(''.join(path + '\n' for path in missing))
+          print('::notice::Confirmed the existing Kimi APKS and release; assets to add: ' + (', '.join(missing) or 'none'))
+          PY
+      - name: Upload missing bundle and checksum without replacing assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r asset; do
+            gh release upload "$RELEASE_TAG" "$asset"
+          done < "$RUNNER_TEMP/kimi-missing.txt"
+      - name: Verify release assets and downloaded bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/kimi-release-after.json"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          tmp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((tmp / 'kimi-release-before.json').read_text())
+          after = json.loads((tmp / 'kimi-release-after.json').read_text())
+          for key in ('id', 'tag_name', 'name', 'draft', 'prerelease', 'target_commitish', 'body'):
+              if before[key] != after[key]:
+                  raise SystemExit('Release metadata changed: ' + key)
+          old_assets = {a['id']: a for a in before['assets']}
+          new_assets = {a['id']: a for a in after['assets']}
+          if not set(old_assets).issubset(new_assets):
+              raise SystemExit('An existing asset was removed')
+          for asset_id, old in old_assets.items():
+              for key in ('name', 'size', 'state', 'digest'):
+                  if old[key] != new_assets[asset_id][key]:
+                      raise SystemExit('An existing asset changed: ' + old['name'])
+          by_name = {a['name']: a for a in after['assets']}
+          for local in (Path('bundles/kimi/bundle.mpp'), Path('bundles/kimi/bundle.mpp.sha256')):
+              asset = by_name.get(local.name)
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if not asset or asset['state'] != 'uploaded' or asset['size'] != local.stat().st_size or asset.get('digest') != digest:
+                  raise SystemExit('Missing or mismatched uploaded asset: ' + local.name)
+          print('::notice::Bundle and checksum match; original APKS and release metadata remain unchanged')
+          PY
+          mkdir -p "$RUNNER_TEMP/kimi-download"
+          gh release download "$RELEASE_TAG" --pattern bundle.mpp --pattern bundle.mpp.sha256 --dir "$RUNNER_TEMP/kimi-download"
+          (cd "$RUNNER_TEMP/kimi-download" && sha256sum --check bundle.mpp.sha256)
+          echo "$EXPECTED_BUNDLE_SHA256  $RUNNER_TEMP/kimi-download/bundle.mpp" | sha256sum --check
+          echo '::notice::Downloaded Kimi bundle matches the tested SHA-256'
