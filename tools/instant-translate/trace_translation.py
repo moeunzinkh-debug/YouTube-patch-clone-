@@ -49,10 +49,14 @@ FOCUS_METHODS = frozenset({
     'Ljj1;->l0(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/io/Serializable;',
     'Lsg0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
     'Lm82;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lwx8;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lnr0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lmr0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lqy8;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
     'Lh19;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;La29;Z)V',
     'Lh19;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;La29;ZI)V',
 })
-FOCUS_FIELD_CLASSES = frozenset({'Lir9;', 'Ld19;', 'Lqc8;', 'Lyp0;', 'Leh7;', 'Lh19;', 'La29;', 'Lnr0;', 'Lb19;'})
+FOCUS_FIELD_CLASSES = frozenset({'Lir9;', 'Ld19;', 'Lqc8;', 'Lyp0;', 'Leh7;', 'Lh19;', 'La29;', 'Lnr0;', 'Lb19;', 'Lmr0;', 'Lqy8;', 'Lwx8;'})
 FOCUS_HOSTS = frozenset({'translate.sapiens8.com', 'translate.google.com'})
 
 
