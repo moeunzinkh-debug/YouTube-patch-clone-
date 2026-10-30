@@ -213,15 +213,24 @@ def main() -> None:
     tap('instant-input.apk', seconds=45)
     nodes = wait_for_patch_selection()
     announce('Instant Translate patch selection', nodes)
-    if any(matches(n, 'Translation fallback (Google, experimental)') and 'Enabled' in n.get('content-desc', '') for n in nodes):
-        raise RuntimeError('Privacy-sensitive fallback should be off by default')
-    tap('Translation fallback (Google, experimental)')
-    time.sleep(2)
-    nodes = dump()
-    if not any(matches(n, 'Translation fallback (Google, experimental)') and 'Enabled' in n.get('content-desc', '') for n in nodes):
-        raise RuntimeError('Opt-in fallback was not enabled: ' + snapshot(nodes)[:1000])
-    # The final screen must also report exactly one applied patch; it is the
-    # reliable cross-source count when Manager displays other source tabs.
+    names = ('Translation fallback (Google, experimental)', 'Settings Patch (SEA-LION, experimental)')
+    for name in names:
+        for attempt in range(4):
+            nodes = dump()
+            if any(matches(n, name) for n in nodes): break
+            start, end = ('220', '500') if attempt == 0 else ('500', '220')
+            adb('shell', 'input', 'swipe', '160', start, '160', end, '400')
+            time.sleep(1)
+        else:
+            raise RuntimeError('Patch selector not visible: ' + name)
+        if any(matches(n, name) and 'Enabled' in n.get('content-desc', '') for n in nodes):
+            raise RuntimeError('Privacy-sensitive patch should be off by default: ' + name)
+        tap(name)
+        time.sleep(2)
+        nodes = dump()
+        if not any(matches(n, name) and 'Enabled' in n.get('content-desc', '') for n in nodes):
+            raise RuntimeError('Opt-in patch was not enabled: ' + name + ' ' + snapshot(nodes)[:1000])
+    # The final screen must report exactly two applied patches.
     tap('Patch', exact=True)
 
     LAST_STAGE = 'patch the APK in Manager'
@@ -231,7 +240,7 @@ def main() -> None:
         if any(matches(n, 'Background patching protection') for n in nodes):
             tap('Not now', exact=True)
         elif (any(matches(n, 'Patched', exact=True) for n in nodes)
-              and any(matches(n, '1 patch', exact=True) for n in nodes)
+              and any(matches(n, '2 patches', exact=True) for n in nodes)
               and any(matches(n, 'Instant Translate patches (experimental)') for n in nodes)
               and any(matches(n, 'Save', exact=True) for n in nodes)):
             announce('Manager patch succeeded', nodes)

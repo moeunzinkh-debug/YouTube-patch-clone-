@@ -71,7 +71,7 @@ jobs:
             tail -n 15 /tmp/instant-manager/verify.log | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
-          echo '::notice::Morphe Manager saved a signed APK containing the selected fallback; runtime still requires separate testing.'
+          echo '::notice::Morphe Manager saved a signed APK with both selected patches and the original integrity check; runtime still requires separate testing.'
       - uses: actions/upload-artifact@v4
         with:
           name: instant-manager-validation

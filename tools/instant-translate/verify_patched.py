@@ -163,7 +163,7 @@ def verify_settings(before: dict, after: dict, enabled: bool) -> None:
         raise ValueError('Unexpected Settings row instruction count')
     injected = after_row[28:45]
     joined = '\n'.join(value for _, value in injected)
-    if ('Settings Patch' not in joined or 'Translation providers' not in joined or
+    if ('SettingsPatch' not in joined or 'Translationproviders' not in joined or
             SETTINGS_CLICK + '-><init>()V' not in joined or 'Lu44;->v(' not in joined):
         raise ValueError('Settings Patch row or click callback was not installed')
     if canonical_body(before_row) != canonical_body(after_row[:28] + after_row[45:]):
