@@ -112,7 +112,10 @@ def main():
         result['provider_persisted'] = True
         click('Clear key')
         click('Clear')
-        result['key_file_deleted'] = private_file('no_backup/morphe-instant-sealion-key.v1').returncode != 0
+        # adb exec-out does not reliably propagate the shell command's status;
+        # inspect the directory listing rather than relying on cat's exit code.
+        remaining = adb('shell', 'run-as', PACKAGE, 'ls', 'no_backup', check=False)
+        result['key_file_deleted'] = 'morphe-instant-sealion-key.v1' not in remaining
         if not result['key_file_deleted']: raise RuntimeError('Encrypted key was not deleted')
         result['cleared_provider_original'] = b'original' in private_file('shared_prefs/morphe_instant_translate_settings.xml').stdout
         if not result['cleared_provider_original']: raise RuntimeError('Clear did not disable SEA-LION')

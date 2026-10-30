@@ -7,6 +7,7 @@ on:
       - 'bundles/instant-translate/bundle.mpp'
       - 'tools/instant-translate/test_manager.py'
       - 'tools/instant-translate/verify_manager.py'
+      - 'tools/instant-translate/verify_patched.py'
       - '.github/workflows/test-instant-manager.yml'
 
 permissions:
