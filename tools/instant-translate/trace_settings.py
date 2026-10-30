@@ -12,7 +12,8 @@ from inspect_apk import DEX_NAME, EXPECTED_PACKAGE, safe_sample, verify_asset
 from trace_translation import method_id, sanitize_focused_instruction
 
 FOCUS = re.compile(r'(?i)(settings?|(?:translation|translate).*(?:engine|model)|(?:engine|model).*(?:translation|translate)|ai_translate)')
-EXACT_UI = re.compile(r'(?i)^(settings?|translation settings|translation engine|translate engine|ai translate|model)$')
+EXACT_UI = re.compile(r'(?i)^(settings?|translation settings|translation engine|translate engine|ai translate|model|simple mode styles|vocabulary)$')
+FOCUS_NAMES = frozenset({'settings', 'app_settings', 'simple_mode_settings', 'simple_mode_settings_desc', 'hide_settings_button', 'ai_translate'})
 
 
 def trace(path):
@@ -39,10 +40,10 @@ def trace(path):
             identifier = resources.get_res_id_by_key(package, 'string', name)
             if isinstance(identifier, int):
                 entry['id'] = f'0x{identifier:08x}'
-                if EXACT_UI.fullmatch(text) or name in {'settings', 'setting', 'settings_title', 'setting_title'}:
+                if EXACT_UI.fullmatch(text) or name in FOCUS_NAMES:
                     anchors[identifier] = name
             entries.append(entry)
-    classes, references = [], defaultdict(list)
+    classes, references, bodies = [], defaultdict(list), {}
     with zipfile.ZipFile(path) as archive:
         for info in archive.infolist():
             if not DEX_NAME.fullmatch(info.filename): continue
@@ -62,12 +63,19 @@ def trace(path):
                                 references[anchors[literal]].append({
                                     'method': method_id(cls, method), 'dex': info.filename, 'index': index,
                                     'instructions': [sanitize_focused_instruction(x)
-                                                     for x in ins[max(0,index-5):index+9]]})
+                                                     for x in ins[max(0,index-12):index+16]]})
+                                if anchors[literal] in {'simple_mode_settings', 'simple_mode_settings_desc'}:
+                                    ident = method_id(cls, method)
+                                    if len(ins) <= 4000:
+                                        code = method.get_code()
+                                        bodies[ident] = {'dex': info.filename, 'registers': code.get_registers_size(),
+                                            'incoming_registers': code.get_ins_size(),
+                                            'instructions': [sanitize_focused_instruction(x) for x in ins]}
             del dex
             gc.collect()
     return {'scope': 'Pinned APK settings metadata only; literal strings and private data redacted',
             'resources': entries, 'anchor_ids': {str(k): v for k,v in anchors.items()},
-            'settings_classes': classes, 'anchor_references': dict(references)}
+            'settings_classes': classes, 'anchor_references': dict(references), 'settings_row_bodies': bodies}
 
 
 def main():
