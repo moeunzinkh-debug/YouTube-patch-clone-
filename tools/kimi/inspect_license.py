@@ -48,15 +48,17 @@ def inspect(input_path: Path, apksigner: str) -> dict:
                     dst.write(chunk)
             apk = APK(str(path))
             split = apk.get_attribute_value('manifest', 'split') or None
-            signed = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs', str(path)],
+            signed = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs',
+                                     '--min-sdk-version', '26', str(path)],
                                     capture_output=True, text=True, timeout=120, check=False)
             lines = []
             for line in (signed.stdout + '\n' + signed.stderr).splitlines():
                 line = line.replace(str(path), '<component.apk>')
-                if line.startswith(('ERROR:', 'WARNING:', 'DOES NOT VERIFY', 'Verifies', 'Exception')):
+                if (line.startswith(('ERROR:', 'WARNING:', 'DOES NOT VERIFY', 'Verifies', 'Exception'))
+                        or re.search(r'(?i)signer|certificate.*digest', line)):
                     lines.append(line[:250])
             component = {'filename': info.filename, 'split': split, 'apksigner_return_code': signed.returncode,
-                         'signature_diagnostics': lines[:8]}
+                         'signature_diagnostics': lines[:20]}
             with zipfile.ZipFile(path) as inner:
                 names = inner.namelist()
                 component['pairip_native_or_vm_assets'] = sorted(name for name in names
@@ -73,6 +75,7 @@ def inspect(input_path: Path, apksigner: str) -> dict:
                                                'enabled': node.get(ANDROID + 'enabled'),
                                                'exported': node.get(ANDROID + 'exported'),
                                                'init_order': node.get(ANDROID + 'initOrder')})
+                    component['application_class'] = apk.get_attribute_value('application', 'name')
                     component['pairip_manifest_components'] = components
                     for info_dex in inner.infolist():
                         if not DEX_NAME.fullmatch(info_dex.filename):

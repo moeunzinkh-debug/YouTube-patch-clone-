@@ -25,8 +25,8 @@ INTEGRITY = re.compile(r'play[/.$]core[/.$]integrity|app.?integrity|integrity.?t
 MOD_TOOL = re.compile(r'multi.?patch|lucky.?patch|license.?verification|signature.?killer', re.I)
 SENSITIVE = re.compile(r'(?i)(?:https?://|www\.|@|token|secret|password|credential|api.?key|private.?key|bearer|[A-Za-z0-9_+/=-]{48,})')
 DEX_NAME = re.compile(r'classes(?:[2-9]|[1-9][0-9]+)?\.dex\Z')
-SIGNER_SHA256 = re.compile(r'Signer #\d+ certificate SHA-256 digest:\s*([0-9a-f]{64})', re.I)
-SIGNER_SHA1 = re.compile(r'Signer #\d+ certificate SHA-1 digest:\s*([0-9a-f]{40})', re.I)
+SIGNER_SHA256 = re.compile(r'certificate SHA-256 digest:\s*([0-9a-f]{64})', re.I)
+SIGNER_SHA1 = re.compile(r'certificate SHA-1 digest:\s*([0-9a-f]{40})', re.I)
 
 
 def digest_file(path: Path) -> str:
@@ -73,7 +73,8 @@ def safe_string(value: str) -> bool:
 
 
 def signature(apksigner: str, apk_path: Path) -> dict:
-    result = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs', str(apk_path)],
+    # Split manifests can omit minSdk; use the base APK's reviewed minSdk=26.
+    result = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs', '--min-sdk-version', '26', str(apk_path)],
                             capture_output=True, text=True, timeout=120, check=False)
     output = result.stdout + '\n' + result.stderr
     sha256 = sorted(set(SIGNER_SHA256.findall(output)))
@@ -173,10 +174,13 @@ def inspect(apks_path: Path, apksigner: str) -> dict:
         if len(bases) != 1:
             raise ValueError(f'Expected exactly one base APK, found {len(bases)}')
         packages = {entry['package'] for entry in result['components']}
-        versions = {(entry['version_name'], entry['version_code']) for entry in result['components']}
+        codes = {entry['version_code'] for entry in result['components']}
+        names = {entry['version_name'] for entry in result['components'] if entry['version_name']}
         signers = {tuple(entry['signature']['signer_sha256']) for entry in result['components']}
         result['split_consistency'] = {
-            'same_package': len(packages) == 1, 'same_version': len(versions) == 1,
+            'same_package': len(packages) == 1,
+            'same_version_code': len(codes) == 1 and bool(next(iter(codes))),
+            'explicit_version_names_match': len(names) == 1,
             'same_signers': len(signers) == 1 and bool(next(iter(signers))),
             'all_signatures_verified': all(entry['signature']['verified'] for entry in result['components']),
         }
