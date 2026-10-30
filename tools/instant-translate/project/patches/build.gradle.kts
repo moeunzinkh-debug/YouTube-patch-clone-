@@ -4,7 +4,7 @@ group = "app.morphe"
 patches {
     about {
         name = "Instant Translate patches (experimental)"
-        description = "An opt-in, version-scoped Google fallback for failed translation requests."
+        description = "Opt-in, version-scoped fallback and in-app settings with a selectable SEA-LION translation provider."
         source = "https://github.com/moeunzinkh-debug/YouTube-patch-clone-"
         author = "YouTube Patch Clone contributors"
         contact = "https://github.com/moeunzinkh-debug/YouTube-patch-clone-"

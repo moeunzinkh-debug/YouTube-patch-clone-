@@ -32,7 +32,7 @@ jobs:
         run: |
           set -o pipefail
           cd "$RUNNER_TEMP/instant-provider-test"
-          ./gradlew :extensions:instanttranslate:testDebugUnitTest --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/instant-provider-test.log"
+          ./gradlew :extensions:instanttranslate:testDebugUnitTest :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/instant-provider-test.log"
       - name: Report safe unit-test failures
         if: failure()
         run: |
