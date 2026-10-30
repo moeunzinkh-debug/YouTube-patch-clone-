@@ -125,9 +125,9 @@ def wait_for_patch_selection() -> list[dict[str, str]]:
 def save_patched_apk() -> Path:
     tap('Save', exact=True)
     time.sleep(4)
-    nodes, _ = wait_for('Save', 45, exact=True)
+    nodes, _ = wait_for('SAVE', 45, exact=True)
     announce('Android save picker', nodes)
-    tap('Save', exact=True)
+    tap('SAVE', exact=True)
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
         candidates = adb('shell', 'find', '/sdcard/Download', '/sdcard/Documents', '-maxdepth', '1', '-type', 'f', '-name', '*.apk').splitlines()
