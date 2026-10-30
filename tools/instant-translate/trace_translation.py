@@ -45,8 +45,14 @@ FOCUS_METHODS = frozenset({
     'Lct9;->call()Ljava/lang/Object;',
     'Lqu;->emit(Ljava/lang/Object;Llx1;)Ljava/lang/Object;',
     'Lu66;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lkb9;->S(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/lang/Object;',
+    'Ljj1;->l0(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/io/Serializable;',
+    'Lsg0;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lm82;->invokeSuspend(Ljava/lang/Object;)Ljava/lang/Object;',
+    'Lh19;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;La29;Z)V',
+    'Lh19;-><init>(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;La29;ZI)V',
 })
-FOCUS_FIELD_CLASSES = frozenset({'Lir9;', 'Ld19;', 'Lqc8;', 'Lyp0;', 'Leh7;'})
+FOCUS_FIELD_CLASSES = frozenset({'Lir9;', 'Ld19;', 'Lqc8;', 'Lyp0;', 'Leh7;', 'Lh19;', 'La29;', 'Lnr0;', 'Lb19;'})
 FOCUS_HOSTS = frozenset({'translate.sapiens8.com', 'translate.google.com'})
 
 
