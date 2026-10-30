@@ -172,18 +172,27 @@ def main() -> None:
     time.sleep(2)
 
     LAST_STAGE = 'open supplied APKS in Manager'
-    apks_id = push_media(APKS, 'kimi-input.apks')
-    # Manager hides its patch dialogs behind the Settings tab. Return to Apps before
-    # sharing the file, just as a user would when choosing an app to patch.
+    push_media(APKS, 'kimi-input.apks')
     tap('Apps', exact=True)
     nodes, _ = wait_for('Kimi AI', 60)
     announce('Kimi visible in Manager Apps', nodes)
-    result = adb('shell', 'am', 'start', '-a', 'android.intent.action.SEND', '-t', 'application/x-apks',
-        '--grant-read-uri-permission', '--eu', 'android.intent.extra.STREAM', f'content://media/external/file/{apks_id}',
-        '-n', 'app.morphe.manager/.MainActivity')
-    print(f'::notice title=Share APKS intent::{result.strip()}', flush=True)
+    tap('Kimi AI', exact=True)
+    nodes, _ = wait_for('No, I already have it', 60)
+    announce('Kimi APK availability', nodes)
+    tap('No, I already have it', exact=True)
     time.sleep(4)
-    announce('after sharing APKS', dump())
+    nodes = dump()
+    announce('Android APK picker', nodes)
+    if not any(matches(n, 'kimi-input.apks') for n in nodes):
+        # The system picker may start in Recent instead of Downloads.
+        if any(matches(n, 'Show roots') for n in nodes):
+            tap('Show roots')
+        elif any(matches(n, 'Browse') for n in nodes):
+            tap('Browse')
+        nodes, _ = wait_for('Downloads', 30)
+        announce('Android storage locations', nodes)
+        tap('Downloads', exact=True)
+    tap('kimi-input.apks', seconds=45)
     nodes = wait_for_patch_selection()
     announce('Kimi patch selection', nodes)
     if not any(matches(n, '1/1', exact=True) for n in nodes):
