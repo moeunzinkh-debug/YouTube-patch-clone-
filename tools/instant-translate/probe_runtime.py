@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Launch only the pinned, unpatched Instant Translate APK in a disposable emulator.
+"""Exercise an original or locally patched APK in a disposable emulator.
 
-This probe uses no account and no private user data. It records ABI/bridge status,
-installation, launch, and a filtered UI snapshot; it does not claim translation
-works. Only routine onboarding buttons are clicked in the temporary emulator.
+No account or private user data is used. The only typed text is the fixed Spanish
+fixture 'hola'. Filtered UI snapshots and crash categories are recorded; launching
+or submitting the fixture alone does not prove translation succeeded.
 """
 from __future__ import annotations
 
@@ -15,8 +15,10 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-INPUT = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'instant-runtime-input.apk'
-OUTPUT = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'instant-runtime.json'
+TEMP = Path(os.environ.get('RUNNER_TEMP', '/tmp'))
+INPUT = Path(os.environ.get('INSTANT_APK', str(TEMP / 'instant-runtime-input.apk')))
+OUTPUT = Path(os.environ.get('INSTANT_REPORT', str(TEMP / 'instant-runtime.json')))
+MODE = os.environ.get('INSTANT_MODE', 'original')
 PACKAGE = 'com.spaceship.screen.textcopy'
 ACTIVITY = 'com.spaceship.screen.translate.page.SplashActivity'
 SAFE_LABEL = re.compile(r"[\w\s.,!?()'&+:/–—\-]{1,90}\Z", re.UNICODE)
@@ -75,13 +77,16 @@ def maybe_click(nodes: list[dict[str, str]]) -> str | None:
 
 
 def main() -> None:
-    report = {'scope': 'Disposable emulator, unpatched input, no account or private text; only a synthetic hola fixture',
-              'package': PACKAGE, 'asset_sha256': 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c',
+    report = {'scope': 'Disposable emulator; no account or private text; only a synthetic hola fixture',
+              'input_mode': MODE,
+              'package': PACKAGE, 'source_asset_sha256': 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c',
               'abi_list': adb('shell', 'getprop', 'ro.product.cpu.abilist'),
               'native_bridge': adb('shell', 'getprop', 'ro.dalvik.vm.native.bridge'),
               'install': None, 'launch_command': None, 'process_alive': False, 'fixture_submitted': False, 'screens': []}
     try:
         report['install'] = adb('install', '-r', str(INPUT), timeout=240)
+        if os.environ.get('INSTANT_CLEAR') == '1':
+            adb('shell', 'pm', 'clear', PACKAGE)
         adb('logcat', '-c')
         report['launch_command'] = adb('shell', 'am', 'start', '-n', f'{PACKAGE}/{ACTIVITY}')
         time.sleep(30)
@@ -125,8 +130,15 @@ def main() -> None:
                                                   'routine_button_clicked': 'Detect Language'})
                         screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
                         (OUTPUT.parent / 'instant-source-screen.png').write_bytes(screen.stdout)
-                        spanish = next((n for n in picker if safe_label(n.get('text', '')) == 'Spanish'), None)
+                        spanish = next((n for n in picker if n.get('class') != 'android.widget.EditText' and
+                                        safe_label(n.get('text', '')) == 'Spanish'), None)
                         if not spanish:
+                            search = next((n for n in picker if safe_label(n.get('content-desc', '')) == 'Search'), None)
+                            if search and re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', search.get('bounds', '')):
+                                a, b, c, d = map(int, re.findall(r'\d+', search['bounds']))
+                                adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
+                                time.sleep(2)
+                                picker = dump()
                             edit = next((n for n in picker if n.get('class') == 'android.widget.EditText'), None)
                             if edit:
                                 a, b, c, d = map(int, re.findall(r'\d+', edit['bounds']))
@@ -136,7 +148,8 @@ def main() -> None:
                                 picker = dump()
                                 report['screens'].append({'stage': 'source_search', 'nodes': snapshot(picker),
                                                           'routine_button_clicked': None})
-                                spanish = next((n for n in picker if safe_label(n.get('text', '')) == 'Spanish'), None)
+                                spanish = next((n for n in picker if n.get('class') != 'android.widget.EditText' and
+                                                safe_label(n.get('text', '')) == 'Spanish'), None)
                         if spanish:
                             a, b, c, d = map(int, re.findall(r'\d+', spanish['bounds']))
                             adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
@@ -170,7 +183,7 @@ def main() -> None:
                                 # instead, so tap the visible IME action.
                                 adb('shell', 'input', 'tap', '294', '590')
                                 report['fixture_submitted'] = True
-                                time.sleep(20)
+                                time.sleep(int(os.environ.get('INSTANT_RESULT_WAIT', '25')))
                                 report['screens'].append({'stage': 'fixture_submitted', 'nodes': snapshot(dump()),
                                                           'routine_button_clicked': 'keyboard action arrow'})
                                 screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
@@ -178,6 +191,18 @@ def main() -> None:
                             break
                     break
         report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
+        log = adb('logcat', '-d', '-t', '5000', timeout=45, check=False)
+        lines = log.splitlines()
+        fatal = []
+        for i, line in enumerate(lines):
+            if 'FATAL EXCEPTION' in line:
+                block = '\n'.join(lines[i:i+25])
+                if PACKAGE in block:
+                    fatal.append(block)
+        report['app_fatal_exception'] = bool(fatal)
+        report['app_fatal_categories'] = [name for name in ('VerifyError', 'NoSuchMethodError',
+            'NoSuchFieldError', 'ClassNotFoundException', 'NetworkOnMainThreadException')
+            if any(name in block for block in fatal)]
     finally:
         OUTPUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
     if 'Success' not in (report['install'] or '').splitlines() or not report['process_alive']:
