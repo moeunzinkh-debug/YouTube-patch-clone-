@@ -114,12 +114,13 @@ def wait_for_patch_selection() -> list[dict[str, str]]:
 
 def save_patched_apk() -> Path:
     tap('Save', exact=True)
+    time.sleep(4)
     nodes, _ = wait_for('Save', 45, exact=True)
     announce('Android save picker', nodes)
     tap('Save', exact=True)
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
-        candidates = adb('shell', 'find', '/sdcard/Download', '-maxdepth', '1', '-type', 'f', '-name', '*.apk').splitlines()
+        candidates = adb('shell', 'find', '/sdcard/Download', '/sdcard/Documents', '-maxdepth', '1', '-type', 'f', '-name', '*.apk').splitlines()
         if candidates:
             target = INPUT / 'manager-merged-patched.apk'
             adb('pull', candidates[-1].strip(), str(target), timeout=180)
@@ -172,9 +173,17 @@ def main() -> None:
 
     LAST_STAGE = 'open supplied APKS in Manager'
     apks_id = push_media(APKS, 'kimi-input.apks')
-    adb('shell', 'am', 'start', '-a', 'android.intent.action.SEND', '-t', 'application/x-apks',
+    # Manager hides its patch dialogs behind the Settings tab. Return to Apps before
+    # sharing the file, just as a user would when choosing an app to patch.
+    tap('Apps', exact=True)
+    nodes, _ = wait_for('Kimi AI', 60)
+    announce('Kimi visible in Manager Apps', nodes)
+    result = adb('shell', 'am', 'start', '-a', 'android.intent.action.SEND', '-t', 'application/x-apks',
         '--grant-read-uri-permission', '--eu', 'android.intent.extra.STREAM', f'content://media/external/file/{apks_id}',
         '-n', 'app.morphe.manager/.MainActivity')
+    print(f'::notice title=Share APKS intent::{result.strip()}', flush=True)
+    time.sleep(4)
+    announce('after sharing APKS', dump())
     nodes = wait_for_patch_selection()
     announce('Kimi patch selection', nodes)
     if not any(matches(n, '1/1', exact=True) for n in nodes):
