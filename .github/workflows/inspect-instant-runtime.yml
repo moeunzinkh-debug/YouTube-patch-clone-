@@ -1,0 +1,70 @@
+name: Probe original Instant Translate on emulator
+
+on:
+  push:
+    branches: [arena/b6e2f975-youtube-patch-clone]
+    paths:
+      - .github/workflows/inspect-instant-runtime.yml
+      - tools/instant-translate/probe_runtime.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: instant-runtime-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  runtime:
+    if: contains(github.event.head_commit.message, '[instant-runtime]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download only the pinned unpatched APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/instant-download"
+          name='Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk'
+          gh release download Instant-translate --pattern "$name" --dir "$RUNNER_TEMP/instant-download"
+          echo 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c  '"$RUNNER_TEMP/instant-download/$name" | sha256sum --check
+          mv "$RUNNER_TEMP/instant-download/$name" "$RUNNER_TEMP/instant-runtime-input.apk"
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Launch original APK in disposable Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 10G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/instant-translate/probe_runtime.py
+      - name: Report filtered emulator observations
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, os
+          from pathlib import Path
+          p = Path(os.environ['RUNNER_TEMP']) / 'instant-runtime.json'
+          if not p.exists():
+              print('::warning::No runtime report was produced')
+          else:
+              payload = base64.b64encode(gzip.compress(p.read_bytes())).decode()
+              chunks = [payload[i:i+3900] for i in range(0, len(payload), 3900)]
+              for i, chunk in enumerate(chunks, 1):
+                  print(f'::notice::INSTANT_RUNTIME {i}/{len(chunks)} {chunk}')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: instant-original-runtime-report
+          path: ${{ runner.temp }}/instant-runtime.json
+          if-no-files-found: ignore

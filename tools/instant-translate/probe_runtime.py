@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""Launch only the pinned, unpatched Instant Translate APK in a disposable emulator.
+
+This probe uses no account and no private user data. It records ABI/bridge status,
+installation, launch, and a filtered UI snapshot; it does not claim translation
+works. Only routine onboarding buttons are clicked in the temporary emulator.
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import time
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+INPUT = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'instant-runtime-input.apk'
+OUTPUT = Path(os.environ.get('RUNNER_TEMP', '/tmp')) / 'instant-runtime.json'
+PACKAGE = 'com.spaceship.screen.textcopy'
+ACTIVITY = 'com.spaceship.screen.translate.page.SplashActivity'
+SAFE_LABEL = re.compile(r"[\w\s.,!?()'&+:/–—\-]{1,90}\Z", re.UNICODE)
+ROUTINE = {'continue', 'get started', 'get start', 'start', 'next', 'skip', 'not now',
+           'allow', 'allow notifications', 'got it', 'ok', 'agree', 'i agree'}
+
+
+def adb(*args: str, timeout: int = 90, check: bool = True) -> str:
+    result = subprocess.run(['adb', *args], text=True, capture_output=True, timeout=timeout)
+    if check and result.returncode:
+        raise RuntimeError('ADB command failed at ' + ' '.join(args[:2]))
+    return (result.stdout or '').strip()
+
+
+def safe_label(value: str) -> str:
+    value = re.sub(r'\s+', ' ', value.strip())
+    if not value or not SAFE_LABEL.fullmatch(value):
+        return ''
+    if 'http' in value.lower() or '@' in value or re.search(r'\d{5,}', value):
+        return ''
+    return value
+
+
+def dump() -> list[dict[str, str]]:
+    adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml', timeout=60)
+    raw = adb('exec-out', 'cat', '/sdcard/window.xml', timeout=30)
+    return [node.attrib for node in ET.fromstring(raw).iter('node')]
+
+
+def snapshot(nodes: list[dict[str, str]]) -> list[dict[str, str]]:
+    result = []
+    for node in nodes:
+        label = safe_label(node.get('text') or node.get('content-desc') or '')
+        bounds = node.get('bounds', '')
+        resource = node.get('resource-id', '')
+        if resource and not re.fullmatch(r'[\w.]+:id/[\w.]+', resource):
+            resource = ''
+        if (label or resource or node.get('class') == 'android.widget.EditText') and re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', bounds):
+            result.append({'label': label, 'id': resource, 'class': node.get('class', ''), 'bounds': bounds,
+                           'clickable': node.get('clickable', ''), 'enabled': node.get('enabled', '')})
+    return result[:90]
+
+
+def maybe_click(nodes: list[dict[str, str]]) -> str | None:
+    for node in nodes:
+        label = safe_label(node.get('text') or node.get('content-desc') or '')
+        bounds = node.get('bounds', '')
+        if label.casefold() not in ROUTINE or not re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', bounds):
+            continue
+        if node.get('enabled') != 'true':
+            continue
+        x1, y1, x2, y2 = map(int, re.findall(r'\d+', bounds))
+        adb('shell', 'input', 'tap', str((x1 + x2) // 2), str((y1 + y2) // 2))
+        return label
+    return None
+
+
+def main() -> None:
+    report = {'scope': 'Disposable emulator, unpatched input, no user account or private text; translation not tested',
+              'package': PACKAGE, 'asset_sha256': 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c',
+              'abi_list': adb('shell', 'getprop', 'ro.product.cpu.abilist'),
+              'native_bridge': adb('shell', 'getprop', 'ro.dalvik.vm.native.bridge'),
+              'install': None, 'launch_command': None, 'process_alive': False, 'screens': []}
+    try:
+        report['install'] = adb('install', '-r', str(INPUT), timeout=240)
+        adb('logcat', '-c')
+        report['launch_command'] = adb('shell', 'am', 'start', '-n', f'{PACKAGE}/{ACTIVITY}')
+        time.sleep(30)
+        for stage in range(7):
+            nodes = dump()
+            clicked = maybe_click(nodes)
+            report['screens'].append({'stage': stage, 'nodes': snapshot(nodes), 'routine_button_clicked': clicked})
+            if not clicked:
+                break
+            time.sleep(4)
+        report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
+    finally:
+        OUTPUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
+    if report['install'] != 'Success' or not report['process_alive']:
+        raise RuntimeError('APK did not remain running; see sanitized runtime report')
+    print('APK installed and launched in disposable emulator; no translation was tested')
+
+
+if __name__ == '__main__':
+    main()
