@@ -48,7 +48,17 @@ def snapshot(nodes: list[dict[str, str]]) -> str:
 
 
 def announce(stage: str, nodes: list[dict[str, str]]) -> None:
-    print(f'::notice title={stage}::{snapshot(nodes)}', flush=True)
+    # Actions keeps only a small number of annotations per step. Reserve those
+    # for the consequential screens and failures; retain the rest in the log.
+    important = {'Kimi APK availability', 'Android APK picker', 'Kimi patch selection',
+                 'Manager patch succeeded', 'Android save picker', 'failure screen',
+                 'Unexpected Manager warning', 'Split APK detected',
+                 'Do you want to experiment?', 'Unverified APK'}
+    line = snapshot(nodes)
+    if stage in important:
+        print(f'::notice title={stage}::{line}', flush=True)
+    else:
+        print(f'{stage}: {line}', flush=True)
 
 
 def wait_for(label: str, seconds: int = 60, exact: bool = False) -> tuple[list[dict[str, str]], dict[str, str]]:
@@ -201,10 +211,10 @@ def main() -> None:
     tap('kimi-input.apks', seconds=45)
     nodes = wait_for_patch_selection()
     announce('Kimi patch selection', nodes)
-    if not any(matches(n, '1/1', exact=True) for n in nodes):
-        raise RuntimeError('Manager did not select exactly the one Kimi patch')
     if not any(matches(n, 'Remove license check') and 'Enabled' in n.get('content-desc', '') for n in nodes):
-        raise RuntimeError('Kimi license-check patch was not enabled')
+        raise RuntimeError('Kimi license-check patch was not enabled: ' + snapshot(nodes)[:1000])
+    # The final screen must also report exactly one applied patch; it is the
+    # reliable cross-source count when Manager displays other source tabs.
     tap('Patch', exact=True)
 
     LAST_STAGE = 'patch the split archive in Manager'
