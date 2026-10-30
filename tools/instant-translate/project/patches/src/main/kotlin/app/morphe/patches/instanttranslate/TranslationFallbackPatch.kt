@@ -1,11 +1,15 @@
 package app.morphe.patches.instanttranslate
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsAtControlFlowLabel
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
+import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.removeInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableField.Companion.toMutable
+import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -17,6 +21,14 @@ import com.android.tools.smali.dexlib2.immutable.ImmutableField
 
 private const val EXTENSION = "Lapp/morphe/extension/instanttranslate/TranslationFallback;"
 private const val CONTINUATION = "Ltk3;->Q(Llx1;)Llx1;"
+
+// Adapted from MorpheApp/morphe-patches-library BytecodeUtils (GPL-3.0).
+// Move the existing control-flow label onto the first inserted instruction.
+private fun MutableMethod.addInstructionsAtControlFlowLabel(index: Int, instructions: String) {
+    addInstruction(index + 1, getInstruction(index))
+    addInstructionsWithLabels(index + 1, instructions)
+    removeInstruction(index)
+}
 
 private val translationExtensionPatch = bytecodePatch {
     extendWith("extensions/instanttranslate.mpe")

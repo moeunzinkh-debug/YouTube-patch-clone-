@@ -54,7 +54,7 @@ def snapshot(nodes: list[dict[str, str]]) -> list[dict[str, str]]:
         resource = node.get('resource-id', '')
         if resource and not re.fullmatch(r'[\w.]+:id/[\w.]+', resource):
             resource = ''
-        if (label or resource or node.get('class') == 'android.widget.EditText') and re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', bounds):
+        if (label or resource or node.get('clickable') == 'true' or node.get('class') == 'android.widget.EditText') and re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', bounds):
             result.append({'label': label, 'id': resource, 'class': node.get('class', ''), 'bounds': bounds,
                            'clickable': node.get('clickable', ''), 'enabled': node.get('enabled', '')})
     return result[:90]
@@ -75,11 +75,11 @@ def maybe_click(nodes: list[dict[str, str]]) -> str | None:
 
 
 def main() -> None:
-    report = {'scope': 'Disposable emulator, unpatched input, no user account or private text; translation not tested',
+    report = {'scope': 'Disposable emulator, unpatched input, no account or private text; only a synthetic hola fixture',
               'package': PACKAGE, 'asset_sha256': 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c',
               'abi_list': adb('shell', 'getprop', 'ro.product.cpu.abilist'),
               'native_bridge': adb('shell', 'getprop', 'ro.dalvik.vm.native.bridge'),
-              'install': None, 'launch_command': None, 'process_alive': False, 'screens': []}
+              'install': None, 'launch_command': None, 'process_alive': False, 'fixture_submitted': False, 'screens': []}
     try:
         report['install'] = adb('install', '-r', str(INPUT), timeout=240)
         adb('logcat', '-c')
@@ -129,6 +129,11 @@ def main() -> None:
                                 time.sleep(2)
                                 report['screens'].append({'stage': 'fixture_entered', 'nodes': snapshot(dump()),
                                                           'routine_button_clicked': None})
+                                adb('shell', 'input', 'keyevent', 'KEYCODE_ENTER')
+                                report['fixture_submitted'] = True
+                                time.sleep(20)
+                                report['screens'].append({'stage': 'fixture_submitted', 'nodes': snapshot(dump()),
+                                                          'routine_button_clicked': 'keyboard Enter'})
                             break
                     break
         report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
@@ -136,7 +141,7 @@ def main() -> None:
         OUTPUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
     if 'Success' not in (report['install'] or '').splitlines() or not report['process_alive']:
         raise RuntimeError('APK did not remain running; see sanitized runtime report')
-    print('APK installed and launched in disposable emulator; no translation was tested')
+    print('APK installed and launched in disposable emulator; fixture submitted:', report['fixture_submitted'])
 
 
 if __name__ == '__main__':
