@@ -11,7 +11,9 @@ import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val SETTINGS = "Lapp/morphe/extension/instanttranslate/SettingsUi;"
@@ -59,9 +61,13 @@ val instantSettingsPatch = bytecodePatch(
             return ref?.definingClass == owner && ref.name == name
         }
         require(row.implementation!!.registerCount == 24 && ri.size == 177 &&
+            ri[19].opcode == Opcode.CONST_4 && (ri[19] as? OneRegisterInstruction)?.registerA == 7 &&
+            (ri[19] as? NarrowLiteralInstruction)?.narrowLiteral == 0 &&
             ri[28].opcode == Opcode.CONST && (ri[28] as? NarrowLiteralInstruction)?.narrowLiteral == 0x7f13046b &&
             ri[31].opcode == Opcode.CONST && (ri[31] as? NarrowLiteralInstruction)?.narrowLiteral == 0x7f13046c &&
             methodAt(ri, 29, "Lpa4;", "P") && methodAt(ri, 34, "Laa4;", "G") &&
+            ri[63].opcode == Opcode.MOVE && (ri[63] as? TwoRegisterInstruction)?.registerA == 0 &&
+            (ri[63] as? TwoRegisterInstruction)?.registerB == 7 &&
             ri[66].opcode == Opcode.INVOKE_STATIC_RANGE && methodAt(ri, 66, "Lu44;", "v")
         ) { "Reviewed Settings renderer changed" }
         require(activity.implementation!!.registerCount == 13 && mi.size == 129 &&
@@ -79,7 +85,8 @@ val instantSettingsPatch = bytecodePatch(
         activity.addAtExistingLabel(15, "invoke-static {v11}, $SETTINGS->attach(Landroid/app/Activity;)V")
 
         // Reuse the app's existing Compose row renderer and icon. v0/v1/v2 and
-        // the incoming receiver stay intact; v9 (composer) is saved/restored.
+        // the incoming receiver stay intact; save/restore v9 (composer) and
+        // restore the original zero in v7, which the next rows still read.
         row.addAtExistingLabel(28, """
             move-object/from16 v16, v9
             const/4 v4, 0x0
@@ -98,6 +105,7 @@ val instantSettingsPatch = bytecodePatch(
             const/16 v18, 1493
             invoke-static/range {v4 .. v18}, Lu44;->v(Lls5;Ljava/lang/String;Lhm3;Ljava/lang/String;Lhm3;Lkotlin/jvm/functions/Function0;JLjava/lang/String;Lc64;JLlo1;II)V
             move-object/from16 v9, v16
+            const/4 v7, 0x0
         """.trimIndent())
     }
 }

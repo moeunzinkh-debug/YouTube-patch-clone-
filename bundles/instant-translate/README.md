@@ -55,4 +55,4 @@
 - [Actions 41074061125](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41074061125) បានសាក import/patch/save bundle **ចាស់** (SHA `0fc40a4c…`) ក្នុង Morphe Manager; [របាយការណ៍ចាស់](manager-smoke.json) មិនមែនភស្តុតាងសម្រាប់ bundle ថ្មីទេ។
 - APK ដើមបើកលើ Android 15 x86_64 emulator ដែលមាន ARM64 translation។ [ការសាក patched APK មុន](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41078192479) និង [ការសាក re-sign ដោយមិនកែ DEX/native libraries](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41079548999) បានជួប `verifyIntegrity` crash។ មូលហេតុដើមនៃ “Translation failed” មិនទាន់បញ្ជាក់។
 
-Bundle SHA-256: `d419454a99ee5997044c1ecac4af21ea51737be155aa22e5c9b7474b5a6dec08`។ ប្រភពនៅ [`tools/instant-translate/project`](../../tools/instant-translate/project/)។ មិនបានបង្កើត release ថ្មី ឬបន្ថែម bundle ទៅ pre-release ទេ។
+[Bundle SHA-256](bundle.mpp.sha256) · ប្រភពនៅ [`tools/instant-translate/project`](../../tools/instant-translate/project/)។ មិនបានបង្កើត release ថ្មី ឬបន្ថែម bundle ទៅ pre-release ទេ។

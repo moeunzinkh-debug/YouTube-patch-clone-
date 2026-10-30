@@ -8,6 +8,7 @@ on:
       - 'tools/instant-translate/prepare_build.py'
       - 'tools/instant-translate/verify_bundle.py'
       - 'tools/instant-translate/verify_patched.py'
+      - 'tools/instant-translate/test_verify_patched.py'
       - '.github/workflows/build-instant-translate-mpp.yml'
 
 permissions:
@@ -43,6 +44,7 @@ jobs:
           set -euo pipefail
           python3 tools/instant-translate/test_inspect_apk.py -v
           python3 tools/instant-translate/test_trace_translation.py -v
+          python3 tools/instant-translate/test_verify_patched.py -v
           python3 tools/instant-translate/prepare_build.py "$RUNNER_TEMP/instant-build"
           mkdir -p "$RUNNER_TEMP/instant-input" "$RUNNER_TEMP/instant-output"
           name='Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk'
@@ -118,7 +120,7 @@ jobs:
           set -euo pipefail
           git fetch origin "$GITHUB_REF_NAME"
           git merge --ff-only FETCH_HEAD
-          for source in tools/instant-translate/project tools/instant-translate/prepare_build.py tools/instant-translate/verify_bundle.py tools/instant-translate/verify_patched.py .github/workflows/build-instant-translate-mpp.yml; do
+          for source in tools/instant-translate/project tools/instant-translate/prepare_build.py tools/instant-translate/verify_bundle.py tools/instant-translate/verify_patched.py tools/instant-translate/test_verify_patched.py .github/workflows/build-instant-translate-mpp.yml; do
             if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
               echo '::warning::Instant Translate build sources changed; not saving stale results.'
               exit 0

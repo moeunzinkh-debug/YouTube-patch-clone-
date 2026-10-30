@@ -149,6 +149,20 @@ def canonical_body(items: list[tuple[str, str]]) -> list[tuple[str, str]]:
     return result
 
 
+def verify_settings_row(before_row: list[tuple[str, str]], after_row: list[tuple[str, str]]) -> None:
+    if len(before_row) != 177 or len(after_row) != 195:
+        raise ValueError('Unexpected Settings row instruction count')
+    injected = after_row[28:46]
+    joined = '\n'.join(value for _, value in injected)
+    if ('SettingsPatch' not in joined or 'Translationproviders' not in joined or
+            SETTINGS_CLICK + '-><init>()V' not in joined or 'Lu44;->v(' not in joined):
+        raise ValueError('Settings Patch row or click callback was not installed')
+    if injected[-2:] != [('move-object/from16', 'v9,v16'), ('const/4', 'v7,0')]:
+        raise ValueError('Compose row did not restore the live composer and zero register')
+    if canonical_body(before_row) != canonical_body(after_row[:28] + after_row[46:]):
+        raise ValueError('Original Settings rows changed beyond the added row')
+
+
 def verify_settings(before: dict, after: dict, enabled: bool) -> None:
     if before['function0_definitions'] != 1 or after['function0_definitions'] != 1:
         raise ValueError('Target Kotlin Function0 interface was missing or duplicated')
@@ -157,17 +171,7 @@ def verify_settings(before: dict, after: dict, enabled: bool) -> None:
             if before['methods'][name] != after['methods'][name]:
                 raise ValueError('Settings patch modified an unselected Settings method: ' + name)
         return
-    before_row = before['methods'][ROW]
-    after_row = after['methods'][ROW]
-    if len(before_row) != 177 or len(after_row) != 194:
-        raise ValueError('Unexpected Settings row instruction count')
-    injected = after_row[28:45]
-    joined = '\n'.join(value for _, value in injected)
-    if ('SettingsPatch' not in joined or 'Translationproviders' not in joined or
-            SETTINGS_CLICK + '-><init>()V' not in joined or 'Lu44;->v(' not in joined):
-        raise ValueError('Settings Patch row or click callback was not installed')
-    if canonical_body(before_row) != canonical_body(after_row[:28] + after_row[45:]):
-        raise ValueError('Original Settings rows changed beyond the added row')
+    verify_settings_row(before['methods'][ROW], after['methods'][ROW])
     for method, hook in ((APPLICATION, 'initialize'), (ACTIVITY, 'attach')):
         original, modified = before['methods'][method], after['methods'][method]
         hook_ref = SETTINGS_UI + '->' + hook

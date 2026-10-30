@@ -83,7 +83,7 @@ jobs:
           set -euo pipefail
           git fetch origin "$GITHUB_REF_NAME"
           git merge --ff-only FETCH_HEAD
-          for source in bundles/instant-translate/bundle.mpp tools/instant-translate/test_manager.py tools/instant-translate/verify_manager.py .github/workflows/test-instant-manager.yml; do
+          for source in bundles/instant-translate/bundle.mpp tools/instant-translate/project tools/instant-translate/test_manager.py tools/instant-translate/verify_manager.py tools/instant-translate/verify_patched.py .github/workflows/test-instant-manager.yml; do
             if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
               echo '::warning::Manager inputs changed; not saving stale results.'
               exit 0
