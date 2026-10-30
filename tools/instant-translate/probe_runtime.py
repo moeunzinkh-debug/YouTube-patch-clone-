@@ -87,6 +87,14 @@ def main() -> None:
         time.sleep(30)
         for stage in range(7):
             nodes = dump()
+            if any("isn't responding" in (n.get('text') or '').lower() for n in nodes):
+                wait = next((n for n in nodes if n.get('text') == 'Wait'), None)
+                if wait and re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', wait.get('bounds', '')):
+                    a, b, c, d = map(int, re.findall(r'\d+', wait['bounds']))
+                    adb('shell', 'input', 'tap', str((a+c)//2), str((b+d)//2))
+                    adb('shell', 'am', 'start', '-n', f'{PACKAGE}/{ACTIVITY}')
+                    time.sleep(12)
+                    nodes = dump()
             clicked = maybe_click(nodes)
             report['screens'].append({'stage': stage, 'nodes': snapshot(nodes), 'routine_button_clicked': clicked})
             if not clicked:
