@@ -122,13 +122,11 @@ jobs:
           disk-size: 10G
           emulator-boot-timeout: 600
           emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          # The emulator action executes each script line in a separate shell;
+          # keep each invocation's environment on the same line.
           script: |
-            set -e
-            export INSTANT_CLEAR=1 INSTANT_RESULT_WAIT=50
-            export INSTANT_APK="$RUNNER_TEMP/instant-fallback/product-signed.apk" INSTANT_REPORT="$RUNNER_TEMP/instant-fallback/product.json" INSTANT_MODE=product
-            python3 tools/instant-translate/probe_runtime.py
-            export INSTANT_APK="$RUNNER_TEMP/instant-fallback/forced-signed.apk" INSTANT_REPORT="$RUNNER_TEMP/instant-fallback/forced.json" INSTANT_MODE=ci-forced-original-failure
-            python3 tools/instant-translate/probe_runtime.py
+            INSTANT_CLEAR=1 INSTANT_RESULT_WAIT=50 INSTANT_APK="$RUNNER_TEMP/instant-fallback/product-signed.apk" INSTANT_REPORT="$RUNNER_TEMP/instant-fallback/product.json" INSTANT_MODE=product python3 tools/instant-translate/probe_runtime.py > "$RUNNER_TEMP/instant-fallback/product-probe.log" 2>&1 || { tail -n 25 "$RUNNER_TEMP/instant-fallback/product-probe.log"; exit 1; }
+            INSTANT_CLEAR=1 INSTANT_RESULT_WAIT=50 INSTANT_APK="$RUNNER_TEMP/instant-fallback/forced-signed.apk" INSTANT_REPORT="$RUNNER_TEMP/instant-fallback/forced.json" INSTANT_MODE=ci-forced-original-failure python3 tools/instant-translate/probe_runtime.py > "$RUNNER_TEMP/instant-fallback/forced-probe.log" 2>&1 || { tail -n 25 "$RUNNER_TEMP/instant-fallback/forced-probe.log"; exit 1; }
       - name: Evaluate the CI-only forced-failure fixture
         run: |
           if ! python3 tools/instant-translate/check_runtime.py "$RUNNER_TEMP/instant-fallback/product.json" \
@@ -149,9 +147,30 @@ jobs:
               if file.exists():
                   data = base64.b64encode(gzip.compress(file.read_bytes())).decode()
                   chunks = [data[i:i+3900] for i in range(0, len(data), 3900)]
-                  if len(chunks) <= 3:
-                      for i, chunk in enumerate(chunks, 1):
-                          print(f'::notice::INSTANT_{mode.upper()} {i}/{len(chunks)} {chunk}')
+                  for i, chunk in enumerate(chunks, 1):
+                      print(f'::notice::INSTANT_{mode.upper()} {i}/{len(chunks)} {chunk}')
+              log = directory / f'{mode}-probe.log'
+              if log.exists():
+                  data = base64.b64encode(gzip.compress(log.read_bytes()[-4000:])).decode()
+                  print(f'::notice::INSTANT_{mode.upper()}_LOG {data}')
+          PY
+      - name: Report disposable final-screen preview
+        if: always()
+        run: |
+          python3 -m pip install --disable-pip-version-check Pillow
+          python3 - <<'PY'
+          import base64, io, os
+          from pathlib import Path
+          from PIL import Image
+          p = Path(os.environ['RUNNER_TEMP']) / 'instant-fallback' / 'instant-result-screen.png'
+          if p.exists():
+              image = Image.open(p).convert('RGB'); image.thumbnail((320, 640))
+              output = io.BytesIO(); image.save(output, format='JPEG', quality=25, optimize=True)
+              encoded = base64.b64encode(output.getvalue()).decode()
+              chunks = [encoded[i:i+3900] for i in range(0, len(encoded), 3900)]
+              if len(chunks) <= 9:
+                  for i, chunk in enumerate(chunks, 1):
+                      print(f'::notice::INSTANT_FINAL_SCREEN {i}/{len(chunks)} {chunk}')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
