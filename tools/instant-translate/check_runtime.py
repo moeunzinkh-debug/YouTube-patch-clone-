@@ -12,7 +12,7 @@ def main() -> None:
     product, forced = (json.loads(Path(path).read_text()) for path in sys.argv[1:3])
     for name, report in [('product', product), ('forced', forced)]:
         stages = {str(screen['stage']): screen for screen in report.get('screens', [])}
-        if not report.get('process_alive') or report.get('app_fatal_exception'):
+        if not report.get('process_alive') or report.get('app_fatal_exception') or report.get('crash_dialog_seen'):
             raise ValueError(name + ' app failed to stay running or crashed')
         if not report.get('fixture_submitted') or 'fixture_submitted' not in stages:
             raise ValueError(name + ' did not submit the synthetic fixture')

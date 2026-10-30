@@ -82,16 +82,28 @@ def main() -> None:
               'package': PACKAGE, 'source_asset_sha256': 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c',
               'abi_list': adb('shell', 'getprop', 'ro.product.cpu.abilist'),
               'native_bridge': adb('shell', 'getprop', 'ro.dalvik.vm.native.bridge'),
-              'install': None, 'launch_command': None, 'process_alive': False, 'fixture_submitted': False, 'screens': []}
+              'install': None, 'launch_command': None, 'process_alive': False, 'fixture_submitted': False,
+              'crash_dialog_seen': False, 'screens': []}
     try:
-        report['install'] = adb('install', '-r', str(INPUT), timeout=240)
+        # Avoid leaving a previous run's crash dialog in front of the next APK.
+        adb('shell', 'am', 'force-stop', PACKAGE, check=False)
+        adb('shell', 'input', 'keyevent', 'KEYCODE_HOME', check=False)
+        report['install'] = adb('install', '-r', '--no-incremental', str(INPUT), timeout=240)
         if os.environ.get('INSTANT_CLEAR') == '1':
             adb('shell', 'pm', 'clear', PACKAGE)
         adb('logcat', '-c')
+        # The main ring is noisy; retain the separate crash buffer for startup
+        # exceptions that might have scrolled out by the time the fixture ends.
+        adb('logcat', '-b', 'crash', '-c', check=False)
         report['launch_command'] = adb('shell', 'am', 'start', '-n', f'{PACKAGE}/{ACTIVITY}')
         time.sleep(30)
         for stage in range(7):
             nodes = dump()
+            if any('keeps stopping' in (n.get('text') or '').lower() for n in nodes):
+                report['crash_dialog_seen'] = True
+            if stage == 0:
+                screen = subprocess.run(['adb', 'exec-out', 'screencap', '-p'], capture_output=True, timeout=30, check=True)
+                (OUTPUT.parent / 'instant-startup-screen.png').write_bytes(screen.stdout)
             if any("isn't responding" in (n.get('text') or '').lower() for n in nodes):
                 wait = next((n for n in nodes if n.get('text') == 'Wait'), None)
                 if wait and re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', wait.get('bounds', '')):
@@ -191,18 +203,41 @@ def main() -> None:
                             break
                     break
         report['process_alive'] = bool(adb('shell', 'pidof', PACKAGE, check=False))
-        log = adb('logcat', '-d', '-t', '5000', timeout=45, check=False)
+        log = adb('logcat', '-b', 'crash', '-d', '-v', 'brief', timeout=45, check=False)
         lines = log.splitlines()
         fatal = []
         for i, line in enumerate(lines):
             if 'FATAL EXCEPTION' in line:
-                block = '\n'.join(lines[i:i+25])
+                block = '\n'.join(lines[i:i+100])
                 if PACKAGE in block:
                     fatal.append(block)
         report['app_fatal_exception'] = bool(fatal)
         report['app_fatal_categories'] = [name for name in ('VerifyError', 'NoSuchMethodError',
-            'NoSuchFieldError', 'ClassNotFoundException', 'NetworkOnMainThreadException')
+            'NoSuchFieldError', 'ClassNotFoundException', 'NetworkOnMainThreadException',
+            'IllegalStateException', 'RuntimeException', 'NullPointerException', 'UnsatisfiedLinkError')
             if any(name in block for block in fatal)]
+        # Include only verifier details (useful for DEX register diagnostics),
+        # not arbitrary exception messages which could contain app data.
+        report['verifier_details'] = []
+        for block in fatal:
+            for line in block.splitlines():
+                if 'VerifyError:' in line:
+                    detail = line.split('VerifyError:', 1)[1].strip()
+                    detail = re.sub(r'https?://\S+|[\w.+-]+@[\w.-]+', '[redacted]', detail)
+                    report['verifier_details'].append(detail[:1000])
+        report['verifier_details'] = report['verifier_details'][:4]
+        report['exception_types'] = []
+        report['stack_frames'] = []
+        for block in fatal:
+            for line in block.splitlines():
+                kind = re.search(r'\b([\w.$]+(?:Exception|Error))(?::|\s*$)', line)
+                frame = re.search(r'\bat ([\w.$]+)\(', line)
+                if kind and kind.group(1) not in report['exception_types']:
+                    report['exception_types'].append(kind.group(1))
+                if frame and frame.group(1) not in report['stack_frames']:
+                    report['stack_frames'].append(frame.group(1))
+        report['exception_types'] = report['exception_types'][:12]
+        report['stack_frames'] = report['stack_frames'][:20]
     finally:
         OUTPUT.write_text(json.dumps(report, indent=2, ensure_ascii=False) + '\n')
     if 'Success' not in (report['install'] or '').splitlines() or not report['process_alive']:
