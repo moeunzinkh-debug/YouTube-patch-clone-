@@ -20,6 +20,8 @@ TRANSLATION_SIGS = (r'^\(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;L
                     r'^\(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;L[^;]+;L[^;]+;\)Ljava/lang/Object;$')
 GATE_CLASSES = frozenset({'Lf0a;', 'La86;', 'Lu76;', 'Llh8;', 'Lmh8;', 'Lwx0;'})
 GATE_METHOD = 'Lf0a;->a(Ljava/lang/String;)Z'
+COROUTINE_CLASSES = frozenset({'Lfra;', 'Lip2;', 'Lhp2;', 'Lor2;', 'Ld1b;', 'Lz37;'})
+TRANSLATE_MAIN = 'Lz37;->A(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lip2;)Ljava/lang/Object;'
 
 
 def trace(path):
@@ -41,6 +43,7 @@ def trace(path):
     }
     entries, fields, callers, entitlements, candidates = {}, {}, defaultdict(list), [], []
     gate_classes, gate_bodies, gate_callers = {}, {}, []
+    coroutine_classes, coroutine_bodies, interceptor_candidates, translate_callers = {}, {}, [], []
     with zipfile.ZipFile(path) as archive:
         for info in archive.infolist():
             if not DEX_NAME.fullmatch(info.filename): continue
@@ -53,6 +56,11 @@ def trace(path):
                                       'access': f.get_access_flags_string()} for f in cls.get_fields()]
                 if owner in GATE_CLASSES:
                     gate_classes[owner] = {'dex': info.filename,
+                        'fields': [{'name': f.get_name(), 'type': ''.join(f.get_descriptor().split()),
+                                    'access': f.get_access_flags_string()} for f in cls.get_fields()],
+                        'methods': [method_id(cls, m) for m in methods]}
+                if owner in COROUTINE_CLASSES:
+                    coroutine_classes[owner] = {'dex': info.filename, 'superclass': cls.get_superclassname(),
                         'fields': [{'name': f.get_name(), 'type': ''.join(f.get_descriptor().split()),
                                     'access': f.get_access_flags_string()} for f in cls.get_fields()],
                         'methods': [method_id(cls, m) for m in methods]}
@@ -71,6 +79,12 @@ def trace(path):
                         gate_bodies[identifier] = {'dex': info.filename, 'access': method.get_access_flags_string(),
                             'registers': code.get_registers_size(), 'incoming': code.get_ins_size(),
                             'instructions': [sanitize(x) for x in ins]}
+                    if owner in COROUTINE_CLASSES and owner != 'Lz37;' and len(ins) <= 150:
+                        coroutine_bodies[identifier] = {'registers': code.get_registers_size(),
+                            'instructions': [sanitize(x) for x in ins]}
+                    if desc == '(Lhp2;)Lhp2;' and 'static' in method.get_access_flags_string() and len(ins) <= 100 and len(interceptor_candidates) < 60:
+                        interceptor_candidates.append({'method': identifier, 'dex': info.filename,
+                            'registers': code.get_registers_size(), 'instructions': [sanitize(x) for x in ins]})
                     hits = []
                     for index, inst in enumerate(ins):
                         if not inst.get_name().startswith('invoke-'): continue
@@ -78,6 +92,9 @@ def trace(path):
                         target = raw.rsplit(',', 1)[-1]
                         if 'Lcom/pairip/licensecheck/' in target and any(x in target for x in ('->checkLicense(', '->initializeLicenseCheck(')):
                             if len(callers[target]) < 40: callers[target].append({'method': identifier, 'index': index})
+                        if target == TRANSLATE_MAIN and len(translate_callers) < 60:
+                            translate_callers.append({'method': identifier, 'dex': info.filename, 'index': index,
+                                'instructions': [sanitize(x) for x in ins[max(0,index-8):index+10]]})
                         if target == GATE_METHOD and len(gate_callers) < 150:
                             gate_callers.append({'method': identifier, 'dex': info.filename, 'index': index,
                                 'instructions': [sanitize(x) for x in ins[max(0,index-8):index+10]]})
@@ -97,7 +114,9 @@ def trace(path):
             'version': VERSION, 'version_code': CODE, 'manifest': manifest_info,
             'pairip_entries': entries, 'pairip_fields': fields, 'pairip_callers': dict(callers),
             'revenuecat_entitlement_callers': entitlements, 'translation_signature_candidates': candidates,
-            'gate_classes': gate_classes, 'gate_bodies': gate_bodies, 'gate_callers': gate_callers}
+            'gate_classes': gate_classes, 'gate_bodies': gate_bodies, 'gate_callers': gate_callers,
+            'coroutine_classes': coroutine_classes, 'coroutine_bodies': coroutine_bodies,
+            'interceptor_candidates': interceptor_candidates, 'translate_callers': translate_callers}
 
 
 def main():
