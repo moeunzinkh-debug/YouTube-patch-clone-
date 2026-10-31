@@ -27,11 +27,11 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - `Unlock premium local gate (experimental)` — ប្ដូរតែ local entitlement gate; មិនធានាមុខងារ ឬសិទ្ធិដែល server ត្រួតពិនិត្យ។
 - `Official microG service visibility (experimental)` — បន្ថែម package visibility ប៉ុណ្ណោះ; ត្រូវមាន official microG ដាច់ដោយឡែក និង system signature spoofing។ Login មិនទាន់បានសាក។
 
-Google translation fallback ត្រូវបានដកចេញពី bundle ក្នុង branch នេះ; វាមិនលុប Google services របស់ app ដើមទេ។ **Bundle ចាស់ក្នុង pre-release នៅតែមាន Google fallback** ហើយមិនបានជំនួស។
+Google translation fallback ត្រូវបានដកចេញពី bundle `0.4.0-dev.1`; វាមិនលុប Google services របស់ app ដើមទេ។ Bundle ថ្មី និង checksum មាននៅ [Instant-translate pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate); APK និង split assets មិនបានប្ដូរ។
 
 **មិនទាន់បញ្ជាក់ runtime:** កំណែថ្មីមិនបាន patch/install APK, សាក SEA-LION ពិត ឬសាក microG login។ របាយការណ៍ Manager និង crash ចាស់គឺសម្រាប់ 50342 និង bundle Google-enabled ចាស់; crash កំណែថ្មីមិនទាន់ដឹង។
 
-[របៀបប្រើ និងលទ្ធផល](bundles/instant-translate/README.md) · [Branch bundle.mpp](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256) · [Pre-release (bundle ចាស់)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate)
+[របៀបប្រើ និងលទ្ធផល](bundles/instant-translate/README.md) · [Repository bundle.mpp](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256) · [ទាញយក bundle ពី pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/Instant-translate/bundle.mpp)
 
 </details>
 

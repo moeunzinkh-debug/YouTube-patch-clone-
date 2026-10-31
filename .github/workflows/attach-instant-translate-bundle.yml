@@ -1,10 +1,13 @@
-name: Attach experimental Instant Translate bundle
+name: Publish Instant Translate 0.4.0-dev.1 bundle
 
 on:
   push:
-    branches: [arena/b6e2f975-youtube-patch-clone]
+    branches:
+      - arena/a54bcff2-youtube-patch-clone
     paths:
-      - '.github/workflows/attach-instant-translate-bundle.yml'
+      - .github/workflows/attach-instant-translate-bundle.yml
+      - tools/instant-translate/publish_release.py
+      - tools/instant-translate/test_publish_release.py
 
 permissions:
   contents: write
@@ -14,89 +17,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  attach:
-    if: contains(github.event.head_commit.message, '[instant-attach]')
+  publish:
+    if: contains(github.event.head_commit.message, '[instant-publish-0.4]')
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      GH_TOKEN: ${{ github.token }}
-      EXPECTED_BUNDLE_SHA256: 4fe99fee6a9ea32887fdb00c694dbb3b2685424dcbe1cff0b4bb770d03ede859
-      RELEASE_ID: '429093150'
-      RELEASE_TAG: Instant-translate
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Validate the bundle and existing pre-release
-        shell: bash
+      - uses: actions/checkout@v4
+      - name: Test safe promotion and rollback (offline)
+        run: python3 tools/instant-translate/test_publish_release.py -v
+      - name: Verify local bundle and checksum (no APKs)
         run: |
-          set -euo pipefail
           python3 tools/instant-translate/verify_bundle.py --mpp bundles/instant-translate/bundle.mpp
-          (cd bundles/instant-translate && sha256sum --check bundle.mpp.sha256)
-          echo "$EXPECTED_BUNDLE_SHA256  bundles/instant-translate/bundle.mpp" | sha256sum --check
-          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/instant-release-before.json"
-          python3 - <<'PY'
-          import hashlib, json, os
-          from pathlib import Path
-          release = json.loads(Path(os.environ['RUNNER_TEMP'], 'instant-release-before.json').read_text())
-          if (release['id'] != int(os.environ['RELEASE_ID']) or release['tag_name'] != os.environ['RELEASE_TAG']
-                  or release['draft'] or not release['prerelease']):
-              raise SystemExit('Refusing to alter a different release or a non-prerelease')
-          if 'verifyIntegrity' not in (release.get('body') or '') or 'not ready for use' not in release['body']:
-              raise SystemExit('Release must disclose the known runtime blocker before attaching the bundle')
-          report = json.loads(Path('bundles/instant-translate/manager-smoke.json').read_text())
-          if report.get('bundle_sha256') != os.environ['EXPECTED_BUNDLE_SHA256'] or report.get('manager_patch_and_save') != 'passed':
-              raise SystemExit('Manager validation does not match the bundle')
-          assets = {asset['name']: asset for asset in release['assets']}
-          if len(assets) != len(release['assets']):
-              raise SystemExit('Duplicate release asset names')
-          apk = assets.get('Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk')
-          if not apk or apk['id'] != 692278800 or apk.get('digest') != 'sha256:f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c':
-              raise SystemExit('Expected pre-existing APK is absent or has changed')
-          wanted = [Path('bundles/instant-translate/bundle.mpp'), Path('bundles/instant-translate/bundle.mpp.sha256')]
-          missing = []
-          for path in wanted:
-              asset = assets.get(path.name)
-              if not asset:
-                  missing.append(str(path))
-              elif (asset['state'] != 'uploaded' or asset['size'] != path.stat().st_size
-                    or asset.get('digest') != 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()):
-                  raise SystemExit('Refusing to replace an existing different asset: ' + path.name)
-          Path(os.environ['RUNNER_TEMP'], 'instant-missing-assets.txt').write_text(''.join(x + '\n' for x in missing))
-          print('Assets to attach:', ', '.join(missing) or '(already present and identical)')
-          PY
-      - name: Attach only missing bundle and checksum assets
-        shell: bash
+          (cd bundles/instant-translate && sha256sum -c bundle.mpp.sha256)
+      - name: Upload, verify, and promote only the bundle assets
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
-          while IFS= read -r asset; do
-            gh release upload "$RELEASE_TAG" "$asset"
-          done < "$RUNNER_TEMP/instant-missing-assets.txt"
-      - name: Verify the published assets and unchanged APK
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/instant-release-after.json"
-          python3 - <<'PY'
-          import hashlib, json, os
-          from pathlib import Path
-          release = json.loads(Path(os.environ['RUNNER_TEMP'], 'instant-release-after.json').read_text())
-          if release['draft'] or not release['prerelease'] or release['tag_name'] != os.environ['RELEASE_TAG']:
-              raise SystemExit('Release state unexpectedly changed')
-          assets = {asset['name']: asset for asset in release['assets']}
-          apk = assets.get('Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk')
-          if not apk or apk['id'] != 692278800 or apk.get('digest') != 'sha256:f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c':
-              raise SystemExit('Original APK was changed or removed')
-          for name in ('bundle.mpp', 'bundle.mpp.sha256'):
-              path = Path('bundles/instant-translate', name)
-              asset = assets.get(name)
-              if not asset or asset['state'] != 'uploaded' or asset['size'] != path.stat().st_size or asset.get('digest') != 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest():
-                  raise SystemExit('Release asset missing or has unexpected digest: ' + name)
-          print('Release assets verified:', release['html_url'])
-          PY
-          mkdir -p "$RUNNER_TEMP/instant-release-download"
-          gh release download "$RELEASE_TAG" --pattern bundle.mpp --pattern bundle.mpp.sha256 --dir "$RUNNER_TEMP/instant-release-download"
-          (cd "$RUNNER_TEMP/instant-release-download" && sha256sum --check bundle.mpp.sha256)
-          echo "$EXPECTED_BUNDLE_SHA256  $RUNNER_TEMP/instant-release-download/bundle.mpp" | sha256sum --check
-          echo '::notice::Experimental bundle and checksum attached to the existing Instant Translate pre-release; original APK preserved.'
+          python3 tools/instant-translate/publish_release.py \
+            --bundle bundles/instant-translate/bundle.mpp \
+            --checksum bundles/instant-translate/bundle.mpp.sha256 \
+            --temp "$RUNNER_TEMP/instant-release" \
+            --report "$RUNNER_TEMP/instant-release-report.json"
+      - name: Save publication report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instant-translate-0.4.0-release-report
+          path: ${{ runner.temp }}/instant-release-report.json
+          if-no-files-found: error
+          retention-days: 14
