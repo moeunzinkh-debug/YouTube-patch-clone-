@@ -42,14 +42,24 @@ jobs:
           else:
               data = json.loads(report.read_text())
               print(f"::notice::Read-only scan for {data['version']} finished; {data['scanned_methods']} app/obfuscated methods scanned. No APK was patched, signed, installed, or executed.")
-              import base64, gzip
-              compressed = base64.b64encode(gzip.compress(report.read_bytes(), mtime=0)).decode()
-              chunks = [compressed[i:i+3500] for i in range(0, len(compressed), 3500)]
-              if len(chunks) > 45:
-                  raise SystemExit('Sanitized report is too large for annotations')
-              for i, chunk in enumerate(chunks, 1):
-                  print(f'::notice::INSTANT_CURRENT_SCAN {i}/{len(chunks)} {chunk}')
           PY
+      # GitHub limits notice annotations per step; split the redacted report.
+      - name: Report scan part 1
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 0
+      - name: Report scan part 2
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 1
+      - name: Report scan part 3
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 2
+      - name: Report scan part 4
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 3
+      - name: Report scan part 5
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 4
+      - name: Report scan part 6
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 5
+      - name: Report scan part 7
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 6
+      - name: Report scan part 8
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 7
       - uses: actions/upload-artifact@v4
         if: success()
         with:
