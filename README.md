@@ -28,7 +28,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - `Settings Patch (SEA-LION, experimental)` — បិទជាមុន; បន្ថែម Settings Patch ជាមួយ dropdown និង **Name, URL, Model, Key** សម្រាប់ SEA-LION។ ផ្លូវ Settings ក្នុង APK ពិតមិនទាន់បានសាកបើក។
 - អត្ថបទដែលបរាជ័យអាចត្រូវបានផ្ញើទៅ Google ឬ SEA-LION/HTTPS host ដែលអ្នកជ្រើស។ SEA-LION ត្រូវការ API key និង internet; model អាចមិនមានសម្រាប់ key របស់អ្នក។ វាមិនជួសជុល offline/model ដើមទេ។
 
-Morphe Manager បាន import ជ្រើស patch ទាំងពីរ និង save APK ដោយជោគជ័យ; តេស្តនេះមិនបានបើក app ទេ។ [របៀបប្រើ សុវត្ថិភាព និងលទ្ធផលតេស្ត](bundles/instant-translate/README.md) · [Local `bundle.mpp`](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256)។
+Morphe Manager បាន import ជ្រើស patch ទាំងពីរ និង save APK ដោយជោគជ័យ; តេស្តនេះមិនបានបើក app ទេ។ [របៀបប្រើ សុវត្ថិភាព និងលទ្ធផលតេស្ត](bundles/instant-translate/README.md) · [Pre-release `Instant-translate`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate) · [Local `bundle.mpp`](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256)។
 
 **ប្រយ័ត្ន៖** មិនទាន់បញ្ជាក់ប្រភព signer របស់ APK នៅ pre-release ថាជាអ្នកបង្កើតផ្លូវការទេ។ ប្រើតែ APK ដែលទុកចិត្ត មុនផ្ដល់សិទ្ធិអានអេក្រង់ ឬបញ្ចូលទិន្នន័យឯកជន។
 
