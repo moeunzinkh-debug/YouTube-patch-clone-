@@ -6,13 +6,14 @@ on:
     paths:
       - '.github/workflows/inspect-instant-current-release.yml'
       - 'tools/instant-translate/trace_current_release.py'
+      - 'tools/instant-translate/trace_current_hooks.py'
 
 permissions:
   contents: read
 
 jobs:
   scan:
-    if: contains(github.event.head_commit.message, '[instant-current-scan]')
+    if: contains(github.event.head_commit.message, '[instant-current-scan]') || contains(github.event.head_commit.message, '[instant-focused-scan]')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
@@ -29,7 +30,11 @@ jobs:
           python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
           mkdir -p "$RUNNER_TEMP/instant-readonly"
           gh release download Instant-translate --pattern 'base.apk' --dir "$RUNNER_TEMP/instant-readonly"
-          python3 tools/instant-translate/trace_current_release.py "$RUNNER_TEMP/instant-readonly/base.apk" "$RUNNER_TEMP/instant-current-scan.json"
+          if [ "${{ contains(github.event.head_commit.message, '[instant-focused-scan]') }}" = 'true' ]; then
+            python3 tools/instant-translate/trace_current_hooks.py "$RUNNER_TEMP/instant-readonly/base.apk" "$RUNNER_TEMP/instant-current-scan.json"
+          else
+            python3 tools/instant-translate/trace_current_release.py "$RUNNER_TEMP/instant-readonly/base.apk" "$RUNNER_TEMP/instant-current-scan.json"
+          fi
       - name: Report scan summary
         if: always()
         run: |
@@ -41,7 +46,7 @@ jobs:
               print('::warning::No sanitized feature report')
           else:
               data = json.loads(report.read_text())
-              print(f"::notice::Read-only scan for {data['version']} finished; {data['scanned_methods']} app/obfuscated methods scanned. No APK was patched, signed, installed, or executed.")
+              print(f"::notice::Read-only scan for {data['version']} finished. No APK was patched, signed, installed, or executed.")
           PY
       # GitHub limits notice annotations per step; split the redacted report.
       - name: Report scan part 1
