@@ -22,7 +22,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 កំណែដែលបានពិនិត្យ៖ `com.spaceship.screen.textcopy` **v7.5.00300 (50342)**, Android 10+ និង arm64។
 
-**មិនទាន់រួចរាល់សម្រាប់ប្រើ៖** APK ដែល re-sign/patch ពីមុនបើកមិនឡើងក្នុង emulator នៅ `verifyIntegrity`។ Bundle ថ្មីនៅតែរក្សា check នេះ; មិនទាន់បញ្ជាក់ការបើក app ឬការបកប្រែជាក់ស្ដែង។
+**មិនទាន់រួចរាល់សម្រាប់ប្រើ៖** APK ដែល patch ដោយ Morphe Manager ជាមួយ bundle នេះបានធ្លាក់ពេលបើកក្នុង emulator នៅ `verifyIntegrity`។ APK ដើមបើកបាន ប៉ុន្តែ re-sign APK ដើមដោយមិនកែ DEX/native libraries ក៏ធ្លាក់ដូចគ្នា។ Check នេះនៅដដែល; មូលហេតុច្បាស់លាស់ និងការបកប្រែជាក់ស្ដែងមិនទាន់បញ្ជាក់។
 
 - `Translation fallback (Google, experimental)` — បិទជាមុន; សាកផ្លូវដើមមុន បន្ទាប់មក provider ដែលបានជ្រើស។
 - `Settings Patch (SEA-LION, experimental)` — បិទជាមុន; បន្ថែម Settings Patch ជាមួយ dropdown និង **Name, URL, Model, Key** សម្រាប់ SEA-LION។ ផ្លូវ Settings ក្នុង APK ពិតមិនទាន់បានសាកបើក។

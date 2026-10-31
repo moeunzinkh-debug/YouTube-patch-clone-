@@ -1,0 +1,67 @@
+{
+  "scope": "Disposable Android 15 x86_64 emulator with ARM64 native bridge; startup only",
+  "package": "com.spaceship.screen.textcopy",
+  "version": "v7.5.00300",
+  "input_sha256": "f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c",
+  "bundle_sha256": "4fe99fee6a9ea32887fdb00c694dbb3b2685424dcbe1cff0b4bb770d03ede859",
+  "abi_list": "x86_64,arm64-v8a",
+  "native_bridge": "libndk_translation.so",
+  "wifi_on": "0",
+  "control_dex_and_native_libraries": "byte-identical to original",
+  "signatures": {
+    "original_signer_sha256": "a3f608b5c58f687d8768c378fea8e2f06426715a36194656beaddd39400ede8d",
+    "resigned_control_matches_original": false,
+    "manager_patched_matches_original": false
+  },
+  "manager_output": "both patches selected, signed and statically verified",
+  "cases": {
+    "original": {
+      "installed": true,
+      "main_activity_reached": true,
+      "app_ui_visible": true,
+      "process_alive_not_proof_of_launch": true,
+      "app_fatal_exception": false,
+      "crash_dialog_seen": false,
+      "exception_types": [],
+      "integrity_in_stack": false,
+      "exception_message_keywords": []
+    },
+    "resigned_control": {
+      "installed": true,
+      "main_activity_reached": false,
+      "app_ui_visible": false,
+      "process_alive_not_proof_of_launch": false,
+      "app_fatal_exception": true,
+      "crash_dialog_seen": false,
+      "exception_types": [
+        "java.lang.RuntimeException"
+      ],
+      "integrity_in_stack": true,
+      "exception_message_keywords": [
+        "license",
+        "signature"
+      ]
+    },
+    "manager_patched": {
+      "installed": true,
+      "main_activity_reached": false,
+      "app_ui_visible": false,
+      "process_alive_not_proof_of_launch": true,
+      "app_fatal_exception": true,
+      "crash_dialog_seen": false,
+      "exception_types": [
+        "java.lang.RuntimeException"
+      ],
+      "integrity_in_stack": true,
+      "exception_message_keywords": [
+        "license",
+        "signature"
+      ]
+    }
+  },
+  "conclusion": "same_integrity_stack_in_manager_and_unchanged_dex_resign_control",
+  "actual_cause": "not established; re-signing and zip alignment both change APK packaging",
+  "integrity_check": "preserved; no bypass used",
+  "real_arm64_devices_or_users_apk": "not tested",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/41151787111"
+}
