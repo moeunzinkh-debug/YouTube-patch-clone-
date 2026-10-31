@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify actual Morphe output and injection points; this does not prove runtime translation."""
+"""Historical v0.2.0-dev.1 / 50342 Google-enabled APK verifier; not for current bundles."""
 from __future__ import annotations
 
 import argparse
@@ -10,8 +10,12 @@ import zipfile
 from pathlib import Path
 
 from inspect_apk import DEX_NAME, verify_asset
-from verify_bundle import NAME, SETTINGS_NAME, PACKAGE, VERSION_NAME
+from verify_bundle import SETTINGS_NAME, PACKAGE
 
+# This validator intentionally remains pinned to historical reports and is not
+# part of the bundle-only build. Do not use it to validate the new MPP.
+NAME = 'Translation fallback (Google, experimental)'
+VERSION_NAME = 'v7.5.00300'
 CODE = '50342'
 SINGLE = 'Lbe4;->g0(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/lang/Object;'
 ENDPOINT = 'Lkb9;->S(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lmx1;)Ljava/lang/Object;'

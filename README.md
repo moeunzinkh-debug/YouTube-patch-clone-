@@ -18,19 +18,20 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
-<summary>🌐 Instant Translate • 2 experimental patches (bundle ដាច់ដោយឡែក)</summary>
+<summary>🌐 Instant Translate • 5 experimental patches (bundle ដាច់ដោយឡែក)</summary>
 
-កំណែដែលបានពិនិត្យ៖ `com.spaceship.screen.textcopy` **v7.5.00300 (50342)**, Android 10+ និង arm64។
+គោលដៅ release បច្ចុប្បន្ន `com.spaceship.screen.textcopy` **v7.5.00307 (50350)**។ SEA-LION ក៏រក្សាគោលដៅចាស់ v7.5.00300 (50342) ដែរ។ Patches បិទជាមុន៖
 
-**មិនទាន់រួចរាល់សម្រាប់ប្រើ៖** APK ដែល patch ដោយ Morphe Manager ជាមួយ bundle នេះបានធ្លាក់ពេលបើកក្នុង emulator នៅ `verifyIntegrity`។ APK ដើមបើកបាន ប៉ុន្តែ re-sign APK ដើមដោយមិនកែ DEX/native libraries ក៏ធ្លាក់ដូចគ្នា។ Check នេះនៅដដែល; មូលហេតុច្បាស់លាស់ និងការបកប្រែជាក់ស្ដែងមិនទាន់បញ្ជាក់។
+- `Translation fallback (SEA-LION, experimental)` និង `Settings Patch (SEA-LION, experimental)` — Original only ជាលំនាំដើម; SEA-LION ត្រូវការការជ្រើស និង API key។ Version ថ្មីសាក fallback តែ single-result failure path ដែលបានពិនិត្យ មិនមែនគ្រប់ផ្នែក។
+- `Remove license check (experimental)` — បិទ PairIP client-side entry points ពីរសម្រាប់ 50350; មិនផ្ដល់ subscription និងបន្ថយការការពារ license/integrity។
+- `Unlock premium local gate (experimental)` — ប្ដូរតែ local entitlement gate; មិនធានាមុខងារ ឬសិទ្ធិដែល server ត្រួតពិនិត្យ។
+- `Official microG service visibility (experimental)` — បន្ថែម package visibility ប៉ុណ្ណោះ; ត្រូវមាន official microG ដាច់ដោយឡែក និង system signature spoofing។ Login មិនទាន់បានសាក។
 
-- `Translation fallback (Google, experimental)` — បិទជាមុន; សាកផ្លូវដើមមុន បន្ទាប់មក provider ដែលបានជ្រើស។
-- `Settings Patch (SEA-LION, experimental)` — បិទជាមុន; បន្ថែម Settings Patch ជាមួយ dropdown និង **Name, URL, Model, Key** សម្រាប់ SEA-LION។ ផ្លូវ Settings ក្នុង APK ពិតមិនទាន់បានសាកបើក។
-- អត្ថបទដែលបរាជ័យអាចត្រូវបានផ្ញើទៅ Google ឬ SEA-LION/HTTPS host ដែលអ្នកជ្រើស។ SEA-LION ត្រូវការ API key និង internet; model អាចមិនមានសម្រាប់ key របស់អ្នក។ វាមិនជួសជុល offline/model ដើមទេ។
+Google translation fallback ត្រូវបានដកចេញពី bundle ក្នុង branch នេះ; វាមិនលុប Google services របស់ app ដើមទេ។ **Bundle ចាស់ក្នុង pre-release នៅតែមាន Google fallback** ហើយមិនបានជំនួស។
 
-Morphe Manager បាន import ជ្រើស patch ទាំងពីរ និង save APK ដោយជោគជ័យ; តេស្តនេះមិនបានបើក app ទេ។ [របៀបប្រើ សុវត្ថិភាព និងលទ្ធផលតេស្ត](bundles/instant-translate/README.md) · [Pre-release `Instant-translate`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate) · [Local `bundle.mpp`](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256)។
+**មិនទាន់បញ្ជាក់ runtime:** កំណែថ្មីមិនបាន patch/install APK, សាក SEA-LION ពិត ឬសាក microG login។ របាយការណ៍ Manager និង crash ចាស់គឺសម្រាប់ 50342 និង bundle Google-enabled ចាស់; crash កំណែថ្មីមិនទាន់ដឹង។
 
-**ប្រយ័ត្ន៖** មិនទាន់បញ្ជាក់ប្រភព signer របស់ APK នៅ pre-release ថាជាអ្នកបង្កើតផ្លូវការទេ។ ប្រើតែ APK ដែលទុកចិត្ត មុនផ្ដល់សិទ្ធិអានអេក្រង់ ឬបញ្ចូលទិន្នន័យឯកជន។
+[របៀបប្រើ និងលទ្ធផល](bundles/instant-translate/README.md) · [Branch bundle.mpp](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256) · [Pre-release (bundle ចាស់)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate)
 
 </details>
 

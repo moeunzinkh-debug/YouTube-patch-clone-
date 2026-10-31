@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check a real Manager-saved APK without executing the app or using an account."""
+"""Historical Manager-output checker for v0.2.0-dev.1 / 50342; not for current bundles."""
 from __future__ import annotations
 
 import argparse
