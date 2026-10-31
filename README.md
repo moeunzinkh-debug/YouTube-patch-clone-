@@ -18,6 +18,24 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
+<summary>🌐 Instant Translate • 5 experimental patches (bundle ដាច់ដោយឡែក)</summary>
+
+គោលដៅ release បច្ចុប្បន្ន `com.spaceship.screen.textcopy` **v7.5.00307 (50350)**។ SEA-LION ក៏រក្សាគោលដៅចាស់ v7.5.00300 (50342) ដែរ។ Patches បិទជាមុន៖
+
+- `Translation fallback (SEA-LION, experimental)` និង `Settings Patch (SEA-LION, experimental)` — Original only ជាលំនាំដើម; SEA-LION ត្រូវការការជ្រើស និង API key។ Version ថ្មីសាក fallback តែ single-result failure path ដែលបានពិនិត្យ មិនមែនគ្រប់ផ្នែក។
+- `Remove license check (experimental)` — បិទ PairIP client-side entry points ពីរសម្រាប់ 50350; មិនផ្ដល់ subscription និងបន្ថយការការពារ license/integrity។
+- `Unlock premium local gate (experimental)` — ប្ដូរតែ local entitlement gate; មិនធានាមុខងារ ឬសិទ្ធិដែល server ត្រួតពិនិត្យ។
+- `Official microG service visibility (experimental)` — បន្ថែម package visibility ប៉ុណ្ណោះ; ត្រូវមាន official microG ដាច់ដោយឡែក និង system signature spoofing។ Login មិនទាន់បានសាក។
+
+Google translation fallback ត្រូវបានដកចេញពី bundle ក្នុង branch នេះ; វាមិនលុប Google services របស់ app ដើមទេ។ **Bundle ចាស់ក្នុង pre-release នៅតែមាន Google fallback** ហើយមិនបានជំនួស។
+
+**មិនទាន់បញ្ជាក់ runtime:** កំណែថ្មីមិនបាន patch/install APK, សាក SEA-LION ពិត ឬសាក microG login។ របាយការណ៍ Manager និង crash ចាស់គឺសម្រាប់ 50342 និង bundle Google-enabled ចាស់; crash កំណែថ្មីមិនទាន់ដឹង។
+
+[របៀបប្រើ និងលទ្ធផល](bundles/instant-translate/README.md) · [Branch bundle.mpp](bundles/instant-translate/bundle.mpp) · [SHA-256](bundles/instant-translate/bundle.mpp.sha256) · [Pre-release (bundle ចាស់)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate)
+
+</details>
+
+<details>
 <summary>🌙 Kimi AI • 1 experimental patch (bundle ដាច់ដោយឡែក)</summary>
 
 កំណែដែលបានពិនិត្យ៖ `com.moonshot.kimichat` **3.1.5 (381)**, Android 8.0+ និង arm64។

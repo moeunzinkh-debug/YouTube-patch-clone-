@@ -1,0 +1,54 @@
+name: Test Instant Translate provider transport
+
+on:
+  push:
+    branches: [arena/b6e2f975-youtube-patch-clone]
+    paths:
+      - 'tools/instant-translate/project/**'
+      - 'tools/instant-translate/prepare_build.py'
+      - '.github/workflows/test-instant-provider.yml'
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  test:
+    if: contains(github.event.head_commit.message, '[instant-provider-test]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Prepare isolated extension
+        run: python3 tools/instant-translate/prepare_build.py "$RUNNER_TEMP/instant-provider-test"
+      - name: Run offline provider unit tests
+        shell: bash
+        run: |
+          set -o pipefail
+          cd "$RUNNER_TEMP/instant-provider-test"
+          ./gradlew :extensions:instanttranslate:testDebugUnitTest :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/instant-provider-test.log"
+      - name: Report safe unit-test failures
+        if: failure()
+        run: |
+          if test -f "$RUNNER_TEMP/instant-provider-test.log"; then
+            grep -E -A 6 '^e:|^error:|FAILED|FAILURE:|Execution failed|What went wrong' "$RUNNER_TEMP/instant-provider-test.log" | tail -60 | while IFS= read -r line; do echo "::error::$line"; done || true
+          fi
+      - name: Report test counts
+        if: success()
+        run: |
+          python3 - <<'PY'
+          import glob, os, xml.etree.ElementTree as ET
+          files = glob.glob(os.environ['RUNNER_TEMP'] + '/instant-provider-test/extensions/instanttranslate/build/test-results/testDebugUnitTest/*.xml')
+          total = errors = failures = 0
+          for filename in files:
+              root = ET.parse(filename).getroot()
+              total += int(root.attrib.get('tests', 0)); errors += int(root.attrib.get('errors', 0)); failures += int(root.attrib.get('failures', 0))
+          assert total > 0 and errors == failures == 0
+          print(f'::notice::Offline extension tests passed: {total}; errors={errors}; failures={failures}. No live provider key was used.')
+          PY

@@ -1,0 +1,74 @@
+name: Read-only Instant Translate release feature scan
+
+on:
+  push:
+    branches: [arena/b6e2f975-youtube-patch-clone]
+    paths:
+      - '.github/workflows/inspect-instant-current-release.yml'
+      - 'tools/instant-translate/trace_current_release.py'
+      - 'tools/instant-translate/trace_current_hooks.py'
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    if: contains(github.event.head_commit.message, '[instant-current-scan]') || contains(github.event.head_commit.message, '[instant-focused-scan]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read pinned release copy without modifying or installing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          mkdir -p "$RUNNER_TEMP/instant-readonly"
+          gh release download Instant-translate --pattern 'base.apk' --dir "$RUNNER_TEMP/instant-readonly"
+          if [ "${{ contains(github.event.head_commit.message, '[instant-focused-scan]') }}" = 'true' ]; then
+            python3 tools/instant-translate/trace_current_hooks.py "$RUNNER_TEMP/instant-readonly/base.apk" "$RUNNER_TEMP/instant-current-scan.json"
+          else
+            python3 tools/instant-translate/trace_current_release.py "$RUNNER_TEMP/instant-readonly/base.apk" "$RUNNER_TEMP/instant-current-scan.json"
+          fi
+      - name: Report scan summary
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = Path(os.environ['RUNNER_TEMP'], 'instant-current-scan.json')
+          if not report.exists():
+              print('::warning::No sanitized feature report')
+          else:
+              data = json.loads(report.read_text())
+              print(f"::notice::Read-only scan for {data['version']} finished. No APK was patched, signed, installed, or executed.")
+          PY
+      # GitHub limits notice annotations per step; split the redacted report.
+      - name: Report scan part 1
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 0
+      - name: Report scan part 2
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 1
+      - name: Report scan part 3
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 2
+      - name: Report scan part 4
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 3
+      - name: Report scan part 5
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 4
+      - name: Report scan part 6
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 5
+      - name: Report scan part 7
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 6
+      - name: Report scan part 8
+        run: python3 tools/instant-translate/emit_current_report.py "$RUNNER_TEMP/instant-current-scan.json" 7
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: instant-current-readonly-scan
+          path: ${{ runner.temp }}/instant-current-scan.json
+          if-no-files-found: error
+          retention-days: 7

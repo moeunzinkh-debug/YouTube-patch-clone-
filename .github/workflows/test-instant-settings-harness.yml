@@ -1,0 +1,80 @@
+name: Test Instant Translate settings in isolated harness
+
+on:
+  push:
+    branches: [arena/b6e2f975-youtube-patch-clone]
+    paths:
+      - 'tools/instant-translate/project/extensions/instanttranslate/**'
+      - 'tools/instant-translate/harness/**'
+      - 'tools/instant-translate/prepare_build.py'
+      - '.github/workflows/test-instant-settings-harness.yml'
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  settings:
+    if: contains(github.event.head_commit.message, '[instant-harness]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build a disposable settings-only host
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/instant-translate/prepare_build.py "$RUNNER_TEMP/instant-harness-project"
+          root="$RUNNER_TEMP/instant-harness-project/extensions/instanttranslate"
+          cp tools/instant-translate/harness/AndroidManifest.xml "$root/src/main/AndroidManifest.xml"
+          cp tools/instant-translate/harness/HarnessActivity.java "$root/src/main/java/app/morphe/extension/instanttranslate/"
+          cat >> "$root/build.gradle.kts" <<'EOF'
+          configure<ApplicationExtension> { defaultConfig { applicationId = "app.morphe.instanttranslate.harness" } }
+          dependencies { implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.0") }
+          EOF
+          cd "$RUNNER_TEMP/instant-harness-project"
+          ./gradlew :extensions:instanttranslate:assembleDebug --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/instant-harness-build.log"
+          mkdir -p "$RUNNER_TEMP/instant-harness"
+          mapfile -t apks < <(find "$root/build/outputs/apk" -name '*debug*.apk' -type f)
+          test "${#apks[@]}" -eq 1
+          cp "${apks[0]}" "$RUNNER_TEMP/instant-harness/harness.apk"
+      - name: Report harness build errors
+        if: failure()
+        run: |
+          if test -f "$RUNNER_TEMP/instant-harness-build.log"; then
+            grep -E -A 6 '^e:|^error:|FAILED|FAILURE:|What went wrong|Execution failed' "$RUNNER_TEMP/instant-harness-build.log" | tail -60 | while IFS= read -r line; do echo "::error::$line"; done || true
+          fi
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Test in-app settings with a synthetic key, not a real APK or provider
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 10G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/instant-translate/harness/test_harness.py
+      - name: Report synthetic harness observations
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, os
+          from pathlib import Path
+          report = Path(os.environ['RUNNER_TEMP']) / 'instant-harness/settings-harness.json'
+          if report.exists():
+              data = base64.b64encode(gzip.compress(report.read_bytes())).decode()
+              chunks = [data[i:i+3900] for i in range(0,len(data),3900)]
+              for i, chunk in enumerate(chunks, 1): print(f'::notice::INSTANT_HARNESS {i}/{len(chunks)} {chunk}')
+          PY
