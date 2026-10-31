@@ -42,6 +42,13 @@ jobs:
           else:
               data = json.loads(report.read_text())
               print(f"::notice::Read-only scan for {data['version']} finished; {data['scanned_methods']} app/obfuscated methods scanned. No APK was patched, signed, installed, or executed.")
+              import base64, gzip
+              compressed = base64.b64encode(gzip.compress(report.read_bytes(), mtime=0)).decode()
+              chunks = [compressed[i:i+3500] for i in range(0, len(compressed), 3500)]
+              if len(chunks) > 45:
+                  raise SystemExit('Sanitized report is too large for annotations')
+              for i, chunk in enumerate(chunks, 1):
+                  print(f'::notice::INSTANT_CURRENT_SCAN {i}/{len(chunks)} {chunk}')
           PY
       - uses: actions/upload-artifact@v4
         if: success()
