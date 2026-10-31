@@ -2,7 +2,7 @@
 
 > **មិនទាន់បានសាកដំណើរការលើឧបករណ៍ទេ។** Bundle នេះសម្រាប់ Morphe Manager មិនមែន APK ទេ។ ការសាកលើ APK ចម្លង ការដំឡើង app, ការចូល microG និងការបកប្រែជាក់ស្ដែងមិនបានធ្វើ។ មិនអាចធានាថា premium ឬមុខងារទាំងអស់ដំណើរការបានទេ។
 >
-> **Release ផ្សព្វផ្សាយនៅតែជាកំណែចាស់:** `bundle.mpp` នៅ [pre-release Instant-translate](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate) នៅតែជា `0.2.0-dev.1` ដែលមាន Google fallback។ Bundle ក្នុង branch នេះដក Google fallback ចេញ; មិនបានជំនួស release asset ឬកែ APK របស់អ្នកទេ។
+> **Release ថ្មី:** `bundle.mpp` និង checksum នៅ [pre-release Instant-translate](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate) ជា `0.4.0-dev.1` ដែលដក Google translation fallback ចេញ។ APK និង split assets នៅក្នុង release មិនបានកែ ឬជំនួស។
 
 ## គោលដៅ និង patch list
 
@@ -45,4 +45,4 @@
 - ក្នុង emulator ការបើក APK ចាស់ដែល Manager patch/sign ធ្លាក់នៅ `bin.edisaputra.protector.LicenseActivity.verifyIntegrity`; control re-sign ដោយមិនកែ DEX/native ក៏ធ្លាក់។ [crash-check.json](crash-check.json) ជាលទ្ធផលចាស់សម្រាប់ 50342 ប៉ុណ្ណោះ។ មិនបានសាកថា 50350 បើកបាន ឬថា patch ថ្មីជួសជុល crash ទេ។
 - ការពិនិត្យ release ថ្មីជា read-only static analysis ប៉ុណ្ណោះ; មិនបានកែ, sign, patch, ដំឡើង ឬជំនួស APK នៅ release។ ប្រភព APK និងការចូលគណនីមិនទាន់បញ្ជាក់ថាមានសុវត្ថិភាព; ប្រើតែឯកសារដែលអ្នកទុកចិត្ត។
 
-[Branch bundle.mpp](bundle.mpp) · [SHA-256](bundle.mpp.sha256) · [Source](../../tools/instant-translate/project/) · [Pre-release ដែលនៅតែមាន bundle ចាស់](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate)
+[Repository bundle.mpp](bundle.mpp) · [SHA-256](bundle.mpp.sha256) · [Source](../../tools/instant-translate/project/) · [Pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Instant-translate)
