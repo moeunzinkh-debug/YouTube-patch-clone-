@@ -1,0 +1,14 @@
+{
+  "sha256": "e3e2152a72bcbfb4a9768f510579ed6a8983bb943315495f91d09ee2795d6679",
+  "bytes": 48619,
+  "version": "0.3.0-dev.1",
+  "scope": "Offline JVM tests, MPP structure and Morphe Desktop patch listing only",
+  "offline_tests": 12,
+  "test_failures": 0,
+  "test_errors": 0,
+  "app_apk_read": false,
+  "app_apk_patched": false,
+  "app_installed_or_run": false,
+  "live_sea_lion_request": false,
+  "morphe_manager_patch_test": false
+}
