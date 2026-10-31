@@ -36,8 +36,8 @@ private val translationExtensionPatch = bytecodePatch {
 
 @Suppress("unused")
 val translationFallbackPatch = bytecodePatch(
-    name = "Translation fallback (Google, experimental)",
-    description = "After an original translation fails, try Google's unofficial endpoint by default. The optional Settings Patch can select a different provider or disable fallback. Internet and data sharing required; not an offline/model repair. Exact v7.5.00300 build 50342 only; device testing required.",
+    name = "Translation fallback (SEA-LION, experimental)",
+    description = "Keep the original translation first. An explicitly configured SEA-LION provider can be tried after failure; default is original only. Internet, a user-supplied key and data sharing are required. Exact v7.5.00300 build 50342 only; device testing required.",
     default = false,
 ) {
     compatibleWith(Compatibility(

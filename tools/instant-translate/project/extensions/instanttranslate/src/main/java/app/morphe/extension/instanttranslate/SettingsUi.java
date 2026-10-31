@@ -86,11 +86,11 @@ public final class SettingsUi {
         content.addView(label(activity, "Translation provider"));
         Spinner provider = new Spinner(activity);
         String savedName = ProviderSettings.name(context);
-        String[] choices = {"Original only", "Google fallback", savedName};
+        String[] choices = {"Original only", savedName};
         provider.setAdapter(new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, choices));
         content.addView(provider);
         String selected = ProviderSettings.selected();
-        provider.setSelection(ProviderRouter.SEA_LION.equals(selected) ? 2 : ProviderRouter.ORIGINAL.equals(selected) ? 0 : 1);
+        provider.setSelection(ProviderRouter.SEA_LION.equals(selected) ? 1 : 0);
 
         LinearLayout fields = new LinearLayout(activity);
         fields.setOrientation(LinearLayout.VERTICAL);
@@ -116,7 +116,7 @@ public final class SettingsUi {
         help.setTextSize(12); help.setPadding(0, dp(activity, 16), 0, dp(activity, 8)); content.addView(help);
         provider.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fields.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
+                fields.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
             }
             @Override public void onNothingSelected(AdapterView<?> parent) { fields.setVisibility(View.GONE); }
         });
@@ -132,7 +132,7 @@ public final class SettingsUi {
                         .setNegativeButton("Cancel", null).setPositiveButton("Clear", (d, w) -> {
                             try {
                                 ProviderSettings.clearKey(context);
-                                if (provider.getSelectedItemPosition() == 2) provider.setSelection(0);
+                                if (provider.getSelectedItemPosition() == 1) provider.setSelection(0);
                                 key.setText(""); key.setHint("API key");
                                 Toast.makeText(activity, "Key cleared", Toast.LENGTH_SHORT).show();
                             } catch (Exception error) {
@@ -142,8 +142,7 @@ public final class SettingsUi {
                 confirm.show(); secure(confirm);
             });
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                String choice = provider.getSelectedItemPosition() == 2 ? ProviderRouter.SEA_LION :
-                        provider.getSelectedItemPosition() == 0 ? ProviderRouter.ORIGINAL : ProviderRouter.GOOGLE;
+                String choice = provider.getSelectedItemPosition() == 1 ? ProviderRouter.SEA_LION : ProviderRouter.ORIGINAL;
                 String enteredName = name.getText().toString().trim();
                 String enteredBase = base.getText().toString().trim();
                 String enteredModel = model.getText().toString().trim();

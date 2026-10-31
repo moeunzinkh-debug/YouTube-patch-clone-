@@ -72,6 +72,9 @@ def main():
         click('Settings Patch >')
         _, spinner = wait_nodes(lambda n: n.get('class') == 'android.widget.Spinner', 'provider dropdown')
         tap(spinner)
+        nodes = dump()
+        result['google_option_absent'] = not any('google' in (n.get('text') or '').lower() for n in nodes)
+        if not result['google_option_absent']: raise RuntimeError('Removed provider is still present')
         click('Sea-Lion Translate Ai')
         result['provider_in_dropdown'] = True
         nodes = dump()

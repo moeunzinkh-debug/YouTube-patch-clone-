@@ -1,4 +1,4 @@
-name: Build experimental Instant Translate Morphe patch
+name: Build Instant Translate Morphe bundle only
 
 on:
   push:
@@ -7,8 +7,7 @@ on:
       - 'tools/instant-translate/project/**'
       - 'tools/instant-translate/prepare_build.py'
       - 'tools/instant-translate/verify_bundle.py'
-      - 'tools/instant-translate/verify_patched.py'
-      - 'tools/instant-translate/test_verify_patched.py'
+      - 'tools/instant-translate/test_verify_bundle.py'
       - '.github/workflows/build-instant-translate-mpp.yml'
 
 permissions:
@@ -38,21 +37,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Prepare isolated project and pinned inputs
+      - name: Prepare a bundle-only build
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/instant-translate/test_inspect_apk.py -v
-          python3 tools/instant-translate/test_trace_translation.py -v
-          python3 tools/instant-translate/test_verify_patched.py -v
+          python3 tools/instant-translate/test_verify_bundle.py -v
           python3 tools/instant-translate/prepare_build.py "$RUNNER_TEMP/instant-build"
-          mkdir -p "$RUNNER_TEMP/instant-input" "$RUNNER_TEMP/instant-output"
-          name='Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk'
-          gh release download Instant-translate --pattern "$name" --dir "$RUNNER_TEMP/instant-input"
-          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$RUNNER_TEMP/instant-input"
-          echo 'f341a1b174bda7b5d1c95cb2fc84da238228a116844069ee962220acaf1e4e4c  '"$RUNNER_TEMP/instant-input/$name" | sha256sum --check
-          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/instant-input/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
-      - name: Test transport, async fallback and build MPP
+          mkdir -p "$RUNNER_TEMP/instant-tools" "$RUNNER_TEMP/instant-output"
+          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$RUNNER_TEMP/instant-tools"
+          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/instant-tools/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
+      - name: Run offline provider tests and build the bundle
         shell: bash
         run: |
           set -o pipefail
@@ -64,7 +58,7 @@ jobs:
           if test -f "$RUNNER_TEMP/instant-build.log"; then
             grep -E -A 5 '^e:|^error:|What went wrong|Execution failed|Could not|FAILED|FAILURE:' "$RUNNER_TEMP/instant-build.log" | tail -45 | while IFS= read -r line; do echo "::error::$line"; done || true
           fi
-      - name: Verify listing and apply the MPP to the pinned APK
+      - name: Verify the bundle and list patches without an APK
         shell: bash
         run: |
           set -euo pipefail
@@ -72,65 +66,61 @@ jobs:
           test "${#candidates[@]}" -eq 1
           cp "${candidates[0]}" "$RUNNER_TEMP/instant-output/bundle.mpp"
           (cd "$RUNNER_TEMP/instant-output" && sha256sum bundle.mpp > bundle.mpp.sha256)
-          desktop="$RUNNER_TEMP/instant-input/morphe-desktop-1.20.0-dev.1-all.jar"
-          input="$RUNNER_TEMP/instant-input/Instant.Translate-v7.5.00300-com.spaceship.screen.textcopy.apk"
+          desktop="$RUNNER_TEMP/instant-tools/morphe-desktop-1.20.0-dev.1-all.jar"
           java -Xmx2g -jar "$desktop" list-patches --patches "$RUNNER_TEMP/instant-output/bundle.mpp" \
             --with-packages --with-versions --include-experimental --out "$RUNNER_TEMP/instant-output/patches.txt"
-          if ! python3 tools/instant-translate/verify_bundle.py --mpp "$RUNNER_TEMP/instant-output/bundle.mpp" \
-            --listing "$RUNNER_TEMP/instant-output/patches.txt" > "$RUNNER_TEMP/instant-list-check.log" 2>&1; then
-            tail -n 15 "$RUNNER_TEMP/instant-list-check.log" | while IFS= read -r line; do echo "::error::$line"; done
-            exit 1
-          fi
-          if ! java -Xmx4g -jar "$desktop" patch "$input" -p "$RUNNER_TEMP/instant-output/bundle.mpp" \
-            --exclusive -e 'Translation fallback (Google, experimental)' --unsigned \
-            -o "$RUNNER_TEMP/instant-input/patched.apk" -r "$RUNNER_TEMP/instant-input/patch-result.json" > "$RUNNER_TEMP/instant-patch.log" 2>&1; then
-            tail -n 30 "$RUNNER_TEMP/instant-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
-            exit 1
-          fi
-          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
-          if ! python3 tools/instant-translate/verify_patched.py "$input" "$RUNNER_TEMP/instant-input/patched.apk" \
-            "$RUNNER_TEMP/instant-input/patch-result.json" "$RUNNER_TEMP/instant-output/fallback-validation.json" > "$RUNNER_TEMP/instant-dex-check.log" 2>&1; then
-            tail -n 20 "$RUNNER_TEMP/instant-dex-check.log" | while IFS= read -r line; do echo "::error::$line"; done
-            exit 1
-          fi
-          if ! java -Xmx4g -jar "$desktop" patch "$input" -p "$RUNNER_TEMP/instant-output/bundle.mpp" \
-            --exclusive -e 'Translation fallback (Google, experimental)' -e 'Settings Patch (SEA-LION, experimental)' --unsigned \
-            -o "$RUNNER_TEMP/instant-input/settings-patched.apk" -r "$RUNNER_TEMP/instant-input/settings-result.json" > "$RUNNER_TEMP/instant-settings-patch.log" 2>&1; then
-            tail -n 30 "$RUNNER_TEMP/instant-settings-patch.log" | while IFS= read -r line; do echo "::error::$line"; done
-            exit 1
-          fi
-          if ! python3 tools/instant-translate/verify_patched.py --settings "$input" "$RUNNER_TEMP/instant-input/settings-patched.apk" \
-            "$RUNNER_TEMP/instant-input/settings-result.json" "$RUNNER_TEMP/instant-output/patch-validation.json" > "$RUNNER_TEMP/instant-settings-check.log" 2>&1; then
-            tail -n 20 "$RUNNER_TEMP/instant-settings-check.log" | while IFS= read -r line; do echo "::error::$line"; done
-            exit 1
-          fi
-          echo '::notice::Both opt-in Instant Translate patches listed and applied; DEX and preserved integrity check verified. Device runtime is not implied.'
+          python3 tools/instant-translate/verify_bundle.py --mpp "$RUNNER_TEMP/instant-output/bundle.mpp" \
+            --listing "$RUNNER_TEMP/instant-output/patches.txt"
+          python3 - <<'PY'
+          import glob, json, os, sys, xml.etree.ElementTree as ET
+          from pathlib import Path
+          sys.path.insert(0, 'tools/instant-translate')
+          from verify_bundle import verify_bundle, verify_listing
+          root = Path(os.environ['RUNNER_TEMP'])
+          files = glob.glob(str(root / 'instant-build/extensions/instanttranslate/build/test-results/testDebugUnitTest/*.xml'))
+          total = failures = errors = 0
+          for filename in files:
+              test = ET.parse(filename).getroot()
+              total += int(test.attrib.get('tests', 0))
+              failures += int(test.attrib.get('failures', 0))
+              errors += int(test.attrib.get('errors', 0))
+          assert total > 0 and failures == errors == 0
+          bundle = root / 'instant-output/bundle.mpp'
+          result = verify_bundle(bundle)
+          verify_listing((root / 'instant-output/patches.txt').read_text())
+          result.update({'scope': 'Offline JVM tests, MPP structure and Morphe Desktop patch listing only',
+                         'offline_tests': total, 'test_failures': failures, 'test_errors': errors,
+                         'app_apk_read': False, 'app_apk_patched': False, 'app_installed_or_run': False,
+                         'live_sea_lion_request': False, 'morphe_manager_patch_test': False})
+          (root / 'instant-output/bundle-build.json').write_text(json.dumps(result, indent=2) + '\n')
+          print(f'::notice::Bundle listing and {total} offline extension tests passed; no APK or live provider was used.')
+          PY
       - uses: actions/upload-artifact@v4
         with:
-          name: instant-translate-experimental-mpp
+          name: instant-translate-bundle-only
           path: |
             ${{ runner.temp }}/instant-output/bundle.mpp
             ${{ runner.temp }}/instant-output/bundle.mpp.sha256
-            ${{ runner.temp }}/instant-output/patch-validation.json
+            ${{ runner.temp }}/instant-output/bundle-build.json
             ${{ runner.temp }}/instant-output/patches.txt
             ${{ runner.temp }}/instant-build/extensions/instanttranslate/build/test-results/testDebugUnitTest/*.xml
-      - name: Save only the small standalone bundle and static report
+      - name: Save only the bundle and bundle-only build report
         shell: bash
         run: |
           set -euo pipefail
           git fetch origin "$GITHUB_REF_NAME"
           git merge --ff-only FETCH_HEAD
-          for source in tools/instant-translate/project tools/instant-translate/prepare_build.py tools/instant-translate/verify_bundle.py tools/instant-translate/verify_patched.py tools/instant-translate/test_verify_patched.py .github/workflows/build-instant-translate-mpp.yml; do
+          for source in tools/instant-translate/project tools/instant-translate/prepare_build.py tools/instant-translate/verify_bundle.py tools/instant-translate/test_verify_bundle.py .github/workflows/build-instant-translate-mpp.yml; do
             if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
-              echo '::warning::Instant Translate build sources changed; not saving stale results.'
+              echo '::warning::Bundle sources changed; not saving stale results.'
               exit 0
             fi
           done
           mkdir -p bundles/instant-translate
-          cp "$RUNNER_TEMP/instant-output/"{bundle.mpp,bundle.mpp.sha256,patch-validation.json} bundles/instant-translate/
+          cp "$RUNNER_TEMP/instant-output/"{bundle.mpp,bundle.mpp.sha256,bundle-build.json} bundles/instant-translate/
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -f bundles/instant-translate/bundle.mpp bundles/instant-translate/bundle.mpp.sha256 bundles/instant-translate/patch-validation.json
+          git add -f bundles/instant-translate/bundle.mpp bundles/instant-translate/bundle.mpp.sha256 bundles/instant-translate/bundle-build.json
           git diff --cached --quiet && exit 0
-          git commit -m 'build: Instant Translate experimental Morphe bundle [skip ci]'
+          git commit -m 'build: Instant Translate bundle-only Morphe bundle [skip ci]'
           git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"

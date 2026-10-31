@@ -6,25 +6,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
 public class ProviderRouterTest {
-    @Test public void selectsOneProviderAndNeverSilentlyFallsBackToAnother() throws Exception {
-        String[] selection = {ProviderRouter.GOOGLE};
-        AtomicInteger googleCalls = new AtomicInteger();
-        AtomicInteger seaCalls = new AtomicInteger();
+    @Test public void routesOnlyExplicitSeaLionAndFailsClosedForLegacySelection() throws Exception {
+        String[] selection = {ProviderRouter.ORIGINAL};
+        AtomicInteger calls = new AtomicInteger();
         ProviderRouter router = new ProviderRouter(() -> selection[0], (text, from, to) -> {
-            googleCalls.incrementAndGet(); return "google";
-        }, (text, from, to) -> {
-            seaCalls.incrementAndGet(); throw new IOException("unavailable");
+            calls.incrementAndGet(); return "mock-sealion";
         });
-        assertEquals("google", router.translate("hola", "es", "en"));
+        for (String disabled : new String[] {ProviderRouter.ORIGINAL, "google", "unknown", "", null}) {
+            assertEquals(ProviderRouter.ORIGINAL, ProviderRouter.normalizeSelection(disabled));
+            selection[0] = disabled;
+            assertThrows(IOException.class, () -> router.translate("hola", "es", "en"));
+        }
+        assertEquals(ProviderRouter.ORIGINAL, ProviderSettings.selected());
+        assertEquals(ProviderRouter.SEA_LION, ProviderRouter.normalizeSelection(ProviderRouter.SEA_LION));
+        assertEquals(0, calls.get());
         selection[0] = ProviderRouter.SEA_LION;
+        assertEquals("mock-sealion", router.translate("hola", "es", "en"));
+        assertEquals(1, calls.get());
+    }
+
+    @Test public void providerFailuresDoNotSelectAnotherProvider() {
+        AtomicInteger calls = new AtomicInteger();
+        ProviderRouter router = new ProviderRouter(() -> ProviderRouter.SEA_LION, (text, from, to) -> {
+            calls.incrementAndGet(); throw new IOException("unavailable");
+        });
         assertThrows(IOException.class, () -> router.translate("hola", "es", "en"));
-        assertEquals(1, googleCalls.get());
-        assertEquals(1, seaCalls.get());
-        selection[0] = ProviderRouter.ORIGINAL;
-        assertThrows(IOException.class, () -> router.translate("hola", "es", "en"));
-        selection[0] = "unknown";
-        assertThrows(IOException.class, () -> router.translate("hola", "es", "en"));
-        assertEquals(1, googleCalls.get());
-        assertEquals(1, seaCalls.get());
+        assertEquals(1, calls.get());
     }
 }

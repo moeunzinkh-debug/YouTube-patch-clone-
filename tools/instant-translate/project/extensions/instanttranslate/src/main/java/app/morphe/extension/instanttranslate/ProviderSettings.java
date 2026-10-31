@@ -42,12 +42,11 @@ final class ProviderSettings {
 
     static String selected() {
         Context context = appContext;
-        // The original standalone patch explicitly selected Google before this
-        // settings patch existed; retain that behavior when no settings UI exists.
-        if (context == null) return ProviderRouter.GOOGLE;
-        String value = prefs(context).getString("provider", ProviderRouter.GOOGLE);
-        if (ProviderRouter.GOOGLE.equals(value) || ProviderRouter.SEA_LION.equals(value) || ProviderRouter.ORIGINAL.equals(value)) return value;
-        return ProviderRouter.ORIGINAL;
+        // No network fallback until SEA-LION is explicitly selected. Unknown
+        // and legacy provider values also fail closed to the original path.
+        if (context == null) return ProviderRouter.ORIGINAL;
+        String value = prefs(context).getString("provider", ProviderRouter.ORIGINAL);
+        return ProviderRouter.normalizeSelection(value);
     }
 
     static String name(Context context) { return prefs(context).getString("name", SeaLionClient.DEFAULT_NAME); }
@@ -66,11 +65,11 @@ final class ProviderSettings {
     }
 
     static void save(Context context, String provider, String name, String base, String model, String newKey) throws IOException {
-        if (context == null || !(ProviderRouter.ORIGINAL.equals(provider) || ProviderRouter.GOOGLE.equals(provider) || ProviderRouter.SEA_LION.equals(provider))) {
+        if (context == null || !(ProviderRouter.ORIGINAL.equals(provider) || ProviderRouter.SEA_LION.equals(provider))) {
             throw new IOException("Invalid provider");
         }
-        // Switching back to Original or Google must remain possible even if the
-        // stored SEA-LION fields are invalid or the keystore is unavailable.
+        // Switching back to Original must remain possible even if the stored
+        // SEA-LION fields are invalid or the keystore is unavailable.
         if (!ProviderRouter.SEA_LION.equals(provider)) {
             synchronized (LOCK) {
                 if (!prefs(context).edit().putString("provider", provider).commit()) {
@@ -91,7 +90,7 @@ final class ProviderSettings {
             SharedPreferences pref = prefs(context);
             // Fail closed during a credential/endpoint change: a failed write must
             // not send a new key to an old endpoint (or the converse).
-            if (ProviderRouter.SEA_LION.equals(pref.getString("provider", ProviderRouter.GOOGLE)) &&
+            if (ProviderRouter.SEA_LION.equals(pref.getString("provider", ProviderRouter.ORIGINAL)) &&
                     !pref.edit().putString("provider", ProviderRouter.ORIGINAL).commit()) {
                 throw new IOException("Settings could not be saved");
             }
@@ -105,7 +104,7 @@ final class ProviderSettings {
     static void clearKey(Context context) throws IOException {
         synchronized (LOCK) {
             SharedPreferences pref = prefs(context);
-            if (ProviderRouter.SEA_LION.equals(pref.getString("provider", ProviderRouter.GOOGLE)) &&
+            if (ProviderRouter.SEA_LION.equals(pref.getString("provider", ProviderRouter.ORIGINAL)) &&
                     !pref.edit().putString("provider", ProviderRouter.ORIGINAL).commit()) throw new IOException("Settings could not be saved");
             try {
                 new AtomicFile(new File(context.getNoBackupFilesDir(), SECRET)).delete();

@@ -16,7 +16,7 @@ public final class TranslationFallback {
                 return thread;
             }, new ThreadPoolExecutor.AbortPolicy());
     private static final ProviderRouter PROVIDER = new ProviderRouter(ProviderSettings::selected,
-            new GtxClient(), new SeaLionClient(ProviderSettings::seaLionConfig));
+            new SeaLionClient(ProviderSettings::seaLionConfig));
     private static final FallbackCoordinator COORDINATOR = new FallbackCoordinator(PROVIDER, EXECUTOR);
 
     private TranslationFallback() {}
@@ -26,7 +26,7 @@ public final class TranslationFallback {
         if (original != null && !original.trim().isEmpty()) return false;
         if (token == null) return false;
         try {
-            if (ProviderRouter.ORIGINAL.equals(ProviderSettings.selected())) return false;
+            if (!ProviderRouter.SEA_LION.equals(ProviderSettings.selected())) return false;
             Class<?> cls = token.getClass();
             String text = stringField(cls, token, "t");
             String source;
@@ -49,7 +49,7 @@ public final class TranslationFallback {
     /** Preserve valid results; retry only explicitly failed entries. */
     public static boolean retryFailedBatch(Object request, List<?> original, Object token, Object continuation) {
         try {
-            if (ProviderRouter.ORIGINAL.equals(ProviderSettings.selected())) return false;
+            if (!ProviderRouter.SEA_LION.equals(ProviderSettings.selected())) return false;
             return COORDINATOR.tryBatch(request, original, token, continuation);
         } catch (RuntimeException ignored) {
             return false;

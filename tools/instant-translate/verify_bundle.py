@@ -10,7 +10,7 @@ from pathlib import Path
 
 from prepare_build import VERSION
 
-NAME = 'Translation fallback (Google, experimental)'
+NAME = 'Translation fallback (SEA-LION, experimental)'
 SETTINGS_NAME = 'Settings Patch (SEA-LION, experimental)'
 PACKAGE = 'com.spaceship.screen.textcopy'
 VERSION_NAME = 'v7.5.00300'
@@ -36,6 +36,16 @@ def verify_bundle(bundle: Path) -> dict:
                 raise ValueError('Missing bundle entry: ' + entry)
         if NAME.encode() not in archive.read(required) or SETTINGS_NAME.encode() not in archive.read(settings):
             raise ValueError('Missing an opt-in selector')
+        extension = archive.read('extensions/instanttranslate.mpe')
+        for forbidden in (b'GtxClient', b'translate.googleapis.com', b'Google fallback'):
+            if forbidden in extension:
+                raise ValueError('Removed Google fallback is still present in the bundle')
+        old_selector = b'Translation fallback (Google, experimental)'
+        if old_selector in archive.read(required) or old_selector in archive.read('classes.dex'):
+            raise ValueError('Removed Google fallback selector is still present')
+        for required_value in (b'https://api.sea-lion.ai/v1/', b'aisingapore/Gemma-SEA-LION-v4-27B-IT'):
+            if required_value not in extension:
+                raise ValueError('SEA-LION configuration defaults are missing from the bundle')
         classes = [name for name in names if name.startswith('app/morphe/patches/') and name.endswith('.class')]
         if not classes or any(not name.startswith('app/morphe/patches/instanttranslate/') for name in classes):
             raise ValueError('Unrelated app patches present in standalone bundle')

@@ -24,11 +24,10 @@ public final class HarnessActivity extends Activity {
                 SeaLionClient.Config config = ProviderSettings.seaLionConfig();
                 if (!SeaLionClient.DEFAULT_BASE.equals(config.baseUrl) || !SeaLionClient.DEFAULT_MODEL.equals(config.model) ||
                         !"fixture-key-2026".equals(config.key)) throw new IllegalStateException();
-                final int[] calls = {0, 0};
+                final int[] calls = {0};
                 ProviderRouter router = new ProviderRouter(ProviderSettings::selected,
-                        (text, from, to) -> { calls[0]++; return "google"; },
-                        (text, from, to) -> { calls[1]++; return "mock-sealion"; });
-                if (!"mock-sealion".equals(router.translate("hola", "es", "en")) || calls[0] != 0 || calls[1] != 1) {
+                        (text, from, to) -> { calls[0]++; return "mock-sealion"; });
+                if (!"mock-sealion".equals(router.translate("hola", "es", "en")) || calls[0] != 1) {
                     throw new IllegalStateException();
                 }
                 result.setText("SEA-LION CONFIG AND ROUTING OK");
