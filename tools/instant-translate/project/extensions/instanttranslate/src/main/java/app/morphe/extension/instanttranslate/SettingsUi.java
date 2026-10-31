@@ -27,7 +27,7 @@ public final class SettingsUi {
     private static volatile WeakReference<Activity> currentActivity = new WeakReference<>(null);
     private SettingsUi() {}
 
-    /** Called by the exact-build app's MainActivity after its existing integrity check. */
+    /** Called by the reviewed app's MainActivity after its original super.onCreate. */
     public static void attach(Activity activity) {
         if (activity == null) return;
         try {

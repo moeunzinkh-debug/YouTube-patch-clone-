@@ -16,7 +16,8 @@ import java.util.regex.Pattern;
 /**
  * Asynchronous last-resort transport. The original coroutine remains suspended;
  * the app's intercepted continuation is resumed once, without blocking Android's
- * main thread. This is specific to the inspected 50342 DEX layout.
+ * main thread. Batch reconstruction is specific to the reviewed 50342 DEX;
+ * the reviewed 50350 hook retries one final empty single-result path only.
  */
 final class FallbackCoordinator {
     interface Client {

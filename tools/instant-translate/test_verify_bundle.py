@@ -21,9 +21,9 @@ class VerifyBundleTest(unittest.TestCase):
             'classes.dex': b'dex',
             'extensions/instanttranslate.mpe': (b'dex SeaLionClient '
                 b'https://api.sea-lion.ai/v1/ aisingapore/Gemma-SEA-LION-v4-27B-IT'),
-            'app/morphe/patches/instanttranslate/TranslationFallbackPatchKt.class': verifier.NAME.encode(),
-            'app/morphe/patches/instanttranslate/SettingsPatchKt.class': verifier.SETTINGS_NAME.encode(),
         }
+        for name, (filename, _) in verifier.PATCHES.items():
+            self.entries['app/morphe/patches/instanttranslate/' + filename] = name.encode()
 
     def write_bundle(self):
         with zipfile.ZipFile(self.bundle, 'w') as out:
@@ -59,9 +59,11 @@ class VerifyBundleTest(unittest.TestCase):
         with self.assertRaises(ValueError): verifier.verify_bundle(self.bundle)
 
     def test_listing_is_opt_in_and_exactly_expected(self):
-        def card(name, enabled='false', package=verifier.PACKAGE, version=verifier.VERSION_NAME):
-            return f'Name: {name}\nEnabled: {enabled}\n  Package name: {package}\n    {version}\n'
-        listing = card(verifier.NAME) + card(verifier.SETTINGS_NAME)
+        def card(name, enabled='false', package=verifier.PACKAGE, versions=None):
+            versions = versions or verifier.PATCHES.get(name, ('', (verifier.VERSION_NAME,)))[1]
+            targets = ''.join(f'    {version}\n' for version in versions)
+            return f'Name: {name}\nEnabled: {enabled}\n  Package name: {package}\n{targets}'
+        listing = ''.join(card(name) for name in verifier.PATCHES)
         verifier.verify_listing(listing)
         for bad in (listing.replace('Enabled: false', 'Enabled: true', 1),
                     listing + card('Google fallback'),

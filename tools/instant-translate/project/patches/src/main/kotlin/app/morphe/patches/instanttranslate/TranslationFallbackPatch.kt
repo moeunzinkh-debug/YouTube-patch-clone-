@@ -37,15 +37,22 @@ private val translationExtensionPatch = bytecodePatch {
 @Suppress("unused")
 val translationFallbackPatch = bytecodePatch(
     name = "Translation fallback (SEA-LION, experimental)",
-    description = "Keep the original translation first. An explicitly configured SEA-LION provider can be tried after failure; default is original only. Internet, a user-supplied key and data sharing are required. Exact v7.5.00300 build 50342 only; device testing required.",
+    description = "Keep original translation first. An explicitly configured SEA-LION provider can retry reviewed blank results; default is original only. Requires internet, a user-supplied key and data sharing. Reviewed builds 50342 and 50350; coverage and device runtime unverified.",
     default = false,
 ) {
     compatibleWith(Compatibility(
         name = "Instant Translate", packageName = "com.spaceship.screen.textcopy",
-        targets = listOf(AppTarget(version = "v7.5.00300", minSdk = 29, isExperimental = true)),
+        targets = listOf(
+            AppTarget(version = "v7.5.00300", minSdk = 29, isExperimental = true),
+            AppTarget(version = "v7.5.00307", minSdk = 29, isExperimental = true),
+        ),
     ))
     dependsOn(translationExtensionPatch)
     execute {
+        if (packageMetadata.versionName == "v7.5.00307" && packageMetadata.versionCode == "50350") {
+            applyCurrentTranslation()
+            return@execute
+        }
         require(packageMetadata.versionName == "v7.5.00300" && packageMetadata.versionCode == "50342") {
             "Translation fallback supports only reviewed Instant Translate v7.5.00300 / 50342"
         }

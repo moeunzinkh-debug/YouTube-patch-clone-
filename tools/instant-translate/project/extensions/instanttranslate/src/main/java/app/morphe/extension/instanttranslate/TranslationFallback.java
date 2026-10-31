@@ -27,20 +27,9 @@ public final class TranslationFallback {
         if (token == null) return false;
         try {
             if (!ProviderRouter.SEA_LION.equals(ProviderSettings.selected())) return false;
-            Class<?> cls = token.getClass();
-            String text = stringField(cls, token, "t");
-            String source;
-            String target;
-            if ("qy8".equals(cls.getName())) {
-                source = stringField(cls, token, "u");
-                target = stringField(cls, token, "v");
-            } else if ("d29".equals(cls.getName())) {
-                source = stringField(cls, token, "morphe_source");
-                target = stringField(cls, token, "morphe_target");
-            } else {
-                return false;
-            }
-            return COORDINATOR.trySingle(original, text, source, target, token, continuation);
+            String[] request = readSingleRequest(token);
+            if (request == null) return false;
+            return COORDINATOR.trySingle(original, request[0], request[1], request[2], token, continuation);
         } catch (ReflectiveOperationException | RuntimeException ignored) {
             return false;
         }
@@ -54,6 +43,22 @@ public final class TranslationFallback {
         } catch (RuntimeException ignored) {
             return false;
         }
+    }
+
+    /** Read only a reviewed coroutine layout; unknown layouts fail closed. */
+    static String[] readSingleRequest(Object token) throws ReflectiveOperationException {
+        if (token == null) return null;
+        Class<?> cls = token.getClass();
+        String sourceField, targetField;
+        if ("qy8".equals(cls.getName()) || "fra".equals(cls.getName())) {
+            sourceField = "u"; targetField = "v";
+        } else if ("d29".equals(cls.getName())) {
+            sourceField = "morphe_source"; targetField = "morphe_target";
+        } else {
+            return null;
+        }
+        return new String[] {stringField(cls, token, "t"), stringField(cls, token, sourceField),
+                stringField(cls, token, targetField)};
     }
 
     private static String stringField(Class<?> cls, Object receiver, String name)

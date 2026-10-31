@@ -51,7 +51,7 @@ jobs:
         run: |
           set -o pipefail
           cd "$RUNNER_TEMP/instant-build"
-          ./gradlew :extensions:instanttranslate:testDebugUnitTest :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/instant-build.log"
+          ./gradlew :extensions:instanttranslate:testDebugUnitTest :patches:test :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/instant-build.log"
       - name: Report build diagnostics
         if: failure()
         run: |
@@ -78,6 +78,7 @@ jobs:
           from verify_bundle import verify_bundle, verify_listing
           root = Path(os.environ['RUNNER_TEMP'])
           files = glob.glob(str(root / 'instant-build/extensions/instanttranslate/build/test-results/testDebugUnitTest/*.xml'))
+          files += glob.glob(str(root / 'instant-build/patches/build/test-results/test/*.xml'))
           total = failures = errors = 0
           for filename in files:
               test = ET.parse(filename).getroot()
@@ -104,6 +105,7 @@ jobs:
             ${{ runner.temp }}/instant-output/bundle-build.json
             ${{ runner.temp }}/instant-output/patches.txt
             ${{ runner.temp }}/instant-build/extensions/instanttranslate/build/test-results/testDebugUnitTest/*.xml
+            ${{ runner.temp }}/instant-build/patches/build/test-results/test/*.xml
       - name: Save only the bundle and bundle-only build report
         shell: bash
         run: |

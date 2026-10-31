@@ -29,15 +29,22 @@ private fun MutableMethod.addAtExistingLabel(index: Int, instructions: String) {
 @Suppress("unused")
 val instantSettingsPatch = bytecodePatch(
     name = "Settings Patch (SEA-LION, experimental)",
-    description = "Add an in-app Settings Patch row and selectable SEA-LION fallback. Requires a user-supplied API key; text and key are sent to the selected HTTPS provider. Exact v7.5.00300 build 50342 only.",
+    description = "Add an in-app Settings Patch row and selectable SEA-LION fallback. Requires a user-supplied API key; text and key are sent to the selected HTTPS provider. Reviewed builds v7.5.00300 (50342) and v7.5.00307 (50350); app runtime is untested.",
     default = false,
 ) {
     compatibleWith(Compatibility(
         name = "Instant Translate", packageName = "com.spaceship.screen.textcopy",
-        targets = listOf(AppTarget(version = "v7.5.00300", minSdk = 29, isExperimental = true)),
+        targets = listOf(
+            AppTarget(version = "v7.5.00300", minSdk = 29, isExperimental = true),
+            AppTarget(version = "v7.5.00307", minSdk = 29, isExperimental = true),
+        ),
     ))
     dependsOn(translationFallbackPatch)
     execute {
+        if (packageMetadata.versionName == "v7.5.00307" && packageMetadata.versionCode == "50350") {
+            applyCurrentSettings()
+            return@execute
+        }
         require(packageMetadata.versionName == "v7.5.00300" && packageMetadata.versionCode == "50342") {
             "Settings Patch supports only reviewed Instant Translate v7.5.00300 / 50342"
         }
