@@ -1,9 +1,28 @@
 {
-  "sha256": "e3e2152a72bcbfb4a9768f510579ed6a8983bb943315495f91d09ee2795d6679",
-  "bytes": 48619,
-  "version": "0.3.0-dev.1",
+  "sha256": "45e5895edbdf1826fc3c0fbfb3c6d82ee867cde645a52b3670d0590f987a30db",
+  "bytes": 84861,
+  "version": "0.4.0-dev.1",
+  "selectors": {
+    "Translation fallback (SEA-LION, experimental)": [
+      "v7.5.00300",
+      "v7.5.00307"
+    ],
+    "Settings Patch (SEA-LION, experimental)": [
+      "v7.5.00300",
+      "v7.5.00307"
+    ],
+    "Remove license check (experimental)": [
+      "v7.5.00307"
+    ],
+    "Official microG service visibility (experimental)": [
+      "v7.5.00307"
+    ],
+    "Unlock premium local gate (experimental)": [
+      "v7.5.00307"
+    ]
+  },
   "scope": "Offline JVM tests, MPP structure and Morphe Desktop patch listing only",
-  "offline_tests": 12,
+  "offline_tests": 16,
   "test_failures": 0,
   "test_errors": 0,
   "app_apk_read": false,
