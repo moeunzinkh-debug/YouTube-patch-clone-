@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Regenerate the collapsible patch catalog in README.md from patches-list.json.
 
-The grouping is kept in `GROUPS`; patches backported from upstream v1.48.0 are
-listed separately so it is obvious which ones are new. Run from the repo root:
+The grouping is kept in `GROUPS`; patches added in the v1.48.0 and v2.0.0
+source syncs are listed separately. Run from the repo root:
 
     python3 tools/generate-patch-catalog.py
 
@@ -36,9 +36,18 @@ NEW_IN_V148 = [
     "Video delay",
 ]
 
+# New YouTube patches in the v2.0.0 source sync.
+NEW_IN_V20 = [
+    "Download post images",
+    "Niconico comments",
+    "Search comments",
+    "Translate posts",
+]
+
 # Existing groups, in display order. Any manifest patch not listed here is
 # reported as an error so a new upstream patch never silently disappears.
 GROUPS: list[tuple[str, list[str]]] = [
+    ("✨ ថ្មីពី v2.0.0 / New in v2.0.0", NEW_IN_V20),
     ("✨ ថ្មីពី v1.48.0 / New in v1.48.0", NEW_IN_V148),
     (
         "🚫 ពាណិជ្ជកម្ម & ការរំខាន / Ads & distractions",
@@ -157,7 +166,7 @@ def main() -> None:
         lines += [f"- `{n}`" for n in sorted(present, key=str.lower)]
         lines += ["", "</details>", ""]
 
-    lines += ["> ចំណាំ៖ ក្រុម «ថ្មីពី v1.48.0» គឺជា patches ដែលបានបន្ថែមពី upstream v1.48.0។ "
+    lines += ["> ចំណាំ៖ ក្រុម «ថ្មីពី v1.48.0» និង «ថ្មីពី v2.0.0» បង្ហាញ patches ដែលបានបន្ថែមពី upstream។ "
               "ស្លាក `youtube-*` មិនបន្ថែម patch ថ្មីទេ — ការបន្ថែមកំណែ YouTube ថ្មីត្រូវការ sync កូដ patch ពី upstream មុន។",
               "", "</details>", END]
     block = "\n".join(lines) + "\n"

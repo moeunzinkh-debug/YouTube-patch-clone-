@@ -1,0 +1,94 @@
+name: Test YouTube 21.30.216 in Morphe Manager
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/c4f8fd6a-youtube-patch-clone]
+    paths:
+      - 'tools/youtube/manager_smoke.py'
+      - '.github/workflows/verify-youtube-2130-manager.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  manager:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[youtube-2130-manager-test]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify bundle and prepare pinned temporary APK inputs
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/youtube-manager"
+          evidence="$RUNNER_TEMP/youtube-manager-evidence"
+          mkdir -p "$work" "$evidence"
+          python3 tools/verify_youtube_update.py --manifest patches-list.json --mpp patch.mpp
+          gh release download v2.3.0-dev.3 --repo MorpheApp/morphe-manager \
+            --pattern morphe-manager-2.3.0-dev.3.apk --dir "$work"
+          echo '9b9cbd8d3e0c4394f87c1a5675db6ff2e473233e316bf2915f6fe447347e5d96  '"$work/morphe-manager-2.3.0-dev.3.apk" | sha256sum -c
+          gh release download youtube-21.30.216-patches-v2.0.0 --repo asp345/youtube-morphe \
+            --pattern youtube-morphe-module-21.30.216-arm64-v8a.zip --dir "$work"
+          module="$work/youtube-morphe-module-21.30.216-arm64-v8a.zip"
+          echo '5c6bba5a6138ff3c6facbfdee7184fee9460afd0e8aaeac0f39fd1fc34aac2c4  '"$module" | sha256sum -c
+          unzip -p "$module" stock/base.apk > "$work/stock.apk"
+          rm "$module"
+          echo '3775a15129dcc4e5b80fc17b7e0841b7fdd1ca89a6e72baa798806f666c74d02  '"$work/stock.apk" | sha256sum -c
+          tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$tools/aapt" dump badging "$work/stock.apk" > "$evidence/stock-badging.txt"
+          grep -E "^package: name='com.google.android.youtube' versionCode='[0-9]+' versionName='21.30.216'" "$evidence/stock-badging.txt"
+          "$tools/apksigner" verify --print-certs "$work/stock.apk" | tee "$evidence/stock-signature.txt"
+          grep -Fi 'certificate SHA-256 digest: 3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a' "$evidence/stock-signature.txt"
+          grep -Fi 'certificate SHA-256 digest: 5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6' "$evidence/stock-signature.txt"
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Apply the local MPP in offline Manager; do not install YouTube
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 4608M
+          heap-size: 1536M
+          disk-size: 12G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/youtube/manager_smoke.py
+      - name: Verify Manager output without publishing APK
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/youtube-manager"
+          evidence="$RUNNER_TEMP/youtube-manager-evidence"
+          tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$tools/apksigner" verify "$work/manager-patched.apk"
+          python3 - "$work/manager-patched.apk" <<'PY'
+          import re, sys, zipfile
+          markers = [b'PostImageDownloadPatch', b'PostTranslatePatch', b'CommentsSearchFilter',
+                     b'NiconicoCommentsController', b'EqualizerPlayerButton', b'KhmerTtsClient']
+          with zipfile.ZipFile(sys.argv[1]) as apk:
+              dexes = [apk.read(n) for n in apk.namelist() if re.fullmatch(r'classes\d*\.dex', n)]
+          assert dexes, 'No DEX in Manager output'
+          for marker in markers:
+              assert any(marker in dex for dex in dexes), marker
+          print('::notice::Manager output is signed and contains all four new and custom extension classes.')
+          PY
+          cp "$work/selection.json" "$evidence/"
+      - name: Discard all test APKs and emulator state
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/youtube-manager"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: youtube-2130-manager-evidence
+          path: ${{ runner.temp }}/youtube-manager-evidence/
+          if-no-files-found: warn
+          retention-days: 14

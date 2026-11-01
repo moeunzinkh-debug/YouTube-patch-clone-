@@ -1,0 +1,100 @@
+name: Smoke-test YouTube 21.30.216 patch application
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/c4f8fd6a-youtube-patch-clone]
+    paths:
+      - '.github/workflows/verify-youtube-2130-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  patch:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[youtube-2130-apk-test]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify bundle and download pinned Morphe Desktop
+        run: |
+          set -euo pipefail
+          # Keep update state and signing material in the disposable runner workspace.
+          export HOME="$RUNNER_TEMP/youtube-home"
+          mkdir -p "$HOME" "$RUNNER_TEMP/youtube-evidence" "$RUNNER_TEMP/youtube-tools"
+          python3 tools/verify_youtube_update.py --manifest patches-list.json --mpp patch.mpp
+          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop \
+            --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$RUNNER_TEMP/youtube-tools"
+          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/youtube-tools/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum -c
+      - name: Verify official stock APK, apply patches, and discard APKs
+        run: |
+          set -euo pipefail
+          export HOME="$RUNNER_TEMP/youtube-home"
+          work="$RUNNER_TEMP/youtube-apk-test"
+          evidence="$RUNNER_TEMP/youtube-evidence"
+          mkdir -p "$work" "$evidence"
+          exec > >(tee "$evidence/smoke.log") 2>&1
+          # APKs are temporary CI test inputs/outputs: never upload or commit them.
+          trap 'rm -rf "$work" "$HOME"' EXIT
+          gh release download youtube-21.30.216-patches-v2.0.0 --repo asp345/youtube-morphe \
+            --pattern youtube-morphe-module-21.30.216-arm64-v8a.zip --dir "$work"
+          module="$work/youtube-morphe-module-21.30.216-arm64-v8a.zip"
+          echo '5c6bba5a6138ff3c6facbfdee7184fee9460afd0e8aaeac0f39fd1fc34aac2c4  '"$module" | sha256sum -c
+          unzip -Z1 "$module" | grep -Fx 'stock/base.apk'
+          unzip -p "$module" stock/base.apk > "$work/stock.apk"
+          echo '3775a15129dcc4e5b80fc17b7e0841b7fdd1ca89a6e72baa798806f666c74d02  '"$work/stock.apk" | sha256sum -c
+          tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          test -x "$tools/aapt" && test -x "$tools/apksigner"
+          "$tools/aapt" dump badging "$work/stock.apk" > "$evidence/stock-badging.txt"
+          grep -E "^package: name='com.google.android.youtube' versionCode='[0-9]+' versionName='21.30.216'" "$evidence/stock-badging.txt"
+          grep -F "sdkVersion:'29'" "$evidence/stock-badging.txt"
+          "$tools/apksigner" verify --print-certs "$work/stock.apk" | tee "$evidence/stock-signature.txt"
+          # YouTube uses v3.0/v3.1 signing rotation: verify both accepted Google certs.
+          grep -Fi 'certificate SHA-256 digest: 3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a' "$evidence/stock-signature.txt"
+          grep -Fi 'certificate SHA-256 digest: 5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6' "$evidence/stock-signature.txt"
+          desktop="$RUNNER_TEMP/youtube-tools/morphe-desktop-1.20.0-dev.1-all.jar"
+          # Defaults plus the custom features and all four newly requested selectors.
+          java -Xmx6g -jar "$desktop" patch -p patch.mpp \
+            -e 'Download post images' -e 'Search comments' -e 'Translate posts' \
+            -e 'Niconico comments' -e 'Audio equalizer' -e 'Voice over translation' \
+            --result-file "$evidence/result.json" --out "$work/patched.apk" \
+            --temporary-files-path "$work/scratch" "$work/stock.apk" \
+            2>&1 | tee "$evidence/patch.log"
+          python3 - "$evidence/result.json" <<'PY'
+          import json, sys
+          report = json.load(open(sys.argv[1], encoding='utf-8'))
+          required = {'Download post images', 'Search comments', 'Translate posts',
+                      'Niconico comments', 'Audio equalizer', 'Voice over translation'}
+          assert report['success'] and not report['failedPatches'], report.get('failureReason')
+          assert report['packageName'] == 'com.google.android.youtube', report['packageName']
+          assert report['packageVersion'] == '21.30.216', report['packageVersion']
+          assert required <= set(report['appliedPatches']), (required, report['appliedPatches'])
+          print(f"::notice::{len(report['appliedPatches'])} selected patches applied successfully; device runtime not tested.")
+          PY
+          unzip -tq "$work/patched.apk"
+          "$tools/apksigner" verify "$work/patched.apk"
+      - name: Report smoke-test diagnostics
+        if: failure()
+        run: |
+          if test -f "$RUNNER_TEMP/youtube-evidence/smoke.log"; then
+            python3 - <<'PY'
+          import os
+          path = os.environ['RUNNER_TEMP'] + '/youtube-evidence/smoke.log'
+          text = ''.join(open(path, encoding='utf-8', errors='replace').readlines()[-30:])[-3200:]
+          print('::error::' + text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: youtube-2130-patch-smoke-evidence
+          path: ${{ runner.temp }}/youtube-evidence/
+          if-no-files-found: warn
+          retention-days: 14
