@@ -17,8 +17,6 @@ jobs:
     timeout-minutes: 60
     env:
       GH_TOKEN: ${{ github.token }}
-      # Prevent GUI/update state and keystores from escaping the temporary workspace.
-      HOME: ${{ runner.temp }}/youtube-home
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -28,6 +26,8 @@ jobs:
       - name: Verify bundle and download pinned Morphe Desktop
         run: |
           set -euo pipefail
+          # Keep update state and signing material in the disposable runner workspace.
+          export HOME="$RUNNER_TEMP/youtube-home"
           mkdir -p "$HOME" "$RUNNER_TEMP/youtube-evidence" "$RUNNER_TEMP/youtube-tools"
           python3 tools/verify_youtube_update.py --manifest patches-list.json --mpp patch.mpp
           gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop \
@@ -36,6 +36,7 @@ jobs:
       - name: Verify official stock APK, apply patches, and discard APKs
         run: |
           set -euo pipefail
+          export HOME="$RUNNER_TEMP/youtube-home"
           work="$RUNNER_TEMP/youtube-apk-test"
           evidence="$RUNNER_TEMP/youtube-evidence"
           mkdir -p "$work" "$evidence"
