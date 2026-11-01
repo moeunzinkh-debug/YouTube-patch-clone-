@@ -1,72 +1,65 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-30T12:47:55Z",
+  "generatedAt": "2026-11-01T10:23:05Z",
   "generator": "youtube-version-advisor/1.0.0",
   "youtubePackage": "com.google.android.youtube",
   "local": {
     "label": "This repository (checked-in patch sources)",
     "source": "patches-list.json",
-    "patchVersion": "1.49.0",
-    "patchCount": 111,
+    "patchVersion": "2.0.0-dev.1",
+    "patchCount": 115,
     "versions": [
+      {
+        "version": "21.43.523",
+        "minSdk": 29,
+        "experimental": true,
+        "patchCount": 110,
+        "androidMin": "10"
+      },
       {
         "version": "21.42.241",
         "minSdk": 29,
         "experimental": true,
-        "patchCount": 106,
+        "patchCount": 110,
         "androidMin": "10"
       },
       {
-        "version": "21.41.525",
+        "version": "21.30.216",
         "minSdk": 29,
-        "experimental": true,
-        "patchCount": 106,
+        "experimental": false,
+        "patchCount": 110,
         "androidMin": "10"
       },
       {
         "version": "21.28.208",
         "minSdk": 29,
-        "experimental": true,
-        "patchCount": 106,
+        "experimental": false,
+        "patchCount": 110,
         "androidMin": "10"
       },
       {
         "version": "21.23.492",
         "minSdk": 28,
         "experimental": false,
-        "patchCount": 106,
-        "androidMin": "9"
-      },
-      {
-        "version": "21.20.405",
-        "minSdk": 28,
-        "experimental": false,
-        "patchCount": 106,
-        "androidMin": "9"
-      },
-      {
-        "version": "21.16.256",
-        "minSdk": 28,
-        "experimental": false,
-        "patchCount": 106,
+        "patchCount": 110,
         "androidMin": "9"
       },
       {
         "version": "20.51.39",
         "minSdk": 28,
         "experimental": false,
-        "patchCount": 106,
+        "patchCount": 110,
         "androidMin": "9"
       },
       {
-        "version": "20.21.37",
+        "version": "20.26.46",
         "minSdk": 26,
         "experimental": false,
-        "patchCount": 106,
+        "patchCount": 110,
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-10-30T12:47:55Z"
+    "checkedAt": "2026-11-01T10:23:05Z"
   },
   "upstream": {
     "label": "Upstream Morphe patch bundle (latest)",
@@ -124,8 +117,7 @@
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-10-30T12:47:55Z",
-    "commitSha": "4fd44029fa086403f7dd4e40d2ca57cf7c6ae16a",
+    "checkedAt": "2026-11-01T10:23:05Z",
     "url": "https://github.com/MorpheApp/morphe-patches/blob/main/patches-list.json",
     "etag": "\"4fd44029fa086403f7dd4e40d2ca57cf7c6ae16a\"",
     "synced": true,
@@ -135,80 +127,12 @@
       "publishedAt": "2026-10-30T11:16:04Z",
       "url": "https://github.com/MorpheApp/morphe-patches/releases/tag/v2.0.0",
       "etag": "\"c3331b7228bb0c5d1b4a763fb085371041223862a4b86393e9af218bfa3696d7\""
-    }
+    },
+    "manifestSha": "4fd44029fa086403f7dd4e40d2ca57cf7c6ae16a"
   },
   "changes": {
-    "added": [
-      {
-        "version": "21.43.523",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 109,
-        "androidMin": "10"
-      },
-      {
-        "version": "21.30.216",
-        "minSdk": 29,
-        "experimental": false,
-        "patchCount": 109,
-        "androidMin": "10"
-      },
-      {
-        "version": "20.26.46",
-        "minSdk": 26,
-        "experimental": false,
-        "patchCount": 109,
-        "androidMin": "8.0"
-      }
-    ],
-    "removed": [
-      {
-        "version": "21.41.525",
-        "minSdk": 29,
-        "experimental": true,
-        "patchCount": 106,
-        "androidMin": "10"
-      },
-      {
-        "version": "21.20.405",
-        "minSdk": 28,
-        "experimental": false,
-        "patchCount": 106,
-        "androidMin": "9"
-      },
-      {
-        "version": "21.16.256",
-        "minSdk": 28,
-        "experimental": false,
-        "patchCount": 106,
-        "androidMin": "9"
-      },
-      {
-        "version": "20.21.37",
-        "minSdk": 26,
-        "experimental": false,
-        "patchCount": 106,
-        "androidMin": "8.0"
-      }
-    ],
-    "modified": [
-      {
-        "version": "21.28.208",
-        "local": {
-          "version": "21.28.208",
-          "minSdk": 29,
-          "experimental": true,
-          "patchCount": 106,
-          "androidMin": "10"
-        },
-        "upstream": {
-          "version": "21.28.208",
-          "minSdk": 29,
-          "experimental": false,
-          "patchCount": 109,
-          "androidMin": "10"
-        }
-      }
-    ]
+    "added": [],
+    "removed": [],
+    "modified": []
   }
 }

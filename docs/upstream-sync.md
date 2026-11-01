@@ -1,5 +1,28 @@
 # Upstream sync report — YouTube only / របាយការណ៍ sync ពី upstream
 
+## Current development sync — v2.0.0
+
+The YouTube subset was refreshed from upstream [v2.0.0](https://github.com/MorpheApp/morphe-patches/releases/tag/v2.0.0), commit `6cb8e6b6ee425eda8a854e026507286359f38a32`. The previous v1.48.0 tag resolves to `f3acc10e2691ffc4db29c6a6a651ee61fb54c047` (the historical report below contains an incorrect short commit ID).
+
+The `2.0.0-dev.1` development bundle targets **21.30.216** as newest stable for Android 10+ (SDK 29). Android 9's newest stable target is **21.23.492** (SDK 28). Experimental targets `21.43.523` and `21.42.241` are retained from upstream. See the generated [version catalog](youtube-versions.md); compatibility is declared in compiled `Compatibility.targets`.
+
+The 115 selectable entries comprise **110 YouTube and 5 generic** patches. The four new upstream selectors are:
+
+| Patch | Function |
+| --- | --- |
+| `Download post images` | Adds a button and menu item to download post images and GIFs. |
+| `Search comments` | Filters **loaded** comments by search terms. |
+| `Translate posts` | Adds a post text translation menu item. |
+| `Niconico comments` | Overlays live chat or replay as scrolling comments on the video. |
+
+The custom in-app Audio equalizer and top-player button, Khmer FastAPI TTS, SEA-LION voice-over provider, previous nine additions, Khmer strings and YouTube-only scope remain. The Translate posts fix from upstream commit [`589c3abbe540026426f3336b04c2f13cd692b127`](https://github.com/MorpheApp/morphe-patches/commit/589c3abbe540026426f3336b04c2f13cd692b127) was backported with references adapted for this patcher API. Device behavior, Android 9 runtime, and live network providers require independent tests.
+
+The checked-in branch bundle is a development artifact. The released YouTube descriptor still advertises **v1.49.0** and its recommendation; no new release was created. See [UPSTREAM.md](../UPSTREAM.md) for provenance and scope.
+
+<details>
+<summary>Historical v1.48.0 / v1.49.0-dev.7 comparison (2026-10-27; not current)</summary>
+
+
 > Compared on 2026-10-27 against [MorpheApp/morphe-patches](https://github.com/MorpheApp/morphe-patches).
 > The comparison was done on 2026-10-27 and the 9 new patches are now implemented (see the «Implemented» section below).
 
@@ -119,3 +142,5 @@ The compiled `patch.mpp` is rebuilt by `.github/workflows/build-mpp.yml` and dec
 - https://github.com/MorpheApp/morphe-patches/compare/v1.47.0...v1.48.0
 - `patches-list.json` at `v1.48.0` / `v1.49.0-dev.7` / `main`
 - Source tarballs compared locally: `v1.47.0`, `v1.48.0`, `v1.49.0-dev.7`
+
+</details>

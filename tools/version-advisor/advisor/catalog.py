@@ -154,7 +154,8 @@ def fetch_upstream(previous: dict, timeout: float = 20) -> tuple[dict | None, di
     except (KeyError, TypeError, ValueError, UnicodeDecodeError) as error:
         raise CatalogSyncError(f"Upstream patches-list.json is invalid ({error})") from error
 
-    meta["sha"] = data.get("sha")
+    # The Contents API returns the file's Git blob SHA, not the ref's commit SHA.
+    meta["manifestSha"] = data.get("sha")
     meta["url"] = data.get("html_url") or f"https://github.com/{owner}/{repo}/blob/{ref}/patches-list.json"
     return manifest, meta
 
@@ -221,7 +222,7 @@ def fingerprint(catalog: dict) -> str:
         "upstream": {
             k: v
             for k, v in catalog.get("upstream", {}).items()
-            if k not in ("checkedAt", "etag", "syncError", "rateRemaining", "release")
+            if k not in ("checkedAt", "etag", "rateRemaining", "release")
         },
         "release": (catalog.get("upstream", {}) or {}).get("release", {}).get("tag"),
     }
@@ -249,7 +250,7 @@ def build_catalog(
             f"{meta.get('owner', DEFAULT_OWNER)}/{meta.get('repo', DEFAULT_REPO)}@{meta.get('ref', DEFAULT_REF)}",
         )
         upstream["checkedAt"] = meta.get("checkedAt") or utcnow()
-        upstream["commitSha"] = meta.get("sha")
+        upstream["manifestSha"] = meta.get("manifestSha")
         upstream["url"] = meta.get("url")
         upstream["etag"] = meta.get("etag") or old_upstream.get("etag")
         upstream["synced"] = True
@@ -261,9 +262,17 @@ def build_catalog(
         upstream.setdefault("source", f"{DEFAULT_OWNER}/{DEFAULT_REPO}@{DEFAULT_REF}")
         upstream.setdefault("versions", local["versions"])
         upstream.setdefault("synced", False)
-        upstream["checkedAt"] = meta.get("checkedAt") or upstream.get("checkedAt") or utcnow()
+        # Older catalogs misnamed this Contents API blob SHA as a commit SHA.
+        if "commitSha" in upstream:
+            legacy_sha = upstream.pop("commitSha")
+            if not upstream.get("manifestSha"):
+                upstream["manifestSha"] = legacy_sha
+        # Offline and failed refreshes must not pretend upstream was checked.
+        upstream["checkedAt"] = meta.get("checkedAt") or upstream.get("checkedAt") or "never"
         if meta.get("etag"):
             upstream["etag"] = meta["etag"]
+        if meta.get("notModified") and not sync_error:
+            upstream.pop("syncError", None)
     if sync_error:
         upstream["syncError"] = sync_error
 
@@ -308,7 +317,7 @@ def sync_catalog(
     # instead of the repository default (important for tests/custom paths).
     previous = load_json(catalog_path) if catalog_path.is_file() else build_catalog(local_manifest)
     upstream_manifest = None
-    meta: dict = {"checkedAt": utcnow()}
+    meta: dict = {}
     error = None
 
     if online:
@@ -316,7 +325,7 @@ def sync_catalog(
             upstream_manifest, meta = fetch_upstream(previous, timeout)
         except CatalogSyncError as caught:
             error = str(caught)
-            meta = {"checkedAt": utcnow()}
+            meta = {}
     else:
         error = "Offline mode: catalog rebuilt from the local manifest only."
 
@@ -387,7 +396,7 @@ def render_markdown(catalog: dict) -> str:
         "",
         f"Patch bundle v{upstream.get('patchVersion', '?')}"
         + (f" (release {release['tag']}, {release.get('publishedAt', '')})" if release.get("tag") else "")
-        + (f", commit `{upstream['commitSha'][:10]}`" if upstream.get("commitSha") else "")
+        + (f", manifest blob `{upstream['manifestSha'][:10]}`" if upstream.get("manifestSha") else "")
         + ".",
         "",
         "| YouTube version | Min Android | Min SDK | Status | In this repo |",

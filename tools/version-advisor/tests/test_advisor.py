@@ -7,6 +7,7 @@ import sys
 import tempfile
 import threading
 import unittest
+from unittest import mock
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -95,6 +96,34 @@ class CatalogTests(unittest.TestCase):
             cat.write_docs(result["catalog"], docs)
             self.assertIn("21.40.161", docs.read_text(encoding="utf-8"))
 
+    def test_contents_api_sha_is_labeled_as_manifest_blob_not_commit(self):
+        previous = cat.build_catalog(SAMPLE_MANIFEST, SAMPLE_MANIFEST)
+        previous['upstream']['commitSha'] = 'abcdef0123456789'
+        refreshed = cat.build_catalog(SAMPLE_MANIFEST, previous=previous, meta={'notModified': True})
+        self.assertNotIn('commitSha', refreshed['upstream'])
+        self.assertEqual(refreshed['upstream']['manifestSha'], 'abcdef0123456789')
+        self.assertIn('manifest blob `abcdef0123`', cat.render_markdown(refreshed))
+        self.assertNotIn('commit `abcdef0123`', cat.render_markdown(refreshed))
+
+    def test_offline_does_not_change_upstream_check_and_success_clears_warning(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            manifest = root / 'patches-list.json'
+            manifest.write_text(json.dumps(SAMPLE_MANIFEST), encoding='utf-8')
+            target = root / 'versions.json'
+            previous = cat.build_catalog(SAMPLE_MANIFEST, SAMPLE_MANIFEST,
+                                         meta={'checkedAt': '2026-10-30T00:00:00Z'})
+            cat.save_json(target, previous)
+            offline = cat.sync_catalog(target, manifest, online=False, with_release=False)
+            self.assertEqual(offline['catalog']['upstream']['checkedAt'], '2026-10-30T00:00:00Z')
+            self.assertIn('syncError', cat.load_json(target)['upstream'])
+            meta = {'notModified': True, 'checkedAt': '2026-11-01T00:00:00Z'}
+            with mock.patch.object(cat, 'fetch_upstream', return_value=(None, meta)):
+                refreshed = cat.sync_catalog(target, manifest, online=True, with_release=False)
+            self.assertTrue(refreshed['changed'])
+            self.assertEqual(refreshed['catalog']['upstream']['checkedAt'], meta['checkedAt'])
+            self.assertNotIn('syncError', cat.load_json(target)['upstream'])
+
 
 class DeviceTests(unittest.TestCase):
     def test_resolve_by_model_code(self):
@@ -169,7 +198,7 @@ class RecommendationTests(unittest.TestCase):
     def test_new_phone_prefers_stable_but_reports_newest(self):
         result = self.analyze(33)
         self.assertFalse(result["recommendation"]["experimental"])
-        self.assertEqual(result["recommendation"]["version"], "21.23.492")
+        self.assertEqual(result["recommendation"]["version"], "21.30.216")
         self.assertTrue(result["newestCompatible"]["experimental"])
         self.assertEqual(result["compatibleCount"], len(result["options"]))
         top_score = max(option["score"] for option in result["options"])
@@ -177,7 +206,8 @@ class RecommendationTests(unittest.TestCase):
 
     def test_android_9_phone_cannot_run_sdk_29_builds(self):
         result = self.analyze(28)
-        self.assertEqual(result["compatibleCount"], 5)
+        self.assertEqual(result["compatibleCount"], 3)
+        self.assertEqual(result["recommendation"]["version"], "21.23.492")
         self.assertFalse(result["recommendation"]["experimental"])
         for option in result["options"]:
             if option["minSdk"] == 29:
@@ -187,7 +217,7 @@ class RecommendationTests(unittest.TestCase):
     def test_old_android_only_one_build(self):
         result = self.analyze(26)
         self.assertEqual(result["compatibleCount"], 1)
-        self.assertEqual(result["recommendation"]["version"], "20.21.37")
+        self.assertEqual(result["recommendation"]["version"], "20.26.46")
 
     def test_unsupported_phone(self):
         result = self.analyze(23)

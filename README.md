@@ -6,11 +6,13 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 >
 > កំណត់សម្គាល់៖ យកតែផ្នែក YouTube ប៉ុណ្ណោះ។ ឯកសារ shared ដែលចាំបាច់សម្រាប់ YouTube នៅតែមាន ប៉ុន្តែមិនបានដាក់ patch set របស់ YouTube Music ឬ Reddit ទេ។
 
-[![Release](https://img.shields.io/badge/release-v1.49.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.49.0)
-[![patch.mpp](https://img.shields.io/badge/patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.49.0/patch.mpp)
-[![YouTube stable](https://img.shields.io/badge/YouTube%20stable-21.23.492-14835b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.23.492)
-[![YouTube latest](https://img.shields.io/badge/YouTube%20latest-21.42.241-a8650b)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/youtube-21.42.241)
-[![Upstream](https://img.shields.io/badge/upstream-v1.48.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.48.0)
+> **Development bundle / Bundle សាកល្បងលើ branch នេះ:** `2.0.0-dev.1` ណែនាំ YouTube **21.30.216** សម្រាប់ Android 10+; Android 9 ប្រើ **21.23.492**។ ទាញយក [`patch.mpp`](patch.mpp) លើ branch នេះ ហើយ import ក្នុង Morphe Manager។ Release និង patch-source descriptor សាធារណៈនៅតែជា `v1.49.0` (ណែនាំ `21.23.492`) — មិនទាន់មាន release ថ្មីទេ។
+
+[![Released bundle](https://img.shields.io/badge/released%20bundle-v1.49.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.49.0)
+[![Release patch.mpp](https://img.shields.io/badge/release%20patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.49.0/patch.mpp)
+[![Development stable](https://img.shields.io/badge/development%20stable-21.30.216-14835b)](patches/src/main/kotlin/app/morphe/patches/youtube/shared/Constants.kt)
+[![Experimental target](https://img.shields.io/badge/experimental-21.43.523-a8650b)](patches/src/main/kotlin/app/morphe/patches/youtube/shared/Constants.kt)
+[![Upstream](https://img.shields.io/badge/upstream-v2.0.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v2.0.0)
 [![License](https://img.shields.io/badge/license-GPLv3-blue)](LICENSE)
 
 [![Build patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/build-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/build-mpp.yml)
@@ -203,11 +205,11 @@ Matching, identically signed splits are required for installation. See the
 
 <!-- PATCH-LIST:START -->
 <details>
-<summary>📦 YouTube • 106 patches</summary>
+<summary>📦 YouTube • 110 patches</summary>
 
 ### YouTube Patches
 
-និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 111 patches ពី [`patches-list.json`](patches-list.json) v1.49.0 (106 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
+និយាយពីអ្វីដែលមាននៅក្នុង patches ទាំងអស់ / What is inside the whole patch bundle. បញ្ជីពេញខាងក្រោមគឺ 115 patches ពី [`patches-list.json`](patches-list.json) v2.0.0-dev.1 (110 កំណត់គោលដៅ `com.google.android.youtube` + 5 shared/generic)។
 
 **ឧទាហរណ៍ / Highlights**
 
@@ -219,6 +221,16 @@ Matching, identically signed splits are required for installation. See the
 ទាំងនេះត្រូវគ្នាជាមួយ `Hide ads`, `Remove background playback restrictions`, `Hide Shorts components` និង `Theme`។ ក្រៅពីនោះនៅមាន SponsorBlock, Return YouTube Dislike, DeArrow, Picture-in-Picture, Playback speed, Video quality, Loop video, Swipe controls, Seekbar, Downloads, Save to Watch later, Copy/share links, Spoof app version/signature, GmsCore support និង **Voice over translation** (Khmer TTS) ជាដើម។
 
 បើកក្រុមខាងក្រោមដើម្បីមើលគ្រប់ patch / Expand a group to see every patch name:
+
+<details>
+<summary>✨ ថ្មីពី v2.0.0 / New in v2.0.0 • 4</summary>
+
+- `Download post images`
+- `Niconico comments`
+- `Search comments`
+- `Translate posts`
+
+</details>
 
 <details>
 <summary>✨ ថ្មីពី v1.48.0 / New in v1.48.0 • 9</summary>
@@ -379,14 +391,16 @@ Matching, identically signed splits are required for installation. See the
 
 </details>
 
-> ចំណាំ៖ ក្រុម «ថ្មីពី v1.48.0» គឺជា patches ដែលបានបន្ថែមពី upstream v1.48.0។ ស្លាក `youtube-*` មិនបន្ថែម patch ថ្មីទេ — ការបន្ថែមកំណែ YouTube ថ្មីត្រូវការ sync កូដ patch ពី upstream មុន។
+> ចំណាំ៖ ក្រុម «ថ្មីពី v1.48.0» និង «ថ្មីពី v2.0.0» បង្ហាញ patches ដែលបានបន្ថែមពី upstream។ ស្លាក `youtube-*` មិនបន្ថែម patch ថ្មីទេ — ការបន្ថែមកំណែ YouTube ថ្មីត្រូវការ sync កូដ patch ពី upstream មុន។
 
 </details>
 <!-- PATCH-LIST:END -->
 
 ## Upstream sync / ការធ្វើបច្ចុប្បន្នភាពពី upstream
 
-This fork is synced to the **YouTube-only source of upstream v1.48.0** (bundle release `v1.49.0`) and includes the **9 new YouTube patches** (Ask flyout menu, Custom font, Feed card layout, Feed video actions, Feed view count, Force animations, Series tracking, Skip live Shorts, Video delay) — see the «New in v1.48.0» group above. Those 9 are the net new features; to compile them the shared YouTube patch/extension sources had to be aligned with v1.48.0 (morphe-patcher 2.0.0), while our Khmer TTS package, Khmer strings, YouTube-only resource checker and fork metadata were preserved. **No YouTube Music or Reddit patches are included.** See [`docs/upstream-sync.md`](docs/upstream-sync.md) for the full comparison, the v1.49.0-dev.7 additions and the supported YouTube versions. **Recommended YouTube target: `21.23.492`** — the same as upstream (Manager recommends the newest non-experimental target; `21.23.492` was promoted to stable upstream in v1.49.0-dev.7).
+The development bundle syncs the **YouTube-only subset of upstream v2.0.0** and adds four selectors: `Download post images`, `Search comments`, `Translate posts` and `Niconico comments`. The previous nine additions, custom in-app EQ and player shortcut, Khmer TTS, SEA-LION provider and Khmer strings remain. **No separate YouTube Music or Reddit patches are included.**
+
+For Android 10+, the compiled stable recommendation is **21.30.216**; for Android 9, use **21.23.492**. Manager reads compatibility targets from the compiled bundle; experimental versions require enabling that option in Manager. Manager displayed 21.30.216 as Recommended, and the bundle passed an offline Desktop patch-application smoke test; device runtime remains unverified. See [validation](docs/youtube-2130-validation.md), [`docs/upstream-sync.md`](docs/upstream-sync.md), [`docs/youtube-versions.md`](docs/youtube-versions.md) and [`UPSTREAM.md`](UPSTREAM.md). The existing v1.49.0 release remains unchanged.
 
 ## New: in-app Audio equalizer (v1.48.2)
 
@@ -400,7 +414,9 @@ of intentionally stopping playback. It does not process remote/cast audio.
 tests passed; APK/device listening tests remain pending. Release badges and the source descriptor point to **1.49.0**. Refresh your patch
 source in Manager or import the release bundle to use EQ.
 
-## v1.49.0: player EQ shortcut and SEA-LION
+## v1.49.0 release history: player EQ shortcut and SEA-LION
+
+The bullets below describe the existing published release, not the `2.0.0-dev.1` development bundle.
 
 - Top-player EQ shortcut near CC/settings, using native relative control layout; opens the existing in-app EQ dialog.
 - New SEA-LION translation provider: `https://api.sea-lion.ai/v1/`, model `aisingapore/Gemma-SEA-LION-v4-27B-IT`, with a separate masked API-key field.
