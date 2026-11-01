@@ -68,9 +68,13 @@ jobs:
       - name: Verify MPP and Morphe Desktop listings
         run: |
           set -euo pipefail
-          mapfile -t bundles < <(find patches/build/libs -maxdepth 1 -type f -name 'patches-*.mpp')
-          test "${#bundles[@]}" -eq 1
-          cp "${bundles[0]}" patch.mpp
+          exec > >(tee "$RUNNER_TEMP/youtube-verification.log") 2>&1
+          # build also creates classified -sources.mpp and -javadoc.mpp files.
+          # Only the unclassified jar is augmented by buildAndroid with classes.dex.
+          version="$(sed -n 's/^version[[:space:]]*=[[:space:]]*//p' gradle.properties)"
+          bundle="patches/build/libs/patches-${version}.mpp"
+          if ! test -f "$bundle"; then ls -lh patches/build/libs; exit 1; fi
+          cp "$bundle" patch.mpp
           sha256sum patch.mpp > patch.mpp.sha256
           python3 .github/scripts/verify-mpp.py
           python3 - <<'PY'
@@ -92,6 +96,17 @@ jobs:
             --experimental-listing "$RUNNER_TEMP/youtube-all-list.txt"
           mkdir -p "$RUNNER_TEMP/youtube-output"
           cp patch.mpp patch.mpp.sha256 patches-list.json "$RUNNER_TEMP/youtube-output/"
+      - name: Report verification diagnostics
+        if: failure()
+        run: |
+          if test -f "$RUNNER_TEMP/youtube-verification.log"; then
+            python3 - <<'PY'
+          import os
+          path = os.environ['RUNNER_TEMP'] + '/youtube-verification.log'
+          text = ''.join(open(path, encoding='utf-8', errors='replace').readlines()[-30:])[-3200:]
+          print('::error::' + text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
+          PY
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: youtube-2130-patch-bundle
