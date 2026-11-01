@@ -21,7 +21,7 @@ jobs:
           python3 - <<'PY'
           import os
           path = os.environ['RUNNER_TEMP'] + '/job.log'
-          text = ''.join(open(path, encoding='utf-8', errors='replace').readlines()[-160:])
+          text = ''.join(open(path, encoding='utf-8', errors='replace').readlines()[-60:])[-3300:]
           text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-          print('::warning::' + text[-50000:])
+          print('::warning::' + text)
           PY
