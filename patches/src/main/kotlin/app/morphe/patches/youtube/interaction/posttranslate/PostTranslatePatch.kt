@@ -10,6 +10,7 @@ package app.morphe.patches.youtube.interaction.posttranslate
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.util.getReference
 import app.morphe.patcher.util.proxy.mutableTypes.MutableClass
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod.Companion.toMutable
@@ -31,6 +32,8 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodParameter
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 private const val EXTENSION_CLASS =
     "Lapp/morphe/extension/youtube/patches/PostTranslatePatch;"
@@ -97,11 +100,13 @@ val postTranslatePatch = bytecodePatch(
         // contents of the hosts, so the contents are read the same way the host reads their texts.
         ComponentHostGetTextContentFingerprint.let {
             val matches = it.instructionMatches
-            val ensureMountItems = matches[0].methodReference
-            val mountItemsField = matches[1].fieldReference
-            val sizeMethod = matches[2].methodReference
-            val valueAtMethod = matches[3].methodReference
-            val contentField = matches[4].fieldReference
+            // Backported from upstream's post-v2.0 Android 9 fix. Use the v2.0
+            // patcher API to obtain the same references from the matched instructions.
+            val ensureMountItems = matches[0].instruction.getReference<MethodReference>()!!
+            val mountItemsField = matches[1].instruction.getReference<FieldReference>()!!
+            val sizeMethod = matches[2].instruction.getReference<MethodReference>()!!
+            val valueAtMethod = matches[3].instruction.getReference<MethodReference>()!!
+            val contentField = matches[4].instruction.getReference<FieldReference>()!!
 
             it.classDef.apply {
                 interfaces.add(EXTENSION_COMPONENT_HOST_INTERFACE)
@@ -134,9 +139,10 @@ val postTranslatePatch = bytecodePatch(
         }
 
         // The layout and the text of the text drawable are given the translation.
-        val textField = LithoTextDrawableGetTextItemsFingerprint.instructionMatches.first().fieldReference
+        val textField = LithoTextDrawableGetTextItemsFingerprint.instructionMatches.first()
+            .instruction.getReference<FieldReference>()!!
         LithoTextDrawableDrawFingerprint.let {
-            val layoutField = it.instructionMatches.first().fieldReference
+            val layoutField = it.instructionMatches.first().instruction.getReference<FieldReference>()!!
 
             it.classDef.apply {
                 interfaces.add(EXTENSION_TEXT_DRAWABLE_INTERFACE)

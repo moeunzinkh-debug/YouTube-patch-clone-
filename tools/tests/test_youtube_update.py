@@ -1,4 +1,5 @@
 """Regression tests for the scoped YouTube 21.30.216 update (no APK required)."""
+import importlib.util
 import json
 import re
 import sys
@@ -50,6 +51,15 @@ class YouTubeUpdate(unittest.TestCase):
         actual = {e.attrib['name']: ''.join(e.itertext()) for e in root if e.tag == 'string'}
         for name, value in fixture.items():
             self.assertEqual(actual.get(name), value, name)
+
+    def test_readme_catalog_groups_match_all_requested_selectors(self):
+        spec = importlib.util.spec_from_file_location('patch_catalog', ROOT / 'tools/generate-patch-catalog.py')
+        catalog = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(catalog)
+        grouped = [name for _, names in catalog.GROUPS for name in names]
+        self.assertEqual(len(grouped), len(set(grouped)), 'duplicate group member')
+        self.assertEqual(set(grouped), verify.expected_names())
+        self.assertEqual(set(catalog.NEW_IN_V20), verify.NEW_PATCHES)
 
     def test_custom_voice_picker_uses_new_shared_slider_api(self):
         source = (ROOT / 'extensions/youtube/src/main/java/app/morphe/extension/youtube/patches/voiceovertranslation/VOTBottomSheet.java').read_text()
