@@ -52,6 +52,19 @@ class YouTubeUpdate(unittest.TestCase):
         for name, value in fixture.items():
             self.assertEqual(actual.get(name), value, name)
 
+    def test_translate_posts_backports_legacy_android_fix(self):
+        base = ROOT / 'patches/src/main/kotlin/app/morphe/patches/youtube/interaction/posttranslate'
+        kotlin = (base / 'PostTranslatePatch.kt').read_text()
+        java = (ROOT / 'extensions/youtube/src/main/java/app/morphe/extension/youtube/patches/PostTranslatePatch.java').read_text()
+        for injected in ('patch_getMountedContents', 'EXTENSION_COMPONENT_HOST_INTERFACE',
+                         'EXTENSION_TEXT_DRAWABLE_INTERFACE'):
+            self.assertIn(injected, kotlin)
+        self.assertIn('getReference<FieldReference>()', kotlin)
+        self.assertIn('getReference<MethodReference>()', kotlin)
+        self.assertIn('interface ComponentHostInterface', java)
+        self.assertIn('interface TextDrawableInterface', java)
+        self.assertNotIn('getDeclaredFields()', java)
+
     def test_readme_catalog_groups_match_all_requested_selectors(self):
         spec = importlib.util.spec_from_file_location('patch_catalog', ROOT / 'tools/generate-patch-catalog.py')
         catalog = importlib.util.module_from_spec(spec)

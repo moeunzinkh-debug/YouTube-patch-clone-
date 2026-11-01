@@ -80,6 +80,8 @@ def verify_archive(path: Path) -> dict:
             check('app/morphe/patches/youtube/' + path in names, 'Patch class missing: ' + path)
         check(not any(n.startswith(('app/morphe/patches/music/', 'app/morphe/patches/reddit/'))
                       for n in names), 'Music/Reddit patch class present')
+        check('classes.dex' in names and z.read('classes.dex').startswith(b'dex\n'),
+              'Android patch-code DEX missing; Manager cannot load a JVM-only jar')
         dex = z.read('extensions/youtube.mpe')
         for needle in (b'KhmerTtsClient', b'/api/process-multi', b'EqualizerPlayerButton',
                        b'EqualizerPatch', b'api.sea-lion.ai', b'aisingapore/Gemma-SEA-LION-v4-27B-IT',
