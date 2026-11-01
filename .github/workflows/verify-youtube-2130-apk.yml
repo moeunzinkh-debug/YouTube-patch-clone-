@@ -40,6 +40,7 @@ jobs:
           work="$RUNNER_TEMP/youtube-apk-test"
           evidence="$RUNNER_TEMP/youtube-evidence"
           mkdir -p "$work" "$evidence"
+          exec > >(tee "$evidence/smoke.log") 2>&1
           # APKs are temporary CI test inputs/outputs: never upload or commit them.
           trap 'rm -rf "$work" "$HOME"' EXIT
           gh release download youtube-21.30.216-patches-v2.0.0 --repo asp345/youtube-morphe \
@@ -55,7 +56,9 @@ jobs:
           grep -E "^package: name='com.google.android.youtube' versionCode='[0-9]+' versionName='21.30.216'" "$evidence/stock-badging.txt"
           grep -F "sdkVersion:'29'" "$evidence/stock-badging.txt"
           "$tools/apksigner" verify --print-certs "$work/stock.apk" | tee "$evidence/stock-signature.txt"
-          grep -Fi 'Signer #1 certificate SHA-256 digest: 3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a' "$evidence/stock-signature.txt"
+          # YouTube uses v3.0/v3.1 signing rotation: verify both accepted Google certs.
+          grep -Fi 'certificate SHA-256 digest: 3d7a1223019aa39d9ea0e3436ab7c0896bfb4fb679f4de5fe7c23f326c8f994a' "$evidence/stock-signature.txt"
+          grep -Fi 'certificate SHA-256 digest: 5aad2bee6db95d17e05a08d7d1e64c10a1511879154483916b6ae6c7fd9cb0c6' "$evidence/stock-signature.txt"
           desktop="$RUNNER_TEMP/youtube-tools/morphe-desktop-1.20.0-dev.1-all.jar"
           # Defaults plus the custom features and all four newly requested selectors.
           java -Xmx6g -jar "$desktop" patch -p patch.mpp \
@@ -80,8 +83,13 @@ jobs:
       - name: Report smoke-test diagnostics
         if: failure()
         run: |
-          if test -f "$RUNNER_TEMP/youtube-evidence/patch.log"; then
-            grep -Ei 'error|failed|exception|aborted' "$RUNNER_TEMP/youtube-evidence/patch.log" | tail -30 | while IFS= read -r line; do echo "::error::$line"; done || true
+          if test -f "$RUNNER_TEMP/youtube-evidence/smoke.log"; then
+            python3 - <<'PY'
+          import os
+          path = os.environ['RUNNER_TEMP'] + '/youtube-evidence/smoke.log'
+          text = ''.join(open(path, encoding='utf-8', errors='replace').readlines()[-30:])[-3200:]
+          print('::error::' + text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
+          PY
           fi
       - uses: actions/upload-artifact@v4
         if: always()
