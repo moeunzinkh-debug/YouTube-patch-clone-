@@ -112,16 +112,36 @@ def verify_selected_patches() -> None:
     tap('Search patches', exact=True)
     time.sleep(2)
     for name in REQUIRED:
+        nodes = dump()
+        # On a cold emulator the search field is visible before it gets focus.
+        field = next((n for n in nodes if n.get('class') == 'android.widget.EditText'), None)
+        if field is None:
+            field = next((n for n in nodes if n.get('text') == 'Search patches'), None)
+        if not field or not re.fullmatch(r'\[\d+,\d+\]\[\d+,\d+\]', field.get('bounds', '')):
+            raise RuntimeError('Search field missing: ' + snapshot(nodes))
+        x1, y1, x2, y2 = (int(x) for x in re.findall(r'\d+', field['bounds']))
+        adb('shell', 'input', 'tap', str((x1 + x2) // 2), str((y1 + y2) // 2))
         adb('shell', 'input', 'text', name.replace(' ', '%s'))
-        nodes, _ = wait_for(name, 45)
-        # The card's accessibility description contains the patch name and state.
-        if not any(name.casefold() in n.get('content-desc', '').casefold()
-                   and 'Enabled' in n.get('content-desc', '') for n in nodes):
-            raise RuntimeError(f'{name} not shown enabled in Manager: {snapshot(nodes)}')
+        deadline = time.monotonic() + 45
+        while time.monotonic() < deadline:
+            nodes = dump()
+            # The card's accessibility description contains the patch name and state.
+            cards = [n for n in nodes if name.casefold() in n.get('content-desc', '').casefold()]
+            if any('Enabled' in n['content-desc'] for n in cards):
+                break
+            if any('Disabled' in n['content-desc'] for n in cards):
+                raise RuntimeError(f'{name} is disabled in Manager: {snapshot(nodes)}')
+            time.sleep(1)
+        else:
+            raise RuntimeError(f'{name} not shown in Manager: {snapshot(nodes)}')
         print(f'::notice::Manager selected {name}', flush=True)
         tap('Clear', exact=True)
         time.sleep(1)
-    tap('Search patches', exact=True)
+    # The toggle, rather than the field placeholder, closes the search.
+    nodes = dump()
+    toggle = next(n for n in nodes if n.get('content-desc') == 'Search patches')
+    x1, y1, x2, y2 = (int(x) for x in re.findall(r'\d+', toggle['bounds']))
+    adb('shell', 'input', 'tap', str((x1 + x2) // 2), str((y1 + y2) // 2))
     time.sleep(2)
 
 
