@@ -14,7 +14,10 @@ jobs:
     steps:
       - name: Surface previous verification failure
         run: |
-          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/124816478295/logs" > "$RUNNER_TEMP/job.log"
+          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/124816478295/logs" > "$RUNNER_TEMP/job.log" 2> "$RUNNER_TEMP/job-error" || {
+            python3 -c 'import os; print("::error::" + open(os.environ["RUNNER_TEMP"] + "/job-error").read().replace("%", "%25").replace("\n", "%0A"))'
+            exit 1
+          }
           python3 - <<'PY'
           import os
           path = os.environ['RUNNER_TEMP'] + '/job.log'
