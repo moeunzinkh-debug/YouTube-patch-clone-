@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     testImplementation(libs.junit)
+    testImplementation("org.json:json:20240303")
+    testImplementation(libs.morphe.extensions.library)
 
     compileOnly(libs.annotation)
     compileOnly(libs.morphe.extensions.library)
@@ -22,6 +24,9 @@ configure<ApplicationExtension> {
     defaultConfig {
         minSdk = 26
     }
+
+    // As upstream: Android Log calls in host-side tests use default stubs.
+    testOptions.unitTests.isReturnDefaultValues = true
 }
 
 protobuf {

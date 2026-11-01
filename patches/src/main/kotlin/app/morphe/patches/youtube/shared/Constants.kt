@@ -18,34 +18,25 @@ internal object Constants {
         ),
         targets = listOf(
             AppTarget(
+                version = "21.43.523",
+                minSdk = 29,
+                isExperimental = true
+            ),
+            AppTarget(
                 version = "21.42.241",
                 minSdk = 29,
                 isExperimental = true
             ),
             AppTarget(
-                version = "21.41.525",
-                minSdk = 29,
-                isExperimental = true
+                version = "21.30.216",
+                minSdk = 29
             ),
             AppTarget(
                 version = "21.28.208", // Last version with different miniplayers.
-                minSdk = 29,
-                isExperimental = true
+                minSdk = 29
             ),
             AppTarget(
-                // Promoted from experimental to stable by upstream v1.49.0-dev.7.
-                // Manager recommends the newest non-experimental target, so this
-                // must stay false for our bundle to recommend the same version.
                 version = "21.23.492", // Last version for Android 9.0
-                minSdk = 28,
-                isExperimental = false
-            ),
-            AppTarget(
-                version = "21.20.405",
-                minSdk = 28
-            ),
-            AppTarget(
-                version = "21.16.256",
                 minSdk = 28
             ),
             AppTarget(
@@ -53,7 +44,7 @@ internal object Constants {
                 minSdk = 28
             ),
             AppTarget(
-                version = "20.21.37",
+                version = "20.26.46", // Last version for Android 8.0
                 minSdk = 26
             )
         )
