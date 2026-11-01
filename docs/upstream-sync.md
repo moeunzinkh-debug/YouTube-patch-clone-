@@ -17,7 +17,7 @@ The 115 selectable entries comprise **110 YouTube and 5 generic** patches. The f
 
 The custom in-app Audio equalizer and top-player button, Khmer FastAPI TTS, SEA-LION voice-over provider, previous nine additions, Khmer strings and YouTube-only scope remain. The Translate posts fix from upstream commit [`589c3abbe540026426f3336b04c2f13cd692b127`](https://github.com/MorpheApp/morphe-patches/commit/589c3abbe540026426f3336b04c2f13cd692b127) was backported with references adapted for this patcher API. Device behavior, Android 9 runtime, and live network providers require independent tests.
 
-The checked-in branch bundle is a development artifact. The released YouTube descriptor still advertises **v1.49.0** and its recommendation; no new release was created. See [UPSTREAM.md](../UPSTREAM.md) for provenance and scope.
+The checked-in development bundle was published as the [v2.0.0-dev.1 pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v2.0.0-dev.1). The default source descriptor and stable v1.49.0 release remain unchanged; the repository source does not automatically discover the pre-release. Import the release MPP manually in Morphe Manager. See [UPSTREAM.md](../UPSTREAM.md) for provenance and scope.
 
 <details>
 <summary>Historical v1.48.0 / v1.49.0-dev.7 comparison (2026-10-27; not current)</summary>

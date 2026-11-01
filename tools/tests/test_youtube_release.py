@@ -29,6 +29,14 @@ class YouTubeDevelopmentRelease(unittest.TestCase):
         for patch in ('Download post images', 'Search comments', 'Translate posts', 'Niconico comments'):
             self.assertIn(patch, notes)
 
+    def test_readme_distinguishes_prerelease_from_default_source(self):
+        readme = (ROOT / 'README.md').read_text()
+        self.assertIn(f'{BASE}/releases/tag/v{VERSION}', readme)
+        self.assertIn(f'{BASE}/releases/download/v{VERSION}/patch.mpp', readme)
+        self.assertIn('default source descriptor', readme)
+        self.assertIn('v1.49.0', readme)
+        self.assertNotIn('មិនទាន់មាន release ថ្មីទេ', readme)
+
     def test_publication_workflow_preserves_the_previous_release(self):
         workflow = (ROOT / '.github/workflows/publish-youtube-200-dev1.yml').read_text()
         self.assertIn('--draft --prerelease', workflow)

@@ -6,10 +6,11 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 >
 > កំណត់សម្គាល់៖ យកតែផ្នែក YouTube ប៉ុណ្ណោះ។ ឯកសារ shared ដែលចាំបាច់សម្រាប់ YouTube នៅតែមាន ប៉ុន្តែមិនបានដាក់ patch set របស់ YouTube Music ឬ Reddit ទេ។
 
-> **Development bundle / Bundle សាកល្បងលើ branch នេះ:** `2.0.0-dev.1` ណែនាំ YouTube **21.30.216** សម្រាប់ Android 10+; Android 9 ប្រើ **21.23.492**។ ទាញយក [`patch.mpp`](patch.mpp) លើ branch នេះ ហើយ import ក្នុង Morphe Manager។ Release និង patch-source descriptor សាធារណៈនៅតែជា `v1.49.0` (ណែនាំ `21.23.492`) — មិនទាន់មាន release ថ្មីទេ។
+> **Pre-release / Bundle សាកល្បង:** [`v2.0.0-dev.1`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v2.0.0-dev.1) ណែនាំ YouTube **21.30.216** សម្រាប់ Android 10+; Android 9 ប្រើ **21.23.492**។ ទាញយក [`patch.mpp`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v2.0.0-dev.1/patch.mpp) ហើយ import ជា local patch source ក្នុង Morphe Manager។ Release stable និង default source descriptor នៅតែជា `v1.49.0` (ណែនាំ `21.23.492`)។ Manager មិនទាញ pre-release នេះពី repository source ដោយស្វ័យប្រវត្តិទេ។
 
-[![Released bundle](https://img.shields.io/badge/released%20bundle-v1.49.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.49.0)
-[![Release patch.mpp](https://img.shields.io/badge/release%20patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.49.0/patch.mpp)
+[![Development pre-release](https://img.shields.io/badge/pre--release-v2.0.0--dev.1-e38416?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v2.0.0-dev.1)
+[![Stable bundle](https://img.shields.io/badge/stable%20bundle-v1.49.0-e4313c?logo=github)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v1.49.0)
+[![Stable patch.mpp](https://img.shields.io/badge/stable%20patch.mpp-9.8%20MiB-3157d5)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v1.49.0/patch.mpp)
 [![Development stable](https://img.shields.io/badge/development%20stable-21.30.216-14835b)](patches/src/main/kotlin/app/morphe/patches/youtube/shared/Constants.kt)
 [![Experimental target](https://img.shields.io/badge/experimental-21.43.523-a8650b)](patches/src/main/kotlin/app/morphe/patches/youtube/shared/Constants.kt)
 [![Upstream](https://img.shields.io/badge/upstream-v2.0.0-6a7290)](https://github.com/MorpheApp/morphe-patches/releases/tag/v2.0.0)
@@ -413,8 +414,8 @@ Settings persist across sessions; unsupported audio engines show a status instea
 of intentionally stopping playback. It does not process remote/cast audio.
 
 [EQ usage and limitations](docs/youtube-equalizer.md). CI compilation and controller
-tests passed; APK/device listening tests remain pending. Release badges and the source descriptor point to **1.49.0**. Refresh your patch
-source in Manager or import the release bundle to use EQ.
+tests passed; APK/device listening tests remain pending. The default source descriptor
+still points to stable **1.49.0**; import the [development pre-release bundle](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v2.0.0-dev.1/patch.mpp) to use the updated patches.
 
 ## v1.49.0 release history: player EQ shortcut and SEA-LION
 
