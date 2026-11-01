@@ -65,6 +65,15 @@ class YouTubeUpdate(unittest.TestCase):
         self.assertIn('interface TextDrawableInterface', java)
         self.assertNotIn('getDeclaredFields()', java)
 
+    def test_translate_posts_network_behavior_is_documented(self):
+        java = (ROOT / 'extensions/youtube/src/main/java/app/morphe/extension/youtube/patches/PostTranslatePatch.java').read_text()
+        translator = (ROOT / 'extensions/shared/library/src/main/java/app/morphe/extension/shared/translation/TextTranslator.java').read_text()
+        readme = (ROOT / 'README.md').read_text()
+        self.assertIn('TextTranslator.translate(', java)
+        self.assertIn('https://translate.googleapis.com/translate_a/single', translator)
+        self.assertIn('Google Translate public endpoint', readme)
+        self.assertIn('Instant Translate bundle', readme)
+
     def test_readme_catalog_groups_match_all_requested_selectors(self):
         spec = importlib.util.spec_from_file_location('patch_catalog', ROOT / 'tools/generate-patch-catalog.py')
         catalog = importlib.util.module_from_spec(spec)

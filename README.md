@@ -400,7 +400,9 @@ Matching, identically signed splits are required for installation. See the
 
 The development bundle syncs the **YouTube-only subset of upstream v2.0.0** and adds four selectors: `Download post images`, `Search comments`, `Translate posts` and `Niconico comments`. The previous nine additions, custom in-app EQ and player shortcut, Khmer TTS, SEA-LION provider and Khmer strings remain. **No separate YouTube Music or Reddit patches are included.**
 
-For Android 10+, the compiled stable recommendation is **21.30.216**; for Android 9, use **21.23.492**. Manager reads compatibility targets from the compiled bundle; experimental versions require enabling that option in Manager. Manager displayed 21.30.216 as Recommended, and the bundle passed an offline Desktop patch-application smoke test; device runtime remains unverified. See [validation](docs/youtube-2130-validation.md), [`docs/upstream-sync.md`](docs/upstream-sync.md), [`docs/youtube-versions.md`](docs/youtube-versions.md) and [`UPSTREAM.md`](UPSTREAM.md). The existing v1.49.0 release remains unchanged.
+**ភាពឯកជន / Privacy:** YouTube `Translate posts` ផ្ញើអត្ថបទ post ដែលអ្នកជ្រើសទៅ Google Translate public endpoint; បើបរាជ័យ វាអាចបញ្ជូនអត្ថបទទៅកម្មវិធីបកប្រែនៅលើទូរសព្ទ។ វាដាច់ដោយឡែកពី Instant Translate bundle ដែលបានដក Google fallback ចេញ។ មិនចង់ប្រើ អាចបិទ patch នេះ។
+
+For Android 10+, the compiled stable recommendation is **21.30.216**; for Android 9, use **21.23.492**. Manager reads compatibility targets from the compiled bundle; experimental versions require enabling that option in Manager. Manager displayed 21.30.216 as Recommended and successfully applied 109 selected patches in an emulator; device runtime remains unverified. See [validation](docs/youtube-2130-validation.md), [`docs/upstream-sync.md`](docs/upstream-sync.md), [`docs/youtube-versions.md`](docs/youtube-versions.md) and [`UPSTREAM.md`](UPSTREAM.md). The existing v1.49.0 release remains unchanged.
 
 ## New: in-app Audio equalizer (v1.48.2)
 

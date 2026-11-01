@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import sys
 import tempfile
@@ -97,6 +98,12 @@ class CatalogTests(unittest.TestCase):
             self.assertIn("21.40.161", docs.read_text(encoding="utf-8"))
 
     def test_contents_api_sha_is_labeled_as_manifest_blob_not_commit(self):
+        body = {'content': base64.b64encode(json.dumps(SAMPLE_MANIFEST).encode()).decode(),
+                'sha': 'abcdef0123456789'}
+        with mock.patch.object(cat, '_github_get', return_value=(body, {})):
+            fetched, meta = cat.fetch_upstream({})
+        self.assertEqual(fetched, SAMPLE_MANIFEST)
+        self.assertEqual(meta['manifestSha'], body['sha'])
         previous = cat.build_catalog(SAMPLE_MANIFEST, SAMPLE_MANIFEST)
         previous['upstream']['commitSha'] = 'abcdef0123456789'
         refreshed = cat.build_catalog(SAMPLE_MANIFEST, previous=previous, meta={'notModified': True})
