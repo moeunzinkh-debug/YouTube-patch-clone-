@@ -1,0 +1,24 @@
+name: Inspect YouTube build failure
+on:
+  push:
+    branches: [arena/c4f8fd6a-youtube-patch-clone]
+    paths: ['.github/workflows/debug-youtube-build.yml']
+permissions:
+  actions: read
+  contents: read
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Surface previous verification failure
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/jobs/124816478295/logs" > "$RUNNER_TEMP/job.log"
+          python3 - <<'PY'
+          import os
+          path = os.environ['RUNNER_TEMP'] + '/job.log'
+          text = ''.join(open(path, encoding='utf-8', errors='replace').readlines()[-160:])
+          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::warning::' + text[-50000:])
+          PY
