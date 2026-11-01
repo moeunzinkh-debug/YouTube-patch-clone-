@@ -1,0 +1,103 @@
+name: Publish YouTube bundle v2.0.0-dev.1
+
+on:
+  push:
+    branches: [arena/c4f8fd6a-youtube-patch-clone]
+    paths:
+      - '.github/workflows/publish-youtube-200-dev1.yml'
+      - 'docs/releases/v2.0.0-dev.1.md'
+      - 'docs/releases/v2.0.0-dev.1/patches-bundle.json'
+      - 'tools/tests/test_youtube_release.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-youtube-200-dev1
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: contains(github.event.head_commit.message, '[publish-youtube-200-dev1]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v2.0.0-dev.1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify exact bundle, metadata and current branch inputs
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s tools/tests -p test_youtube_release.py -v
+          python3 .github/scripts/verify-mpp.py
+          python3 tools/verify_youtube_update.py --manifest patches-list.json --mpp patch.mpp
+          sha256sum -c patch.mpp.sha256
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          version = '2.0.0-dev.1'
+          assert f'version = {version}' in Path('gradle.properties').read_text().splitlines()
+          assert hashlib.sha256(Path('patch.mpp').read_bytes()).hexdigest() == '1ad416a7ce886dca2b8131e82f7c59c6e86bca1d1c30352eefe6b77f5bad1775'
+          metadata = json.loads(Path('docs/releases/v2.0.0-dev.1/patches-bundle.json').read_text())
+          assert metadata['version'] == version
+          assert metadata['download_url'] == 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v2.0.0-dev.1/patch.mpp'
+          assert metadata['page_url'] == 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v2.0.0-dev.1'
+          PY
+          git fetch origin "$GITHUB_REF_NAME"
+          for path in patch.mpp patch.mpp.sha256 patches-list.json gradle.properties \
+                      tools/verify_youtube_update.py tools/tests/data/youtube-patch-names.json \
+                      tools/tests/test_youtube_release.py docs/releases/v2.0.0-dev.1.md docs/releases/v2.0.0-dev.1/patches-bundle.json \
+                      .github/workflows/publish-youtube-200-dev1.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$path")" != "$(git rev-parse "FETCH_HEAD:$path")" ]; then
+              echo '::error::Release inputs changed after this workflow was triggered.'
+              exit 1
+            fi
+          done
+      - name: Create draft, upload and verify assets, then publish pre-release
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.49.0" \
+            --jq '{id,tag_name,draft,prerelease,assets:([.assets[]|{id,name,size,digest}]|sort_by(.name))}' \
+            > "$RUNNER_TEMP/youtube-stable-before.json"
+          # Never overwrite an existing release or reuse an existing tag.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo '::error::A release already exists for this tag; refusing to overwrite it.'
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null 2>&1; then
+            echo '::error::The tag already exists; refusing to reuse it.'
+            exit 1
+          fi
+          gh release create "$TAG" --target "$GITHUB_SHA" --draft --prerelease \
+            --title 'YouTube patches v2.0.0-dev.1 (pre-release)' \
+            --notes-file docs/releases/v2.0.0-dev.1.md
+          gh release upload "$TAG" patch.mpp patch.mpp.sha256 docs/releases/v2.0.0-dev.1/patches-bundle.json
+          api_url="$(gh release view "$TAG" --json apiUrl --jq .apiUrl)"
+          gh api "${api_url#https://api.github.com/}" > "$RUNNER_TEMP/youtube-draft.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          report = json.loads(Path(os.environ['RUNNER_TEMP'], 'youtube-draft.json').read_text())
+          assert report['tag_name'] == os.environ['TAG'] and report['draft'] and report['prerelease']
+          files = [Path('patch.mpp'), Path('patch.mpp.sha256'), Path('docs/releases/v2.0.0-dev.1/patches-bundle.json')]
+          actual = {asset['name']: asset for asset in report['assets']}
+          assert set(actual) == {path.name for path in files}, list(actual)
+          for path in files:
+              data = path.read_bytes()
+              asset = actual[path.name]
+              assert asset['state'] == 'uploaded' and asset['size'] == len(data), path
+              assert asset['digest'] == 'sha256:' + hashlib.sha256(data).hexdigest(), path
+          print('All three draft assets match local size and SHA-256.')
+          PY
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.49.0" \
+            --jq '{id,tag_name,draft,prerelease,assets:([.assets[]|{id,name,size,digest}]|sort_by(.name))}' \
+            > "$RUNNER_TEMP/youtube-stable-after.json"
+          cmp "$RUNNER_TEMP/youtube-stable-before.json" "$RUNNER_TEMP/youtube-stable-after.json"
+          gh release edit "$TAG" --draft=false --prerelease
+          gh release view "$TAG" --json tagName,isDraft,isPrerelease,url,assets
+          tag_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq .object.sha)"
+          test "$tag_sha" = "$GITHUB_SHA"
+          echo '::notice::Published the verified YouTube development bundle as a pre-release; stable v1.49.0 assets were unchanged.'

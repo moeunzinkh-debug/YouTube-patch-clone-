@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-11-01T10:53:19Z",
+  "description": "Unofficial YouTube-only development patch bundle: 110 YouTube and 5 generic patches. Recommended YouTube 21.30.216 on Android 10+; 21.23.492 on Android 9. Morphe Manager patching was tested; device runtime remains unverified.",
+  "download_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v2.0.0-dev.1/patch.mpp",
+  "signature_download_url": "",
+  "page_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v2.0.0-dev.1",
+  "version": "2.0.0-dev.1"
+}
