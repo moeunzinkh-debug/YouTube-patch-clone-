@@ -33,8 +33,16 @@ def adb(*args: str, timeout: int = 90) -> str:
 
 
 def dump() -> list[dict[str, str]]:
-    adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml', timeout=45)
-    return [n.attrib for n in ET.fromstring(adb('exec-out', 'cat', '/sdcard/window.xml')).iter('node')]
+    # A rapidly changing Compose screen can make uiautomator emit an empty or
+    # incomplete dump even though the command exits successfully. Retry it.
+    for _ in range(6):
+        try:
+            adb('shell', 'uiautomator', 'dump', '/sdcard/window.xml', timeout=45)
+            data = adb('exec-out', 'cat', '/sdcard/window.xml')
+            return [n.attrib for n in ET.fromstring(data).iter('node')]
+        except (RuntimeError, ET.ParseError):
+            time.sleep(1)
+    raise RuntimeError('Could not obtain a valid Manager UI hierarchy after retries')
 
 
 def matches(node: dict[str, str], label: str, exact: bool = False) -> bool:
