@@ -6,13 +6,15 @@
   "source_commit": "cef25d12c71c33f555b52d8330c1ca886bf59ccc",
   "compiled_gemini_support": false,
   "upstream_discovery": {
-    "commit": "d1c8a2008901634ece533e53d6b1caa66226ac18",
+    "commit": "3f113c1bd9fe5d34a4206e0a8902d963292bb66c",
     "profile_versions": {
       "google": [
-        "17.54.18.ve.arm64"
+        "17.54.18.ve.arm64",
+        "17.70.11.ve.arm64"
       ],
       "gemini": [
-        "1.0.958859967"
+        "1.0.958859967",
+        "1.0.995038376"
       ],
       "microg": []
     }
@@ -30,7 +32,8 @@
       "recommended_for_reference": null,
       "requested_status": "unverified",
       "upstream_profile_versions": [
-        "17.54.18.ve.arm64"
+        "17.54.18.ve.arm64",
+        "17.70.11.ve.arm64"
       ]
     },
     {
@@ -45,7 +48,8 @@
       "recommended_for_reference": null,
       "requested_status": "unverified",
       "upstream_profile_versions": [
-        "1.0.958859967"
+        "1.0.958859967",
+        "1.0.995038376"
       ]
     },
     {

@@ -17,9 +17,9 @@ MicroG release numbers are not auto-promoted: this snapshot declares only its pi
 
 ## Upstream discovery
 
-Checked upstream commit: `d1c8a2008901634ece533e53d6b1caa66226ac18`.
-- Google App: 17.54.18.ve.arm64
-- Gemini: 1.0.958859967
+Checked upstream commit: `3f113c1bd9fe5d34a4206e0a8902d963292bb66c`.
+- Google App: 17.54.18.ve.arm64, 17.70.11.ve.arm64
+- Gemini: 1.0.958859967, 1.0.995038376
 - MicroG RE: no app profile published
 
 ## Automatic updates
