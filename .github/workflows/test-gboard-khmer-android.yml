@@ -1,0 +1,139 @@
+name: Experimental Gboard Khmerlish Android smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/383e624b-youtube-patch-clone]
+    paths:
+      - 'tools/gboard-khmer/**'
+      - '.github/workflows/test-gboard-khmer-android.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  android-smoke:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[gboard-khmer-android-ci]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify bundle and disposable-fixture tooling
+        run: |
+          set -euo pipefail
+          (cd bundles/gboard-khmer && sha256sum -c gboard-khmerlish-experimental.mpp.sha256)
+          python3 tools/gboard-khmer/test_emulator_fixture.py -v
+      - name: Make a temporary third-party-derived emulator fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          trap 'status=$?; echo "::error::Fixture setup failed at line $LINENO (exit $status)"; if test -f /tmp/gboard-khmer-android/apply.log; then tail -20 /tmp/gboard-khmer-android/apply.log | while IFS= read -r line; do echo "::error::$line"; done; fi' ERR
+          mkdir -p /tmp/gboard-khmer-android
+          gh release download v1.19.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/gboard-khmer-android
+          echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/gboard-khmer-android/morphe-desktop-1.19.1-all.jar' | sha256sum --check
+          gh release download 'gboard-v18.5.4.993608717-release-arm64-v8a-p4.0.0' \
+            --repo iamwaqargulzar/auto-morphe-apk-builds \
+            --pattern 'gboard-18.5.4.993608717-release-arm64-v8a-arm64-v8a.apk' --dir /tmp/gboard-khmer-android
+          input=/tmp/gboard-khmer-android/gboard-18.5.4.993608717-release-arm64-v8a-arm64-v8a.apk
+          echo "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea  $input" | sha256sum --check
+          python3 tools/gboard-khmer/make_fixture.py "$input" /tmp/gboard-khmer-android/input.apk
+          java -Xmx3g -jar /tmp/gboard-khmer-android/morphe-desktop-1.19.1-all.jar patch \
+            --patches bundles/gboard-khmer/gboard-khmerlish-experimental.mpp --exclusive \
+            --enable 'Direct Google Translate (experimental)' --enable 'Khmerlish to Khmer (experimental)' \
+            --bytecode-mode FULL --out /tmp/gboard-khmer-android/patched.apk \
+            --result-file /tmp/gboard-khmer-android/patch-result.json \
+            /tmp/gboard-khmer-android/input.apk 2>&1 | tee /tmp/gboard-khmer-android/apply.log
+          python3 - <<'PY'
+          import json
+          result = json.load(open('/tmp/gboard-khmer-android/patch-result.json'))
+          assert result['success'] and not result['failedPatches']
+          assert {'Direct Google Translate (experimental)', 'Khmerlish to Khmer (experimental)'} <= set(result['appliedPatches'])
+          PY
+          python3 tools/gboard-khmer/make_emulator_fixture.py "$input" \
+            /tmp/gboard-khmer-android/patched.apk /tmp/gboard-khmer-android/hybrid.apk
+          tools="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1 | xargs dirname)"
+          "$tools/zipalign" -p -f 4 /tmp/gboard-khmer-android/hybrid.apk /tmp/gboard-khmer-android/aligned.apk
+          keytool -genkeypair -noprompt -keystore /tmp/gboard-khmer-android/test.keystore \
+            -storepass android -keypass android -alias test -dname 'CN=Disposable Gboard emulator test' \
+            -keyalg RSA -keysize 2048 -validity 2 > /dev/null 2>&1
+          "$tools/apksigner" sign --ks /tmp/gboard-khmer-android/test.keystore --ks-pass pass:android --key-pass pass:android \
+            --out /tmp/gboard-khmer-android/test-fixture.apk /tmp/gboard-khmer-android/aligned.apk
+          "$tools/aapt" dump badging /tmp/gboard-khmer-android/test-fixture.apk | sed -n '1p' \
+            | grep -F "name='dev.jason.com.google.android.inputmethod.latin'"
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM is unavailable'; fi
+      - name: Try Gboard settings and synthetic typing on Android 15
+        id: emulator
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 8G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/gboard-khmer/emulator_smoke.py /tmp/gboard-khmer-android/test-fixture.apk /tmp/gboard-khmer-android/report.json
+      - name: Record exact outcome; never publish the APK
+        if: always()
+        env:
+          EMULATOR_OUTCOME: ${{ steps.emulator.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gboard-khmer-android
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          report = Path('/tmp/gboard-khmer-android/report.json')
+          data = json.loads(report.read_text()) if report.exists() else {
+              'environment': 'disposable Android emulator, synthetic text only',
+              'fixture_install': 'not run', 'settings_entry': 'not tested', 'actual_gboard_typing': 'not tested',
+          }
+          bundle = Path('bundles/gboard-khmer/gboard-khmerlish-experimental.mpp')
+          data['bundle_sha256'] = hashlib.sha256(bundle.read_bytes()).hexdigest() if bundle.exists() else None
+          data['emulator_action_outcome'] = os.environ.get('EMULATOR_OUTCOME') or 'not run'
+          data['run_url'] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          report.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
+          print(json.dumps(data, ensure_ascii=False, indent=2))
+          PY
+      - name: Save only the sanitized report to this branch
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/arena/383e624b-youtube-patch-clone'
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          for path in tools/gboard-khmer bundles/gboard-khmer/gboard-khmerlish-experimental.mpp .github/workflows/test-gboard-khmer-android.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$path")" != "$(git rev-parse "HEAD:$path")" ]; then
+              echo 'Android smoke inputs changed; not recording an outdated result.'
+              exit 0
+            fi
+          done
+          cp /tmp/gboard-khmer-android/report.json bundles/gboard-khmer/android-smoke.json
+          git add bundles/gboard-khmer/android-smoke.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'test: record Gboard Khmerlish Android smoke [skip ci]'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "$GITHUB_REF_NAME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gboard-khmer-android-report
+          if-no-files-found: ignore
+          path: |
+            /tmp/gboard-khmer-android/report.json
+            /tmp/gboard-khmer-android/patch-result.json
