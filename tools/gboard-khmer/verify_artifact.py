@@ -10,7 +10,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = '4.0.0-khmerlish-dev.2'
+VERSION = '4.0.0-khmerlish-dev.3'
 NAME = 'Khmerlish to Khmer (experimental)'
 PACKAGE = 'com.google.android.inputmethod.latin'
 TARGET = '18.5.4.993608717-release-arm64-v8a'
@@ -55,7 +55,9 @@ def verify(bundle: Path, metadata: Path, listing: Path) -> str:
             raise ValueError('Extension is not Android DEX')
         for marker in (b'KhmerlishRuntime', b'KhmerlishController', b'KhmerlishSettingsFeature',
                        b'KhmerlishPanelRuntime', b'KhmerlishPanelSession', b'KhmerlishPanelConverter',
-                       b'KhmerlishPanelCommitter', b'KhmerlishAccessPoint', b'GboardDirectTranslateRuntime'):
+                       b'KhmerlishPanelCommitter', b'KhmerlishAccessPoint', b'KhmerlishDictionaryActivity',
+                       b'KhmerlishPersonalData', b'KhmerlishPersonalStore', b'KhmerlishWordGuide',
+                       b'GboardDirectTranslateRuntime'):
             if marker not in dex:
                 raise ValueError(f'Missing extension class: {marker!r}')
         manifest = archive.read('META-INF/MANIFEST.MF').decode('utf-8').replace('\r\n ', '')

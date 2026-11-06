@@ -67,6 +67,7 @@ def build_probes(tmp: Path, fixture_keystore: Path) -> None:
     common.run('javac', '-source', '8', '-target', '8', '-encoding', 'UTF-8', '-cp', str(android_jar),
         '-d', str(classes), str(ROOT / 'tools/gboard-khmer/AndroidKhmerProbeActivity.java'),
         str(ROOT / 'tools/gboard-khmer/AndroidGboardInspector.java'),
+        str(ROOT / 'tools/gboard-khmer/AndroidSyntheticUi.java'),
         str(ROOT / 'tools/gboard-translate/AndroidWindowInspector.java'), timeout=90)
     common.run(str(tools / 'd8'), '--min-api', '26', '--lib', str(android_jar), '--output', str(dex),
         *sorted(map(str, classes.rglob('*.class'))), timeout=90)
@@ -85,6 +86,7 @@ def build_probes(tmp: Path, fixture_keystore: Path) -> None:
             <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
             <application android:label="Synthetic keyboard inspector" />
             <instrumentation android:name="{common.INSPECTOR_RUNNER}" android:targetPackage="{INSPECTOR_PACKAGE}" />
+            <instrumentation android:name="dev.arena.khmerprobe.AndroidSyntheticUi" android:targetPackage="{INSPECTOR_PACKAGE}" />
             </manifest>''',
         'target_inspector': f'''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="{TARGET_INSPECTOR_PACKAGE}">
             <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
@@ -191,6 +193,30 @@ def find_and_tap(label: str, scroll: bool = True) -> bool:
 def labels() -> list[str]:
     return [n.get('text', '')[:100] for n in ET.fromstring(common.dump_ui()).iter('node')
             if n.get('text', '').strip()][:60]
+
+
+def set_synthetic_field(description: str, text: str) -> None:
+    encode = lambda value: base64.b64encode(value.encode('utf-8')).decode('ascii')
+    output = common.run('adb', 'shell', 'am', 'instrument', '-w', '-r',
+                        '-e', 'description', encode(description), '-e', 'value', encode(text),
+                        f'{INSPECTOR_PACKAGE}/dev.arena.khmerprobe.AndroidSyntheticUi', timeout=45)
+    if 'INSTRUMENTATION_RESULT: set=true' not in output:
+        raise RuntimeError('Could not set the synthetic field: ' + description)
+    time.sleep(1)
+
+
+def wait_for_text(text: str, seconds: int = 15) -> bool:
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        if any(text.lower() in label.lower() for label in labels()):
+            return True
+        time.sleep(1)
+    return False
+
+
+def require_tap(label: str, scroll: bool = False) -> None:
+    if not find_and_tap(label, scroll=scroll):
+        raise RuntimeError('Synthetic UI action not found: ' + label)
 
 
 def disable_autocorrect(report: dict) -> None:
@@ -591,6 +617,174 @@ def panel_smoke(report: dict) -> bool:
                 pass
 
 
+def open_dictionary() -> None:
+    command = common.run('adb', 'shell', 'am', 'start', '-n',
+                         f'{PACKAGE}/com.google.android.apps.inputmethod.latin.preference.SettingsActivity')
+    if 'Error:' in command:
+        raise RuntimeError('Native Gboard settings could not be launched')
+    time.sleep(5)
+    require_tap('Patches', scroll=True)
+    require_tap('Khmerlish', scroll=True)
+    require_tap('Personal Dictionary & Documents', scroll=True)
+    if not wait_for_text('Khmerlish Dictionary'):
+        raise RuntimeError('Private dictionary screen did not open')
+
+
+def personal_tab() -> None:
+    require_tap('Personal dictionary')
+    if not find_and_tap('Add personal word'):
+        raise RuntimeError('Personal dictionary actions are unavailable')
+
+
+def edit_synthetic_word(roman: str, khmer: str) -> None:
+    set_synthetic_field('Personal Khmerlish spelling', roman)
+    set_synthetic_field('Personal Khmer word', khmer)
+    require_tap('Save')
+    if not wait_for_text(roman + '  →  ' + khmer):
+        raise RuntimeError('Saved synthetic entry did not appear')
+
+
+def select_document(filename: str) -> None:
+    time.sleep(3)
+    if find_and_tap(filename):
+        return
+    # DocumentsUI may start in Recents. Open its navigation drawer and choose
+    # the Downloads root, which contains only files created by this smoke test.
+    if not find_and_tap('Downloads'):
+        for nav in ('Show roots', 'Open navigation drawer', 'Browse', 'Show navigation'):
+            if find_and_tap(nav):
+                break
+        require_tap('Downloads')
+    require_tap(filename)
+
+
+def import_document(filename: str, replace: bool | None = False) -> None:
+    require_tap('Import dictionary file')
+    require_tap('Choose file')
+    select_document(filename)
+    if replace is None:
+        # Invalid input is rejected before the confirmation or any DB writes.
+        time.sleep(4)
+        if any('Keep existing' in value for value in labels()):
+            raise RuntimeError('Invalid document was offered for import')
+        return
+    if not wait_for_text('Keep existing'):
+        raise RuntimeError('Import preview did not appear')
+    require_tap('Replace' if replace else 'Keep existing')
+    time.sleep(3)
+
+
+def dictionary_smoke(tmp: Path, report: dict) -> bool:
+    result = report['personal_dictionary'] = {'status': 'not tested'}
+    try:
+        # Synthetic UTF-8 documents are created only inside this disposable emulator.
+        valid = tmp / 'khmerlish-smoke-valid.csv'
+        valid.write_text('khmerlish,khmer\nnv,កម្ពុជា\nzztest,សួស្តី\n', encoding='utf-8')
+        invalid = tmp / 'khmerlish-smoke-invalid.csv'
+        invalid.write_text('khmerlish,khmer\nnv,ផ្សេង\ninvalid,English\n', encoding='utf-8')
+        for path in (valid, invalid):
+            common.run('adb', 'push', str(path), '/sdcard/Download/' + path.name)
+
+        open_dictionary()
+        set_synthetic_field('Search Khmerlish or Khmer', 'srey')
+        if not wait_for_text('srey  →  ស្រី'):
+            raise RuntimeError('Built-in searchable word guide returned the wrong result')
+        result['search_bundled'] = 'passed'
+        set_synthetic_field('Search Khmerlish or Khmer', '')
+        personal_tab()  # Also opens the Add dialog.
+        edit_synthetic_word('nv', 'នាវា')
+        result['add'] = 'passed'
+
+        open_editor()
+        time.sleep(4)
+        enter('nv', None)
+        if editor_text().rstrip() != 'នាវា':
+            raise RuntimeError('Automatic typing ignored a personal override')
+        result['automatic_override'] = 'passed'
+        open_editor()
+        time.sleep(3)
+        panel_report = {}
+        if not tap_panel_icon(panel_report):
+            raise RuntimeError('Could not open the panel for a personal override')
+        panel_press('nv')
+        if editor_text() != 'នាវា':
+            raise RuntimeError('Toolbar panel ignored a personal override')
+        result['panel_override'] = 'passed'
+        keys = panel_key_positions(common.inspect_ime_windows())
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+
+        open_dictionary()
+        require_tap('Personal dictionary')
+        if not wait_for_text('nv  →  នាវា'):
+            raise RuntimeError('Saved word did not persist when settings reopened')
+        require_tap('Edit personal word nv')
+        edit_synthetic_word('nv', 'នឹក')
+        result['edit_and_persist'] = 'passed'
+        import_document(valid.name)
+        if not wait_for_text('zztest  →  សួស្តី') or not wait_for_text('nv  →  នឹក'):
+            raise RuntimeError('Keep-existing import did not merge as previewed')
+        result['import_keep_existing'] = 'passed'
+        import_document(valid.name, replace=True)
+        if not wait_for_text('nv  →  កម្ពុជា'):
+            raise RuntimeError('Explicit conflict replacement did not apply')
+        result['import_replace_conflicts'] = 'passed'
+        import_document(invalid.name, replace=None)
+        if not wait_for_text('nv  →  កម្ពុជា') or not wait_for_text('zztest  →  សួស្តី'):
+            raise RuntimeError('Invalid import changed the personal dictionary')
+        result['invalid_import_atomic'] = 'passed'
+        require_tap('Word guide')
+        set_synthetic_field('Search Khmerlish or Khmer', 'zztest')
+        if not wait_for_text('zztest  →  សួស្តី'):
+            raise RuntimeError('Imported word was missing from the guide')
+        result['search_personal'] = 'passed'
+        set_synthetic_field('Search Khmerlish or Khmer', '')
+        require_tap('Personal dictionary')
+
+        require_tap('Export personal dictionary')
+        time.sleep(3)
+        if not find_and_tap('Downloads'):
+            for nav in ('Show roots', 'Open navigation drawer', 'Browse', 'Show navigation'):
+                if find_and_tap(nav):
+                    break
+            require_tap('Downloads')
+        require_tap('Save')
+        time.sleep(4)
+        exported = common.run('adb', 'shell', 'cat', '/sdcard/Download/khmerlish-personal.tsv')
+        if not all(row in exported for row in ('khmerlish\tkhmer', 'nv\tកម្ពុជា', 'zztest\tសួស្តី')):
+            raise RuntimeError('Exported UTF-8 TSV did not contain the synthetic entries')
+        result['export'] = 'passed'
+
+        require_tap('Edit personal word nv')
+        require_tap('Delete')
+        require_tap('Delete')
+        if not wait_for_text('zztest  →  សួស្តី'):
+            raise RuntimeError('Remaining word disappeared after delete')
+        result['delete'] = 'passed'
+        # Stop the target to prove the imported word survives a process restart.
+        common.run('adb', 'shell', 'am', 'force-stop', PACKAGE)
+        open_editor()
+        time.sleep(6)
+        enter('zztest', None)
+        if editor_text().rstrip() != 'សួស្តី':
+            raise RuntimeError('Imported word was not used after restarting Gboard')
+        open_editor()
+        time.sleep(4)
+        enter('nv', None)
+        if editor_text().rstrip() != 'នៅ':
+            raise RuntimeError('Deleting an override did not restore the built-in word')
+        result['restart_and_delete_fallback'] = 'passed'
+        result['status'] = 'passed'
+        return True
+    except (RuntimeError, ValueError, KeyError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:
+        result['status'] = 'failed'
+        result['error'] = f'{type(error).__name__}: {error}'
+        try:
+            result['synthetic_screen_labels_on_failure'] = labels()
+        except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired, ET.ParseError):
+            pass
+        return False
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('fixture_apk', type=Path)
@@ -671,10 +865,13 @@ def main() -> None:
             report['examples'] = results
             all_pass = all(x['passed'] for x in results.values())
             report['actual_gboard_typing'] = 'passed' if all_pass else 'failed'
+            report['phase'] = 'exercise personal dictionary, guide and documents'
+            personal_passed = dictionary_smoke(tmp, report)
             crashes = common.gboard_crash_types(common.run('adb', 'logcat', '-d', '-s', 'AndroidRuntime:E', '*:S'))
             if crashes:
                 report['gboard_fatal_exception_types'] = crashes
-            failed = (not panel_passed or not all_pass or report['default_off_example'] != 'passed' or bool(crashes)
+            failed = (not panel_passed or not all_pass or not personal_passed
+                      or report['default_off_example'] != 'passed' or bool(crashes)
                       or report['settings_default_off'] != 'passed' or report['settings_toggle'] != 'passed')
     except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:
         report['error'] = f'{type(error).__name__}: {error}'

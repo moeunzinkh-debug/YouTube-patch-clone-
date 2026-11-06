@@ -10,10 +10,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-/** Immutable exact-match dictionary. No text is logged, stored or sent over the network. */
+/** Offline built-in lookup plus an explicitly managed, in-memory personal overlay. */
 final class KhmerlishDictionary {
     private static final int MAX_ENTRIES = 30000;
     private final Map<String, String> words;
+    private volatile Map<String, String> personal = Collections.emptyMap();
 
     private KhmerlishDictionary(Map<String, String> words) {
         this.words = Collections.unmodifiableMap(words);
@@ -46,8 +47,18 @@ final class KhmerlishDictionary {
     }
 
     String lookup(String roman) {
-        return words.get(roman.toLowerCase(Locale.ROOT));
+        if (roman == null) return null;
+        String key = roman.toLowerCase(Locale.ROOT);
+        String custom = personal.get(key);
+        return custom != null ? custom : words.get(key);
     }
 
+    /** Atomic snapshot swap; readers never touch the database while typing. */
+    void setPersonal(Map<String, String> values) {
+        personal = values == null || values.isEmpty() ? Collections.emptyMap()
+                : Collections.unmodifiableMap(new HashMap<>(values));
+    }
+
+    Map<String, String> builtInEntries() { return words; }
     int size() { return words.size(); }
 }

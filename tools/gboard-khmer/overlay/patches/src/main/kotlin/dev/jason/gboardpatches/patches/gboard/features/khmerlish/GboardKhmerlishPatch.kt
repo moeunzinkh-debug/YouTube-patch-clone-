@@ -10,8 +10,11 @@ import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.applyFeatureMarker
 import dev.jason.gboardpatches.patches.gboard.shared.accesspoint.GboardAccessPointContributionsTargets
 import dev.jason.gboardpatches.patches.gboard.shared.accesspoint.gboardAccessPointContributions1803Patch
+import dev.jason.gboardpatches.patches.gboard.shared.childElements
+import dev.jason.gboardpatches.patches.gboard.shared.ensureManifestComponent
 import dev.jason.gboardpatches.patches.gboard.shared.findMutableMethodOrThrow
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesSettingsPatch
+import dev.jason.gboardpatches.patches.gboard.shared.setManifestAndroidAttribute
 import dev.jason.gboardpatches.patches.gboard.shared.isMethodReference
 import dev.jason.gboardpatches.patches.gboard.shared.isOpcode
 import dev.jason.gboardpatches.patches.gboard.shared.mutableClass
@@ -59,13 +62,24 @@ private val gboardKhmerlishMarkerPatch = resourcePatch(
     description = "Mark Khmerlish as available in Gboard Patches settings.",
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
-    finalize { applyFeatureMarker(FEATURE_MARKER) }
+    finalize {
+        applyFeatureMarker(FEATURE_MARKER)
+        document("AndroidManifest.xml").use { manifest ->
+            val application = manifest.documentElement.childElements("application").singleOrNull()
+                ?: error("Expected one Gboard application element")
+            ensureManifestComponent(
+                manifest, application, "activity",
+                "dev.jason.gboardpatches.extension.khmerlish.KhmerlishDictionaryActivity",
+            ).setManifestAndroidAttribute("exported", "false")
+        }
+    }
 }
 
 /** Explicitly opt-in; exact obfuscated lifecycle targets are reviewed only for this APK version. */
 internal val gboardKhmerlishPatch = bytecodePatch(
     name = "Khmerlish to Khmer (experimental)",
-    description = "Adds an offline Khmerlish toolbar panel and an optional automatic setting. " +
+    description = "Adds an offline Khmerlish toolbar panel, optional automatic setting, " +
+        "personal dictionary and searchable word guide with text import/export. " +
         "Known Romanized words are converted to Khmer; unknown and ambiguous spellings stay unchanged.",
     default = false,
 ) {

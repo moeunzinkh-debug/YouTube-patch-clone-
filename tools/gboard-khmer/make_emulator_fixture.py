@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 """Create a disposable, unsigned hybrid for the emulator; NEVER distribute it.
 
-The input is a third-party prepatched Gboard. In its manifest only, replace the
-already-applied Calculator marker with the Khmerlish marker so that this
-synthetic test can discover the new settings page. Calculator is therefore not
-tested in the hybrid. The real MPP inserts its own marker and does not replace
-Calculator. Original native code and the renamed manifest are retained; DEX,
-assets, and resources come from the actual Morphe output. The resource-table
-package name and Patches settings intents are restored to match the renamed
-manifest, solely so this test hybrid can coexist with system Gboard.
-Alignment and signing happen later.
+The input is a third-party prepatched Gboard, not stock. Keep the actual
+patched manifest so the real Khmerlish activity and feature marker are tested.
+Restore the renamed test package and its Patches provider authority within the
+binary XML string pool, plus the resource-table name and settings intents, so
+this disposable hybrid can coexist with system Gboard. DEX, assets, and
+resources come from the actual Morphe output. Alignment and signing happen later.
 """
 from pathlib import Path
 import argparse
@@ -26,18 +23,20 @@ from axml_fixture import rewrite_pool_string  # noqa: E402
 
 CALCULATOR = 'dev.jason.gboardpatches.feature.simple_calculator'
 KHMERLISH = 'dev.jason.gboardpatches.feature.khmerlish'
+DICTIONARY_ACTIVITY = 'dev.jason.gboardpatches.extension.khmerlish.KhmerlishDictionaryActivity'
+PROVIDER_SUFFIX = '.gboard_patches'
 DEX = re.compile(r'classes(?:[2-9]|[1-9][0-9]+)?\.dex\Z')
 SIGNATURE = re.compile(r'META-INF/[^/]+\.(?:SF|RSA|DSA|EC)\Z', re.IGNORECASE)
 ASSETS = ('assets/gboard-khmer/dictionary.tsv', 'assets/gboard-khmer/LICENSE.txt')
 
 
-def rewrite_test_marker(manifest: bytes) -> bytes:
-    original_old, original_new = binary_xml.OLD, binary_xml.NEW
-    try:
-        binary_xml.OLD, binary_xml.NEW = CALCULATOR, KHMERLISH
-        return binary_xml.replace_manifest_package(manifest)
-    finally:
-        binary_xml.OLD, binary_xml.NEW = original_old, original_new
+def rewrite_test_manifest(manifest: bytes) -> bytes:
+    """Restore only test package strings while retaining actual patched components."""
+    contains = lambda value: any(value.encode(enc) in manifest for enc in ('utf-8', 'utf-16le'))
+    if not all(contains(value) for value in (KHMERLISH, DICTIONARY_ACTIVITY, CALCULATOR)):
+        raise ValueError('Patched manifest is missing a required activity or feature marker')
+    manifest = rewrite_pool_string(manifest, binary_xml.NEW, binary_xml.OLD)
+    return rewrite_pool_string(manifest, binary_xml.NEW + PROVIDER_SUFFIX, binary_xml.OLD + PROVIDER_SUFFIX)
 
 
 def build(original: Path, patched: Path, output: Path) -> int:
@@ -49,7 +48,8 @@ def build(original: Path, patched: Path, output: Path) -> int:
         if not dexes or len({x.filename for x in dexes}) != len(dexes) or 'classes.dex' not in names:
             raise ValueError('Missing or duplicate patched DEX files')
         if (source.namelist().count('AndroidManifest.xml') != 1
-                or names.count('resources.arsc') != 1 or any(names.count(x) != 1 for x in ASSETS)):
+                or names.count('AndroidManifest.xml') != 1 or names.count('resources.arsc') != 1
+                or any(names.count(x) != 1 for x in ASSETS)):
             raise ValueError('Missing manifest, resource table or Khmerlish assets')
         new_resources = [x for x in result.infolist()
                          if x.filename.startswith(('res/', 'assets/'))]
@@ -60,7 +60,7 @@ def build(original: Path, patched: Path, output: Path) -> int:
                         or entry.filename.startswith(('res/', 'assets/'))):
                     continue
                 if entry.filename == 'AndroidManifest.xml':
-                    destination.writestr(entry, rewrite_test_marker(source.read(entry)))
+                    destination.writestr(entry, rewrite_test_manifest(result.read('AndroidManifest.xml')))
                 else:
                     with source.open(entry) as src, destination.open(entry, 'w') as dst:
                         shutil.copyfileobj(src, dst, 1024 * 1024)

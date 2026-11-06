@@ -26,14 +26,20 @@ def resource_table(name: str) -> bytes:
 
 
 class EmulatorFixtureTests(unittest.TestCase):
-    def test_settings_marker_rewrite_for_both_xml_encodings(self):
+    def test_patched_manifest_rewrites_package_and_provider_for_both_xml_encodings(self):
         for utf8 in (True, False):
-            original = xml_with_pool(utf8, ['dev.jason.com.google.android.inputmethod.latin', fixture.CALCULATOR])
-            changed = fixture.rewrite_test_marker(original)
+            original = xml_with_pool(utf8, [fixture.binary_xml.NEW,
+                                           fixture.binary_xml.NEW + fixture.PROVIDER_SUFFIX,
+                                           fixture.CALCULATOR, fixture.KHMERLISH,
+                                           fixture.DICTIONARY_ACTIVITY])
+            changed = fixture.rewrite_test_manifest(original)
             encoding = 'utf-8' if utf8 else 'utf-16le'
-            self.assertEqual(len(original), len(changed))
+            self.assertEqual(len(changed), struct.unpack_from('<I', changed, 4)[0])
+            self.assertIn(fixture.binary_xml.OLD.encode(encoding), changed)
+            self.assertIn((fixture.binary_xml.OLD + fixture.PROVIDER_SUFFIX).encode(encoding), changed)
             self.assertIn(fixture.KHMERLISH.encode(encoding), changed)
-            self.assertNotIn(fixture.CALCULATOR.encode(encoding), changed)
+            self.assertIn(fixture.CALCULATOR.encode(encoding), changed)
+            self.assertIn(fixture.DICTIONARY_ACTIVITY.encode(encoding), changed)
 
     def test_settings_xml_can_grow_without_changing_string_indices(self):
         for utf8 in (True, False):
@@ -59,6 +65,9 @@ class EmulatorFixtureTests(unittest.TestCase):
                 archive.writestr('classes.dex', b'old dex')
                 archive.writestr('META-INF/CERT.RSA', b'old signature')
             with zipfile.ZipFile(patched, 'w') as archive:
+                archive.writestr('AndroidManifest.xml', xml_with_pool(True, [
+                    fixture.binary_xml.NEW, fixture.binary_xml.NEW + fixture.PROVIDER_SUFFIX,
+                    fixture.CALCULATOR, fixture.KHMERLISH, fixture.DICTIONARY_ACTIVITY]))
                 archive.writestr('classes.dex', b'patched dex')
                 archive.writestr('classes2.dex', b'extension dex')
                 archive.writestr('resources.arsc', resource_table(fixture.binary_xml.NEW))
@@ -82,9 +91,12 @@ class EmulatorFixtureTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 fixture.build(original, patched, output)
 
-    def test_missing_marker_fails_closed(self):
+    def test_missing_activity_or_provider_fails_closed(self):
         with self.assertRaises(ValueError):
-            fixture.rewrite_test_marker(xml_with_pool(True, ['unrelated']))
+            fixture.rewrite_test_manifest(xml_with_pool(True, ['unrelated']))
+        with self.assertRaises(ValueError):
+            fixture.rewrite_test_manifest(xml_with_pool(True, [fixture.binary_xml.NEW,
+                fixture.CALCULATOR, fixture.KHMERLISH, fixture.DICTIONARY_ACTIVITY]))
 
 
 class PanelLayoutTests(unittest.TestCase):

@@ -33,7 +33,11 @@ CLASSES = {RUNTIME, SETTINGS, ACCESS,
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelConverter;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelCommitter;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishController;',
-           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishDictionary;'}
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishDictionary;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishDictionaryActivity;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPersonalData;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPersonalStore;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishWordGuide;'}
 
 
 def main() -> None:
@@ -51,6 +55,11 @@ def main() -> None:
                if node.get(android + 'name') == 'dev.jason.gboardpatches.feature.khmerlish']
     if len(markers) != 1 or markers[0].get(android + 'value') != 'true':
         raise SystemExit('Khmerlish settings availability marker missing')
+    activities = [node for node in manifest.iter('activity') if node.get(android + 'name')
+                  == 'dev.jason.gboardpatches.extension.khmerlish.KhmerlishDictionaryActivity']
+    if (len(activities) != 1 or activities[0].get(android + 'exported') != 'false'
+            or any(child.tag == 'intent-filter' for child in activities[0])):
+        raise SystemExit('Expected one non-exported Khmerlish dictionary activity with no intent filter')
     source = ROOT / 'tools/gboard-khmer/overlay/patches/src/main/resources/gboard-khmer'
     with zipfile.ZipFile(args.apk) as archive:
         for name in ('dictionary.tsv', 'LICENSE.txt'):

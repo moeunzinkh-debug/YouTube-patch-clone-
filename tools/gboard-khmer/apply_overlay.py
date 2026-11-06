@@ -10,7 +10,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERLAY = ROOT / 'tools/gboard-khmer/overlay'
-VERSION = '4.0.0-khmerlish-dev.2'
+VERSION = '4.0.0-khmerlish-dev.3'
 PATCH_NAME = 'Khmerlish to Khmer (experimental)'
 SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/arena/383e624b-youtube-patch-clone/tools/gboard-khmer'
 

@@ -21,9 +21,25 @@
 
 5. ប្រសិនបើ Gboard English autocorrect កែពាក្យ Latin មុនពេលបម្លែងស្វ័យប្រវត្តិ សាកបិទ autocorrect ក្នុង Gboard។ ដើម្បីសាកដំបូង ប្រើអត្ថបទមិនសម្ងាត់ និងរក្សា keyboard បម្រុងដែលដំណើរការ។
 
+## វចនានុក្រមផ្ទាល់ខ្លួន និងឯកសារពាក្យ
+
+ចូល **Gboard Settings → Patches → Khmerlish → ខ្មែរ (experimental) → Personal Dictionary & Documents**។ ផ្ទាំង **ឯកសារពាក្យ / Word guide** អាចស្វែងរកទាំងអក្សរ Khmerlish និងខ្មែរ។ ផ្ទាំង **ផ្ទាល់ខ្លួន / Personal** អាចបន្ថែម ប៉ះលើពាក្យដើម្បីកែ ឬលុប និងនាំចូល/នាំចេញបញ្ជីបាន។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាពលើវចនានុក្រមដើមសម្រាប់ទាំង automatic និង panel; ពេលលុប នឹងត្រឡប់ទៅពាក្យដើមប្រសិនបើមាន។ វាជាវចនានុក្រមដាច់ដោយឡែក មិនមែន Gboard personal dictionary ទេ។
+
+- សរសេរ Khmerlish មួយពាក្យជាអក្សរ `a-z` (មិនគិតអក្សរធំ/តូច; អតិបរមា 32 តួ) និងតម្លៃមានអក្សរខ្មែរ (អតិបរមា 128 តួ)។ អាចប្រើ keyboard ខ្មែរ ឬ paste ដើម្បីបញ្ចូលតម្លៃខ្មែរ។
+- នាំចូលតែឯកសារ **UTF-8 `.txt`, `.csv` ឬ `.tsv`** មួយគូក្នុងមួយជួរ ដូចខាងក្រោម។ មិនគាំទ្រ PDF/DOCX ឬ Khmerlish ច្រើនពាក្យក្នុង key តែមួយទេ។ ឯកសារមិនត្រឹមត្រូវ ឬ key ស្ទួនត្រូវបានបដិសេធទាំងមូល។ អតិបរមា 5,000 គូ និង 2.5 MB ក្នុងឯកសារ; សរុបក្នុងវចនានុក្រមផ្ទាល់ខ្លួនមិនលើស 5,000 គូ។
+
+  ```csv
+  khmerlish,khmer
+  soksabay,សុខសប្បាយ
+  susdei,សួស្តី
+  ```
+
+- មុននាំចូល វាបង្ហាញចំនួនពាក្យថ្មី/ទំនាស់។ ជម្រើសធម្មតា **Keep existing** រក្សាពាក្យផ្ទាល់ខ្លួនចាស់; ជ្រើស **Replace** ប៉ុណ្ណោះទើបជំនួសទំនាស់។ **Export** បង្កើតឯកសារ TSV សម្រាប់ backup ដោយដៃ។
+- ពាក្យដែលបានរក្សាទុកស្ថិតក្នុង private storage របស់ Gboard លើឧបករណ៍ មិន sync ឬ backup ដោយស្វ័យប្រវត្តិ។ សូម **Export មុន uninstall, clear data ឬប្ដូរ package**។ មិនរក្សាទុកអត្ថបទដែលអ្នកវាយក្នុង app ដោយស្វ័យប្រវត្តិទេ។
+
 ## លទ្ធផលសាកល្បង
 
-[Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42214537226) បានសាក icon, panel offline, ឧទាហរណ៍ទាំងអស់ (រួមទាំងអក្សរធំ), backspace, បិទ/បើកឡើងវិញ, setting និងការវាយស្វ័យប្រវត្តិ។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី បញ្ចូល DEX ពី `.mpp` នេះ និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK និងការប្រើលើទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+Version មុនបានសាក icon, panel offline, ឧទាហរណ៍ទាំងអស់, backspace, setting និងការវាយស្វ័យប្រវត្តិនៅលើ [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42214537226)។ សម្រាប់ bundle បច្ចុប្បន្ន សូមពិនិត្យ [លទ្ធផលសាកល្បងចុងក្រោយ](android-smoke.json) និង SHA ឲ្យត្រូវគ្នា។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 

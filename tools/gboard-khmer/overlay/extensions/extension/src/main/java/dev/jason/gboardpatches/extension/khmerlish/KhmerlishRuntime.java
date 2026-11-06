@@ -13,12 +13,24 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.SurroundingText;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /** Gboard lifecycle bridge. No user text is logged, persisted or transmitted. */
 public final class KhmerlishRuntime {
     private static final int WINDOW = 96;
     private static final KhmerlishController CONTROLLER = new KhmerlishController();
     private static volatile KhmerlishDictionary dictionary;
+    private static volatile boolean personalReady;
+    private static Map<String, String> personalSnapshot = Collections.emptyMap();
+    private static long personalRevision;
+    private static final ExecutorService PERSONAL_READER = Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "GboardKhmerlishPersonal");
+        thread.setDaemon(true);
+        return thread;
+    });
     private static boolean loading;
     private static boolean loadFailed;
     private static long generation;
@@ -34,6 +46,7 @@ public final class KhmerlishRuntime {
             // The toolbar panel is independent of the default-off automatic switch.
             if (service != null) {
                 preload(service);
+                refreshPersonal(service);
                 Handler main = new Handler(Looper.getMainLooper());
                 main.postDelayed(KhmerlishAccessPoint::ensureAccessible, 300);
                 main.postDelayed(KhmerlishAccessPoint::ensureAccessible, 1000);
@@ -69,7 +82,7 @@ public final class KhmerlishRuntime {
                 resetController();
                 return;
             }
-            if (dictionary == null) {
+            if (dictionary == null || !personalReady) {
                 preload(service);
                 return;
             }
@@ -88,7 +101,7 @@ public final class KhmerlishRuntime {
             // Let Gboard finish its native callback before touching the editor.
             new Handler(Looper.getMainLooper()).post(() -> {
                 try {
-                    if (capturedGeneration != generation || editing
+                    if (capturedGeneration != generation || editing || !personalReady
                             || service.getCurrentInputConnection() != connection
                             || service.getCurrentInputEditorInfo() != editor
                             || !KhmerlishSettings.isEnabled(service) || !isSafeField(editor)) return;
@@ -115,7 +128,40 @@ public final class KhmerlishRuntime {
     }
 
     static KhmerlishDictionary dictionaryIfReady() {
-        return dictionary;
+        return personalReady ? dictionary : null;
+    }
+
+    /** Called after an explicit add, edit, delete or import has committed. */
+    static void personalChanged(Context context) {
+        refreshPersonal(context);
+    }
+
+    /** Never query disk from a typing callback; atomically publish a fresh snapshot. */
+    private static void refreshPersonal(Context context) {
+        if (context == null) return;
+        Context app = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        final long ticket;
+        synchronized (KhmerlishRuntime.class) {
+            ticket = ++personalRevision;
+            personalReady = false;
+        }
+        PERSONAL_READER.execute(() -> {
+            Map<String, String> loaded = null;
+            try {
+                loaded = KhmerlishPersonalStore.read(app);
+            } catch (Throwable unavailable) {
+                // If credential storage is locked or broken, do not silently
+                // replace an unknown personal override with a built-in word.
+                // The normal keyboard remains usable, and the next input start
+                // retries after storage becomes available.
+            }
+            synchronized (KhmerlishRuntime.class) {
+                if (ticket != personalRevision || loaded == null) return;
+                personalSnapshot = loaded;
+                if (dictionary != null) dictionary.setPersonal(loaded);
+                personalReady = true;
+            }
+        });
     }
 
     static boolean isSafeField(EditorInfo editor) {
@@ -232,6 +278,7 @@ public final class KhmerlishRuntime {
                 // Missing/corrupt assets fail closed; no typed content is logged.
             }
             synchronized (KhmerlishRuntime.class) {
+                if (loaded != null) loaded.setPersonal(personalSnapshot);
                 dictionary = loaded;
                 loadFailed = loaded == null;
                 loading = false;

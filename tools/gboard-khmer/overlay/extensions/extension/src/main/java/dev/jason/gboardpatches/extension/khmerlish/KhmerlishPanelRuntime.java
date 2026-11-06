@@ -310,7 +310,7 @@ public final class KhmerlishPanelRuntime {
             if (panel != this || root.getParent() != parent) return;
             FrameLayout.LayoutParams next = overlayLayout(parent, holder);
             if (next == null || holder.getWidth() < dp(180) || holder.getHeight() < dp(160)) {
-                root.post(KhmerlishPanelRuntime::dismiss);
+                root.post(() -> { if (panel == this) KhmerlishPanelRuntime.dismiss(); });
                 return;
             }
             FrameLayout.LayoutParams old = (FrameLayout.LayoutParams) root.getLayoutParams();

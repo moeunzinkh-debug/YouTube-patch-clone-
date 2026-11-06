@@ -1,6 +1,8 @@
 package dev.jason.gboardpatches.extension.khmerlish;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +51,12 @@ public final class KhmerlishSettingsFeature implements GboardPatchesSettingsCont
                                                 "Automatic conversion in normal typing; default off. The toolbar panel works separately.",
                                                 context != null, enabled,
                                                 value -> KhmerlishSettings.setEnabled(context, value)))),
+                        new GboardPatchesSettingsContract.Section("វចនានុក្រម / Dictionary",
+                                Collections.singletonList(
+                                        new GboardPatchesSettingsContract.NavigationRow(
+                                                "Personal Dictionary & Documents",
+                                                "បន្ថែមពាក្យផ្ទាល់ខ្លួន · មើល ស្វែងរក និងនាំចូលបញ្ជីពាក្យ offline",
+                                                context != null, () -> openDictionary(context)))),
                         new GboardPatchesSettingsContract.Section("ការប្រើប្រាស់ / Usage",
                                 Arrays.asList(
                                         new GboardPatchesSettingsContract.InfoRow(
@@ -61,5 +69,17 @@ public final class KhmerlishSettingsFeature implements GboardPatchesSettingsCont
                                                 "no-suggestions fields are excluded. Turn off Gboard " +
                                                 "autocorrect if it replaces Khmerlish before this feature can act.",
                                                 true)))));
+    }
+
+    private static void openDictionary(Context context) {
+        if (context == null) return;
+        try {
+            Intent intent = new Intent(context, KhmerlishDictionaryActivity.class);
+            if (!(context instanceof Activity)) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Throwable unavailable) {
+            // Leave the existing Gboard settings screen usable on incompatible targets.
+            android.widget.Toast.makeText(context, "Khmerlish dictionary is unavailable", android.widget.Toast.LENGTH_SHORT).show();
+        }
     }
 }

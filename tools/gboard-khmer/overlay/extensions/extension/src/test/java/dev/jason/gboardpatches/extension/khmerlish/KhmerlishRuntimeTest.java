@@ -67,6 +67,10 @@ public final class KhmerlishRuntimeTest {
                 (GboardPatchesSettingsContract.ToggleRow) feature.buildScreen(host)
                         .getSections().get(0).getItems().get(0);
         Assert.assertFalse(toggle.isChecked());
+        GboardPatchesSettingsContract.Row dictionaryRow = feature.buildScreen(host)
+                .getSections().get(1).getItems().get(0);
+        Assert.assertTrue(dictionaryRow instanceof GboardPatchesSettingsContract.NavigationRow);
+        Assert.assertEquals("Personal Dictionary & Documents", dictionaryRow.getTitle());
         toggle.getToggleAction().accept(true);
         Assert.assertTrue(KhmerlishSettings.isEnabled(app));
         toggle.getToggleAction().accept(false);
