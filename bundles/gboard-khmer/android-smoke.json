@@ -3,10 +3,10 @@
   "fixture": "re-signed hybrid of third-party prepatched Gboard and the actual MPP output; not stock",
   "fixture_install": "passed",
   "ime_selected": "passed",
-  "settings_entry": "visible via same-signature test launcher in test fixture",
+  "settings_entry": "not tested",
   "settings_default_off": "not tested",
-  "settings_toggle": "set using same-signature test instrumentation; UI not confirmed",
-  "actual_gboard_typing": "passed",
+  "settings_toggle": "not tested",
+  "actual_gboard_typing": "not tested",
   "android_api": "35",
   "target_diagnostic_before": {
     "marker": true,
@@ -15,108 +15,8 @@
     "runtime_enabled": false,
     "registry_entry": true
   },
-  "ime_visibility_flags": {
-    "mShowForced": false,
-    "mInputShown": true,
-    "mInputViewStarted": true
-  },
-  "ime_visible": "passed",
-  "default_off_example": "passed",
-  "settings_launch": "Starting: Intent { cmp=dev.jason.com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.latin.preference.SettingsActivity }",
-  "settings_initial_labels": [
-    "Languages",
-    "English (US) (QWERTY)",
-    "Preferences",
-    "Theme",
-    "Corrections & suggestions",
-    "Glide typing",
-    "Voice typing"
-  ],
-  "corrections_labels": [
-    "Automatic corrections",
-    "Auto-correction",
-    "Correct words while typing",
-    "Auto-capitalization",
-    "Capitalize the first word of each sentence while using on-screen keyboard",
-    "Spelling & grammar",
-    "Change default spell checker",
-    "Use Gboard's spell checker to access spelling and grammar features",
-    "Spell check",
-    "Underline misspelled words in red"
-  ],
-  "autocorrect": "disabled via Gboard settings",
-  "patches_entry_found": false,
-  "settings_final_labels": [
-    "Dictionary",
-    "Emojis, Stickers & GIFs",
-    "Privacy",
-    "Translate",
-    "Rate us",
-    "About",
-    "Help & feedback"
-  ],
-  "target_diagnostic_open_settings": {
-    "marker": true,
-    "dictionary_asset_present": true,
-    "preference": false,
-    "runtime_enabled": false,
-    "registry_entry": true,
-    "settings_activity_started": true
-  },
-  "direct_patches_labels": [
-    "Synthetic Khmerlish test",
-    "nv "
-  ],
-  "khmerlish_entry_found": true,
-  "target_diagnostic_after_settings": {
-    "marker": true,
-    "dictionary_asset_present": true,
-    "preference": false,
-    "runtime_enabled": false,
-    "registry_entry": true
-  },
-  "target_diagnostic_programmatic_enable": {
-    "marker": true,
-    "dictionary_asset_present": true,
-    "programmatic_set": true,
-    "preference": true,
-    "runtime_enabled": true,
-    "registry_entry": true
-  },
-  "input_method": "taps on the actual Gboard soft-key accessibility bounds",
-  "examples": {
-    "nv na": {
-      "expected": "នៅណា",
-      "actual": "នៅណា",
-      "passed": true
-    },
-    "kampuchea": {
-      "expected": "កម្ពុជា",
-      "actual": "កម្ពុជា",
-      "passed": true
-    },
-    "kampu": {
-      "expected": "កម្ពុជា",
-      "actual": "កម្ពុជា",
-      "passed": true
-    },
-    "nak na": {
-      "expected": "អ្នកណា",
-      "actual": "អ្នកណា",
-      "passed": true
-    },
-    "srey sart": {
-      "expected": "ស្រីស្អាត",
-      "actual": "ស្រីស្អាត",
-      "passed": true
-    },
-    "nik o": {
-      "expected": "នឹកអូន",
-      "actual": "នឹកអូន",
-      "passed": true
-    }
-  },
+  "error": "RuntimeError: adb shell failed (exit 255)",
   "bundle_sha256": "5205aac44a4c21c4595b05e07b212c79f30297fbd35f8789b34e6d8f91bc586f",
-  "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42197188000"
+  "emulator_action_outcome": "failure",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42198402721"
 }
