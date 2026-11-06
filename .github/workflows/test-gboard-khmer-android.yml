@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Verify bundle and disposable-fixture tooling
+      - name: Verify the Khmerlish bundle and disposable-fixture tooling
         run: |
           set -euo pipefail
           (cd bundles/gboard-khmer && sha256sum -c gboard-khmerlish-experimental.mpp.sha256)
