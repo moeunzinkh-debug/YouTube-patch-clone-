@@ -625,6 +625,10 @@ def open_dictionary() -> None:
     if 'Error:' in command:
         raise RuntimeError('Native Gboard settings could not be launched')
     time.sleep(5)
+    # Android can bring the existing settings task to the foreground with the
+    # dictionary activity still on top, instead of recreating the root screen.
+    if any(label == 'Khmerlish Dictionary' for label in labels()):
+        return
     require_tap('Patches', scroll=True)
     require_tap('Khmerlish', scroll=True)
     require_tap('Personal Dictionary & Documents', scroll=True)
@@ -797,9 +801,12 @@ def main() -> None:
     parser.add_argument('fixture_apk', type=Path)
     parser.add_argument('report', type=Path)
     parser.add_argument('--fixture-keystore', type=Path, required=True)
+    parser.add_argument('--personal-only', action='store_true',
+                        help='skip the long bundled-example regression while debugging dictionary UI')
     args = parser.parse_args()
     report = {
         'environment': 'disposable Android emulator, synthetic text only',
+        'mode': 'personal-only diagnostic' if args.personal_only else 'complete smoke',
         'fixture': 're-signed hybrid of third-party prepatched Gboard and the actual MPP output; not stock',
         'fixture_install': 'not run', 'ime_selected': 'not run',
         'settings_entry': 'not tested', 'settings_default_off': 'not tested', 'settings_toggle': 'not tested',
@@ -828,11 +835,13 @@ def main() -> None:
             # Before the toggle, synthetic English remains untouched.
             enter('nv', None)
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
-            report['phase'] = 'test offline Khmerlish toolbar panel while automatic conversion is off'
-            panel_passed = panel_smoke(report)
-            if not panel_passed:
-                report['toolbar_diagnostic_after_panel'] = target_diagnostic()
-                raise RuntimeError('Khmerlish toolbar panel failed; see sanitized diagnostics')
+            panel_passed = True
+            if not args.personal_only:
+                report['phase'] = 'test offline Khmerlish toolbar panel while automatic conversion is off'
+                panel_passed = panel_smoke(report)
+                if not panel_passed:
+                    report['toolbar_diagnostic_after_panel'] = target_diagnostic()
+                    raise RuntimeError('Khmerlish toolbar panel failed; see sanitized diagnostics')
             report['phase'] = 'navigate Gboard patch settings'
             enabled = enable_via_settings(report)
             if not enabled:
@@ -848,30 +857,32 @@ def main() -> None:
                         raise RuntimeError('The Gboard runtime did not observe its enabled setting')
                 else:
                     report['settings_toggle'] = 'set using same-signature test instrumentation; UI not confirmed'
-            open_editor()
-            time.sleep(5)
-            examples = {'nv na': 'នៅណា', 'kampuchea': 'កម្ពុជា', 'kampu': 'កម្ពុជា',
-                        'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'nik o': 'នឹកអូន'}
-            try:
-                keys = keyboard_keys()
-            except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired):
-                keys = {}
-            required = set(''.join(examples.keys()))
-            if not required.issubset(keys):
-                keys = None
-                report['input_method'] = 'hardware key events to a focused editor while Gboard IME is active'
-            else:
-                report['input_method'] = 'taps on the actual Gboard soft-key accessibility bounds'
-            results = {}
-            report['phase'] = 'type synthetic examples'
-            for source, expected in examples.items():
+            all_pass = True
+            if not args.personal_only:
                 open_editor()
-                enter(source, keys)
-                actual = editor_text().rstrip()
-                results[source] = {'expected': expected, 'actual': actual, 'passed': actual == expected}
-            report['examples'] = results
-            all_pass = all(x['passed'] for x in results.values())
-            report['actual_gboard_typing'] = 'passed' if all_pass else 'failed'
+                time.sleep(5)
+                examples = {'nv na': 'នៅណា', 'kampuchea': 'កម្ពុជា', 'kampu': 'កម្ពុជា',
+                            'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'nik o': 'នឹកអូន'}
+                try:
+                    keys = keyboard_keys()
+                except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired):
+                    keys = {}
+                required = set(''.join(examples.keys()))
+                if not required.issubset(keys):
+                    keys = None
+                    report['input_method'] = 'hardware key events to a focused editor while Gboard IME is active'
+                else:
+                    report['input_method'] = 'taps on the actual Gboard soft-key accessibility bounds'
+                results = {}
+                report['phase'] = 'type synthetic examples'
+                for source, expected in examples.items():
+                    open_editor()
+                    enter(source, keys)
+                    actual = editor_text().rstrip()
+                    results[source] = {'expected': expected, 'actual': actual, 'passed': actual == expected}
+                report['examples'] = results
+                all_pass = all(x['passed'] for x in results.values())
+                report['actual_gboard_typing'] = 'passed' if all_pass else 'failed'
             report['phase'] = 'exercise personal dictionary, guide and documents'
             personal_passed = dictionary_smoke(tmp, report)
             crashes = common.gboard_crash_types(common.run('adb', 'logcat', '-d', '-s', 'AndroidRuntime:E', '*:S'))
