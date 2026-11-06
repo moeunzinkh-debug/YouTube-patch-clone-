@@ -84,10 +84,12 @@ def build_probes(tmp: Path, fixture_keystore: Path) -> None:
         common.run('adb', 'install', '-r', str(signed), timeout=90)
 
 
-def target_diagnostic(enable: bool = False) -> dict:
+def target_diagnostic(enable: bool = False, open_settings: bool = False) -> dict:
     command = ['adb', 'shell', 'am', 'instrument', '-w', '-r']
     if enable:
         command.extend(['-e', 'enable', 'true'])
+    if open_settings:
+        command.extend(['-e', 'open_settings', 'true'])
     command.append(f'{TARGET_INSPECTOR_PACKAGE}/{TARGET_INSPECTOR}')
     output = common.run(*command, timeout=90)
     match = re.search(r'^INSTRUMENTATION_RESULT: diagnostic=([A-Za-z0-9+/=]+)$', output, re.MULTILINE)
@@ -137,6 +139,16 @@ def editor_text() -> str:
     raise RuntimeError('Synthetic editor was not found')
 
 
+def swipe_down_page() -> None:
+    sizes = re.findall(r'(\d+)x(\d+)', common.run('adb', 'shell', 'wm', 'size'))
+    if not sizes:
+        raise RuntimeError('Emulator screen size is unavailable')
+    width, height = map(int, sizes[-1])
+    common.run('adb', 'shell', 'input', 'swipe', str(width // 2), str(int(height * .80)),
+               str(width // 2), str(int(height * .27)), '450')
+    time.sleep(1)
+
+
 def find_and_tap(label: str, scroll: bool = True) -> bool:
     for attempt in range(6):
         for node in ET.fromstring(common.dump_ui()).iter('node'):
@@ -149,9 +161,53 @@ def find_and_tap(label: str, scroll: bool = True) -> bool:
                     return True
         if not scroll:
             return False
-        common.run('adb', 'shell', 'input', 'swipe', '500', '1700', '500', '550', '450')
-        time.sleep(1)
+        swipe_down_page()
     return False
+
+
+def labels() -> list[str]:
+    return [n.get('text', '')[:100] for n in ET.fromstring(common.dump_ui()).iter('node')
+            if n.get('text', '').strip()][:60]
+
+
+def disable_autocorrect(report: dict) -> None:
+    # Match the documented usage: Gboard must not replace Roman words first.
+    if not find_and_tap('Corrections & suggestions', scroll=False):
+        report['autocorrect'] = 'correction settings not located'
+        return
+    report['corrections_labels'] = labels()
+    for _ in range(6):
+        root = ET.fromstring(common.dump_ui())
+        parents = {child: parent for parent in root.iter() for child in parent}
+        title = next((n for n in root.iter('node')
+                      if 'auto-correction' in n.get('text', '').lower()), None)
+        if title is not None:
+            group = title
+            for _ in range(4):
+                switches = [n for n in group.iter('node') if n.get('class', '').endswith('Switch')]
+                if switches:
+                    switch = switches[0]
+                    bounds = switch.get('bounds', '')
+                    if switch.get('checked') == 'true':
+                        position = common.center(bounds)
+                        if position:
+                            common.run('adb', 'shell', 'input', 'tap', *map(str, position))
+                            time.sleep(2)
+                    current = [n for n in ET.fromstring(common.dump_ui()).iter('node')
+                               if n.get('bounds') == bounds and n.get('class', '').endswith('Switch')]
+                    report['autocorrect'] = ('disabled via Gboard settings' if current
+                                             and current[0].get('checked') == 'false' else 'not confirmed')
+                    common.run('adb', 'shell', 'input', 'keyevent', '4')
+                    time.sleep(2)
+                    return
+                group = parents.get(group)
+                if group is None:
+                    break
+        swipe_down_page()
+    report['autocorrect'] = 'auto-correction switch not located'
+    report['corrections_final_labels'] = labels()
+    common.run('adb', 'shell', 'input', 'keyevent', '4')
+    time.sleep(2)
 
 
 def enable_via_settings(report: dict) -> bool:
@@ -161,21 +217,22 @@ def enable_via_settings(report: dict) -> bool:
     if 'Error:' in command:
         return False
     time.sleep(6)
-    report['settings_initial_labels'] = [
-        n.get('text', '')[:100] for n in ET.fromstring(common.dump_ui()).iter('node')
-        if n.get('text', '').strip()
-    ][:60]
+    report['settings_initial_labels'] = labels()
+    disable_autocorrect(report)
     report['patches_entry_found'] = find_and_tap('Patches')
     if not report['patches_entry_found']:
+        report['settings_final_labels'] = labels()
         return False
-    report['patches_labels'] = [
-        n.get('text', '')[:100] for n in ET.fromstring(common.dump_ui()).iter('node')
-        if n.get('text', '').strip()
-    ][:60]
+    report['patches_labels'] = labels()
+    return enable_on_patches_page(report, 'native Gboard settings')
+
+
+def enable_on_patches_page(report: dict, route: str) -> bool:
     report['khmerlish_entry_found'] = find_and_tap('Khmerlish')
     if not report['khmerlish_entry_found']:
+        report['patches_final_labels'] = labels()
         return False
-    report['settings_entry'] = 'visible in test fixture'
+    report['settings_entry'] = f'visible via {route} in test fixture'
     xml = common.dump_ui()
     switches = [n for n in ET.fromstring(xml).iter('node') if n.get('class', '').endswith('Switch')]
     if not switches or switches[0].get('checked') != 'false':
@@ -289,6 +346,12 @@ def main() -> None:
             enter('nv', None)
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
             enabled = enable_via_settings(report)
+            if not enabled:
+                report['target_diagnostic_open_settings'] = target_diagnostic(open_settings=True)
+                if report['target_diagnostic_open_settings'].get('settings_activity_started'):
+                    time.sleep(3)
+                    report['direct_patches_labels'] = labels()
+                    enabled = enable_on_patches_page(report, 'same-signature test launcher')
             report['target_diagnostic_after_settings'] = target_diagnostic()
             if not enabled or not report['target_diagnostic_after_settings'].get('runtime_enabled'):
                 report['target_diagnostic_programmatic_enable'] = target_diagnostic(enable=True)

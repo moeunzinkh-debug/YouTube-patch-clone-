@@ -3,6 +3,7 @@ package dev.arena.khmerprobe;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -61,6 +62,13 @@ public final class AndroidGboardInspector extends Instrumentation {
                 }
             }
             diagnostic.put("registry_entry", present);
+            if (arguments != null && "true".equals(arguments.getString("open_settings"))) {
+                Intent intent = new Intent();
+                intent.setClassName(context, "dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsActivity");
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivitySync(intent);
+                diagnostic.put("settings_activity_started", true);
+            }
         } catch (Throwable error) {
             try {
                 Throwable cause = error.getCause() == null ? error : error.getCause();

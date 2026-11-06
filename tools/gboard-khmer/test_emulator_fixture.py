@@ -2,11 +2,19 @@
 """Offline checks for the temporary, non-distributable emulator hybrid."""
 from pathlib import Path
 import tempfile
+import struct
 import unittest
 import zipfile
 
 import make_emulator_fixture as fixture
 from test_fixture import xml_with_pool
+
+
+def resource_table(name: str) -> bytes:
+    encoded = name.encode('utf-16le')
+    package = struct.pack('<HHII', 0x0200, 288, 288, 0x7f)
+    package += encoded + bytes(256 - len(encoded)) + bytes(20)
+    return struct.pack('<HHII', 0x0002, 12, 12 + len(package), 1) + package
 
 
 class EmulatorFixtureTests(unittest.TestCase):
@@ -32,12 +40,15 @@ class EmulatorFixtureTests(unittest.TestCase):
             with zipfile.ZipFile(patched, 'w') as archive:
                 archive.writestr('classes.dex', b'patched dex')
                 archive.writestr('classes2.dex', b'extension dex')
+                archive.writestr('resources.arsc', resource_table(fixture.binary_xml.NEW))
+                archive.writestr('res/xml/settings.xml', b'patched settings')
                 for path in fixture.ASSETS:
                     archive.writestr(path, b'new asset')
             self.assertEqual(2, fixture.build(original, patched, output))
             with zipfile.ZipFile(output) as archive:
                 self.assertIn(fixture.KHMERLISH.encode(), archive.read('AndroidManifest.xml'))
-                self.assertEqual(b'original resources', archive.read('resources.arsc'))
+                self.assertIn(fixture.binary_xml.OLD.encode('utf-16le'), archive.read('resources.arsc'))
+                self.assertEqual(b'patched settings', archive.read('res/xml/settings.xml'))
                 self.assertEqual(b'patched dex', archive.read('classes.dex'))
                 self.assertEqual(b'new asset', archive.read(fixture.ASSETS[0]))
                 self.assertNotIn('META-INF/CERT.RSA', archive.namelist())

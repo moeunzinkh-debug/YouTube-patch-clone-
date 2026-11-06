@@ -5,8 +5,10 @@ The input is a third-party prepatched Gboard. In its manifest only, replace the
 already-applied Calculator marker with the Khmerlish marker so that this
 synthetic test can discover the new settings page. Calculator is therefore not
 tested in the hybrid. The real MPP inserts its own marker and does not replace
-Calculator. Original resources/native code are retained; DEX and dictionary
-assets come from the actual Morphe output. Alignment and signing happen later.
+Calculator. Original native code and the renamed manifest are retained; DEX,
+assets, and resources come from the actual Morphe output. The fixed-length
+resource-table package name is restored to match the renamed manifest.
+Alignment and signing happen later.
 """
 from pathlib import Path
 import argparse
@@ -18,6 +20,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/gboard-translate'))
 import make_manifest_fixture as binary_xml  # noqa: E402
+from make_fixture import replace_resource_package  # noqa: E402
 
 CALCULATOR = 'dev.jason.gboardpatches.feature.simple_calculator'
 KHMERLISH = 'dev.jason.gboardpatches.feature.khmerlish'
@@ -43,18 +46,25 @@ def build(original: Path, patched: Path, output: Path) -> int:
         names = result.namelist()
         if not dexes or len({x.filename for x in dexes}) != len(dexes) or 'classes.dex' not in names:
             raise ValueError('Missing or duplicate patched DEX files')
-        if source.namelist().count('AndroidManifest.xml') != 1 or any(names.count(x) != 1 for x in ASSETS):
-            raise ValueError('Missing manifest or Khmerlish assets')
+        if (source.namelist().count('AndroidManifest.xml') != 1
+                or names.count('resources.arsc') != 1 or any(names.count(x) != 1 for x in ASSETS)):
+            raise ValueError('Missing manifest, resource table or Khmerlish assets')
+        new_resources = [x for x in result.infolist()
+                         if x.filename.startswith(('res/', 'assets/'))]
         with zipfile.ZipFile(output, 'w') as destination:
             for entry in source.infolist():
-                if DEX.fullmatch(entry.filename) or SIGNATURE.fullmatch(entry.filename) or entry.filename in ASSETS:
+                if (DEX.fullmatch(entry.filename) or SIGNATURE.fullmatch(entry.filename)
+                        or entry.filename == 'resources.arsc'
+                        or entry.filename.startswith(('res/', 'assets/'))):
                     continue
                 if entry.filename == 'AndroidManifest.xml':
                     destination.writestr(entry, rewrite_test_marker(source.read(entry)))
                 else:
                     with source.open(entry) as src, destination.open(entry, 'w') as dst:
                         shutil.copyfileobj(src, dst, 1024 * 1024)
-            for entry in dexes + [result.getinfo(x) for x in ASSETS]:
+            table = replace_resource_package(result.read('resources.arsc'), binary_xml.NEW, binary_xml.OLD)
+            destination.writestr(result.getinfo('resources.arsc'), table)
+            for entry in dexes + new_resources:
                 with result.open(entry) as src, destination.open(entry, 'w') as dst:
                     shutil.copyfileobj(src, dst, 1024 * 1024)
     return len(dexes)

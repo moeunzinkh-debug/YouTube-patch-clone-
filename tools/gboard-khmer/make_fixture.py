@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / 'tools/gboard-translate'))
 from make_manifest_fixture import OLD, NEW, replace_manifest_package  # noqa: E402
 
 
-def replace_resource_package(resource_table: bytes) -> bytes:
+def replace_resource_package(resource_table: bytes, old: str = OLD, new: str = NEW) -> bytes:
     data = bytearray(resource_table)
     if len(data) < 12:
         raise ValueError('Truncated resource table')
@@ -39,8 +39,8 @@ def replace_resource_package(resource_table: bytes) -> bytes:
             start = cursor + 12
             raw_name = bytes(data[start:start + 256]).decode('utf-16le')
             current = raw_name.split('\x00', 1)[0]
-            if current == OLD:
-                encoded = NEW.encode('utf-16le')
+            if current == old:
+                encoded = new.encode('utf-16le')
                 if len(encoded) >= 256:
                     raise ValueError('Replacement package name is too long')
                 data[start:start + 256] = encoded + bytes(256 - len(encoded))
