@@ -1,13 +1,13 @@
 {
   "environment": "disposable Android emulator, synthetic text only",
-  "mode": "personal-only diagnostic",
+  "mode": "complete smoke",
   "fixture": "re-signed hybrid of third-party prepatched Gboard and the actual MPP output; not stock",
   "fixture_install": "passed",
   "ime_selected": "passed",
   "settings_entry": "visible via native Gboard settings in test fixture",
   "settings_default_off": "passed",
   "settings_toggle": "passed",
-  "actual_gboard_typing": "not tested",
+  "actual_gboard_typing": "passed",
   "android_api": "35",
   "target_diagnostic_before": {
     "marker": true,
@@ -26,6 +26,1069 @@
   },
   "ime_visible": "passed",
   "default_off_example": "passed",
+  "toolbar_panel": {
+    "status": "passed",
+    "initial_toolbar_labels": [
+      "Open features menu",
+      "Khmerlish → ខ្មែរ",
+      "Sticker Keyboard, This app does not support images here",
+      "GIF Keyboard, This app does not support images here",
+      "Use voice typing",
+      "q",
+      "1",
+      "w",
+      "2",
+      "e",
+      "3",
+      "r",
+      "4",
+      "t",
+      "5",
+      "y",
+      "6",
+      "u",
+      "7",
+      "i",
+      "8",
+      "o",
+      "9",
+      "p",
+      "0",
+      "a",
+      "s",
+      "d",
+      "f",
+      "g",
+      "h",
+      "j",
+      "k",
+      "l",
+      "Shift",
+      "z",
+      "x",
+      "c",
+      "v",
+      "b",
+      "n",
+      "m",
+      "Delete",
+      "Symbol keyboard",
+      "?123",
+      ",",
+      "Emoji button",
+      "Space",
+      "Period",
+      ".",
+      "Done"
+    ],
+    "native_layout_paths": {
+      "native_a": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/input_area",
+          "bounds": "[2,427][318,571]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[2,475][318,523]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/C01",
+          "bounds": "[2,475][49,523]"
+        }
+      ],
+      "native_n": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/input_area",
+          "bounds": "[2,427][318,571]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[2,523][318,571]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/B06",
+          "bounds": "[206,523][238,571]"
+        }
+      ],
+      "native_space": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0139",
+          "bounds": "[2,571][318,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/key_pos_space",
+          "bounds": "[111,571][238,616]"
+        }
+      ]
+    },
+    "initial_unlabelled_clickable_nodes": [],
+    "visible_in_toolbar": "passed",
+    "labels_after_tap": [
+      "Open features menu",
+      "Khmerlish → ខ្មែរ",
+      "Sticker Keyboard, This app does not support images here",
+      "GIF Keyboard, This app does not support images here",
+      "Use voice typing",
+      "q",
+      "1",
+      "w",
+      "2",
+      "e",
+      "3",
+      "r",
+      "4",
+      "t",
+      "5",
+      "y",
+      "6",
+      "u",
+      "7",
+      "i",
+      "8",
+      "o",
+      "9",
+      "p",
+      "0",
+      "a",
+      "s",
+      "d",
+      "f",
+      "g",
+      "h",
+      "j",
+      "k",
+      "l",
+      "Shift",
+      "z",
+      "x",
+      "c",
+      "v",
+      "b",
+      "n",
+      "m",
+      "Delete",
+      "Symbol keyboard",
+      "?123",
+      ",",
+      "Emoji button",
+      "Space",
+      "Period",
+      ".",
+      "Done",
+      "Khmerlish offline panel",
+      "Khmerlish → ខ្មែរ  ·  Offline",
+      "Close Khmerlish panel",
+      "Khmerlish input",
+      "Khmerlish key q",
+      "Khmerlish key w",
+      "Khmerlish key e",
+      "Khmerlish key r",
+      "Khmerlish key t",
+      "Khmerlish key y",
+      "Khmerlish key u",
+      "Khmerlish key i",
+      "Khmerlish key o",
+      "Khmerlish key p",
+      "Khmerlish key a",
+      "Khmerlish key s",
+      "Khmerlish key d",
+      "Khmerlish key f",
+      "Khmerlish key g",
+      "Khmerlish key h",
+      "Khmerlish key j",
+      "Khmerlish key k",
+      "Khmerlish key l",
+      "Khmerlish shift",
+      "Khmerlish key z",
+      "Khmerlish key x",
+      "Khmerlish key c",
+      "Khmerlish key v",
+      "Khmerlish key b",
+      "Khmerlish key n",
+      "Khmerlish key m",
+      "Khmerlish backspace",
+      "Khmerlish symbols",
+      "Khmerlish key ,",
+      "Khmerlish key space",
+      "Khmerlish key .",
+      "Done Khmerlish"
+    ],
+    "panel_layout_paths": {
+      "native_a": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/input_area",
+          "bounds": "[2,427][318,571]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[2,475][318,523]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/C01",
+          "bounds": "[2,475][49,523]"
+        }
+      ],
+      "native_n": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/input_area",
+          "bounds": "[2,427][318,571]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[2,523][318,571]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/B06",
+          "bounds": "[206,523][238,571]"
+        }
+      ],
+      "native_space": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0139",
+          "bounds": "[2,571][318,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/key_pos_space",
+          "bounds": "[111,571][238,616]"
+        }
+      ],
+      "panel": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        }
+      ],
+      "panel_a": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,459][315,612]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,497][315,535]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[7,499][37,533]"
+        }
+      ],
+      "panel_n": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,459][315,612]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,535][315,573]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[209,537][238,571]"
+        }
+      ],
+      "panel_space": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,459][315,612]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,573][315,612]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[85,575][233,610]"
+        }
+      ]
+    },
+    "screen_size": "Physical size: 320x640",
+    "panel_within_native_keyboard": "passed",
+    "key_count": 32,
+    "airplane_mode": "enabled",
+    "snapshots": {
+      "n": {
+        "panel_visible": true,
+        "lower_input": "n",
+        "host_output": "n",
+        "key_positions": {
+          "a": [
+            22,
+            516
+          ],
+          "n": [
+            223,
+            554
+          ],
+          "v": [
+            158,
+            554
+          ],
+          "space": [
+            159,
+            592
+          ],
+          "khmerlish backspace": [
+            293,
+            554
+          ],
+          "done khmerlish": [
+            292,
+            592
+          ]
+        }
+      },
+      "nv": {
+        "panel_visible": true,
+        "lower_input": "nv",
+        "host_output": "នៅ",
+        "key_positions": {
+          "a": [
+            22,
+            516
+          ],
+          "n": [
+            223,
+            554
+          ],
+          "v": [
+            158,
+            554
+          ],
+          "space": [
+            159,
+            592
+          ],
+          "khmerlish backspace": [
+            293,
+            554
+          ],
+          "done khmerlish": [
+            292,
+            592
+          ]
+        }
+      },
+      "nv na": {
+        "panel_visible": true,
+        "lower_input": "nv na",
+        "host_output": "នៅណា",
+        "key_positions": {
+          "a": [
+            22,
+            516
+          ],
+          "n": [
+            223,
+            554
+          ],
+          "v": [
+            158,
+            554
+          ],
+          "space": [
+            159,
+            592
+          ],
+          "khmerlish backspace": [
+            293,
+            554
+          ],
+          "done khmerlish": [
+            292,
+            592
+          ]
+        }
+      },
+      "after backspace": {
+        "panel_visible": true,
+        "lower_input": "nv n",
+        "host_output": "នៅ n",
+        "key_positions": {
+          "a": [
+            22,
+            516
+          ],
+          "n": [
+            223,
+            554
+          ],
+          "v": [
+            158,
+            554
+          ],
+          "space": [
+            159,
+            592
+          ],
+          "khmerlish backspace": [
+            293,
+            554
+          ],
+          "done khmerlish": [
+            292,
+            592
+          ]
+        }
+      },
+      "after retype": {
+        "panel_visible": true,
+        "lower_input": "nv na",
+        "host_output": "នៅណា",
+        "key_positions": {
+          "a": [
+            22,
+            516
+          ],
+          "n": [
+            223,
+            554
+          ],
+          "v": [
+            158,
+            554
+          ],
+          "space": [
+            159,
+            592
+          ],
+          "khmerlish backspace": [
+            293,
+            554
+          ],
+          "done khmerlish": [
+            292,
+            592
+          ]
+        }
+      }
+    },
+    "live_steps": {
+      "nv": "នៅ",
+      "nv na": "នៅណា",
+      "after_backspace": "នៅ n",
+      "after_retype": "នៅណា"
+    },
+    "close_commits": "passed",
+    "reopen_output": "នៅណាកម្ពុជា",
+    "reopen": "passed",
+    "examples": {
+      "nv na": {
+        "expected": "នៅណា",
+        "actual": "នៅណា",
+        "lower_input": "nv na",
+        "passed": true
+      },
+      "Kampuchea": {
+        "expected": "កម្ពុជា",
+        "actual": "កម្ពុជា",
+        "lower_input": "Kampuchea",
+        "passed": true
+      },
+      "kampuchea": {
+        "expected": "កម្ពុជា",
+        "actual": "កម្ពុជា",
+        "lower_input": "kampuchea",
+        "passed": true
+      },
+      "kampu": {
+        "expected": "កម្ពុជា",
+        "actual": "កម្ពុជា",
+        "lower_input": "kampu",
+        "passed": true
+      },
+      "nak na": {
+        "expected": "អ្នកណា",
+        "actual": "អ្នកណា",
+        "lower_input": "nak na",
+        "passed": true
+      },
+      "srey sart": {
+        "expected": "ស្រីស្អាត",
+        "actual": "ស្រីស្អាត",
+        "lower_input": "srey sart",
+        "passed": true
+      },
+      "Nik o": {
+        "expected": "នឹកអូន",
+        "actual": "នឹកអូន",
+        "lower_input": "Nik o",
+        "passed": true
+      }
+    },
+    "toolbar_debug_stages": [
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0"
+    ]
+  },
   "settings_launch": "Starting: Intent { cmp=dev.jason.com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.latin.preference.SettingsActivity }",
   "settings_initial_labels": [
     "Languages",
@@ -72,8 +1135,41 @@
     "runtime_enabled": true,
     "registry_entry": true
   },
+  "input_method": "taps on the actual Gboard soft-key accessibility bounds",
+  "examples": {
+    "nv na": {
+      "expected": "នៅណា",
+      "actual": "នៅណា",
+      "passed": true
+    },
+    "kampuchea": {
+      "expected": "កម្ពុជា",
+      "actual": "កម្ពុជា",
+      "passed": true
+    },
+    "kampu": {
+      "expected": "កម្ពុជា",
+      "actual": "កម្ពុជា",
+      "passed": true
+    },
+    "nak na": {
+      "expected": "អ្នកណា",
+      "actual": "អ្នកណា",
+      "passed": true
+    },
+    "srey sart": {
+      "expected": "ស្រីស្អាត",
+      "actual": "ស្រីស្អាត",
+      "passed": true
+    },
+    "nik o": {
+      "expected": "នឹកអូន",
+      "actual": "នឹកអូន",
+      "passed": true
+    }
+  },
   "personal_dictionary": {
-    "status": "failed",
+    "status": "passed",
     "search_bundled": "passed",
     "add": "passed",
     "automatic_override": "passed",
@@ -89,10 +1185,10 @@
       "Downloads",
       "khmerlish-smoke-valid.csv",
       "67 B",
-      "3:32 PM",
+      "3:47 PM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "3:32 PM",
+      "3:47 PM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -112,14 +1208,13 @@
       "synthetic_import_persisted": true,
       "synthetic_override_deleted": true
     },
-    "restart_ime_component": "com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME",
+    "ime_after_force_stop": "com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME",
+    "restart_ime_component": "dev.jason.com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME",
     "restart_keyboard_labels": [
       "Open features menu",
-      "Sticker Keyboard",
-      "GIF Keyboard",
-      "Clipboard",
-      "Settings",
-      "Theme settings",
+      "Khmerlish → ខ្មែរ",
+      "Sticker Keyboard, This app does not support images here",
+      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -160,20 +1255,18 @@
       "m",
       "Delete",
       "Symbol keyboard",
+      "?123",
       ",",
       "Emoji button",
       "Space",
+      "Period",
       ".",
       "Done"
     ],
-    "error": "RuntimeError: Android selected a different IME after force-stop",
-    "synthetic_screen_labels_on_failure": [
-      "Synthetic Khmerlish test",
-      "Synthetic Khmerlish test"
-    ],
-    "synthetic_picker_nodes": []
+    "panel_after_restart": "passed",
+    "restart_and_delete_fallback": "passed"
   },
   "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
-  "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42243431827"
+  "emulator_action_outcome": "success",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42244932669"
 }
