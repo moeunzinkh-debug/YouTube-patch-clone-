@@ -94,7 +94,10 @@
       "catalog_added",
       "register_catalog_ok",
       "register_descriptor_ok",
-      "register_done"
+      "register_done",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1"
     ]
   },
   "toolbar_diagnostic_after_panel": {
@@ -107,7 +110,7 @@
     "registry_entry": true
   },
   "error": "RuntimeError: Khmerlish toolbar panel failed; see sanitized diagnostics",
-  "bundle_sha256": "c1b530fc290313715a848cf2ab80bd03f629d902059b9be6950c50fb3fc33876",
+  "bundle_sha256": "b7f59b817786c16abd15ae328636edf62b18a77cad5a3ce5948c6d9f32b7fc66",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42207422405"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42208606513"
 }
