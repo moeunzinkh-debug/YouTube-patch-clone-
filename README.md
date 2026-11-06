@@ -144,6 +144,17 @@ OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភ
 <!-- GBOARD-PATCH-LIST:END -->
 
 <details>
+<summary>🧪 Gboard Khmerlish → ខ្មែរ (bundle សាកល្បង)</summary>
+
+Fork សាកល្បងនេះបន្ថែម toolbar panel សម្រាប់វាយ Khmerlish ខាងក្រោម និងបង្ហាញអក្សរខ្មែរក្នុង app ខាងលើ ព្រមទាំង setting សម្រាប់បម្លែងពេលវាយធម្មតា។ វាមានវចនានុក្រម offline ផ្ទាល់ខ្លួន បញ្ជីពាក្យអាចស្វែងរក និងនាំចូល/នាំចេញឯកសារអត្ថបទ CSV/TSV។ វាមិនជំនួស Gboard bundle upstream 43 patches ខាងលើទេ។
+
+[ឯកសារ `.mpp`](bundles/gboard-khmer/gboard-khmerlish-experimental.mpp) · [របៀបប្រើ និងកម្រិត](bundles/gboard-khmer/README.md) · [លទ្ធផល build](bundles/gboard-khmer/validation.json) · [លទ្ធផល Android ចុងក្រោយ](bundles/gboard-khmer/android-smoke.json)
+
+គោលដៅគឺ Gboard `18.5.4.993608717-release-arm64-v8a` ប៉ុណ្ណោះ។ នេះមិនមែនជា release ថ្មីទេ; សូមពិនិត្យលទ្ធផលតេស្ត និងរក្សា keyboard បម្រុង។
+
+</details>
+
+<details>
 <summary>✈️ Telegram • 15 patches (bundle ដាច់ដោយឡែក)</summary>
 
 ប្រភព៖ [rushiranpise/morphe-patches v1.23.1](https://github.com/rushiranpise/morphe-patches/releases/tag/v1.23.1)។

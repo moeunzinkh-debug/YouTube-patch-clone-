@@ -1,0 +1,190 @@
+name: Build experimental Gboard Khmerlish bundle
+
+on:
+  push:
+    branches: [arena/383e624b-youtube-patch-clone]
+    paths:
+      - 'tools/gboard-khmer/**'
+      - '.github/workflows/build-gboard-khmer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: gboard-khmer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-verify:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[gboard-khmer-ci]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify source, licensing, dictionary, and overlay
+        run: |
+          set -euo pipefail
+          python3 tools/gboard/verify_bundle.py --verify-vendor
+          python3 tools/gboard-khmer/test_khmer.py -v
+          python3 tools/gboard-translate/test_fixture.py -v
+          python3 tools/gboard-khmer/apply_overlay.py /tmp/gboard-khmer-source
+      - name: Compile Android MPP and verify extension ABI
+        working-directory: /tmp/gboard-khmer-source
+        env:
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          ./gradlew :patches:test --tests '*runtimeabi.*' :patches:buildAndroid generatePatchesList \
+            --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/gboard-khmer-build.log
+      - name: Test examples, settings, privacy guards, and edit safety
+        working-directory: /tmp/gboard-khmer-source
+        env:
+          GITHUB_ACTOR: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          ./gradlew :extensions:extension:testDebugUnitTest --tests '*khmerlish.*' \
+            --no-daemon --max-workers=2 --stacktrace 2>&1 | tee /tmp/gboard-khmer-unit.log
+      - name: List the actual MPP using Morphe Desktop
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gboard-khmer-input /tmp/gboard-khmer-output
+          gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
+            --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/gboard-khmer-input
+          echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/gboard-khmer-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
+          mpp=/tmp/gboard-khmer-source/patches/build/libs/patches-4.0.0-khmerlish-dev.3.mpp
+          test -s "$mpp"
+          cp "$mpp" /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp
+          cp /tmp/gboard-khmer-source/patches-list.json /tmp/gboard-khmer-output/patches-list.json
+          java -Xmx2g -jar /tmp/gboard-khmer-input/morphe-desktop-1.19.1-all.jar list-patches \
+            --patches /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp \
+            --with-packages --with-versions --out /tmp/gboard-khmer-output/desktop-patches.txt \
+            2>&1 | tee /tmp/gboard-khmer-list.log
+          python3 tools/gboard-khmer/verify_artifact.py \
+            /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp \
+            /tmp/gboard-khmer-output/patches-list.json /tmp/gboard-khmer-output/desktop-patches.txt
+      - name: Apply both experimental patches to the pinned non-stock fixture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          gh release download 'gboard-v18.5.4.993608717-release-arm64-v8a-p4.0.0' \
+            --repo iamwaqargulzar/auto-morphe-apk-builds \
+            --pattern 'gboard-18.5.4.993608717-release-arm64-v8a-arm64-v8a.apk' \
+            --dir /tmp/gboard-khmer-input
+          input=/tmp/gboard-khmer-input/gboard-18.5.4.993608717-release-arm64-v8a-arm64-v8a.apk
+          echo "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea  $input" | sha256sum --check
+          python3 tools/gboard-khmer/make_fixture.py "$input" /tmp/gboard-khmer-input/fixture.apk
+          java -Xmx3g -jar /tmp/gboard-khmer-input/morphe-desktop-1.19.1-all.jar patch \
+            --patches /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp \
+            --exclusive --enable 'Direct Google Translate (experimental)' \
+            --enable 'Khmerlish to Khmer (experimental)' --bytecode-mode FULL \
+            --out /tmp/gboard-khmer-output/fixture-patched.apk \
+            --result-file /tmp/gboard-khmer-output/patch-result.json \
+            /tmp/gboard-khmer-input/fixture.apk 2>&1 | tee /tmp/gboard-khmer-apply.log
+          python3 - <<'PY'
+          import json
+          result = json.load(open('/tmp/gboard-khmer-output/patch-result.json'))
+          assert result['success'] and not result['failedPatches'], result.get('failureReason')
+          assert {'Direct Google Translate (experimental)', 'Khmerlish to Khmer (experimental)'} <= set(result['appliedPatches'])
+          PY
+          python3 tools/gboard-translate/verify_fixture_apk.py /tmp/gboard-khmer-output/fixture-patched.apk
+          python3 tools/gboard-khmer/verify_fixture_apk.py /tmp/gboard-khmer-output/fixture-patched.apk \
+            2>&1 | tee /tmp/gboard-khmer-fixture-verify.log
+      - name: Record verification, without publishing or saving an APK
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, xml.etree.ElementTree as ET
+          from pathlib import Path
+          output = Path('/tmp/gboard-khmer-output')
+          bundle = output / 'gboard-khmerlish-experimental.mpp'
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          (output / (bundle.name + '.sha256')).write_text(f'{digest}  {bundle.name}\n')
+          reports = list(Path('/tmp/gboard-khmer-source/extensions/extension/build/test-results/testDebugUnitTest').glob('TEST-*khmerlish*.xml'))
+          assert reports, 'Missing Khmerlish JVM unit test reports'
+          counts = {'tests': 0, 'failures': 0, 'errors': 0, 'skipped': 0}
+          for report in reports:
+              suite = ET.parse(report).getroot()
+              for key in counts: counts[key] += int(suite.get(key, 0))
+          assert counts['tests'] >= 10 and counts['failures'] == counts['errors'] == counts['skipped'] == 0, counts
+          data = {
+              'version': '4.0.0-khmerlish-dev.3', 'experimental': True,
+              'sha256': digest, 'size': bundle.stat().st_size,
+              'target': '18.5.4.993608717-release-arm64-v8a / 176049702',
+              'checks': {
+                  'existing_43_and_direct_translate_metadata': 'passed',
+                  'morphe_desktop_listing': 'passed',
+                  'khmerlish_unit_tests': counts,
+                  'third_party_prepatched_fixture_application_and_dex_inspection': 'passed',
+                  'stock_google_apk_patch_application': 'not tested',
+                  'actual_gboard_typing_on_device': 'not tested',
+              },
+              'fixture_sha256': '1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea',
+              'run_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+          }
+          (output / 'validation.json').write_text(json.dumps(data, indent=2) + '\n')
+          PY
+      - name: Save the verified MPP and metadata to this session branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/arena/383e624b-youtube-patch-clone'
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          for path in extras/gboard-patches tools/gboard tools/gboard-translate tools/gboard-khmer \
+                      bundles/gboard-experimental/patches-list.json .github/workflows/build-gboard-khmer.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$path")" != "$(git rev-parse "HEAD:$path")" ]; then
+              echo '::error::Khmerlish inputs changed; refusing to save a stale MPP.'
+              exit 1
+            fi
+          done
+          cp /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp* bundles/gboard-khmer/
+          cp /tmp/gboard-khmer-output/{patches-list.json,validation.json} bundles/gboard-khmer/
+          git add -f bundles/gboard-khmer/gboard-khmerlish-experimental.mpp \
+            bundles/gboard-khmer/gboard-khmerlish-experimental.mpp.sha256 \
+            bundles/gboard-khmer/patches-list.json bundles/gboard-khmer/validation.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'build: add experimental Gboard Khmerlish MPP [skip ci]'
+          git push origin "$GITHUB_REF_NAME"
+      - name: Surface build or fixture errors
+        if: failure()
+        run: |
+          for log in /tmp/gboard-khmer-build.log /tmp/gboard-khmer-unit.log /tmp/gboard-khmer-list.log /tmp/gboard-khmer-apply.log; do
+            if test -f "$log"; then
+              grep -E -A 5 'What went wrong|Execution failed|Could not|FAILURE:|^e: |error:|Exception| FAILED|ERROR:|FAILED:' "$log" | tail -45 | while IFS= read -r line; do echo "::error::$line"; done || true
+            fi
+          done
+          if test -f /tmp/gboard-khmer-fixture-verify.log; then
+            tail -30 /tmp/gboard-khmer-fixture-verify.log | while IFS= read -r line; do echo "::error::$line"; done
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gboard-khmer-validation-logs
+          if-no-files-found: ignore
+          path: |
+            /tmp/gboard-khmer-build.log
+            /tmp/gboard-khmer-unit.log
+            /tmp/gboard-khmer-list.log
+            /tmp/gboard-khmer-apply.log
+            /tmp/gboard-khmer-source/patches/build/test-results/test/*.xml
+            /tmp/gboard-khmer-source/extensions/extension/build/test-results/testDebugUnitTest/*.xml
+            /tmp/gboard-khmer-output/patch-result.json
+            /tmp/gboard-khmer-output/validation.json
+            /tmp/gboard-khmer-output/desktop-patches.txt

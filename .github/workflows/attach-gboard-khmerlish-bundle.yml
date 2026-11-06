@@ -1,0 +1,208 @@
+name: Add Khmerlish bundle to the existing Gboard pre-release
+
+on:
+  push:
+    branches:
+      - arena/383e624b-youtube-patch-clone
+    paths:
+      - .github/workflows/attach-gboard-khmerlish-bundle.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gboard-khmerlish-existing-release
+  cancel-in-progress: false
+
+jobs:
+  attach:
+    # Only this explicitly authorized, branch-scoped action may update the release.
+    if: contains(github.event.head_commit.message, '[attach-gboard-khmerlish-dev3]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: '426612803'
+      RELEASE_TAG: Gboard-v4.0.0
+      EXPECTED_BUNDLE_SHA256: 52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify the exact tested bundle and reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd bundles/gboard-khmer && sha256sum --check gboard-khmerlish-experimental.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          root = Path('bundles/gboard-khmer')
+          bundle = root / 'gboard-khmerlish-experimental.mpp'
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          build = json.loads((root / 'validation.json').read_text(encoding='utf-8'))
+          android = json.loads((root / 'android-smoke.json').read_text(encoding='utf-8'))
+          unit = build['checks']['khmerlish_unit_tests']
+          panel = android.get('toolbar_panel', {})
+          personal = android.get('personal_dictionary', {})
+          expected_personal = ('search_bundled', 'add', 'automatic_override', 'panel_override',
+                               'edit_and_persist', 'import_keep_existing', 'import_replace_conflicts',
+                               'invalid_import_atomic', 'search_personal', 'export', 'delete',
+                               'panel_after_restart', 'restart_and_delete_fallback')
+          if digest != os.environ['EXPECTED_BUNDLE_SHA256'] or bundle.stat().st_size != 8422643:
+              raise SystemExit('The bundle is not the exact approved dev.3 artifact')
+          if (build['version'] != '4.0.0-khmerlish-dev.3' or build['sha256'] != digest
+                  or build['checks']['morphe_desktop_listing'] != 'passed'
+                  or build['checks']['third_party_prepatched_fixture_application_and_dex_inspection'] != 'passed'
+                  or unit['tests'] != 32 or unit['failures'] or unit['errors'] or unit['skipped']):
+              raise SystemExit('Build verification is missing or does not match the artifact')
+          if (android.get('bundle_sha256') != digest or android.get('mode') != 'complete smoke'
+                  or android.get('emulator_action_outcome') != 'success'
+                  or android.get('actual_gboard_typing') != 'passed' or panel.get('status') != 'passed'
+                  or len(android.get('examples', {})) != 6
+                  or not all(item.get('passed') for item in android['examples'].values())
+                  or len(panel.get('examples', {})) != 7
+                  or not all(item.get('passed') for item in panel['examples'].values())
+                  or personal.get('status') != 'passed'
+                  or any(personal.get(check) != 'passed' for check in expected_personal)):
+              raise SystemExit('Android smoke report does not match the tested artifact')
+          print('Verified 32 unit tests and the complete Android smoke for', digest)
+          PY
+      - name: Verify existing Gboard pre-release and stage unique assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F383e624b-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to upload a stale bundle'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-before.json"
+          mkdir -p "$RUNNER_TEMP/gboard-khmer-assets"
+          cp bundles/gboard-khmer/gboard-khmerlish-experimental.mpp* "$RUNNER_TEMP/gboard-khmer-assets/"
+          cp bundles/gboard-khmer/khmerlish-personal-example.csv "$RUNNER_TEMP/gboard-khmer-assets/"
+          cp bundles/gboard-khmer/validation.json "$RUNNER_TEMP/gboard-khmer-assets/gboard-khmerlish-validation.json"
+          cp bundles/gboard-khmer/android-smoke.json "$RUNNER_TEMP/gboard-khmer-assets/gboard-khmerlish-android-smoke.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          temp = Path(os.environ['RUNNER_TEMP'])
+          release = json.loads((temp / 'release-before.json').read_text())
+          if (release['id'] != int(os.environ['RELEASE_ID']) or release['tag_name'] != os.environ['RELEASE_TAG']
+                  or release['name'] != 'Gboard patches v4.0.0' or release['draft'] or not release['prerelease']):
+              raise SystemExit('The expected existing Gboard pre-release is unavailable')
+          assets = {asset['name']: asset for asset in release['assets']}
+          if len(assets) != len(release['assets']):
+              raise SystemExit('Duplicate existing asset names')
+          upstream = assets.get('gboard-patches-4.0.0.mpp')
+          if (not upstream or upstream['state'] != 'uploaded' or upstream['size'] != 8186810
+                  or upstream.get('digest') != 'sha256:fadf54bea20f337a03baddf2bd294c86d254a744456c6e53ee13f4ad25a58716'):
+              raise SystemExit('The original upstream bundle changed; refusing to modify the release')
+          expected_old = {'gboard-patches-4.0.0.mpp.sha256', 'morphe-validation.json', 'patches-list.json'}
+          if not expected_old.issubset(assets):
+              raise SystemExit('An original Gboard asset is missing')
+          missing = []
+          for local in sorted((temp / 'gboard-khmer-assets').iterdir()):
+              remote = assets.get(local.name)
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if remote is None:
+                  missing.append(str(local))
+              elif (remote['state'] != 'uploaded' or remote['size'] != local.stat().st_size
+                    or remote.get('digest') != digest):
+                  raise SystemExit('Conflicting asset exists; refusing to replace ' + local.name)
+          (temp / 'gboard-khmer-missing.txt').write_text(''.join(path + '\n' for path in missing))
+          print('Additional assets:', len(missing))
+          PY
+      - name: Upload only missing Khmerlish assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r asset; do
+            gh release upload "$RELEASE_TAG" "$asset"
+          done < "$RUNNER_TEMP/gboard-khmer-missing.txt"
+      - name: Verify all uploaded bytes and preserve existing assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-after-upload.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'release-before.json').read_text())
+          after = json.loads((temp / 'release-after-upload.json').read_text())
+          for key in ('id', 'tag_name', 'name', 'draft', 'prerelease', 'target_commitish', 'body'):
+              if before[key] != after[key]:
+                  raise SystemExit('Unexpected release metadata change: ' + key)
+          old = {a['id']: a for a in before['assets']}
+          new = {a['id']: a for a in after['assets']}
+          if not set(old).issubset(new):
+              raise SystemExit('An existing release asset was removed')
+          for asset_id, original in old.items():
+              for key in ('name', 'size', 'state', 'digest'):
+                  if original[key] != new[asset_id][key]:
+                      raise SystemExit('An existing release asset changed: ' + original['name'])
+          by_name = {a['name']: a for a in after['assets']}
+          for local in (temp / 'gboard-khmer-assets').iterdir():
+              uploaded = by_name.get(local.name)
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if (not uploaded or uploaded['state'] != 'uploaded' or uploaded['size'] != local.stat().st_size
+                      or uploaded.get('digest') != digest):
+                  raise SystemExit('Upload differs: ' + local.name)
+          print('All existing assets preserved; new upload digests match')
+          PY
+          mkdir -p "$RUNNER_TEMP/gboard-khmer-download"
+          gh release download "$RELEASE_TAG" --pattern 'gboard-khmerlish-experimental.mpp' \
+            --pattern 'gboard-khmerlish-experimental.mpp.sha256' --dir "$RUNNER_TEMP/gboard-khmer-download"
+          (cd "$RUNNER_TEMP/gboard-khmer-download" && sha256sum --check gboard-khmerlish-experimental.mpp.sha256)
+          echo "$EXPECTED_BUNDLE_SHA256  $RUNNER_TEMP/gboard-khmer-download/gboard-khmerlish-experimental.mpp" | sha256sum --check
+      - name: Add a clearly separated Khmerlish section to release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-before-notes.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'release-before.json').read_text())
+          current = json.loads((temp / 'release-before-notes.json').read_text())
+          if current['body'] != before['body']:
+              raise SystemExit('Release notes changed during upload; refusing to overwrite them')
+          marker = '## Khmerlish 4.0.0-khmerlish-dev.3 (experimental)'
+          body = current['body'] or ''
+          if marker not in body:
+              old = 'Release នេះចម្លង `.mpp` **មិនកែប្រែ**'
+              new = 'ឯកសារ `gboard-patches-4.0.0.mpp` ក្នុង release នេះចម្លង **មិនកែប្រែ**'
+              if old not in body:
+                  raise SystemExit('Original description changed; refusing to edit release notes')
+              body = body.replace(old, new, 1)
+              repo = os.environ['GITHUB_REPOSITORY']
+              commit = os.environ['GITHUB_SHA']
+              body += f'''
+
+          {marker}
+
+          **Bundle បន្ថែមដាច់ដោយឡែក**៖ ទាញយក `gboard-khmerlish-experimental.mpp` ពី Assets (កុំបើកវាជាមួយ Gboard source ចាស់ក្នុង Morphe Manager ព្រោះ patches អាចស្ទួន)។ វារក្សា upstream 43 patches និង Direct Google Translate experiment ដាច់ដោយឡែក; asset upstream ដើមខាងលើមិនត្រូវបានជំនួស។
+
+          - ក្នុង Morphe Manager៖ **Sources → Add patch source → Local** → ជ្រើស `.mpp` → ជ្រើស Gboard `18.5.4.993608717-release-arm64-v8a` / `176049702` និង patch **Khmerlish to Khmer (experimental)**។
+          - រួមមាន toolbar panel offline, automatic conversion (បិទជាមុន), វចនានុក្រមផ្ទាល់ខ្លួន add/edit/delete និងបញ្ជីពាក្យអាចស្វែងរក។ នៅ Settings → Patches → Khmerlish → Personal Dictionary & Documents អាច import/export ឯកសារ UTF-8 CSV/TSV។ PDF/DOCX មិនគាំទ្រ; សាក `khmerlish-personal-example.csv`។
+          - ពាក្យផ្ទាល់ខ្លួនផ្ទុកក្នុង private storage ដោយគ្មាន automatic backup; **export មុន uninstall ឬ clear data**។ Khmerlish មិនផ្ញើអត្ថបទទៅ server; Direct Google Translate ជា patch ផ្សេង ហើយបើប្រើវានឹងផ្ញើអត្ថបទទៅ Google។
+          - SHA-256: `{os.environ['EXPECTED_BUNDLE_SHA256']}`។ [ការប្រើប្រាស់លម្អិត](https://github.com/{repo}/blob/{commit}/bundles/gboard-khmer/README.md) · [Build/test 32/32](https://github.com/{repo}/actions/runs/42232463897) · [Android 15 emulator](https://github.com/{repo}/actions/runs/42244932669)។
+          - សាកល្បងលើ fixture Gboard ភាគីទីបីដែលបាន patch រួច **មិនមែន stock**; stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។ កំណែនេះនៅតែជា pre-release សាកល្បង។
+          '''
+          (temp / 'gboard-release-notes.md').write_text(body.rstrip() + '\n', encoding='utf-8')
+          PY
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+            -F body=@"$RUNNER_TEMP/gboard-release-notes.md" > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-final.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'release-before.json').read_text())
+          final = json.loads((temp / 'release-final.json').read_text())
+          for key in ('id', 'tag_name', 'name', 'draft', 'prerelease', 'target_commitish'):
+              if before[key] != final[key]:
+                  raise SystemExit('Release identity changed: ' + key)
+          if '## Khmerlish 4.0.0-khmerlish-dev.3 (experimental)' not in final['body']:
+              raise SystemExit('New release notes are missing')
+          print('Updated existing pre-release:', final['html_url'])
+          PY
