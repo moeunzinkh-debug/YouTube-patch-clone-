@@ -790,9 +790,23 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
                 if find_and_tap(nav):
                     break
             require_tap('Downloads')
+        result['synthetic_save_dialog_labels'] = labels()
         require_tap('Save')
         time.sleep(4)
-        exported = common.run('adb', 'shell', 'cat', '/sdcard/Download/khmerlish-personal.tsv')
+        # Some document providers append an extension or save in Documents
+        # rather than Downloads; enumerate only our synthetic export name.
+        candidates = []
+        for directory in ('/sdcard/Download', '/sdcard/Documents'):
+            found = subprocess.run(['adb', 'shell', 'find', directory, '-maxdepth', '3',
+                                    '-type', 'f', '-name', 'khmerlish-personal*'],
+                                   text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                                   timeout=30, check=False)
+            candidates.extend(line.strip() for line in found.stdout.splitlines()
+                              if '/khmerlish-personal' in line)
+        result['synthetic_export_candidates'] = candidates
+        if len(candidates) != 1:
+            raise RuntimeError('The exported synthetic file was not found in device storage')
+        exported = common.run('adb', 'shell', 'cat', candidates[0])
         if not all(row in exported for row in ('khmerlish\tkhmer', 'nv\tកម្ពុជា', 'zztest\tសួស្តី')):
             raise RuntimeError('Exported UTF-8 TSV did not contain the synthetic entries')
         result['export'] = 'passed'
