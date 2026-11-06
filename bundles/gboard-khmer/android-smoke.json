@@ -174,11 +174,28 @@
     ],
     "key_count": 32,
     "airplane_mode": "enabled",
+    "snapshots": {
+      "n": {
+        "panel_visible": true,
+        "lower_input": "n",
+        "host_output": "n"
+      },
+      "nv": {
+        "panel_visible": true,
+        "lower_input": "nv",
+        "host_output": "នៅ"
+      },
+      "nv na": {
+        "panel_visible": true,
+        "lower_input": "nv n",
+        "host_output": "នៅ n"
+      }
+    },
     "live_steps": {
-      "nv": "nនៅ",
-      "nv na": "nនៅនៅ n",
-      "after_backspace": "npនៅនៅ n",
-      "after_retype": "npនៅនៅ n"
+      "nv": "នៅ",
+      "nv na": "នៅ n",
+      "after_backspace": "នៅ n",
+      "after_retype": "នៅ n"
     },
     "close_commits": "failed",
     "labels_before_panel": [],
@@ -194,11 +211,7 @@
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
-      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
-      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
-      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
-      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0"
@@ -214,7 +227,7 @@
     "registry_entry": true
   },
   "error": "RuntimeError: Khmerlish toolbar panel failed; see sanitized diagnostics",
-  "bundle_sha256": "4fd12ece6a3b33c3966b628c17620c9edb2edf70c1bd63898ddd731622eebffa",
+  "bundle_sha256": "70fd09ef8155cbe478f5898b3074fe96ddaf142ca9cfa53723466b46fe8535b5",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42210445173"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42211966474"
 }
