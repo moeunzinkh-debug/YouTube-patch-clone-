@@ -16,8 +16,6 @@ Included are the YouTube patch package, its common patch packages (`all`, `share
 
 Local customizations retained through the sync include the in-app equalizer and top-player shortcut, Khmer FastAPI TTS, the SEA-LION voice-over translation provider, existing Khmer translations, the YouTube-only resource checker, and fork metadata. This is a **modified YouTube-only selection**, not an unmodified upstream mirror. See [`docs/upstream-sync.md`](docs/upstream-sync.md) for the current sync and historical details, and [`docs/youtube-versions.md`](docs/youtube-versions.md) for the generated target catalog.
 
-The separate Gemini/microG RE source under `extras/gemini-microg-patches/` remains outside every YouTube Gradle source set and is not part of `patch.mpp`.
-
 ## Development bundle versus release
 
 The source update and built bundle on this branch use version **`2.0.0-dev.1`**, published as a [YouTube pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/v2.0.0-dev.1). The stable YouTube release and default `patches-bundle.json` remain at **`1.49.0`**. To try the development update, [download `patch.mpp`](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/v2.0.0-dev.1/patch.mpp) and import it as a local patch source in Morphe Manager. The repository source does not automatically discover this GitHub pre-release.
