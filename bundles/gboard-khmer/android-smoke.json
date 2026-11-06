@@ -17,7 +17,7 @@
     "runtime_enabled": false,
     "registry_entry": true
   },
-  "phase": "type synthetic examples",
+  "phase": "exercise personal dictionary, guide and documents",
   "ime_visibility_flags": {
     "mShowForced": false,
     "mInputShown": true,
@@ -1167,7 +1167,26 @@
       "passed": true
     }
   },
-  "bundle_sha256": "33cbb083604f5282a9d1060550907f78b99c240002471fa37287c80fa4229def",
-  "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42214537226"
+  "personal_dictionary": {
+    "status": "failed",
+    "search_bundled": "passed",
+    "error": "RuntimeError: Could not set the synthetic field: Search Khmerlish or Khmer",
+    "synthetic_screen_labels_on_failure": [
+      "‹",
+      "Khmerlish Dictionary",
+      "ឯកសារពាក្យ",
+      "ផ្ទាល់ខ្លួន",
+      "srey",
+      "ពាក្យ 3 · Khmerlish → ខ្មែរ",
+      "‹",
+      "1 / 1",
+      "›",
+      "srey  →  ស្រី",
+      "sreysaiphoan  →  ស្រីសោភ័ណ",
+      "sreysaophorn  →  ស្រីសោភ័ណ"
+    ]
+  },
+  "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
+  "emulator_action_outcome": "failure",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42233193955"
 }
