@@ -1170,23 +1170,27 @@
   "personal_dictionary": {
     "status": "failed",
     "search_bundled": "passed",
-    "error": "RuntimeError: Could not set the synthetic field: Search Khmerlish or Khmer",
+    "add": "passed",
+    "automatic_override": "passed",
+    "panel_override": "passed",
+    "error": "RuntimeError: Synthetic UI action not found: Patches",
     "synthetic_screen_labels_on_failure": [
       "‹",
       "Khmerlish Dictionary",
       "ឯកសារពាក្យ",
       "ផ្ទាល់ខ្លួន",
-      "srey",
-      "ពាក្យ 3 · Khmerlish → ខ្មែរ",
+      "ស្វែងរក Khmerlish ឬ ខ្មែរ",
+      "＋ បន្ថែម",
+      "នាំចូល",
+      "នាំចេញ",
+      "ពាក្យផ្ទាល់ខ្លួន 1 · ប៉ះដើម្បីកែ ឬលុប",
       "‹",
       "1 / 1",
       "›",
-      "srey  →  ស្រី",
-      "sreysaiphoan  →  ស្រីសោភ័ណ",
-      "sreysaophorn  →  ស្រីសោភ័ណ"
+      "nv  →  នាវា  · ផ្ទាល់ខ្លួន"
     ]
   },
   "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42233193955"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42234745803"
 }
