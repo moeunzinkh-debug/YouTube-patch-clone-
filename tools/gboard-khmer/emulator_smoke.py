@@ -196,7 +196,9 @@ def labels() -> list[str]:
 
 
 def set_synthetic_field(description: str, text: str) -> None:
-    encode = lambda value: base64.b64encode(value.encode('utf-8')).decode('ascii')
+    # adb shell drops an empty argument, so use an explicit sentinel for an
+    # empty field instead of passing an empty base64 string to instrumentation.
+    encode = lambda value: base64.b64encode(value.encode('utf-8')).decode('ascii') if value else '__empty__'
     output = common.run('adb', 'shell', 'am', 'instrument', '-w', '-r',
                         '-e', 'description', encode(description), '-e', 'value', encode(text),
                         f'{INSPECTOR_PACKAGE}/dev.arena.khmerprobe.AndroidSyntheticUi', timeout=45)
@@ -762,6 +764,11 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         result['delete'] = 'passed'
         # Stop the target to prove the imported word survives a process restart.
         common.run('adb', 'shell', 'am', 'force-stop', PACKAGE)
+        # Explicitly relaunch Gboard to clear Android's stopped-package state
+        # before requesting its IME from the synthetic editor.
+        common.run('adb', 'shell', 'am', 'start', '-n',
+                   f'{PACKAGE}/com.google.android.apps.inputmethod.latin.preference.SettingsActivity')
+        time.sleep(3)
         open_editor()
         time.sleep(6)
         enter('zztest', None)

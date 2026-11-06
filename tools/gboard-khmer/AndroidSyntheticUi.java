@@ -28,8 +28,9 @@ public final class AndroidSyntheticUi extends Instrumentation {
         try {
             String description = new String(Base64.decode(arguments.getString("description", ""),
                     Base64.DEFAULT), StandardCharsets.UTF_8);
-            String value = new String(Base64.decode(arguments.getString("value", ""),
-                    Base64.DEFAULT), StandardCharsets.UTF_8);
+            String encoded = arguments.getString("value", "__empty__");
+            String value = "__empty__".equals(encoded) ? ""
+                    : new String(Base64.decode(encoded, Base64.DEFAULT), StandardCharsets.UTF_8);
             UiAutomation automation = getUiAutomation();
             AccessibilityServiceInfo info = automation.getServiceInfo();
             info.flags |= AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
