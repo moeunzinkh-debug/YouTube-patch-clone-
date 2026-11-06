@@ -21,6 +21,10 @@
 
 5. ប្រសិនបើ Gboard English autocorrect កែពាក្យ Latin មុនពេលបម្លែងស្វ័យប្រវត្តិ សាកបិទ autocorrect ក្នុង Gboard។ ដើម្បីសាកដំបូង ប្រើអត្ថបទមិនសម្ងាត់ និងរក្សា keyboard បម្រុងដែលដំណើរការ។
 
+## លទ្ធផលសាកល្បង
+
+[Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42214537226) បានសាក icon, panel offline, ឧទាហរណ៍ទាំងអស់ (រួមទាំងអក្សរធំ), backspace, បិទ/បើកឡើងវិញ, setting និងការវាយស្វ័យប្រវត្តិ។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី បញ្ចូល DEX ពី `.mpp` នេះ និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK និងការប្រើលើទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+
 ## ឯកជនភាព និងកម្រិត
 
 - ការបម្លែងនេះប្រើវចនានុក្រម **offline** ប្រហែល 24,506 spellings និងមិនផ្ញើអត្ថបទទៅ server។ `Direct Google Translate` ជា patch ផ្សេង៖ បើអ្នកជ្រើសប្រើវា អត្ថបទក្នុង Translate UI ត្រូវផ្ញើទៅ Google ដូចការព្រមានរបស់វា។
