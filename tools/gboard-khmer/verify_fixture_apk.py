@@ -31,6 +31,7 @@ CLASSES = {RUNTIME, SETTINGS, ACCESS,
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelRuntime;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelSession;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelConverter;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelCommitter;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishController;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishDictionary;'}
 

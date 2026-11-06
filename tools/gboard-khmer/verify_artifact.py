@@ -55,7 +55,7 @@ def verify(bundle: Path, metadata: Path, listing: Path) -> str:
             raise ValueError('Extension is not Android DEX')
         for marker in (b'KhmerlishRuntime', b'KhmerlishController', b'KhmerlishSettingsFeature',
                        b'KhmerlishPanelRuntime', b'KhmerlishPanelSession', b'KhmerlishPanelConverter',
-                       b'KhmerlishAccessPoint', b'GboardDirectTranslateRuntime'):
+                       b'KhmerlishPanelCommitter', b'KhmerlishAccessPoint', b'GboardDirectTranslateRuntime'):
             if marker not in dex:
                 raise ValueError(f'Missing extension class: {marker!r}')
         manifest = archive.read('META-INF/MANIFEST.MF').decode('utf-8').replace('\r\n ', '')

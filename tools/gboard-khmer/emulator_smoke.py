@@ -413,8 +413,17 @@ def panel_press(keys: dict[str, tuple[int, int]], text: str) -> None:
         time.sleep(.12)
 
 
+def panel_snapshot() -> dict:
+    windows = common.inspect_ime_windows()
+    nodes = list(common.flatten_window_nodes(windows))
+    active = any(str(node.get('description', '')).lower() == 'khmerlish offline panel' for node in nodes)
+    lower = next((str(node.get('text', '')) for node in nodes
+                  if str(node.get('description', '')).lower() == 'khmerlish input'), '')
+    return {'panel_visible': active, 'lower_input': lower, 'host_output': editor_text()}
+
+
 def panel_smoke(report: dict) -> bool:
-    """Tap the real toolbar, then verify host composing while the emulator is offline."""
+    """Tap the real toolbar, then verify live host output while the emulator is offline."""
     result = report['toolbar_panel'] = {'status': 'not tested'}
     offline = False
     try:
@@ -435,10 +444,21 @@ def panel_smoke(report: dict) -> bool:
         result['airplane_mode'] = 'enabled' if offline else 'not confirmed'
         if not offline:
             raise RuntimeError('Could not confirm airplane mode in disposable emulator')
-        panel_press(keys, 'nv')
-        after_nv = editor_text()
+        snapshots = result['snapshots'] = {}
+        panel_press(keys, 'n')
+        snapshots['n'] = panel_snapshot()
+        if not snapshots['n']['panel_visible']:
+            raise RuntimeError('Panel closed after the first character')
+        panel_press(keys, 'v')
+        snapshots['nv'] = panel_snapshot()
+        if not snapshots['nv']['panel_visible']:
+            raise RuntimeError('Panel closed after the second character')
+        after_nv = snapshots['nv']['host_output']
         panel_press(keys, ' na')
-        after_phrase = editor_text()
+        snapshots['nv na'] = panel_snapshot()
+        if not snapshots['nv na']['panel_visible']:
+            raise RuntimeError('Panel closed while entering the phrase')
+        after_phrase = snapshots['nv na']['host_output']
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['khmerlish backspace']))
         time.sleep(1)
         after_delete = editor_text()

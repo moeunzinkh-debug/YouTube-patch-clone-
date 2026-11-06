@@ -1,6 +1,6 @@
 package dev.jason.gboardpatches.extension.khmerlish;
 
-/** One host-field composing session; no text is persisted or transmitted. */
+/** One live host-field panel session; no text is persisted or transmitted. */
 final class KhmerlishPanelSession {
     interface Output {
         boolean isCurrent();

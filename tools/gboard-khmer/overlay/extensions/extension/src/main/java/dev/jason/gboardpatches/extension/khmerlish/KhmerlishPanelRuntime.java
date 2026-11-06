@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.ExtractedText;
+import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -30,7 +32,7 @@ import java.util.Locale;
 
 /**
  * A self-contained, offline keyboard panel in the IME's own window. It does not
- * launch Google Translate, use the network, or read existing host-field text.
+ * launch Google Translate, use the network, or persist or log editor contents.
  */
 public final class KhmerlishPanelRuntime {
     private static WeakReference<InputMethodService> serviceRef = new WeakReference<>(null);
@@ -114,12 +116,9 @@ public final class KhmerlishPanelRuntime {
             int composingStart, int composingEnd) {
         Panel current = panel;
         if (current == null || current.service != service || !current.written) return;
-        // If a host reports a composing region and moves its cursor outside it,
-        // stop rather than replacing text at an unexpected location.
-        if (start != end || (composingStart >= 0 && composingEnd >= 0
-                && (end < composingStart || end > composingEnd))) {
-            dismiss();
-        }
+        // A selection in the host field must not be overwritten. A collapsed
+        // cursor move is checked authoritatively before the next panel edit.
+        if (start != end) dismiss();
     }
 
     public static void dismiss() {
@@ -196,23 +195,39 @@ public final class KhmerlishPanelRuntime {
             input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(KhmerlishPanelConverter.MAX_LENGTH)});
             root.addView(input, new LinearLayout.LayoutParams(-1, dp(48)));
 
-            session = new KhmerlishPanelSession(dictionary, new KhmerlishPanelSession.Output() {
+            KhmerlishPanelCommitter.Host host = new KhmerlishPanelCommitter.Host() {
                 @Override public boolean isCurrent() {
                     return panel == Panel.this && service.getCurrentInputConnection() == connection
                             && service.getCurrentInputEditorInfo() == editor
                             && KhmerlishRuntime.isSafeField(editor);
                 }
-                @Override public boolean replace(String text) {
-                    return connection.setComposingText(text, 1);
+                @Override public int cursor() {
+                    ExtractedTextRequest request = new ExtractedTextRequest();
+                    request.hintMaxChars = 1;
+                    request.hintMaxLines = 1;
+                    ExtractedText current = connection.getExtractedText(request, 0);
+                    if (current == null || current.startOffset < 0 || current.selectionStart < 0
+                            || current.selectionStart != current.selectionEnd) return -1;
+                    long position = (long) current.startOffset + current.selectionStart;
+                    return position > Integer.MAX_VALUE ? -1 : (int) position;
                 }
-                @Override public void finish() { connection.finishComposingText(); }
-            });
+                @Override public CharSequence before(int length) {
+                    return connection.getTextBeforeCursor(length, 0);
+                }
+                @Override public boolean begin() { return connection.beginBatchEdit(); }
+                @Override public boolean deleteBefore(int length) {
+                    return connection.deleteSurroundingText(length, 0);
+                }
+                @Override public boolean commit(String value) { return connection.commitText(value, 1); }
+                @Override public void end() { connection.endBatchEdit(); }
+            };
+            session = new KhmerlishPanelSession(dictionary, new KhmerlishPanelCommitter(host));
             watcher = new TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override public void afterTextChanged(Editable editable) {
                     if (!session.update(editable)) {
-                        notifyUser(service, "This field cannot accept Khmerlish composition");
+                        notifyUser(service, "This field cannot safely update Khmerlish text");
                         root.post(KhmerlishPanelRuntime::dismiss);
                     } else {
                         written = true;
