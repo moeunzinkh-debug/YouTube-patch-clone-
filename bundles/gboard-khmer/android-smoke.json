@@ -1,15 +1,54 @@
 {
   "environment": "disposable Android emulator, synthetic text only",
   "fixture": "re-signed hybrid of third-party prepatched Gboard and the actual MPP output; not stock",
-  "fixture_install": "not run",
-  "ime_selected": "not run",
+  "fixture_install": "passed",
+  "ime_selected": "passed",
   "settings_entry": "not tested",
   "settings_default_off": "not tested",
-  "settings_toggle": "not tested",
-  "actual_gboard_typing": "not tested",
+  "settings_toggle": "set by root in disposable emulator; settings UI not confirmed",
+  "actual_gboard_typing": "failed",
   "android_api": "35",
-  "error": "RuntimeError: aapt failed (exit 1) [No AndroidManifest.xml file found.]",
+  "ime_visibility_flags": {
+    "mShowForced": false,
+    "mInputShown": true,
+    "mInputViewStarted": true
+  },
+  "ime_visible": "passed",
+  "default_off_example": "passed",
+  "input_method": "taps on the actual Gboard soft-key accessibility bounds",
+  "examples": {
+    "nv na": {
+      "expected": "នៅណា",
+      "actual": "nv na",
+      "passed": false
+    },
+    "kampuchea": {
+      "expected": "កម្ពុជា",
+      "actual": "kampuchea",
+      "passed": false
+    },
+    "kampu": {
+      "expected": "កម្ពុជា",
+      "actual": "kampu",
+      "passed": false
+    },
+    "nak na": {
+      "expected": "អ្នកណា",
+      "actual": "nak na",
+      "passed": false
+    },
+    "srey sart": {
+      "expected": "ស្រីស្អាត",
+      "actual": "srey start",
+      "passed": false
+    },
+    "nik o": {
+      "expected": "នឹកអូន",
+      "actual": "Nike o",
+      "passed": false
+    }
+  },
   "bundle_sha256": "82d8473eda2db443919799ccc74d114c3002ff8ac304fb7c3d211cf4d9bf83f7",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42194279097"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42194635567"
 }
