@@ -60,7 +60,9 @@ def build_probes(tmp: Path) -> None:
             </manifest>''',
     }
     for name, manifest_xml in manifests.items():
-        manifest = tmp / f'{name}.xml'
+        manifest_dir = tmp / name
+        manifest_dir.mkdir()
+        manifest = manifest_dir / 'AndroidManifest.xml'
         manifest.write_text(manifest_xml, encoding='utf-8')
         unsigned, aligned, signed = (tmp / f'{name}-{suffix}.apk' for suffix in ('unsigned', 'aligned', 'signed'))
         common.run(str(tools / 'aapt'), 'package', '-f', '-M', str(manifest), '-I', str(android_jar), '-F', str(unsigned))
