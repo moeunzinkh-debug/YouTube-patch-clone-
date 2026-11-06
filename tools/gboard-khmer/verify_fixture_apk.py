@@ -50,15 +50,21 @@ def main() -> None:
                if node.get(android + 'name') == 'dev.jason.gboardpatches.feature.khmerlish']
     if len(markers) != 1 or markers[0].get(android + 'value') != 'true':
         raise SystemExit('Khmerlish settings availability marker missing')
-    resource_table = apk.get_android_resources()
-    if not resource_table or not resource_table.get_res_id_by_key(
-            apk.get_package(), 'drawable', 'gboard_khmerlish_panel'):
-        raise SystemExit('Khmerlish toolbar drawable is missing from the compiled resource table')
     source = ROOT / 'tools/gboard-khmer/overlay/patches/src/main/resources/gboard-khmer'
     with zipfile.ZipFile(args.apk) as archive:
         for name in ('dictionary.tsv', 'LICENSE.txt'):
             if archive.read('assets/gboard-khmer/' + name) != (source / name).read_bytes():
                 raise SystemExit('Wrong or missing offline dictionary asset: ' + name)
+        # Androguard 4.1.3 cannot parse all of this Gboard's complex resource
+        # table entries. Check the binary string pool and packaged drawable;
+        # Android's own resource lookup is additionally exercised in the smoke.
+        table = archive.read('resources.arsc')
+        resource_name = 'gboard_khmerlish_panel'
+        if not any(resource_name.encode(enc) in table for enc in ('utf-8', 'utf-16le')):
+            raise SystemExit('Khmerlish toolbar name missing from compiled resource table')
+        if not any(name.startswith('res/') and name.endswith('/' + resource_name + '.xml')
+                   for name in archive.namelist()):
+            raise SystemExit('Compiled Khmerlish toolbar drawable is missing')
     bodies: dict[tuple[str, str, str], str] = {}
     found = set()
     for data in apk.get_all_dex():
