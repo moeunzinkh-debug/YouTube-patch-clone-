@@ -39,7 +39,7 @@
 
 ## លទ្ធផលសាកល្បង
 
-Version មុនបានសាក icon, panel offline, ឧទាហរណ៍ទាំងអស់, backspace, setting និងការវាយស្វ័យប្រវត្តិនៅលើ [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42214537226)។ សម្រាប់ bundle បច្ចុប្បន្ន សូមពិនិត្យ [លទ្ធផលសាកល្បងចុងក្រោយ](android-smoke.json) និង SHA ឲ្យត្រូវគ្នា។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+[Android 15 emulator សម្រាប់ dev.3](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42244932669) បានសាក panel 7/7 និង automatic 6/6, setting, វចនានុក្រម add/edit/delete, ការស្វែងរក, import រក្សា/ជំនួសពាក្យស្ទួន, បដិសេធឯកសារខូច, export និងការប្រើពាក្យក្រោយ restart។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឲ្យត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 
