@@ -1,0 +1,65 @@
+package dev.jason.gboardpatches.extension.khmerlish;
+
+import android.content.Context;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import dev.jason.gboardpatches.extension.settings.GboardPatchesFeatureAvailability;
+import dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsContract;
+
+/** The entry is visible only if its Morphe patch was selected. */
+public final class KhmerlishSettingsFeature implements GboardPatchesSettingsContract.Feature {
+    private static final String MARKER = "dev.jason.gboardpatches.feature.khmerlish";
+    private static final String TITLE = "Khmerlish → ខ្មែរ (experimental)";
+    private static final String SUMMARY = "បម្លែងអក្សរឡាតាំងទៅខ្មែរដោយប្រើវចនានុក្រម offline។";
+
+    public KhmerlishSettingsFeature(Context context) {}
+
+    /** Called by the injected settings registry hook before its list is frozen. */
+    public static void append(Context context, List<GboardPatchesSettingsContract.Feature> features) {
+        try {
+            if (features != null && GboardPatchesFeatureAvailability.hasFeature(context, MARKER)) {
+                features.add(new KhmerlishSettingsFeature(context));
+            }
+        } catch (Throwable ignored) {
+            // A broken or unavailable feature must not prevent other Patches settings from opening.
+        }
+    }
+
+    @Override public String getEntryTitle() { return TITLE; }
+    @Override public String getEntrySummary() { return SUMMARY; }
+    @Override public boolean isAvailable(Context context) {
+        return GboardPatchesFeatureAvailability.hasFeature(context, MARKER);
+    }
+
+    @Override public GboardPatchesSettingsContract.Screen buildScreen(
+            GboardPatchesSettingsContract.FeatureHost host) {
+        Context context = host == null ? null : host.getContext();
+        boolean enabled = context != null && KhmerlishSettings.isEnabled(context);
+        return new GboardPatchesSettingsContract.Screen(
+                TITLE, "Patches", TITLE, SUMMARY,
+                Collections.emptyList(),
+                Arrays.asList(
+                        new GboardPatchesSettingsContract.Section("មុខងារ / Feature",
+                                Collections.singletonList(
+                                        new GboardPatchesSettingsContract.ToggleRow(
+                                                "បើក Khmerlish → ខ្មែរ",
+                                                "Convert known words after space or punctuation; default off.",
+                                                context != null, enabled,
+                                                value -> KhmerlishSettings.setEnabled(context, value)))),
+                        new GboardPatchesSettingsContract.Section("ការប្រើប្រាស់ / Usage",
+                                Arrays.asList(
+                                        new GboardPatchesSettingsContract.InfoRow(
+                                                "សរសេរជាអក្សរឡាតាំង",
+                                                "nv na → នៅណា · kampu → កម្ពុជា · nik o → នឹកអូន", true),
+                                        new GboardPatchesSettingsContract.InfoRow(
+                                                "ដែនកំណត់ និងឯកជនភាព",
+                                                "Offline only. Unknown or ambiguous spellings stay unchanged. " +
+                                                "English words may also match. Password, email, URL and " +
+                                                "no-suggestions fields are excluded. Turn off Gboard " +
+                                                "autocorrect if it replaces Khmerlish before this feature can act.",
+                                                true)))));
+    }
+}
