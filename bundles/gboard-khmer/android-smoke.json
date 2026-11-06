@@ -3,19 +3,21 @@
   "fixture": "re-signed hybrid of third-party prepatched Gboard and the actual MPP output; not stock",
   "fixture_install": "passed",
   "ime_selected": "passed",
-  "settings_entry": "visible via native Gboard settings in test fixture",
-  "settings_default_off": "passed",
-  "settings_toggle": "passed",
-  "actual_gboard_typing": "passed",
+  "settings_entry": "not tested",
+  "settings_default_off": "not tested",
+  "settings_toggle": "not tested",
+  "actual_gboard_typing": "not tested",
   "android_api": "35",
   "target_diagnostic_before": {
     "marker": true,
+    "toolbar_icon_resource_found": true,
+    "toolbar_position_initialized": true,
     "dictionary_asset_present": true,
     "preference": false,
     "runtime_enabled": false,
     "registry_entry": true
   },
-  "phase": "type synthetic examples",
+  "phase": "test offline Khmerlish toolbar panel while automatic conversion is off",
   "ime_visibility_flags": {
     "mShowForced": false,
     "mInputShown": true,
@@ -86,86 +88,24 @@
       "Split keyboard",
       "Quick Insert",
       "Undo"
+    ],
+    "toolbar_debug_stages": [
+      "catalog_added",
+      "register_descriptor_ok",
+      "register_done"
     ]
   },
-  "settings_launch": "Starting: Intent { cmp=dev.jason.com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.latin.preference.SettingsActivity }",
-  "settings_initial_labels": [
-    "Languages",
-    "English (US) (QWERTY)",
-    "Preferences",
-    "Theme",
-    "Corrections & suggestions",
-    "Glide typing",
-    "Voice typing"
-  ],
-  "corrections_labels": [
-    "Automatic corrections",
-    "Auto-correction",
-    "Correct words while typing",
-    "Auto-capitalization",
-    "Capitalize the first word of each sentence while using on-screen keyboard",
-    "Spelling & grammar",
-    "Change default spell checker",
-    "Use Gboard's spell checker to access spelling and grammar features",
-    "Spell check",
-    "Underline misspelled words in red"
-  ],
-  "autocorrect": "disabled via Gboard settings",
-  "patches_entry_found": true,
-  "patches_labels": [
-    "Patches",
-    "Features",
-    "AI & Voice",
-    "AI writing tools, advanced voice typing, and Bluetooth microphone.",
-    "Keyboard Tools & Shortcuts",
-    "Customize the top row, incognito mode, long-press shortcuts, and OCR.",
-    "Keys, Layout & Symbols",
-    "Globe key behavior, English uppercase, Zhuyin bottom row, and emoji, sticker, and GIF tab order.",
-    "Clipboard",
-    "Adjusts clipboard retention, item limits, preview lines, metadata labels, order index, columns, and "
-  ],
-  "khmerlish_entry_found": true,
-  "target_diagnostic_after_settings": {
+  "toolbar_diagnostic_after_panel": {
     "marker": true,
+    "toolbar_icon_resource_found": true,
+    "toolbar_position_initialized": true,
     "dictionary_asset_present": true,
-    "preference": true,
-    "runtime_enabled": true,
+    "preference": false,
+    "runtime_enabled": false,
     "registry_entry": true
   },
-  "input_method": "taps on the actual Gboard soft-key accessibility bounds",
-  "examples": {
-    "nv na": {
-      "expected": "នៅណា",
-      "actual": "នៅណា",
-      "passed": true
-    },
-    "kampuchea": {
-      "expected": "កម្ពុជា",
-      "actual": "កម្ពុជា",
-      "passed": true
-    },
-    "kampu": {
-      "expected": "កម្ពុជា",
-      "actual": "កម្ពុជា",
-      "passed": true
-    },
-    "nak na": {
-      "expected": "អ្នកណា",
-      "actual": "អ្នកណា",
-      "passed": true
-    },
-    "srey sart": {
-      "expected": "ស្រីស្អាត",
-      "actual": "ស្រីស្អាត",
-      "passed": true
-    },
-    "nik o": {
-      "expected": "នឹកអូន",
-      "actual": "នឹកអូន",
-      "passed": true
-    }
-  },
-  "bundle_sha256": "3c10291f597210de292d4310a72315e4883022e34177aed033f9237ad601d24c",
+  "error": "RuntimeError: Khmerlish toolbar panel failed; see sanitized diagnostics",
+  "bundle_sha256": "fd11fbebececd90a468ffa19c120449427b4c7581823f13854ca66a4524e155d",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42204792716"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42206331760"
 }
