@@ -371,6 +371,7 @@ def ime_labels(windows: list) -> list[str]:
 def tap_panel_icon(panel_report: dict) -> bool:
     windows = common.inspect_ime_windows()
     panel_report.setdefault('initial_toolbar_labels', ime_labels(windows))
+    panel_report.setdefault('native_layout_paths', keyboard_layout_paths(windows))
     panel_report.setdefault('initial_unlabelled_clickable_nodes', [
         {key: str(node.get(key, ''))[:120] for key in ('class', 'id', 'bounds')}
         for node in common.flatten_window_nodes(windows)
@@ -387,6 +388,32 @@ def tap_panel_icon(panel_report: dict) -> bool:
         return False
     time.sleep(2)
     return True
+
+
+def keyboard_layout_paths(windows: list) -> dict[str, list[dict[str, str]]]:
+    """Record only view classes, IDs and bounds for known synthetic-test nodes."""
+    wanted = {
+        'khmerlish offline panel': 'panel', 'khmerlish key a': 'panel_a',
+        'khmerlish key n': 'panel_n', 'khmerlish key space': 'panel_space',
+        'a': 'native_a', 'n': 'native_n', 'space': 'native_space',
+    }
+    result: dict[str, list[dict[str, str]]] = {}
+
+    def visit(node: dict, ancestors: list[dict[str, str]]) -> None:
+        identity = {key: str(node.get(key, ''))[:150] for key in ('class', 'id', 'bounds')}
+        path = ancestors + [identity]
+        for value in (node.get('description', ''), node.get('text', '')):
+            name = wanted.get(str(value).strip().lower())
+            if name and name not in result:
+                result[name] = path
+        for child in node.get('children', []):
+            if isinstance(child, dict):
+                visit(child, path)
+
+    for window in windows:
+        if isinstance(window, dict):
+            visit(window, [])
+    return result
 
 
 def panel_key_positions(windows: list) -> dict[str, tuple[int, int]]:
@@ -438,6 +465,8 @@ def panel_smoke(report: dict) -> bool:
             raise RuntimeError('Khmerlish toolbar access point was not found')
         windows = common.inspect_ime_windows()
         result['labels_after_tap'] = ime_labels(windows)
+        result['panel_layout_paths'] = keyboard_layout_paths(windows)
+        result['screen_size'] = common.run('adb', 'shell', 'wm', 'size')
         if not any('khmerlish offline panel' in str(n.get('description', '')).lower()
                    for n in common.flatten_window_nodes(windows)):
             raise RuntimeError('Khmerlish panel did not open')
