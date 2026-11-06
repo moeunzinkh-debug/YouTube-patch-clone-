@@ -482,6 +482,14 @@ def panel_smoke(report: dict) -> bool:
             pass
         return False
     finally:
+        try:
+            log = common.run('adb', 'logcat', '-d', '-s', 'GboardKhmerlish:D', '*:S', timeout=30)
+            # The extension emits fixed stage names and exception types only;
+            # never save arbitrary log text or text entered by the test.
+            result['toolbar_debug_stages'] = re.findall(
+                r'GboardKhmerlish\s*:\s*((?:catalog|register)_[a-z_]+(?::[A-Za-z]+)?)', log)[-30:]
+        except (RuntimeError, OSError, subprocess.TimeoutExpired):
+            pass
         if offline:
             try:
                 common.run('adb', 'shell', 'cmd', 'connectivity', 'airplane-mode', 'disable')
@@ -511,6 +519,7 @@ def main() -> None:
             build_probes(tmp, args.fixture_keystore)
             report['target_diagnostic_before'] = target_diagnostic()
             report['phase'] = 'clear synthetic log and open editor'
+            common.run('adb', 'shell', 'setprop', 'log.tag.GboardKhmerlish', 'DEBUG')
             common.run('adb', 'logcat', '-c')
             open_editor()
             report['phase'] = 'wait for Gboard IME'
@@ -526,6 +535,9 @@ def main() -> None:
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
             report['phase'] = 'test offline Khmerlish toolbar panel while automatic conversion is off'
             panel_passed = panel_smoke(report)
+            if not panel_passed:
+                report['toolbar_diagnostic_after_panel'] = target_diagnostic()
+                raise RuntimeError('Khmerlish toolbar panel failed; see sanitized diagnostics')
             report['phase'] = 'navigate Gboard patch settings'
             enabled = enable_via_settings(report)
             if not enabled:

@@ -36,6 +36,11 @@ public final class AndroidGboardInspector extends Instrumentation {
                     context.getPackageName(), PackageManager.GET_META_DATA);
             diagnostic.put("marker", info.metaData != null
                     && info.metaData.getBoolean("dev.jason.gboardpatches.feature.khmerlish", false));
+            int iconId = context.getResources().getIdentifier(
+                    "gboard_khmerlish_panel", "drawable", context.getPackageName());
+            diagnostic.put("toolbar_icon_resource_found", iconId != 0);
+            diagnostic.put("toolbar_position_initialized", context.getSharedPreferences(
+                    "gboard_khmerlish_panel", 0).getBoolean("toolbar_position_initialized", false));
             try (InputStream input = context.getAssets().open("gboard-khmer/dictionary.tsv")) {
                 diagnostic.put("dictionary_asset_present", input.read() >= 0);
             }
