@@ -1,0 +1,22 @@
+{
+  "version": "4.0.0-khmerlish-dev.1",
+  "experimental": true,
+  "sha256": "82d8473eda2db443919799ccc74d114c3002ff8ac304fb7c3d211cf4d9bf83f7",
+  "size": 8392899,
+  "target": "18.5.4.993608717-release-arm64-v8a / 176049702",
+  "checks": {
+    "existing_43_and_direct_translate_metadata": "passed",
+    "morphe_desktop_listing": "passed",
+    "khmerlish_unit_tests": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "third_party_prepatched_fixture_application_and_dex_inspection": "passed",
+    "stock_google_apk_patch_application": "not tested",
+    "actual_gboard_typing_on_device": "not tested"
+  },
+  "fixture_sha256": "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42193228227"
+}
