@@ -57,6 +57,25 @@ public final class KhmerlishAccessPoint {
             Class<?> builder = Class.forName("mtm", false, loader);
             Class<?> controllerClass = Class.forName("mwv", false, loader);
             if (!controllerClass.isInstance(controller)) { debug("register_controller_type", null); return; }
+            // Gboard keeps a second master catalog in the controller. The
+            // order-factory hook alone does not extend that catalog; g() will
+            // silently reject an otherwise valid synthetic access point.
+            stage = "register_catalog";
+            Class<?> orderClass = Class.forName("mwg", false, loader);
+            Field helperField = controllerClass.getDeclaredField("g");
+            Field masterField = orderClass.getDeclaredField("c");
+            if (helperField.getType() != orderClass) return;
+            helperField.setAccessible(true);
+            masterField.setAccessible(true);
+            Object helper = helperField.get(controller);
+            Object stockCatalog = masterField.get(helper);
+            Object expandedCatalog = extendOrderCatalog(context, stockCatalog);
+            if (!(expandedCatalog instanceof Set<?>) || !((Set<?>) expandedCatalog).contains(TOKEN)) {
+                debug("register_catalog_missing", null);
+                return;
+            }
+            if (expandedCatalog != stockCatalog) masterField.set(helper, expandedCatalog);
+            debug("register_catalog_ok", null);
             stage = "register_builder";
             Object value = method(descriptor, "c", builder, true).invoke(null);
             method(builder, "l", void.class, false, String.class).invoke(value, TOKEN);
