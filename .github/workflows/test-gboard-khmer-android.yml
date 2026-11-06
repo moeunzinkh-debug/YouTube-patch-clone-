@@ -75,6 +75,7 @@ jobs:
           if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM is unavailable'; fi
       - name: Try the offline toolbar, Gboard settings, and synthetic typing on Android 15
         id: emulator
+        timeout-minutes: 35
         continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
