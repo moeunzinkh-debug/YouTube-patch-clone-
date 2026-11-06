@@ -109,12 +109,14 @@ def build_probes(tmp: Path, fixture_keystore: Path) -> None:
         common.run('adb', 'install', '-r', str(signed), timeout=90)
 
 
-def target_diagnostic(enable: bool = False, open_settings: bool = False) -> dict:
+def target_diagnostic(enable: bool = False, open_settings: bool = False, personal: bool = False) -> dict:
     command = ['adb', 'shell', 'am', 'instrument', '-w', '-r']
     if enable:
         command.extend(['-e', 'enable', 'true'])
     if open_settings:
         command.extend(['-e', 'open_settings', 'true'])
+    if personal:
+        command.extend(['-e', 'personal', 'true'])
     command.append(f'{TARGET_INSPECTOR_PACKAGE}/{TARGET_INSPECTOR}')
     output = common.run(*command, timeout=90)
     match = re.search(r'^INSTRUMENTATION_RESULT: diagnostic=([A-Za-z0-9+/=]+)$', output, re.MULTILINE)
@@ -385,7 +387,13 @@ def keyboard_keys() -> dict[str, tuple[int, int]]:
 def enter(text: str, keys: dict[str, tuple[int, int]] | None) -> None:
     for word in text.lower().split(' '):
         if keys is None:
-            common.run('adb', 'shell', 'input', 'text', word)
+            # Send individually, like real typing. A single `input text word`
+            # burst can make every selection callback stale before the IME has
+            # observed the word, which correctly causes the safety guard to skip.
+            for letter in word:
+                common.run('adb', 'shell', 'input', 'text', letter)
+                time.sleep(.18)
+            time.sleep(.5)
             common.run('adb', 'shell', 'input', 'keyevent', '62')
         else:
             for letter in word + ' ':
@@ -824,6 +832,11 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         common.run('adb', 'shell', 'am', 'start', '-n',
                    f'{PACKAGE}/com.google.android.apps.inputmethod.latin.preference.SettingsActivity')
         time.sleep(3)
+        diagnostic = target_diagnostic(personal=True)
+        result['after_restart_diagnostic'] = diagnostic
+        if not (diagnostic.get('synthetic_import_persisted')
+                and diagnostic.get('synthetic_override_deleted') and diagnostic.get('runtime_enabled')):
+            raise RuntimeError('Personal entries or the enabled setting did not persist after restart')
         open_editor()
         time.sleep(6)
         enter('zztest', None)

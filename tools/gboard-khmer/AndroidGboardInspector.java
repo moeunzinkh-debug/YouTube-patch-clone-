@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 /** Disposable, same-signature test inspector. Never included in the MPP. */
 public final class AndroidGboardInspector extends Instrumentation {
@@ -67,6 +68,17 @@ public final class AndroidGboardInspector extends Instrumentation {
                 }
             }
             diagnostic.put("registry_entry", present);
+            if (arguments != null && "true".equals(arguments.getString("personal"))) {
+                // Only read the two explicitly synthetic smoke-test keys; never
+                // enumerate or report an arbitrary user's personal dictionary.
+                Class<?> store = Class.forName(
+                        "dev.jason.gboardpatches.extension.khmerlish.KhmerlishPersonalStore", true, loader);
+                Method read = store.getDeclaredMethod("read", Context.class);
+                read.setAccessible(true);
+                Map<?, ?> words = (Map<?, ?>) read.invoke(null, context);
+                diagnostic.put("synthetic_import_persisted", "សួស្តី".equals(words.get("zztest")));
+                diagnostic.put("synthetic_override_deleted", !words.containsKey("nv"));
+            }
             if (arguments != null && "true".equals(arguments.getString("open_settings"))) {
                 Intent intent = new Intent();
                 intent.setClassName(context, "dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsActivity");
