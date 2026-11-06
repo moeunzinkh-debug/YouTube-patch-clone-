@@ -839,12 +839,34 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
             raise RuntimeError('Personal entries or the enabled setting did not persist after restart')
         open_editor()
         time.sleep(6)
-        enter('zztest', None)
-        if editor_text().rstrip() != 'សួស្តី':
-            raise RuntimeError('Imported word was not used after restarting Gboard')
+        result['restart_ime_component'] = common.run(
+                'adb', 'shell', 'settings', 'get', 'secure', 'default_input_method')
+        result['restart_keyboard_labels'] = ime_labels(common.inspect_ime_windows())
+        if not result['restart_ime_component'].startswith(PACKAGE + '/'):
+            raise RuntimeError('Android selected a different IME after force-stop')
+        restarted_panel = {}
+        if not tap_panel_icon(restarted_panel):
+            raise RuntimeError('Could not open the Khmerlish panel after restarting Gboard')
+        panel_press('zztest')
+        if editor_text() != 'សួស្តី':
+            raise RuntimeError('The restarted panel did not load the imported word')
+        result['panel_after_restart'] = 'passed'
+        keys = panel_key_positions(common.inspect_ime_windows())
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
         open_editor()
         time.sleep(4)
-        enter('nv', None)
+        keys = keyboard_keys()
+        if not set('zztest ').issubset(keys):
+            raise RuntimeError('Real Gboard keys were unavailable after restart')
+        enter('zztest', keys)
+        if editor_text().rstrip() != 'សួស្តី':
+            raise RuntimeError('Automatic mode did not load the imported word after restart')
+        open_editor()
+        time.sleep(4)
+        keys = keyboard_keys()
+        if not set('nv ').issubset(keys):
+            raise RuntimeError('Real Gboard keys were unavailable for delete fallback')
+        enter('nv', keys)
         if editor_text().rstrip() != 'នៅ':
             raise RuntimeError('Deleting an override did not restore the built-in word')
         result['restart_and_delete_fallback'] = 'passed'
