@@ -370,6 +370,7 @@ def ime_labels(windows: list) -> list[str]:
 
 def tap_panel_icon(panel_report: dict) -> bool:
     windows = common.inspect_ime_windows()
+    panel_report.setdefault('initial_toolbar_labels', ime_labels(windows))
     direct = any('khmerlish' in (str(n.get('description', '')) + ' ' + str(n.get('text', ''))).lower()
                  for n in common.flatten_window_nodes(windows))
     panel_report.setdefault('visible_in_toolbar', 'passed' if direct else 'not initially visible')
