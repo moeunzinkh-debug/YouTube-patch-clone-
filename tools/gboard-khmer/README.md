@@ -10,9 +10,13 @@ The compressed, byte-for-byte dataset `data/eng_khm_data.txt.gz` decompresses to
 
 ## Operation and safety
 
-The feature sees a word boundary after normal typing, and only edits a word previously observed in the same input session. It rechecks editor focus, cursor and the exact suffix before a batched edit. It leaves unknown/ambiguous entries unchanged, and only joins a space it inserted itself between consecutive converted words. It ignores passwords, email/URL/numeric/no-suggestions and no-personalized-learning fields. A failed insertion triggers best-effort restoration; arbitrary editor implementations can still misbehave. There is no network component in the Khmerlish implementation.
+The automatic setting sees a word boundary after normal typing, and only edits a word previously observed in the same input session. It rechecks editor focus, cursor and the exact suffix before a batched edit. It leaves unknown/ambiguous entries unchanged, and only joins a space it inserted itself between consecutive converted words.
 
-Gboard can autocorrect a Roman word before the feature sees the space, in which case the feature safely skips it. Disable Gboard autocorrect for testing. This experiment targets only version name `18.5.4.993608717-release-arm64-v8a` and code `176049702`; new versions require a fresh review of the obfuscated lifecycle methods. Device and stock-Gboard behavior must be validated separately from algorithm tests and patching the already-patched third-party fixture.
+The separate toolbar icon opens an offline Khmerlish panel without enabling the automatic setting. Its lower input drives live replacement of the panel's own output in the host app. It overlays the measured Gboard `keyboard_holder`, rather than the full IME decor (which may cover the app but have untouchable regions); it refuses to open if the holder is absent or too small. The panel's simplified QWERTY/symbol keyboard is separate from normal Gboard, and closing it restores the normal view and accessibility state. The output writer verifies the current editor, collapsed cursor and exact prior output before replacing anything.
+
+Both modes ignore passwords, email/URL/numeric/no-suggestions and no-personalized-learning fields. A failed insertion triggers best-effort restoration; arbitrary editor implementations can still misbehave. There is no network component in the Khmerlish implementation.
+
+Gboard can autocorrect a Roman word before the automatic mode sees the space, in which case the feature safely skips it. Disable Gboard autocorrect for testing. This experiment targets only version name `18.5.4.993608717-release-arm64-v8a` and code `176049702`; new versions require a fresh review of the obfuscated lifecycle methods. Device and stock-Gboard behavior must be validated separately from algorithm tests and patching the already-patched third-party fixture.
 
 To create the isolated source tree locally (requires the upstream Android/Gradle/Morphe packages toolchain):
 
@@ -23,5 +27,7 @@ cd /tmp/gboard-khmer-source
 ./gradlew :patches:test --tests '*runtimeabi.*' :patches:buildAndroid generatePatchesList
 ./gradlew :extensions:extension:testDebugUnitTest --tests '*khmerlish.*'
 ```
+
+The Android workflow uses the actual MPP in a disposable, re-signed third-party-derived hybrid on an emulator. It taps the toolbar, checks that the panel stays within the native keyboard, types the examples offline including uppercase, exercises deletion and reopening, and then tests the setting and automatic mode. This is not stock Gboard or a physical-device test. The workflow can finish green even when its emulator step fails; inspect [`android-smoke.json`](../../bundles/gboard-khmer/android-smoke.json), its `emulator_action_outcome`, and its bundle SHA rather than the job color.
 
 See [`bundles/gboard-khmer/README.md`](../../bundles/gboard-khmer/README.md) for usage, limitations, and the experimental bundle after a successful build. No APK is committed or released by the workflow.
