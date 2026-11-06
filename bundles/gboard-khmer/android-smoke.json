@@ -12,7 +12,7 @@
   "target_diagnostic_before": {
     "marker": true,
     "toolbar_icon_resource_found": true,
-    "toolbar_position_initialized": true,
+    "toolbar_position_initialized": false,
     "dictionary_asset_present": true,
     "preference": false,
     "runtime_enabled": false,
@@ -83,26 +83,32 @@
     "import_replace_conflicts": "passed",
     "invalid_import_atomic": "passed",
     "search_personal": "passed",
-    "error": "RuntimeError: adb shell cat /sdcard/Download/khmerlish-personal.tsv failed (exit 1)",
+    "synthetic_save_dialog_labels": [
+      "Downloads",
+      "Files in Downloads",
+      "Downloads",
+      "khmerlish-smoke-valid.csv",
+      "67 B",
+      "3:12 PM",
+      "khmerlish-smoke-invalid.csv",
+      "51 B",
+      "3:12 PM",
+      "khmerlish-personal.tsv",
+      "SAVE"
+    ],
+    "synthetic_export_candidates": [
+      "/sdcard/Download/khmerlish-personal.tsv.txt"
+    ],
+    "export": "passed",
+    "delete": "passed",
+    "error": "RuntimeError: Imported word was not used after restarting Gboard",
     "synthetic_screen_labels_on_failure": [
-      "‹",
-      "Khmerlish Dictionary",
-      "ឯកសារពាក្យ",
-      "ផ្ទាល់ខ្លួន",
-      "ស្វែងរក Khmerlish ឬ ខ្មែរ",
-      "＋ បន្ថែម",
-      "នាំចូល",
-      "នាំចេញ",
-      "ពាក្យផ្ទាល់ខ្លួន 2 · ប៉ះដើម្បីកែ ឬលុប",
-      "‹",
-      "1 / 1",
-      "›",
-      "nv  →  កម្ពុជា  · ផ្ទាល់ខ្លួន",
-      "zztest  →  សួស្តី  · ផ្ទាល់ខ្លួន"
+      "Synthetic Khmerlish test",
+      "zztest "
     ],
     "synthetic_picker_nodes": []
   },
   "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42238933542"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42240317943"
 }
