@@ -407,10 +407,13 @@ def panel_key_positions(windows: list) -> dict[str, tuple[int, int]]:
 def panel_press(keys: dict[str, tuple[int, int]], text: str) -> None:
     for character in text:
         name = 'space' if character == ' ' else character.lower()
-        if name not in keys:
+        # Android may resize/reposition the IME when the editor changes. Never
+        # reuse stale coordinates for an actual user-visible soft key.
+        current = panel_key_positions(common.inspect_ime_windows())
+        if name not in current:
             raise RuntimeError('Synthetic Khmerlish key is missing: ' + name)
-        common.run('adb', 'shell', 'input', 'tap', *map(str, keys[name]))
-        time.sleep(.12)
+        common.run('adb', 'shell', 'input', 'tap', *map(str, current[name]))
+        time.sleep(.25)
 
 
 def panel_snapshot() -> dict:
@@ -419,7 +422,10 @@ def panel_snapshot() -> dict:
     active = any(str(node.get('description', '')).lower() == 'khmerlish offline panel' for node in nodes)
     lower = next((str(node.get('text', '')) for node in nodes
                   if str(node.get('description', '')).lower() == 'khmerlish input'), '')
-    return {'panel_visible': active, 'lower_input': lower, 'host_output': editor_text()}
+    positions = panel_key_positions(windows)
+    tracked = {name: positions[name] for name in ('a', 'n', 'v', 'space', 'khmerlish backspace', 'done khmerlish')
+               if name in positions}
+    return {'panel_visible': active, 'lower_input': lower, 'host_output': editor_text(), 'key_positions': tracked}
 
 
 def panel_smoke(report: dict) -> bool:
@@ -459,15 +465,19 @@ def panel_smoke(report: dict) -> bool:
         if not snapshots['nv na']['panel_visible']:
             raise RuntimeError('Panel closed while entering the phrase')
         after_phrase = snapshots['nv na']['host_output']
+        keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['khmerlish backspace']))
         time.sleep(1)
-        after_delete = editor_text()
+        snapshots['after backspace'] = panel_snapshot()
+        after_delete = snapshots['after backspace']['host_output']
         panel_press(keys, 'a')
-        after_restore = editor_text()
+        snapshots['after retype'] = panel_snapshot()
+        after_restore = snapshots['after retype']['host_output']
         result['live_steps'] = {
             'nv': after_nv, 'nv na': after_phrase,
             'after_backspace': after_delete, 'after_retype': after_restore,
         }
+        keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
         time.sleep(2)
         after_close = editor_text()
@@ -480,6 +490,7 @@ def panel_smoke(report: dict) -> bool:
         after_reopen = editor_text()
         result['reopen_output'] = after_reopen
         result['reopen'] = 'passed' if after_reopen == 'នៅណាកម្ពុជា' else 'failed'
+        new_keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, new_keys['done khmerlish']))
         examples = {'nv na': 'នៅណា', 'kampuchea': 'កម្ពុជា', 'kampu': 'កម្ពុជា',
                     'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'nik o': 'នឹកអូន'}
@@ -492,6 +503,7 @@ def panel_smoke(report: dict) -> bool:
             panel_press(example_keys, source)
             actual = editor_text()
             tested[source] = {'expected': expected, 'actual': actual, 'passed': expected == actual}
+            example_keys = panel_key_positions(common.inspect_ime_windows())
             common.run('adb', 'shell', 'input', 'tap', *map(str, example_keys['done khmerlish']))
         result['examples'] = tested
         passed = (result['visible_in_toolbar'] == 'passed' and after_nv == 'នៅ'
