@@ -111,7 +111,7 @@ jobs:
           print(json.dumps(data, ensure_ascii=False, indent=2))
           PY
       - name: Save only the sanitized report to this branch
-        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/arena/383e624b-youtube-patch-clone'
+        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/383e624b-youtube-patch-clone'
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
