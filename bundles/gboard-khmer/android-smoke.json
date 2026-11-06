@@ -178,29 +178,157 @@
       "n": {
         "panel_visible": true,
         "lower_input": "n",
-        "host_output": "n"
+        "host_output": "n",
+        "key_positions": {
+          "a": [
+            22,
+            311
+          ],
+          "n": [
+            223,
+            441
+          ],
+          "v": [
+            158,
+            441
+          ],
+          "space": [
+            159,
+            571
+          ],
+          "khmerlish backspace": [
+            293,
+            441
+          ],
+          "done khmerlish": [
+            292,
+            571
+          ]
+        }
       },
       "nv": {
         "panel_visible": true,
         "lower_input": "nv",
-        "host_output": "នៅ"
+        "host_output": "នៅ",
+        "key_positions": {
+          "a": [
+            22,
+            311
+          ],
+          "n": [
+            223,
+            441
+          ],
+          "v": [
+            158,
+            441
+          ],
+          "space": [
+            159,
+            571
+          ],
+          "khmerlish backspace": [
+            293,
+            441
+          ],
+          "done khmerlish": [
+            292,
+            571
+          ]
+        }
       },
       "nv na": {
         "panel_visible": true,
         "lower_input": "nv n",
-        "host_output": "នៅ n"
+        "host_output": "នៅ n",
+        "key_positions": {
+          "a": [
+            22,
+            311
+          ],
+          "n": [
+            223,
+            441
+          ],
+          "v": [
+            158,
+            441
+          ],
+          "space": [
+            159,
+            571
+          ],
+          "khmerlish backspace": [
+            293,
+            441
+          ],
+          "done khmerlish": [
+            292,
+            571
+          ]
+        }
+      },
+      "after backspace": {
+        "panel_visible": false,
+        "lower_input": "",
+        "host_output": "នៅ n",
+        "key_positions": {}
       }
     },
-    "live_steps": {
-      "nv": "នៅ",
-      "nv na": "នៅ n",
-      "after_backspace": "នៅ n",
-      "after_retype": "នៅ n"
-    },
-    "close_commits": "failed",
-    "labels_before_panel": [],
-    "error": "RuntimeError: Khmerlish icon could not reopen the panel",
-    "labels_on_failure": [],
+    "error": "RuntimeError: Synthetic Khmerlish key is missing: a",
+    "labels_on_failure": [
+      "Open features menu",
+      "Khmerlish → ខ្មែរ",
+      "Sticker Keyboard, This app does not support images here",
+      "GIF Keyboard, This app does not support images here",
+      "Use voice typing",
+      "q",
+      "1",
+      "w",
+      "2",
+      "e",
+      "3",
+      "r",
+      "4",
+      "t",
+      "5",
+      "y",
+      "6",
+      "u",
+      "7",
+      "i",
+      "8",
+      "o",
+      "9",
+      "p",
+      "0",
+      "a",
+      "s",
+      "d",
+      "f",
+      "g",
+      "h",
+      "j",
+      "k",
+      "l",
+      "Shift",
+      "z",
+      "x",
+      "c",
+      "v",
+      "b",
+      "n",
+      "m",
+      "Delete",
+      "Symbol keyboard",
+      "?123",
+      ",",
+      "Emoji button",
+      "Space",
+      "Period",
+      ".",
+      "Done"
+    ],
     "toolbar_debug_stages": [
       "catalog_added",
       "catalog_added",
@@ -213,8 +341,8 @@
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
       "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
-      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0",
-      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_1_visibility_0"
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0",
+      "state_master_1_map_1_order_1_sorted_1_toolbar_1_overflow_0_view_1_shown_0_visibility_0"
     ]
   },
   "toolbar_diagnostic_after_panel": {
@@ -229,5 +357,5 @@
   "error": "RuntimeError: Khmerlish toolbar panel failed; see sanitized diagnostics",
   "bundle_sha256": "70fd09ef8155cbe478f5898b3074fe96ddaf142ca9cfa53723466b46fe8535b5",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42211966474"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42212558926"
 }
