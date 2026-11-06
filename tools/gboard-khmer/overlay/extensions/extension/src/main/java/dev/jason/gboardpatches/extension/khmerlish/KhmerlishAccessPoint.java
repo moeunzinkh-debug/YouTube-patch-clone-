@@ -2,6 +2,7 @@ package dev.jason.gboardpatches.extension.khmerlish;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -17,7 +18,9 @@ public final class KhmerlishAccessPoint {
     private static final String TOKEN = "gboard_khmerlish_panel";
     private static final String PREFS = "gboard_khmerlish_panel";
     private static final String PLACED = "toolbar_position_initialized";
+    private static final String LABEL = "Khmerlish → ខ្មែរ";
     private static WeakReference<Object> controllerRef = new WeakReference<>(null);
+    private static WeakReference<View> labelledViewRef = new WeakReference<>(null);
 
     private KhmerlishAccessPoint() {}
 
@@ -84,7 +87,7 @@ public final class KhmerlishAccessPoint {
             Field title = builder.getDeclaredField("d");
             if (title.getType() != String.class || Modifier.isStatic(title.getModifiers())) return;
             title.setAccessible(true);
-            title.set(value, "Khmerlish → ខ្មែរ");
+            title.set(value, LABEL);
             WeakReference<Context> weakContext = new WeakReference<>(context);
             method(builder, "q", void.class, false, Runnable.class).invoke(value,
                     (Runnable) () -> KhmerlishPanelRuntime.open(weakContext.get()));
@@ -93,6 +96,7 @@ public final class KhmerlishAccessPoint {
             method(controllerClass, "g", void.class, false, descriptor, boolean.class)
                     .invoke(controller, built, false);
             controllerRef = new WeakReference<>(controller);
+            labelledViewRef = new WeakReference<>(null);
             debug("register_descriptor_ok", null);
             stage = "register_position";
             // Put the icon in the visible toolbar once. User reordering/removal
@@ -107,6 +111,30 @@ public final class KhmerlishAccessPoint {
         } catch (Throwable failure) {
             // Debug output is opt-in via Android log settings; it never contains typed text.
             debug(stage, failure);
+        }
+    }
+
+    /** Make the generated icon identifiable to TalkBack and UI automation. */
+    static void ensureAccessible() {
+        try {
+            Object controller = controllerRef.get();
+            if (controller == null) return;
+            Field mapField = controller.getClass().getDeclaredField("h");
+            mapField.setAccessible(true);
+            Object map = mapField.get(controller);
+            Method get = map.getClass().getMethod("get", Object.class);
+            get.setAccessible(true);
+            Object descriptor = get.invoke(map, TOKEN);
+            if (descriptor == null) return;
+            Field viewField = descriptor.getClass().getField("a");
+            viewField.setAccessible(true);
+            Object candidate = viewField.get(descriptor);
+            if (!(candidate instanceof View view) || labelledViewRef.get() == view) return;
+            view.setContentDescription(LABEL);
+            view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+            labelledViewRef = new WeakReference<>(view);
+        } catch (Throwable failure) {
+            debug("accessibility_exception", failure);
         }
     }
 
@@ -161,7 +189,9 @@ public final class KhmerlishAccessPoint {
                     + "_sorted_" + flag(inSorted)
                     + "_toolbar_" + flag(toolbar instanceof Collection<?> && ((Collection<?>) toolbar).contains(TOKEN))
                     + "_overflow_" + flag(overflow instanceof Collection<?> && ((Collection<?>) overflow).contains(TOKEN))
-                    + "_view_" + flag(view != null));
+                    + "_view_" + flag(view != null)
+                    + "_shown_" + flag(view instanceof View && ((View) view).isShown())
+                    + "_visibility_" + (view instanceof View ? ((View) view).getVisibility() : 9));
         } catch (Throwable failure) {
             debug("state_exception", failure);
         }

@@ -32,7 +32,12 @@ public final class KhmerlishRuntime {
             resetController();
             KhmerlishPanelRuntime.inputStarted(service);
             // The toolbar panel is independent of the default-off automatic switch.
-            if (service != null) preload(service);
+            if (service != null) {
+                preload(service);
+                Handler main = new Handler(Looper.getMainLooper());
+                main.postDelayed(KhmerlishAccessPoint::ensureAccessible, 300);
+                main.postDelayed(KhmerlishAccessPoint::ensureAccessible, 1000);
+            }
         } catch (Throwable ignored) {
             // The stock keyboard must remain usable if an extension fails.
         }
@@ -52,6 +57,7 @@ public final class KhmerlishRuntime {
     public static void onSelection(InputMethodService service, int oldStart, int oldEnd,
             int newStart, int newEnd, int composingStart, int composingEnd) {
         try {
+            KhmerlishAccessPoint.ensureAccessible();
             KhmerlishAccessPoint.traceController(); // opt-in debug only, no editor text
             if (KhmerlishPanelRuntime.isActive(service)) {
                 resetController();
