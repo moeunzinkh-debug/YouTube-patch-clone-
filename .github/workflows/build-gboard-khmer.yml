@@ -104,7 +104,8 @@ jobs:
           assert {'Direct Google Translate (experimental)', 'Khmerlish to Khmer (experimental)'} <= set(result['appliedPatches'])
           PY
           python3 tools/gboard-translate/verify_fixture_apk.py /tmp/gboard-khmer-output/fixture-patched.apk
-          python3 tools/gboard-khmer/verify_fixture_apk.py /tmp/gboard-khmer-output/fixture-patched.apk
+          python3 tools/gboard-khmer/verify_fixture_apk.py /tmp/gboard-khmer-output/fixture-patched.apk \
+            2>&1 | tee /tmp/gboard-khmer-fixture-verify.log
       - name: Record verification, without publishing or saving an APK
         run: |
           set -euo pipefail
@@ -169,6 +170,9 @@ jobs:
               grep -E -A 5 'What went wrong|Execution failed|Could not|FAILURE:|^e: |error:|Exception| FAILED|ERROR:|FAILED:' "$log" | tail -45 | while IFS= read -r line; do echo "::error::$line"; done || true
             fi
           done
+          if test -f /tmp/gboard-khmer-fixture-verify.log; then
+            tail -30 /tmp/gboard-khmer-fixture-verify.log | while IFS= read -r line; do echo "::error::$line"; done
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

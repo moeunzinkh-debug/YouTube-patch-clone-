@@ -357,6 +357,138 @@ def enter(text: str, keys: dict[str, tuple[int, int]] | None) -> None:
         time.sleep(2)
 
 
+
+def ime_labels(windows: list) -> list[str]:
+    # Only disposable, synthetic emulator text is present in this test.
+    labels = []
+    for node in common.flatten_window_nodes(windows):
+        label = str(node.get('description', '') or node.get('text', '')).strip()
+        if label and label not in labels:
+            labels.append(label[:100])
+    return labels[:100]
+
+
+def tap_panel_icon(panel_report: dict) -> bool:
+    windows = common.inspect_ime_windows()
+    direct = any('khmerlish' in (str(n.get('description', '')) + ' ' + str(n.get('text', ''))).lower()
+                 for n in common.flatten_window_nodes(windows))
+    panel_report.setdefault('visible_in_toolbar', 'passed' if direct else 'not initially visible')
+    if not direct and common.tap_ime_label(windows, 'open features menu'):
+        time.sleep(2)
+        windows = common.inspect_ime_windows()
+    if not common.tap_ime_label(windows, 'khmerlish'):
+        panel_report['labels_before_panel'] = ime_labels(windows)
+        return False
+    time.sleep(2)
+    return True
+
+
+def panel_key_positions(windows: list) -> dict[str, tuple[int, int]]:
+    positions = {}
+    for node in common.flatten_window_nodes(windows):
+        label = str(node.get('description', '')).strip().lower()
+        if label.startswith('khmerlish key '):
+            position = common.center(str(node.get('bounds', '')))
+            if position:
+                positions[label.removeprefix('khmerlish key ')] = position
+        elif label in ('khmerlish backspace', 'khmerlish shift', 'done khmerlish'):
+            position = common.center(str(node.get('bounds', '')))
+            if position:
+                positions[label] = position
+    return positions
+
+
+def panel_press(keys: dict[str, tuple[int, int]], text: str) -> None:
+    for character in text:
+        name = 'space' if character == ' ' else character.lower()
+        if name not in keys:
+            raise RuntimeError('Synthetic Khmerlish key is missing: ' + name)
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys[name]))
+        time.sleep(.12)
+
+
+def panel_smoke(report: dict) -> bool:
+    result = report['toolbar_panel'] = {'status': 'not tested'}
+    offline = False
+    try:
+        open_editor()
+        if not tap_panel_icon(result):
+            raise RuntimeError('Khmerlish toolbar access point was not found')
+        windows = common.inspect_ime_windows()
+        result['labels_after_tap'] = ime_labels(windows)
+        if not any('khmerlish offline panel' in str(n.get('description', '')).lower()
+                   for n in common.flatten_window_nodes(windows)):
+            raise RuntimeError('Khmerlish panel did not open')
+        keys = panel_key_positions(windows)
+        result['key_count'] = len(keys)
+        if not set('nvakmpuchesrtoyl').union({'space', 'khmerlish backspace', 'done khmerlish'}).issubset(keys):
+            raise RuntimeError('Khmerlish panel keys were not accessible')
+        common.run('adb', 'shell', 'cmd', 'connectivity', 'airplane-mode', 'enable')
+        offline = common.run('adb', 'shell', 'settings', 'get', 'global', 'airplane_mode_on') == '1'
+        result['airplane_mode'] = 'enabled' if offline else 'not confirmed'
+        if not offline:
+            raise RuntimeError('Could not confirm airplane mode in disposable emulator')
+        panel_press(keys, 'nv')
+        after_nv = editor_text()
+        panel_press(keys, ' na')
+        after_phrase = editor_text()
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['khmerlish backspace']))
+        time.sleep(1)
+        after_delete = editor_text()
+        panel_press(keys, 'a')
+        after_restore = editor_text()
+        result['live_steps'] = {
+            'nv': after_nv, 'nv na': after_phrase,
+            'after_backspace': after_delete, 'after_retype': after_restore,
+        }
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+        time.sleep(2)
+        after_close = editor_text()
+        result['close_commits'] = 'passed' if after_close == 'នៅណា' else 'failed'
+        if not tap_panel_icon(result):
+            raise RuntimeError('Khmerlish icon could not reopen the panel')
+        reopened = common.inspect_ime_windows()
+        new_keys = panel_key_positions(reopened)
+        panel_press(new_keys, 'kampu')
+        after_reopen = editor_text()
+        result['reopen_output'] = after_reopen
+        result['reopen'] = 'passed' if after_reopen == 'នៅណាកម្ពុជា' else 'failed'
+        common.run('adb', 'shell', 'input', 'tap', *map(str, new_keys['done khmerlish']))
+        examples = {'nv na': 'នៅណា', 'kampuchea': 'កម្ពុជា', 'kampu': 'កម្ពុជា',
+                    'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'nik o': 'នឹកអូន'}
+        tested = {}
+        for source, expected in examples.items():
+            open_editor()
+            if not tap_panel_icon(result):
+                raise RuntimeError('Khmerlish panel failed to reopen for an example')
+            example_keys = panel_key_positions(common.inspect_ime_windows())
+            panel_press(example_keys, source)
+            actual = editor_text()
+            tested[source] = {'expected': expected, 'actual': actual, 'passed': expected == actual}
+            common.run('adb', 'shell', 'input', 'tap', *map(str, example_keys['done khmerlish']))
+        result['examples'] = tested
+        passed = (result['visible_in_toolbar'] == 'passed' and after_nv == 'នៅ'
+                  and after_phrase == 'នៅណា' and after_delete == 'នៅ n'
+                  and after_restore == 'នៅណា' and result['close_commits'] == 'passed'
+                  and result['reopen'] == 'passed' and all(item['passed'] for item in tested.values()))
+        result['status'] = 'passed' if passed else 'failed'
+        return passed
+    except (RuntimeError, ValueError, KeyError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:
+        result['status'] = 'failed'
+        result['error'] = f'{type(error).__name__}: {error}'
+        try:
+            result['labels_on_failure'] = ime_labels(common.inspect_ime_windows())
+        except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired):
+            pass
+        return False
+    finally:
+        if offline:
+            try:
+                common.run('adb', 'shell', 'cmd', 'connectivity', 'airplane-mode', 'disable')
+            except (RuntimeError, OSError, subprocess.TimeoutExpired):
+                pass
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('fixture_apk', type=Path)
@@ -392,6 +524,8 @@ def main() -> None:
             # Before the toggle, synthetic English remains untouched.
             enter('nv', None)
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
+            report['phase'] = 'test offline Khmerlish toolbar panel while automatic conversion is off'
+            panel_passed = panel_smoke(report)
             report['phase'] = 'navigate Gboard patch settings'
             enabled = enable_via_settings(report)
             if not enabled:
@@ -434,7 +568,7 @@ def main() -> None:
             crashes = common.gboard_crash_types(common.run('adb', 'logcat', '-d', '-s', 'AndroidRuntime:E', '*:S'))
             if crashes:
                 report['gboard_fatal_exception_types'] = crashes
-            failed = (not all_pass or report['default_off_example'] != 'passed' or bool(crashes)
+            failed = (not panel_passed or not all_pass or report['default_off_example'] != 'passed' or bool(crashes)
                       or report['settings_default_off'] != 'passed' or report['settings_toggle'] != 'passed')
     except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:
         report['error'] = f'{type(error).__name__}: {error}'
