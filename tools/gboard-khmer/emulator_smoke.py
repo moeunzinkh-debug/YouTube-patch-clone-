@@ -826,6 +826,11 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
             raise RuntimeError('Remaining word disappeared after delete')
         result['delete'] = 'passed'
         # Stop the target to prove the imported word survives a process restart.
+        # Android can switch back to the preinstalled IME when a selected
+        # package is force-stopped; explicitly restore the same test IME below.
+        fixture_ime = common.run('adb', 'shell', 'settings', 'get', 'secure', 'default_input_method')
+        if not fixture_ime.startswith(PACKAGE + '/'):
+            raise RuntimeError('The test IME was not selected before restart')
         common.run('adb', 'shell', 'am', 'force-stop', PACKAGE)
         # Explicitly relaunch Gboard to clear Android's stopped-package state
         # before requesting its IME from the synthetic editor.
@@ -837,6 +842,10 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if not (diagnostic.get('synthetic_import_persisted')
                 and diagnostic.get('synthetic_override_deleted') and diagnostic.get('runtime_enabled')):
             raise RuntimeError('Personal entries or the enabled setting did not persist after restart')
+        result['ime_after_force_stop'] = common.run(
+                'adb', 'shell', 'settings', 'get', 'secure', 'default_input_method')
+        common.run('adb', 'shell', 'ime', 'enable', fixture_ime)
+        common.run('adb', 'shell', 'ime', 'set', fixture_ime)
         open_editor()
         time.sleep(6)
         result['restart_ime_component'] = common.run(
