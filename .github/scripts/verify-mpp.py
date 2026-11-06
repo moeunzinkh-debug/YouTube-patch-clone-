@@ -23,6 +23,12 @@ def check(condition: bool, message: str) -> None:
         raise SystemExit(1)
 
 
+def standalone_google_app_patch_classes(classes: list[str]) -> list[str]:
+    """Detect separate Google/Gemini app patches without touching YouTube settings."""
+    prefixes = ("app/morphe/patches/google/", "app/morphe/patches/gemini/")
+    return [name for name in classes if name.startswith(prefixes)]
+
+
 def main() -> None:
     check(BUNDLE.is_file(), f"{BUNDLE.name} exists ({BUNDLE.stat().st_size if BUNDLE.exists() else 0} bytes)")
     check(CHECKSUM.is_file(), f"{CHECKSUM.name} exists")
@@ -49,6 +55,10 @@ def main() -> None:
         check(
             not any(n.startswith(("app/morphe/patches/music/", "app/morphe/patches/reddit/")) for n in classes),
             "no excluded Music/Reddit patch classes",
+        )
+        check(
+            not standalone_google_app_patch_classes(classes),
+            "no standalone Google/Gemini app patch classes",
         )
 
         extensions = [n for n in names if n.endswith(".mpe")]
