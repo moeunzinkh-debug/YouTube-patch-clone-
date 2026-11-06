@@ -66,7 +66,7 @@ jobs:
           gh release download v1.19.1 --repo MorpheApp/morphe-desktop \
             --pattern morphe-desktop-1.19.1-all.jar --dir /tmp/gboard-khmer-input
           echo 'a51472252cd63b2eac635dbb5a154ff918bfc15268da89679feb3d760230c573  /tmp/gboard-khmer-input/morphe-desktop-1.19.1-all.jar' | sha256sum --check
-          mpp=/tmp/gboard-khmer-source/patches/build/libs/patches-4.0.0-khmerlish-dev.1.mpp
+          mpp=/tmp/gboard-khmer-source/patches/build/libs/patches-4.0.0-khmerlish-dev.2.mpp
           test -s "$mpp"
           cp "$mpp" /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp
           cp /tmp/gboard-khmer-source/patches-list.json /tmp/gboard-khmer-output/patches-list.json
@@ -123,7 +123,7 @@ jobs:
               for key in counts: counts[key] += int(suite.get(key, 0))
           assert counts['tests'] >= 10 and counts['failures'] == counts['errors'] == counts['skipped'] == 0, counts
           data = {
-              'version': '4.0.0-khmerlish-dev.1', 'experimental': True,
+              'version': '4.0.0-khmerlish-dev.2', 'experimental': True,
               'sha256': digest, 'size': bundle.stat().st_size,
               'target': '18.5.4.993608717-release-arm64-v8a / 176049702',
               'checks': {

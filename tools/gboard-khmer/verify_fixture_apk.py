@@ -15,6 +15,7 @@ logger.remove()
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME = 'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;'
 SETTINGS = 'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishSettingsFeature;'
+ACCESS = 'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishAccessPoint;'
 REGISTRY = 'Ldev/jason/gboardpatches/extension/settings/GboardPatchesSettingsFeatureRegistry;'
 TARGETS = {
     ('Lphr;', 'onUpdateSelection', '(IIIIII)V'): RUNTIME + '->onSelection(',
@@ -23,8 +24,13 @@ TARGETS = {
     ('Lphr;', 'onFinishInput', '()V'): RUNTIME + '->reset(',
     ('Lphr;', 'onWindowHidden', '()V'): RUNTIME + '->reset(',
     (REGISTRY, 'features', '(Landroid/content/Context;)Ljava/util/List;'): SETTINGS + '->append(',
+    ('Lmvg;', 'm', '(Landroid/content/Context;Lniv;Lnyt;Lwpa;Lwpa;)Lmvg;'): ACCESS + '->extendOrderCatalog(',
+    ('Lmwv;', '<init>', '(Landroid/content/Context;Lmyc;)V'): ACCESS + '->register(',
 }
-CLASSES = {RUNTIME, SETTINGS,
+CLASSES = {RUNTIME, SETTINGS, ACCESS,
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelRuntime;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelSession;',
+           'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelConverter;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishController;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishDictionary;'}
 
@@ -44,6 +50,10 @@ def main() -> None:
                if node.get(android + 'name') == 'dev.jason.gboardpatches.feature.khmerlish']
     if len(markers) != 1 or markers[0].get(android + 'value') != 'true':
         raise SystemExit('Khmerlish settings availability marker missing')
+    resource_table = apk.get_android_resources()
+    if not resource_table or not resource_table.get_res_id_by_key(
+            apk.get_package(), 'drawable', 'gboard_khmerlish_panel'):
+        raise SystemExit('Khmerlish toolbar drawable is missing from the compiled resource table')
     source = ROOT / 'tools/gboard-khmer/overlay/patches/src/main/resources/gboard-khmer'
     with zipfile.ZipFile(args.apk) as archive:
         for name in ('dictionary.tsv', 'LICENSE.txt'):
@@ -59,7 +69,7 @@ def main() -> None:
                 if owner in found:
                     raise SystemExit('Duplicate new extension class: ' + owner)
                 found.add(owner)
-            if owner not in {'Lphr;', REGISTRY}:
+            if owner not in {'Lphr;', 'Lmvg;', 'Lmwv;', REGISTRY}:
                 continue
             for method in cls.get_methods():
                 key = (owner, method.get_name(), method.get_descriptor().replace(' ', ''))

@@ -10,7 +10,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERLAY = ROOT / 'tools/gboard-khmer/overlay'
-VERSION = '4.0.0-khmerlish-dev.1'
+VERSION = '4.0.0-khmerlish-dev.2'
 PATCH_NAME = 'Khmerlish to Khmer (experimental)'
 SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/arena/383e624b-youtube-patch-clone/tools/gboard-khmer'
 
@@ -68,6 +68,8 @@ def main() -> None:
                  '    KHMERLISH_ON_SELECTION("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;->onSelection(Landroid/inputmethodservice/InputMethodService;IIIIII)V"),\n'
                  '    KHMERLISH_ON_INPUT_VIEW_STARTED("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;->onInputViewStarted(Landroid/inputmethodservice/InputMethodService;)V"),\n'
                  '    KHMERLISH_RESET("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;->reset(Landroid/inputmethodservice/InputMethodService;)V"),\n'
+                 '    KHMERLISH_ACCESS_POINT_CATALOG("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishAccessPoint;->extendOrderCatalog(Landroid/content/Context;Ljava/lang/Object;)Ljava/lang/Object;"),\n'
+                 '    KHMERLISH_ACCESS_POINT_REGISTER("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishAccessPoint;->register(Ljava/lang/Object;Landroid/content/Context;)V"),\n'
                  '    KHMERLISH_ADD_SETTINGS("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishSettingsFeature;->append(Landroid/content/Context;Ljava/util/List;)V"),\n')
     print(f'Created {VERSION} with upstream, Direct Translate and Khmerlish at {destination}.')
 

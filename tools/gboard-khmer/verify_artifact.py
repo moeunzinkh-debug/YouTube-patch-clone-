@@ -10,7 +10,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = '4.0.0-khmerlish-dev.1'
+VERSION = '4.0.0-khmerlish-dev.2'
 NAME = 'Khmerlish to Khmer (experimental)'
 PACKAGE = 'com.google.android.inputmethod.latin'
 TARGET = '18.5.4.993608717-release-arm64-v8a'
@@ -43,17 +43,19 @@ def verify(bundle: Path, metadata: Path, listing: Path) -> str:
         if archive.testzip() is not None:
             raise ValueError('Corrupted MPP')
         required = {'META-INF/MANIFEST.MF', 'classes.dex', 'extensions/gboard-patches.rve',
-                    'gboard-khmer/dictionary.tsv', 'gboard-khmer/LICENSE.txt'}
+                    'gboard-khmer/dictionary.tsv', 'gboard-khmer/LICENSE.txt',
+                    'gboard-khmer/gboard_khmerlish_panel.xml'}
         if not required.issubset(archive.namelist()):
             raise ValueError(f'Missing MPP files: {required - set(archive.namelist())}')
-        for filename in ('dictionary.tsv', 'LICENSE.txt'):
+        for filename in ('dictionary.tsv', 'LICENSE.txt', 'gboard_khmerlish_panel.xml'):
             if archive.read(f'gboard-khmer/{filename}') != (resource / filename).read_bytes():
                 raise ValueError(f'MPP resource differs from checked-in source: {filename}')
         dex = archive.read('extensions/gboard-patches.rve')
         if not dex.startswith(b'dex\n'):
             raise ValueError('Extension is not Android DEX')
         for marker in (b'KhmerlishRuntime', b'KhmerlishController', b'KhmerlishSettingsFeature',
-                       b'GboardDirectTranslateRuntime'):
+                       b'KhmerlishPanelRuntime', b'KhmerlishPanelSession', b'KhmerlishPanelConverter',
+                       b'KhmerlishAccessPoint', b'GboardDirectTranslateRuntime'):
             if marker not in dex:
                 raise ValueError(f'Missing extension class: {marker!r}')
         manifest = archive.read('META-INF/MANIFEST.MF').decode('utf-8').replace('\r\n ', '')

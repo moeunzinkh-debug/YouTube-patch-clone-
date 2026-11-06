@@ -46,7 +46,7 @@ public final class KhmerlishSettingsFeature implements GboardPatchesSettingsCont
                                 Collections.singletonList(
                                         new GboardPatchesSettingsContract.ToggleRow(
                                                 "បើក Khmerlish → ខ្មែរ",
-                                                "Convert known words after space or punctuation; default off.",
+                                                "Automatic conversion in normal typing; default off. The toolbar panel works separately.",
                                                 context != null, enabled,
                                                 value -> KhmerlishSettings.setEnabled(context, value)))),
                         new GboardPatchesSettingsContract.Section("ការប្រើប្រាស់ / Usage",

@@ -29,14 +29,21 @@ public final class KhmerlishRuntime {
 
     public static void onInputViewStarted(InputMethodService service) {
         try {
-            reset(service);
-            if (service != null && KhmerlishSettings.isEnabled(service)) preload(service);
+            resetController();
+            KhmerlishPanelRuntime.inputStarted(service);
+            // The toolbar panel is independent of the default-off automatic switch.
+            if (service != null) preload(service);
         } catch (Throwable ignored) {
             // The stock keyboard must remain usable if an extension fails.
         }
     }
 
-    public static void reset(InputMethodService ignored) {
+    public static void reset(InputMethodService service) {
+        resetController();
+        KhmerlishPanelRuntime.inputFinished(service);
+    }
+
+    private static void resetController() {
         generation++;
         sessionConnection = new WeakReference<>(null);
         CONTROLLER.reset();
@@ -45,9 +52,14 @@ public final class KhmerlishRuntime {
     public static void onSelection(InputMethodService service, int oldStart, int oldEnd,
             int newStart, int newEnd, int composingStart, int composingEnd) {
         try {
+            if (KhmerlishPanelRuntime.isActive(service)) {
+                resetController();
+                KhmerlishPanelRuntime.onSelection(service, newStart, newEnd, composingStart, composingEnd);
+                return;
+            }
             if (service == null || editing || !KhmerlishSettings.isEnabled(service)
                     || !isSafeField(service.getCurrentInputEditorInfo())) {
-                reset(service);
+                resetController();
                 return;
             }
             if (dictionary == null) {
@@ -57,7 +69,7 @@ public final class KhmerlishRuntime {
             final InputConnection connection = service.getCurrentInputConnection();
             final EditorInfo editor = service.getCurrentInputEditorInfo();
             if (connection == null || newStart != newEnd || newStart < 0) {
-                reset(service);
+                resetController();
                 return;
             }
             if (sessionConnection.get() != connection) {
@@ -91,8 +103,12 @@ public final class KhmerlishRuntime {
                 }
             });
         } catch (Throwable ignored) {
-            reset(service);
+            resetController();
         }
+    }
+
+    static KhmerlishDictionary dictionaryIfReady() {
+        return dictionary;
     }
 
     static boolean isSafeField(EditorInfo editor) {

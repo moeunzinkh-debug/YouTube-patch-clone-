@@ -5,12 +5,17 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.ResourcePatchContext
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
+import app.morphe.patcher.resource.PublicXmlManager
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import dev.jason.gboardpatches.patches.gboard.features.featureflags.applyFeatureMarker
+import dev.jason.gboardpatches.patches.gboard.shared.accesspoint.GboardAccessPointContributionsTargets
+import dev.jason.gboardpatches.patches.gboard.shared.accesspoint.gboardAccessPointContributions1803Patch
 import dev.jason.gboardpatches.patches.gboard.shared.findMutableMethodOrThrow
 import dev.jason.gboardpatches.patches.gboard.shared.gboardPatchesSettingsPatch
 import dev.jason.gboardpatches.patches.gboard.shared.isMethodReference
+import dev.jason.gboardpatches.patches.gboard.shared.isOpcode
 import dev.jason.gboardpatches.patches.gboard.shared.mutableClass
+import dev.jason.gboardpatches.patches.gboard.shared.returnInstructionIndices
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeAbiCatalog
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallEmitter
 import dev.jason.gboardpatches.patches.gboard.shared.runtimeabi.RuntimeCallId
@@ -36,6 +41,18 @@ private fun copyKhmerlishAssets() = with(context) {
         target.parentFile?.mkdirs()
         target.outputStream().use { it.write(bytes) }
     }
+    val iconName = "gboard_khmerlish_panel"
+    val iconBytes = loader.getResourceAsStream("$RESOURCE_ROOT/$iconName.xml")?.use { it.readBytes() }
+        ?: error("Missing Khmerlish toolbar icon")
+    val icon = this["res/drawable/$iconName.xml", false]
+    check(!icon.isFile || icon.readBytes().contentEquals(iconBytes)) {
+        "Khmerlish toolbar drawable collides with an existing resource"
+    }
+    icon.parentFile?.mkdirs()
+    icon.writeBytes(iconBytes)
+    PublicXmlManager(this["res/values/public.xml"]).use { publicIds ->
+        publicIds.createPublicId("drawable", iconName)
+    }
 }
 
 private val gboardKhmerlishMarkerPatch = resourcePatch(
@@ -48,12 +65,15 @@ private val gboardKhmerlishMarkerPatch = resourcePatch(
 /** Explicitly opt-in; exact obfuscated lifecycle targets are reviewed only for this APK version. */
 internal val gboardKhmerlishPatch = bytecodePatch(
     name = "Khmerlish to Khmer (experimental)",
-    description = "Adds an opt-in offline Khmerlish-to-Khmer setting. Recognized words " +
-        "are replaced after a space or punctuation; unknown and ambiguous words are left unchanged.",
+    description = "Adds an offline Khmerlish toolbar panel and an optional automatic setting. " +
+        "Known Romanized words are converted to Khmer; unknown and ambiguous spellings stay unchanged.",
     default = false,
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)
-    dependsOn(gboardPatchesSettingsPatch, gboardKhmerlishMarkerPatch, gboardKhmerlishAssetsPatch)
+    dependsOn(
+        gboardPatchesSettingsPatch, gboardKhmerlishMarkerPatch, gboardKhmerlishAssetsPatch,
+        gboardAccessPointContributions1803Patch,
+    )
 
     execute {
         check(packageMetadata.versionName == "18.5.4.993608717-release-arm64-v8a" &&
@@ -63,6 +83,33 @@ internal val gboardKhmerlishPatch = bytecodePatch(
         check(mutableClass("Lphr;").superclass == "Landroid/inputmethodservice/InputMethodService;") {
             "Gboard input service changed"
         }
+        // Keep our delegate separate from the shared extension class. This also
+        // works when a disposable, already-patched fixture retains older shared
+        // extension methods during class merging.
+        val catalog = findMutableMethodOrThrow(GboardAccessPointContributionsTargets.orderFactory)
+        val controller = findMutableMethodOrThrow(GboardAccessPointContributionsTargets.controllerConstructor)
+        val catalogRef = RuntimeAbiCatalog.abi(RuntimeCallId.KHMERLISH_ACCESS_POINT_CATALOG).reference
+        val registerRef = RuntimeAbiCatalog.abi(RuntimeCallId.KHMERLISH_ACCESS_POINT_REGISTER).reference
+        check(catalog.implementation?.instructions?.none { it.isMethodReference(catalogRef) } == true)
+        check(controller.implementation?.instructions?.none { it.isMethodReference(registerRef) } == true)
+        catalog.addInstructions(
+            0,
+            """
+                move-object/from16 v0, p0
+                move-object/from16 v1, p3
+                ${RuntimeCallEmitter.invoke(RuntimeCallId.KHMERLISH_ACCESS_POINT_CATALOG, "v0, v1")}
+                move-result-object v0
+                move-object/from16 p3, v0
+                check-cast p3, Lwpa;
+            """.trimIndent(),
+        )
+        val constructorReturns = controller.returnInstructionIndices().filter {
+            controller.implementation!!.instructions[it].isOpcode("RETURN_VOID")
+        }
+        check(constructorReturns.size == 1) { "Unexpected Gboard toolbar controller constructor" }
+        controller.addInstructions(constructorReturns.single(), RuntimeCallEmitter.invoke(
+            RuntimeCallId.KHMERLISH_ACCESS_POINT_REGISTER, "p0, p1",
+        ))
         val selection = findMutableMethodOrThrow(
             "Lphr;", "onUpdateSelection", "V", listOf("I", "I", "I", "I", "I", "I"),
         )
