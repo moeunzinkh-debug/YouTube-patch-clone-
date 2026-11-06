@@ -34,6 +34,29 @@ TARGET_INSPECTOR = 'dev.arena.khmerprobe.AndroidGboardInspector'
 PREF_KEY = 'pref_khmerlish_to_khmer_enabled'
 
 
+def run_synthetic(*command: str, timeout: int = 60) -> str:
+    """Like the shared runner, but report the failing command stage precisely."""
+    result = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            timeout=timeout, check=False)
+    if result.returncode:
+        if Path(command[0]).name == 'adb':
+            limit = 4 if tuple(command[1:4]) == ('shell', 'input', 'text') else 5
+            stage = ' '.join(command[:limit])
+        else:
+            stage = Path(command[0]).name
+        diagnostic = re.search(r'(?:INSTALL_FAILED_[A-Z0-9_]+|device offline|device not found|'
+                               r'no devices/emulators found|(?:[A-Za-z_][\\w$]*\\.)*[A-Za-z_][\\w$]*(?:Exception|Error))',
+                               result.stdout, re.IGNORECASE)
+        detail = f' [{diagnostic.group(0)}]' if diagnostic else ''
+        raise RuntimeError(f'{stage} failed (exit {result.returncode}){detail}')
+    return result.stdout.strip()
+
+
+# The shared UI helpers call their module's run(), so they inherit these
+# sanitized diagnostics as well. The emulator contains only synthetic data.
+common.run = run_synthetic
+
+
 def build_probes(tmp: Path, fixture_keystore: Path) -> None:
     sdk = Path(os.environ['ANDROID_HOME'])
     android_jar = sdk / 'platforms/android-35/android.jar'
@@ -355,17 +378,21 @@ def main() -> None:
             install_and_select(args.fixture_apk, report)
             build_probes(tmp, args.fixture_keystore)
             report['target_diagnostic_before'] = target_diagnostic()
+            report['phase'] = 'clear synthetic log and open editor'
             common.run('adb', 'logcat', '-c')
             open_editor()
+            report['phase'] = 'wait for Gboard IME'
             time.sleep(5)
             visible = common.ime_visibility_flags(common.run('adb', 'shell', 'dumpsys', 'input_method', timeout=30))
             report['ime_visibility_flags'] = visible
             if not (visible.get('mInputShown') or visible.get('isInputViewShown')):
                 raise RuntimeError('Gboard keyboard did not become visible')
             report['ime_visible'] = 'passed'
+            report['phase'] = 'verify feature is disabled by default'
             # Before the toggle, synthetic English remains untouched.
             enter('nv', None)
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
+            report['phase'] = 'navigate Gboard patch settings'
             enabled = enable_via_settings(report)
             if not enabled:
                 enabled = enable_via_test_launcher(report)
@@ -395,6 +422,7 @@ def main() -> None:
             else:
                 report['input_method'] = 'taps on the actual Gboard soft-key accessibility bounds'
             results = {}
+            report['phase'] = 'type synthetic examples'
             for source, expected in examples.items():
                 open_editor()
                 enter(source, keys)
@@ -410,6 +438,12 @@ def main() -> None:
                       or report['settings_default_off'] != 'passed' or report['settings_toggle'] != 'passed')
     except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:
         report['error'] = f'{type(error).__name__}: {error}'
+        try:
+            crashes = common.gboard_crash_types(common.run('adb', 'logcat', '-d', '-s', 'AndroidRuntime:E', '*:S'))
+            if crashes:
+                report['gboard_fatal_exception_types'] = crashes
+        except (RuntimeError, OSError, subprocess.TimeoutExpired):
+            pass
         failed = True
     finally:
         args.report.parent.mkdir(parents=True, exist_ok=True)
