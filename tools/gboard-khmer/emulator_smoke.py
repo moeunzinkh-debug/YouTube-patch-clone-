@@ -408,6 +408,7 @@ def panel_press(keys: dict[str, tuple[int, int]], text: str) -> None:
 
 
 def panel_smoke(report: dict) -> bool:
+    """Tap the real toolbar, then verify host composing while the emulator is offline."""
     result = report['toolbar_panel'] = {'status': 'not tested'}
     offline = False
     try:
