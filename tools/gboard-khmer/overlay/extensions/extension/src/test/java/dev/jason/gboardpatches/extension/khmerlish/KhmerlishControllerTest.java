@@ -36,6 +36,24 @@ public final class KhmerlishControllerTest {
         Assert.assertEquals("ស្រឡាញ់ ", type("srolanh "));
     }
 
+    @Test public void gboardCapitalizationAtCommitStillMatchesObservedSpelling() {
+        KhmerlishController controller = new KhmerlishController();
+        controller.observe("nv", 2, 0, 2, dictionary);
+        KhmerlishController.Edit edit = controller.observe("NV ", 3, -1, -1, dictionary);
+        Assert.assertNotNull(edit);
+        Assert.assertEquals("នៅ ", edit.insert);
+
+        controller.reset();
+        controller.observe("nik", 3, 0, 3, dictionary);
+        edit = controller.observe("Nik ", 4, -1, -1, dictionary);
+        Assert.assertNotNull(edit);
+        Assert.assertEquals("នឹក ", edit.insert);
+
+        controller.reset();
+        controller.observe("srey", 4, 0, 4, dictionary);
+        Assert.assertNull(controller.observe("sorry ", 6, -1, -1, dictionary));
+    }
+
     @Test public void unknownAndAmbiguousWordsRemainLatin() {
         Assert.assertEquals("zzzzzz ", type("zzzzzz "));
         Assert.assertEquals("som ", type("som "));

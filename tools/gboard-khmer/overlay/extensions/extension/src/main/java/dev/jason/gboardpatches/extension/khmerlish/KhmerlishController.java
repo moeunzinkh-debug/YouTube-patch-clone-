@@ -122,7 +122,12 @@ final class KhmerlishController {
     private static long hash(CharSequence value, int start, int end) {
         long result = 0xcbf29ce484222325L;
         for (int i = start; i < end; i++) {
-            result = (result ^ value.charAt(i)) * 0x100000001b3L;
+            char c = value.charAt(i);
+            // Gboard can change only the capitalization when it commits a word.
+            // Dictionary lookup is case-insensitive, so treat that as the same
+            // observed spelling while still rejecting a different correction.
+            if (c >= 'A' && c <= 'Z') c = (char) (c + ('a' - 'A'));
+            result = (result ^ c) * 0x100000001b3L;
         }
         return result;
     }
