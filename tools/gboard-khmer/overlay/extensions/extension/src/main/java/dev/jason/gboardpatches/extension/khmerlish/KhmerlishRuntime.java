@@ -111,16 +111,13 @@ public final class KhmerlishRuntime {
     }
 
     /** Reject delayed selection notifications, selections, and editors that cannot report a cursor. */
-    private static CharSequence readBeforeAtCursor(InputConnection connection, int start, int end) {
+    static CharSequence readBeforeAtCursor(InputConnection connection, int start, int end) {
         if (start != end) return null;
         if (Build.VERSION.SDK_INT >= 31) {
-            SurroundingText text = connection.getSurroundingText(WINDOW, 0, 0);
-            if (text == null || text.getText() == null || text.getOffset() < 0
-                    || text.getSelectionStart() != text.getSelectionEnd()
-                    || text.getSelectionStart() < 0
-                    || text.getSelectionStart() > text.getText().length()
-                    || text.getOffset() + text.getSelectionStart() != end) return null;
-            return text.getText().subSequence(0, text.getSelectionStart());
+            CursorView view = Api31.read(connection, end);
+            // An authoritative mismatch means a stale callback; never fall back
+            // to another API to bypass that result. Unavailable offsets may fall back.
+            if (view.authoritative) return view.before;
         }
         ExtractedTextRequest request = new ExtractedTextRequest();
         request.hintMaxChars = WINDOW;
@@ -129,6 +126,36 @@ public final class KhmerlishRuntime {
         if (text == null || text.selectionStart != text.selectionEnd || text.startOffset < 0
                 || text.startOffset + text.selectionStart != end) return null;
         return connection.getTextBeforeCursor(WINDOW, 0);
+    }
+
+    private static final class CursorView {
+        final boolean authoritative;
+        final CharSequence before;
+        CursorView(boolean authoritative, CharSequence before) {
+            this.authoritative = authoritative;
+            this.before = before;
+        }
+    }
+
+    // Isolate the Android 12 API reference so the bridge can load on older Android.
+    private static final class Api31 {
+        static CursorView read(InputConnection connection, int expectedEnd) {
+            try {
+                SurroundingText text = connection.getSurroundingText(WINDOW, 0, 0);
+                if (text == null || text.getText() == null || text.getOffset() < 0) {
+                    return new CursorView(false, null);
+                }
+                int selected = text.getSelectionStart();
+                if (selected != text.getSelectionEnd() || selected < 0
+                        || selected > text.getText().length()
+                        || text.getOffset() + selected != expectedEnd) {
+                    return new CursorView(true, null);
+                }
+                return new CursorView(true, text.getText().subSequence(0, selected));
+            } catch (Throwable unavailable) {
+                return new CursorView(false, null);
+            }
+        }
     }
 
     /** Recheck the exact suffix, batch the edit, and attempt rollback if insertion fails. */

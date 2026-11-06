@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 import unittest
@@ -17,7 +18,33 @@ builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
 
 
+fixture_spec = importlib.util.spec_from_file_location('khmer_fixture', BASE / 'make_fixture.py')
+fixture = importlib.util.module_from_spec(fixture_spec)
+fixture_spec.loader.exec_module(fixture)
+
+
+def resource_table(*names):
+    packages = []
+    for name in names:
+        encoded = name.encode('utf-16le')
+        package = struct.pack('<HHII', 0x0200, 288, 288, 0x7f)
+        package += encoded + bytes(256 - len(encoded)) + bytes(20)
+        packages.append(package)
+    size = 12 + sum(len(package) for package in packages)
+    return struct.pack('<HHII', 0x0002, 12, size, len(names)) + b''.join(packages)
+
+
 class DictionaryTests(unittest.TestCase):
+    def test_resource_fixture_rewrites_exactly_one_package(self):
+        original = resource_table(fixture.OLD, 'android')
+        changed = fixture.replace_resource_package(original)
+        self.assertEqual(len(original), len(changed))
+        self.assertIn(fixture.NEW.encode('utf-16le'), changed)
+        self.assertNotIn(fixture.OLD.encode('utf-16le'), changed)
+        for invalid in (resource_table('other'), resource_table(fixture.OLD, fixture.OLD), original[:-1]):
+            with self.assertRaises(ValueError):
+                fixture.replace_resource_package(invalid)
+
     def test_reproducible_offline_dictionary(self):
         output, stats = builder.make_dictionary()
         self.assertEqual(output, builder.OUTPUT.read_bytes())

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.ExtractedText;
+import android.view.inputmethod.SurroundingText;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -73,6 +75,19 @@ public final class KhmerlishRuntimeTest {
         Assert.assertFalse(feature.isAvailable(app));
     }
 
+    @Test public void staleSelectionAndUnavailableOffsetsFailSafely() {
+        FakeEditor editor = new FakeEditor("nv ");
+        InputConnection connection = editor.connection();
+        Assert.assertEquals("nv ", KhmerlishRuntime.readBeforeAtCursor(connection, 3, 3).toString());
+        Assert.assertNull(KhmerlishRuntime.readBeforeAtCursor(connection, 2, 2));
+        Assert.assertNull(KhmerlishRuntime.readBeforeAtCursor(connection, 2, 3));
+        editor.noSurroundingOffset = true;
+        Assert.assertEquals("nv ", KhmerlishRuntime.readBeforeAtCursor(connection, 3, 3).toString());
+        Assert.assertNull(KhmerlishRuntime.readBeforeAtCursor(connection, 2, 2));
+        editor.noExtracted = true;
+        Assert.assertNull(KhmerlishRuntime.readBeforeAtCursor(connection, 3, 3));
+    }
+
     @Test public void batchedEditRechecksSuffixAndRestoresOnFailedInsertion() {
         FakeEditor success = new FakeEditor("nv ");
         KhmerlishController.Edit edit = new KhmerlishController.Edit(3, "នៅ ", 4);
@@ -101,6 +116,8 @@ public final class KhmerlishRuntimeTest {
         final StringBuilder text;
         boolean failFirstCommit;
         boolean supportBatch = true;
+        boolean noSurroundingOffset;
+        boolean noExtracted;
         int batchEnds;
         FakeEditor(String value) { text = new StringBuilder(value); }
         InputConnection connection() {
@@ -108,6 +125,15 @@ public final class KhmerlishRuntimeTest {
                     new Class<?>[]{InputConnection.class}, (proxy, method, args) -> {
                         switch (method.getName()) {
                             case "getSelectedText": return null;
+                            case "getSurroundingText":
+                                return new SurroundingText(text.toString(), text.length(), text.length(),
+                                        noSurroundingOffset ? -1 : 0);
+                            case "getExtractedText":
+                                if (noExtracted) return null;
+                                ExtractedText extracted = new ExtractedText();
+                                extracted.startOffset = 0;
+                                extracted.selectionStart = extracted.selectionEnd = text.length();
+                                return extracted;
                             case "getTextBeforeCursor":
                                 int count = (Integer) args[0];
                                 return text.substring(Math.max(0, text.length() - count));

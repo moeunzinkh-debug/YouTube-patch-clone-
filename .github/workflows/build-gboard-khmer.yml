@@ -89,7 +89,7 @@ jobs:
             --dir /tmp/gboard-khmer-input
           input=/tmp/gboard-khmer-input/gboard-18.5.4.993608717-release-arm64-v8a-arm64-v8a.apk
           echo "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea  $input" | sha256sum --check
-          python3 tools/gboard-translate/make_manifest_fixture.py "$input" /tmp/gboard-khmer-input/fixture.apk
+          python3 tools/gboard-khmer/make_fixture.py "$input" /tmp/gboard-khmer-input/fixture.apk
           java -Xmx3g -jar /tmp/gboard-khmer-input/morphe-desktop-1.19.1-all.jar patch \
             --patches /tmp/gboard-khmer-output/gboard-khmerlish-experimental.mpp \
             --exclusive --enable 'Direct Google Translate (experimental)' \
