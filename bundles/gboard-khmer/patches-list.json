@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-khmerlish-dev.2",
+  "version": "4.0.0-khmerlish-dev.3",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -339,7 +339,7 @@
     },
     {
       "name": "Khmerlish to Khmer (experimental)",
-      "description": "Adds an offline Khmerlish toolbar panel and an optional automatic setting. Known Romanized words are converted to Khmer; unknown and ambiguous spellings stay unchanged.",
+      "description": "Adds an offline Khmerlish toolbar panel, optional automatic setting, personal dictionary and searchable word guide with text import/export. Known Romanized words are converted to Khmer; unknown and ambiguous spellings stay unchanged.",
       "use": false,
       "dependencies": [],
       "compatiblePackages": {
