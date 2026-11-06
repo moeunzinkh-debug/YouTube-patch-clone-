@@ -5,9 +5,16 @@
   "ime_selected": "passed",
   "settings_entry": "not tested",
   "settings_default_off": "not tested",
-  "settings_toggle": "set by root in disposable emulator; settings UI not confirmed",
+  "settings_toggle": "set using same-signature test instrumentation; UI not confirmed",
   "actual_gboard_typing": "failed",
   "android_api": "35",
+  "target_diagnostic_before": {
+    "marker": true,
+    "dictionary_asset_present": true,
+    "preference": false,
+    "runtime_enabled": false,
+    "registry_entry": true
+  },
   "ime_visibility_flags": {
     "mShowForced": false,
     "mInputShown": true,
@@ -15,40 +22,66 @@
   },
   "ime_visible": "passed",
   "default_off_example": "passed",
+  "settings_launch": "Starting: Intent { cmp=dev.jason.com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.latin.preference.SettingsActivity }",
+  "settings_initial_labels": [
+    "Languages",
+    "English (US) (QWERTY)",
+    "Preferences",
+    "Theme",
+    "Corrections & suggestions",
+    "Glide typing",
+    "Voice typing"
+  ],
+  "patches_entry_found": false,
+  "target_diagnostic_after_settings": {
+    "marker": true,
+    "dictionary_asset_present": true,
+    "preference": false,
+    "runtime_enabled": false,
+    "registry_entry": true
+  },
+  "target_diagnostic_programmatic_enable": {
+    "marker": true,
+    "dictionary_asset_present": true,
+    "programmatic_set": true,
+    "preference": true,
+    "runtime_enabled": true,
+    "registry_entry": true
+  },
   "input_method": "taps on the actual Gboard soft-key accessibility bounds",
   "examples": {
     "nv na": {
       "expected": "នៅណា",
-      "actual": "nv na",
+      "actual": "NV ណា",
       "passed": false
     },
     "kampuchea": {
       "expected": "កម្ពុជា",
-      "actual": "kampuchea",
+      "actual": "Kampuchea",
       "passed": false
     },
     "kampu": {
       "expected": "កម្ពុជា",
-      "actual": "kampu",
-      "passed": false
+      "actual": "កម្ពុជា",
+      "passed": true
     },
     "nak na": {
       "expected": "អ្នកណា",
-      "actual": "nak na",
-      "passed": false
+      "actual": "អ្នកណា",
+      "passed": true
     },
     "srey sart": {
       "expected": "ស្រីស្អាត",
-      "actual": "srey start",
+      "actual": "sorry start",
       "passed": false
     },
     "nik o": {
       "expected": "នឹកអូន",
-      "actual": "Nike o",
+      "actual": "Nik អូន",
       "passed": false
     }
   },
   "bundle_sha256": "82d8473eda2db443919799ccc74d114c3002ff8ac304fb7c3d211cf4d9bf83f7",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42194635567"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42195522232"
 }
