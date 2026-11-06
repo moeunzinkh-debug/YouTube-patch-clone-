@@ -431,16 +431,39 @@ def panel_key_positions(windows: list) -> dict[str, tuple[int, int]]:
     return positions
 
 
-def panel_press(keys: dict[str, tuple[int, int]], text: str) -> None:
+def panel_press(text: str) -> None:
     for character in text:
         name = 'space' if character == ' ' else character.lower()
         # Android may resize/reposition the IME when the editor changes. Never
         # reuse stale coordinates for an actual user-visible soft key.
         current = panel_key_positions(common.inspect_ime_windows())
+        if character.isupper():
+            if 'khmerlish shift' not in current:
+                raise RuntimeError('Synthetic Khmerlish shift is missing')
+            common.run('adb', 'shell', 'input', 'tap', *map(str, current['khmerlish shift']))
+            current = panel_key_positions(common.inspect_ime_windows())
         if name not in current:
             raise RuntimeError('Synthetic Khmerlish key is missing: ' + name)
         common.run('adb', 'shell', 'input', 'tap', *map(str, current[name]))
         time.sleep(.25)
+
+
+def rect(bounds: str) -> tuple[int, int, int, int] | None:
+    values = re.fullmatch(r'\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]', bounds)
+    return tuple(map(int, values.groups())) if values else None
+
+
+def panel_within_native_keyboard(native_paths: dict, panel_paths: dict) -> bool:
+    holder = next((item for item in native_paths.get('native_a', [])
+                   if item.get('id', '').endswith(':id/keyboard_holder')), None)
+    path = panel_paths.get('panel', [])
+    native = rect(holder.get('bounds', '')) if holder else None
+    panel = rect(path[-1].get('bounds', '')) if path else None
+    if not native or not panel:
+        return False
+    nl, nt, nr, nb = native
+    pl, pt, pr, pb = panel
+    return nl <= pl < pr <= nr and nt <= pt < pb <= nb
 
 
 def panel_snapshot() -> dict:
@@ -470,6 +493,10 @@ def panel_smoke(report: dict) -> bool:
         if not any('khmerlish offline panel' in str(n.get('description', '')).lower()
                    for n in common.flatten_window_nodes(windows)):
             raise RuntimeError('Khmerlish panel did not open')
+        contained = panel_within_native_keyboard(result.get('native_layout_paths', {}), result['panel_layout_paths'])
+        result['panel_within_native_keyboard'] = 'passed' if contained else 'failed'
+        if not contained:
+            raise RuntimeError('Panel must stay within the existing keyboard area')
         keys = panel_key_positions(windows)
         result['key_count'] = len(keys)
         if not set('nvakmpuchesrtoyl').union({'space', 'khmerlish backspace', 'done khmerlish'}).issubset(keys):
@@ -480,16 +507,16 @@ def panel_smoke(report: dict) -> bool:
         if not offline:
             raise RuntimeError('Could not confirm airplane mode in disposable emulator')
         snapshots = result['snapshots'] = {}
-        panel_press(keys, 'n')
+        panel_press('n')
         snapshots['n'] = panel_snapshot()
         if not snapshots['n']['panel_visible']:
             raise RuntimeError('Panel closed after the first character')
-        panel_press(keys, 'v')
+        panel_press('v')
         snapshots['nv'] = panel_snapshot()
         if not snapshots['nv']['panel_visible']:
             raise RuntimeError('Panel closed after the second character')
         after_nv = snapshots['nv']['host_output']
-        panel_press(keys, ' na')
+        panel_press(' na')
         snapshots['nv na'] = panel_snapshot()
         if not snapshots['nv na']['panel_visible']:
             raise RuntimeError('Panel closed while entering the phrase')
@@ -499,7 +526,7 @@ def panel_smoke(report: dict) -> bool:
         time.sleep(1)
         snapshots['after backspace'] = panel_snapshot()
         after_delete = snapshots['after backspace']['host_output']
-        panel_press(keys, 'a')
+        panel_press('a')
         snapshots['after retype'] = panel_snapshot()
         after_restore = snapshots['after retype']['host_output']
         result['live_steps'] = {
@@ -513,25 +540,24 @@ def panel_smoke(report: dict) -> bool:
         result['close_commits'] = 'passed' if after_close == 'នៅណា' else 'failed'
         if not tap_panel_icon(result):
             raise RuntimeError('Khmerlish icon could not reopen the panel')
-        reopened = common.inspect_ime_windows()
-        new_keys = panel_key_positions(reopened)
-        panel_press(new_keys, 'kampu')
+        panel_press('kampu')
         after_reopen = editor_text()
         result['reopen_output'] = after_reopen
         result['reopen'] = 'passed' if after_reopen == 'នៅណាកម្ពុជា' else 'failed'
         new_keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, new_keys['done khmerlish']))
-        examples = {'nv na': 'នៅណា', 'kampuchea': 'កម្ពុជា', 'kampu': 'កម្ពុជា',
-                    'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'nik o': 'នឹកអូន'}
+        examples = {'nv na': 'នៅណា', 'Kampuchea': 'កម្ពុជា', 'kampuchea': 'កម្ពុជា',
+                    'kampu': 'កម្ពុជា', 'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'Nik o': 'នឹកអូន'}
         tested = {}
         for source, expected in examples.items():
             open_editor()
             if not tap_panel_icon(result):
                 raise RuntimeError('Khmerlish panel failed to reopen for an example')
-            example_keys = panel_key_positions(common.inspect_ime_windows())
-            panel_press(example_keys, source)
-            actual = editor_text()
-            tested[source] = {'expected': expected, 'actual': actual, 'passed': expected == actual}
+            panel_press(source)
+            snapshot = panel_snapshot()
+            actual = snapshot['host_output']
+            tested[source] = {'expected': expected, 'actual': actual, 'lower_input': snapshot['lower_input'],
+                              'passed': snapshot['panel_visible'] and snapshot['lower_input'] == source and expected == actual}
             example_keys = panel_key_positions(common.inspect_ime_windows())
             common.run('adb', 'shell', 'input', 'tap', *map(str, example_keys['done khmerlish']))
         result['examples'] = tested

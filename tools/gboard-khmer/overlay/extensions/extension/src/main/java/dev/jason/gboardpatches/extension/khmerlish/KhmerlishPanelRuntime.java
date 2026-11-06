@@ -15,12 +15,14 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,9 +101,20 @@ public final class KhmerlishPanelRuntime {
         }
         try {
             Window window = service.getWindow() == null ? null : service.getWindow().getWindow();
-            View decor = window == null ? null : window.getDecorView();
-            if (!(decor instanceof ViewGroup)) throw new IllegalStateException("IME window unavailable");
-            Panel next = new Panel(service, connection, editor, dictionary, (ViewGroup) decor);
+            if (window == null) throw new IllegalStateException("IME window unavailable");
+            // Gboard's decor can occupy the whole screen while only the bottom
+            // keyboard area receives touches. Overlay the real keyboard holder,
+            // never the full decor (which could cover the host app's editor).
+            int holderId = service.getResources().getIdentifier(
+                    "keyboard_holder", "id", service.getPackageName());
+            View holder = holderId == 0 ? null : window.findViewById(holderId);
+            if (holder == null || !holder.isShown()
+                    || holder.getWidth() < dp(service, 180) || holder.getHeight() < dp(service, 160)) {
+                throw new IllegalStateException("Gboard keyboard area unavailable");
+            }
+            FrameLayout parent = findOverlayParent(holder);
+            if (parent == null) throw new IllegalStateException("Keyboard overlay area unavailable");
+            Panel next = new Panel(service, connection, editor, dictionary, parent, holder);
             panel = next;
             // Commit any previous Gboard composition before starting our own.
             connection.finishComposingText();
@@ -110,6 +123,41 @@ public final class KhmerlishPanelRuntime {
             dismiss();
             notifyUser(service, "Khmerlish panel is unavailable");
         }
+    }
+
+    private static int dp(Context context, int value) {
+        return Math.round(value * context.getResources().getDisplayMetrics().density);
+    }
+
+    private static FrameLayout findOverlayParent(View holder) {
+        for (ViewParent candidate = holder.getParent(); candidate instanceof View;
+                candidate = candidate.getParent()) {
+            if (candidate instanceof FrameLayout
+                    && overlayLayout((FrameLayout) candidate, holder) != null) {
+                return (FrameLayout) candidate;
+            }
+        }
+        return null;
+    }
+
+    /** The holder and its ancestor are already laid out in the same window. */
+    private static FrameLayout.LayoutParams overlayLayout(FrameLayout parent, View holder) {
+        int[] parentLocation = new int[2];
+        int[] holderLocation = new int[2];
+        parent.getLocationOnScreen(parentLocation);
+        holder.getLocationOnScreen(holderLocation);
+        int width = holder.getWidth(), height = holder.getHeight();
+        int left = holderLocation[0] - parentLocation[0] - parent.getPaddingLeft();
+        int top = holderLocation[1] - parentLocation[1] - parent.getPaddingTop();
+        int availableWidth = parent.getWidth() - parent.getPaddingLeft() - parent.getPaddingRight();
+        int availableHeight = parent.getHeight() - parent.getPaddingTop() - parent.getPaddingBottom();
+        if (!KhmerlishPanelBounds.fits(availableWidth, availableHeight, left, top, width, height)) {
+            return null;
+        }
+        FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(width, height, Gravity.TOP | Gravity.LEFT);
+        layout.leftMargin = left;
+        layout.topMargin = top;
+        return layout;
     }
 
     static void onSelection(InputMethodService service, int start, int end,
@@ -141,23 +189,30 @@ public final class KhmerlishPanelRuntime {
         final InputMethodService service;
         final InputConnection connection;
         final EditorInfo editor;
-        final ViewGroup parent;
+        final FrameLayout parent;
+        final View holder;
         final LinearLayout root;
         final EditText input;
         final KhmerlishPanelSession session;
         final TextWatcher watcher;
+        final View.OnLayoutChangeListener layoutListener;
         final List<TextView> letterKeys = new ArrayList<>();
         final boolean dark;
+        int previousAccessibility;
+        boolean accessibilityHidden;
         boolean written;
         boolean shift;
         boolean symbols;
 
         Panel(InputMethodService service, InputConnection connection, EditorInfo editor,
-                KhmerlishDictionary dictionary, ViewGroup parent) {
+                KhmerlishDictionary dictionary, FrameLayout parent, View holder) {
             this.service = service;
             this.connection = connection;
             this.editor = editor;
             this.parent = parent;
+            this.holder = holder;
+            layoutListener = (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom)
+                    -> updatePosition();
             dark = (service.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
                     == Configuration.UI_MODE_NIGHT_YES;
             root = new LinearLayout(service);
@@ -174,10 +229,10 @@ public final class KhmerlishPanelRuntime {
             title.setTextSize(15);
             title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
             title.setTextColor(dark ? Color.WHITE : 0xff263247);
-            header.addView(title, new LinearLayout.LayoutParams(0, dp(38), 1));
+            header.addView(title, new LinearLayout.LayoutParams(0, dp(32), 1));
             TextView close = plainButton("✕", "Close Khmerlish panel");
             close.setOnClickListener(v -> dismiss());
-            header.addView(close, new LinearLayout.LayoutParams(dp(48), dp(38)));
+            header.addView(close, new LinearLayout.LayoutParams(dp(48), dp(32)));
             root.addView(header);
 
             input = new EditText(service);
@@ -193,7 +248,7 @@ public final class KhmerlishPanelRuntime {
             input.setShowSoftInputOnFocus(false);
             input.setSaveEnabled(false);
             input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(KhmerlishPanelConverter.MAX_LENGTH)});
-            root.addView(input, new LinearLayout.LayoutParams(-1, dp(48)));
+            root.addView(input, new LinearLayout.LayoutParams(-1, dp(40)));
 
             KhmerlishPanelCommitter.Host host = new KhmerlishPanelCommitter.Host() {
                 @Override public boolean isCurrent() {
@@ -239,17 +294,46 @@ public final class KhmerlishPanelRuntime {
         }
 
         void attach() {
-            parent.addView(root, new ViewGroup.LayoutParams(-1, -1));
+            FrameLayout.LayoutParams layout = overlayLayout(parent, holder);
+            if (layout == null) throw new IllegalStateException("Keyboard area changed");
+            root.setElevation(dp(8));
+            parent.addView(root, layout);
+            previousAccessibility = holder.getImportantForAccessibility();
+            holder.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+            accessibilityHidden = true;
+            holder.addOnLayoutChangeListener(layoutListener);
+            parent.addOnLayoutChangeListener(layoutListener);
             input.requestFocus();
         }
 
+        void updatePosition() {
+            if (panel != this || root.getParent() != parent) return;
+            FrameLayout.LayoutParams next = overlayLayout(parent, holder);
+            if (next == null || holder.getWidth() < dp(180) || holder.getHeight() < dp(160)) {
+                root.post(KhmerlishPanelRuntime::dismiss);
+                return;
+            }
+            FrameLayout.LayoutParams old = (FrameLayout.LayoutParams) root.getLayoutParams();
+            if (old.width != next.width || old.height != next.height
+                    || old.leftMargin != next.leftMargin || old.topMargin != next.topMargin) {
+                root.setLayoutParams(next);
+            }
+        }
+
         void close() {
+            holder.removeOnLayoutChangeListener(layoutListener);
+            parent.removeOnLayoutChangeListener(layoutListener);
             input.removeTextChangedListener(watcher);
             session.close();
             try { input.setText(""); } catch (Throwable ignored) {}
             if (root.getParent() instanceof ViewGroup) {
                 ((ViewGroup) root.getParent()).removeView(root);
             }
+            if (accessibilityHidden
+                    && holder.getImportantForAccessibility() == View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS) {
+                holder.setImportantForAccessibility(previousAccessibility);
+            }
+            accessibilityHidden = false;
         }
 
         void addKeyboard() {

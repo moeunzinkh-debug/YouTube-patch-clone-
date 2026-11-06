@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline checks for the temporary, non-distributable emulator hybrid."""
 from pathlib import Path
+import importlib.util
 import tempfile
 import struct
 import unittest
@@ -8,6 +9,13 @@ import zipfile
 
 import make_emulator_fixture as fixture
 from test_fixture import xml_with_pool
+
+# Both the Translate and Khmerlish tools contain an emulator_smoke.py. Load
+# this directory's file explicitly instead of relying on sys.path ordering.
+_spec = importlib.util.spec_from_file_location('gboard_khmer_emulator_smoke',
+                                               Path(__file__).with_name('emulator_smoke.py'))
+smoke = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(smoke)
 
 
 def resource_table(name: str) -> bytes:
@@ -77,6 +85,25 @@ class EmulatorFixtureTests(unittest.TestCase):
     def test_missing_marker_fails_closed(self):
         with self.assertRaises(ValueError):
             fixture.rewrite_test_marker(xml_with_pool(True, ['unrelated']))
+
+
+class PanelLayoutTests(unittest.TestCase):
+    def test_panel_must_remain_inside_native_keyboard_area(self):
+        native = {'native_a': [{'id': 'dev.example:id/keyboard_holder', 'bounds': '[0,381][320,616]'}]}
+        contained = {'panel': [{'bounds': '[0,381][320,616]'}]}
+        whole_screen = {'panel': [{'bounds': '[0,24][320,640]'}]}
+        self.assertTrue(smoke.panel_within_native_keyboard(native, contained))
+        self.assertFalse(smoke.panel_within_native_keyboard(native, whole_screen))
+        self.assertFalse(smoke.panel_within_native_keyboard({}, contained))
+        self.assertFalse(smoke.panel_within_native_keyboard(native, {'panel': [{'bounds': 'bad'}]}))
+
+    def test_layout_paths_find_only_known_nodes(self):
+        nodes = [{'class': 'Frame', 'id': 'dev.example:id/keyboard_holder', 'bounds': '[0,381][320,616]',
+                  'children': [{'class': 'Key', 'description': 'a', 'bounds': '[2,475][49,523]'}]},
+                 {'class': 'Panel', 'description': 'Khmerlish offline panel', 'bounds': '[0,381][320,616]'}]
+        paths = smoke.keyboard_layout_paths(nodes)
+        self.assertEqual('dev.example:id/keyboard_holder', paths['native_a'][0]['id'])
+        self.assertTrue(smoke.panel_within_native_keyboard(paths, paths))
 
 
 if __name__ == '__main__':
