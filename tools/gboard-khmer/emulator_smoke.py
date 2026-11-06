@@ -207,6 +207,15 @@ def set_synthetic_field(description: str, text: str) -> None:
     time.sleep(1)
 
 
+def click_synthetic_document(filename: str) -> bool:
+    encoded = base64.b64encode(filename.encode('utf-8')).decode('ascii')
+    output = common.run('adb', 'shell', 'am', 'instrument', '-w', '-r',
+                        '-e', 'action', 'click_document', '-e', 'description', 'dW51c2Vk',
+                        '-e', 'value', encoded,
+                        f'{INSPECTOR_PACKAGE}/dev.arena.khmerprobe.AndroidSyntheticUi', timeout=45)
+    return 'INSTRUMENTATION_RESULT: clicked=true' in output
+
+
 def wait_for_text(text: str, seconds: int = 15) -> bool:
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
@@ -670,12 +679,26 @@ def import_document(filename: str, replace: bool | None = False) -> None:
     select_document(filename)
     if replace is None:
         # Invalid input is rejected before the confirmation or any DB writes.
-        time.sleep(4)
+        for attempt in range(3):
+            if wait_for_text('Khmerlish Dictionary', seconds=5):
+                break
+            if not click_synthetic_document(filename) and not find_and_tap(filename):
+                raise RuntimeError('Invalid document was not returned by the picker')
+        else:
+            raise RuntimeError('Invalid synthetic document did not open')
+        time.sleep(3)
         if any('Keep existing' in value for value in labels()):
             raise RuntimeError('Invalid document was offered for import')
         return
-    if not wait_for_text('Keep existing'):
-        raise RuntimeError('Import preview did not appear')
+    # DocumentsUI on some images selects an item on the first tap and opens it
+    # on the next; retry only while our exact synthetic filename remains visible.
+    for attempt in range(3):
+        if wait_for_text('Keep existing', seconds=5):
+            break
+        if not click_synthetic_document(filename) and not find_and_tap(filename):
+            raise RuntimeError('Import preview did not appear')
+    else:
+        raise RuntimeError('Import preview did not appear after opening the synthetic file')
     require_tap('Replace' if replace else 'Keep existing')
     time.sleep(3)
 
@@ -791,6 +814,15 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         result['error'] = f'{type(error).__name__}: {error}'
         try:
             result['synthetic_screen_labels_on_failure'] = labels()
+            # Only synthetic filenames and file-picker controls are recorded;
+            # do not capture arbitrary real user content or screenshots.
+            result['synthetic_picker_nodes'] = [
+                {key: node.get(key, '')[:150] for key in
+                 ('text', 'content-desc', 'class', 'bounds', 'clickable', 'enabled', 'selected')}
+                for node in ET.fromstring(common.dump_ui()).iter('node')
+                if any(token in (node.get('text', '') + ' ' + node.get('content-desc', '')).lower()
+                       for token in ('khmerlish-smoke-', 'downloads', 'open'))
+            ][:25]
         except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired, ET.ParseError):
             pass
         return False

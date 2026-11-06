@@ -36,17 +36,40 @@ public final class AndroidSyntheticUi extends Instrumentation {
             info.flags |= AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
             automation.setServiceInfo(info);
             SystemClock.sleep(350);
-            boolean set = false;
+            boolean documentClick = "click_document".equals(arguments.getString("action"));
+            boolean done = false;
             for (AccessibilityWindowInfo window : automation.getWindows()) {
                 if (window.getType() != AccessibilityWindowInfo.TYPE_APPLICATION) continue;
                 AccessibilityNodeInfo root = window.getRoot();
-                if (root != null && setText(root, description, value)) { set = true; break; }
+                if (root == null) continue;
+                if (documentClick ? clickDocument(root, value) : setText(root, description, value)) {
+                    done = true;
+                    break;
+                }
             }
-            result.putBoolean("set", set);
+            result.putBoolean(documentClick ? "clicked" : "set", done);
         } catch (Throwable failure) {
             result.putString("error_type", failure.getClass().getSimpleName());
         }
         finish(Activity.RESULT_OK, result);
+    }
+
+    private boolean clickDocument(AccessibilityNodeInfo node, String filename) {
+        CharSequence packageName = node.getPackageName();
+        String pkg = packageName == null ? "" : packageName.toString();
+        if (filename.startsWith("khmerlish-smoke-")
+                && ("com.google.android.documentsui".equals(pkg) || "com.android.documentsui".equals(pkg))
+                && filename.equals(String.valueOf(node.getText()))) {
+            for (AccessibilityNodeInfo target = node; target != null; target = target.getParent()) {
+                if (target.isClickable() && target.isEnabled()
+                        && target.performAction(AccessibilityNodeInfo.ACTION_CLICK)) return true;
+            }
+        }
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            if (child != null && clickDocument(child, filename)) return true;
+        }
+        return false;
     }
 
     private boolean setText(AccessibilityNodeInfo node, String description, String value) {
