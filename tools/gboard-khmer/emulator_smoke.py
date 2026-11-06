@@ -659,9 +659,22 @@ def edit_synthetic_word(roman: str, khmer: str) -> None:
         raise RuntimeError('Saved synthetic entry did not appear')
 
 
+def tap_synthetic_filename(filename: str) -> bool:
+    # Do not tap a thumbnail with content-desc "Preview the file ...": that
+    # previews the file instead of choosing it. Use its exact text row.
+    for node in ET.fromstring(common.dump_ui()).iter('node'):
+        if node.get('text') == filename:
+            position = common.center(node.get('bounds', ''))
+            if position:
+                common.run('adb', 'shell', 'input', 'tap', *map(str, position))
+                time.sleep(2)
+                return True
+    return False
+
+
 def select_document(filename: str) -> None:
     time.sleep(3)
-    if find_and_tap(filename):
+    if tap_synthetic_filename(filename):
         return
     # DocumentsUI may start in Recents. Open its navigation drawer and choose
     # the Downloads root, which contains only files created by this smoke test.
@@ -670,7 +683,8 @@ def select_document(filename: str) -> None:
             if find_and_tap(nav):
                 break
         require_tap('Downloads')
-    require_tap(filename)
+    if not tap_synthetic_filename(filename):
+        raise RuntimeError('Synthetic file is not visible in Downloads')
 
 
 def import_document(filename: str, replace: bool | None = False) -> None:
@@ -682,7 +696,7 @@ def import_document(filename: str, replace: bool | None = False) -> None:
         for attempt in range(3):
             if wait_for_text('Khmerlish Dictionary', seconds=5):
                 break
-            if not click_synthetic_document(filename) and not find_and_tap(filename):
+            if not click_synthetic_document(filename) and not tap_synthetic_filename(filename):
                 raise RuntimeError('Invalid document was not returned by the picker')
         else:
             raise RuntimeError('Invalid synthetic document did not open')
@@ -695,7 +709,7 @@ def import_document(filename: str, replace: bool | None = False) -> None:
     for attempt in range(3):
         if wait_for_text('Keep existing', seconds=5):
             break
-        if not click_synthetic_document(filename) and not find_and_tap(filename):
+        if not click_synthetic_document(filename) and not tap_synthetic_filename(filename):
             raise RuntimeError('Import preview did not appear')
     else:
         raise RuntimeError('Import preview did not appear after opening the synthetic file')

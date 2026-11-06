@@ -5,6 +5,7 @@ import importlib.util
 import tempfile
 import struct
 import unittest
+from unittest.mock import patch
 import zipfile
 
 import make_emulator_fixture as fixture
@@ -97,6 +98,18 @@ class EmulatorFixtureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             fixture.rewrite_test_manifest(xml_with_pool(True, [fixture.binary_xml.NEW,
                 fixture.CALCULATOR, fixture.KHMERLISH, fixture.DICTIONARY_ACTIVITY]))
+
+
+class DocumentPickerTests(unittest.TestCase):
+    def test_filename_tap_does_not_open_thumbnail_preview(self):
+        name = 'khmerlish-smoke-valid.csv'
+        xml = ('<hierarchy><node text="" content-desc="Preview the file ' + name
+               + '" bounds="[248,232][296,280]"/><node text="' + name
+               + '" content-desc="" bounds="[214,372][284,392]"/></hierarchy>')
+        with patch.object(smoke.common, 'dump_ui', return_value=xml), \
+                patch.object(smoke.common, 'run') as run, patch.object(smoke.time, 'sleep'):
+            self.assertTrue(smoke.tap_synthetic_filename(name))
+            run.assert_called_once_with('adb', 'shell', 'input', 'tap', '249', '382')
 
 
 class PanelLayoutTests(unittest.TestCase):
