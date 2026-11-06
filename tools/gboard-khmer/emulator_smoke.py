@@ -250,6 +250,27 @@ def enable_on_patches_page(report: dict, route: str) -> bool:
     return False
 
 
+def enable_via_test_launcher(report: dict) -> bool:
+    command = ['adb', 'shell', 'am', 'instrument', '-w', '-r', '-e', 'open_settings', 'true',
+               '-e', 'hold_ms', '45000', f'{TARGET_INSPECTOR_PACKAGE}/{TARGET_INSPECTOR}']
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    enabled = False
+    try:
+        time.sleep(5)
+        report['direct_patches_labels'] = labels()
+        enabled = enable_on_patches_page(report, 'same-signature test launcher')
+    finally:
+        try:
+            output, _ = process.communicate(timeout=65)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            output, _ = process.communicate()
+        match = re.search(r'^INSTRUMENTATION_RESULT: diagnostic=([A-Za-z0-9+/=]+)$', output, re.MULTILINE)
+        if match:
+            report['target_diagnostic_open_settings'] = json.loads(base64.b64decode(match.group(1)).decode('utf-8'))
+    return enabled
+
+
 def enable_via_root(tmp: Path, report: dict) -> bool:
     """Fallback for environments where UI automation cannot reach the page."""
     try:
@@ -347,11 +368,7 @@ def main() -> None:
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
             enabled = enable_via_settings(report)
             if not enabled:
-                report['target_diagnostic_open_settings'] = target_diagnostic(open_settings=True)
-                if report['target_diagnostic_open_settings'].get('settings_activity_started'):
-                    time.sleep(3)
-                    report['direct_patches_labels'] = labels()
-                    enabled = enable_on_patches_page(report, 'same-signature test launcher')
+                enabled = enable_via_test_launcher(report)
             report['target_diagnostic_after_settings'] = target_diagnostic()
             if not enabled or not report['target_diagnostic_after_settings'].get('runtime_enabled'):
                 report['target_diagnostic_programmatic_enable'] = target_diagnostic(enable=True)
@@ -389,7 +406,8 @@ def main() -> None:
             crashes = common.gboard_crash_types(common.run('adb', 'logcat', '-d', '-s', 'AndroidRuntime:E', '*:S'))
             if crashes:
                 report['gboard_fatal_exception_types'] = crashes
-            failed = not all_pass or report['default_off_example'] != 'passed' or bool(crashes)
+            failed = (not all_pass or report['default_off_example'] != 'passed' or bool(crashes)
+                      or report['settings_default_off'] != 'passed' or report['settings_toggle'] != 'passed')
     except (RuntimeError, ValueError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:
         report['error'] = f'{type(error).__name__}: {error}'
         failed = True

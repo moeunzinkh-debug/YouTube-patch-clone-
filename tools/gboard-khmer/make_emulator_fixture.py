@@ -6,8 +6,9 @@ already-applied Calculator marker with the Khmerlish marker so that this
 synthetic test can discover the new settings page. Calculator is therefore not
 tested in the hybrid. The real MPP inserts its own marker and does not replace
 Calculator. Original native code and the renamed manifest are retained; DEX,
-assets, and resources come from the actual Morphe output. The fixed-length
-resource-table package name is restored to match the renamed manifest.
+assets, and resources come from the actual Morphe output. The resource-table
+package name and Patches settings intents are restored to match the renamed
+manifest, solely so this test hybrid can coexist with system Gboard.
 Alignment and signing happen later.
 """
 from pathlib import Path
@@ -21,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/gboard-translate'))
 import make_manifest_fixture as binary_xml  # noqa: E402
 from make_fixture import replace_resource_package  # noqa: E402
+from axml_fixture import rewrite_pool_string  # noqa: E402
 
 CALCULATOR = 'dev.jason.gboardpatches.feature.simple_calculator'
 KHMERLISH = 'dev.jason.gboardpatches.feature.khmerlish'
@@ -64,9 +66,22 @@ def build(original: Path, patched: Path, output: Path) -> int:
                         shutil.copyfileobj(src, dst, 1024 * 1024)
             table = replace_resource_package(result.read('resources.arsc'), binary_xml.NEW, binary_xml.OLD)
             destination.writestr(result.getinfo('resources.arsc'), table)
+            settings_count = 0
             for entry in dexes + new_resources:
-                with result.open(entry) as src, destination.open(entry, 'w') as dst:
-                    shutil.copyfileobj(src, dst, 1024 * 1024)
+                if entry.filename.startswith('res/') and entry.filename.endswith('.xml'):
+                    data = result.read(entry)
+                    marker = 'gboard_patches_entry'
+                    activity = 'dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsActivity'
+                    contains = lambda text: text.encode('utf-8') in data or text.encode('utf-16le') in data
+                    if contains(marker) and contains(activity):
+                        data = rewrite_pool_string(data, binary_xml.NEW, binary_xml.OLD)
+                        settings_count += 1
+                    destination.writestr(entry, data)
+                else:
+                    with result.open(entry) as src, destination.open(entry, 'w') as dst:
+                        shutil.copyfileobj(src, dst, 1024 * 1024)
+            if settings_count < 2:
+                raise ValueError(f'Expected both Patches settings XMLs; found {settings_count}')
     return len(dexes)
 
 

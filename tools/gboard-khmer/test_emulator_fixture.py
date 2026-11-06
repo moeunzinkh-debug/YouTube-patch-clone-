@@ -27,6 +27,19 @@ class EmulatorFixtureTests(unittest.TestCase):
             self.assertIn(fixture.KHMERLISH.encode(encoding), changed)
             self.assertNotIn(fixture.CALCULATOR.encode(encoding), changed)
 
+    def test_settings_xml_can_grow_without_changing_string_indices(self):
+        for utf8 in (True, False):
+            original = xml_with_pool(utf8, ['before', fixture.binary_xml.NEW, 'after'])
+            changed = fixture.rewrite_pool_string(original, fixture.binary_xml.NEW, fixture.binary_xml.OLD)
+            encoding = 'utf-8' if utf8 else 'utf-16le'
+            self.assertGreater(len(changed), len(original))
+            self.assertEqual(len(changed), struct.unpack_from('<I', changed, 4)[0])
+            self.assertIn(fixture.binary_xml.OLD.encode(encoding), changed)
+            self.assertIn('before'.encode(encoding), changed)
+            self.assertIn('after'.encode(encoding), changed)
+            with self.assertRaises(ValueError):
+                fixture.rewrite_pool_string(original, 'not-present', 'other')
+
     def test_hybrid_copies_patched_dex_and_assets_but_not_signatures(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -41,14 +54,20 @@ class EmulatorFixtureTests(unittest.TestCase):
                 archive.writestr('classes.dex', b'patched dex')
                 archive.writestr('classes2.dex', b'extension dex')
                 archive.writestr('resources.arsc', resource_table(fixture.binary_xml.NEW))
-                archive.writestr('res/xml/settings.xml', b'patched settings')
+                values = [fixture.binary_xml.NEW, 'gboard_patches_entry',
+                          'dev.jason.gboardpatches.extension.settings.GboardPatchesSettingsActivity']
+                archive.writestr('res/xml/settings.xml', xml_with_pool(True, values))
+                archive.writestr('res/xml/settings_legacy.xml', xml_with_pool(False, values))
                 for path in fixture.ASSETS:
                     archive.writestr(path, b'new asset')
             self.assertEqual(2, fixture.build(original, patched, output))
             with zipfile.ZipFile(output) as archive:
                 self.assertIn(fixture.KHMERLISH.encode(), archive.read('AndroidManifest.xml'))
                 self.assertIn(fixture.binary_xml.OLD.encode('utf-16le'), archive.read('resources.arsc'))
-                self.assertEqual(b'patched settings', archive.read('res/xml/settings.xml'))
+                for path, encoding in [('res/xml/settings.xml', 'utf-8'), ('res/xml/settings_legacy.xml', 'utf-16le')]:
+                    settings = archive.read(path)
+                    self.assertIn(fixture.binary_xml.OLD.encode(encoding), settings)
+                    self.assertEqual(len(settings), struct.unpack_from('<I', settings, 4)[0])
                 self.assertEqual(b'patched dex', archive.read('classes.dex'))
                 self.assertEqual(b'new asset', archive.read(fixture.ASSETS[0]))
                 self.assertNotIn('META-INF/CERT.RSA', archive.namelist())

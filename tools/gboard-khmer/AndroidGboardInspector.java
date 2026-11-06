@@ -68,6 +68,9 @@ public final class AndroidGboardInspector extends Instrumentation {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivitySync(intent);
                 diagnostic.put("settings_activity_started", true);
+                int holdMillis = Math.min(60000, Math.max(0,
+                        Integer.parseInt(arguments.getString("hold_ms", "0"))));
+                if (holdMillis > 0) Thread.sleep(holdMillis);
             }
         } catch (Throwable error) {
             try {
