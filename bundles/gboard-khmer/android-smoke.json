@@ -80,6 +80,234 @@
       ".",
       "Done"
     ],
+    "native_layout_paths": {
+      "native_a": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/input_area",
+          "bounds": "[2,427][318,571]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[2,475][318,523]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/C01",
+          "bounds": "[2,475][49,523]"
+        }
+      ],
+      "native_n": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/input_area",
+          "bounds": "[2,427][318,571]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[2,523][318,571]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/B06",
+          "bounds": "[206,523][238,571]"
+        }
+      ],
+      "native_space": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/content",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "android:id/parentPanel",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "android:id/inputArea",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0402",
+          "bounds": "[0,24][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c5",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/keyboard_holder",
+          "bounds": "[0,381][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b05c8",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,419][320,616]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/id_0x7f0b0139",
+          "bounds": "[2,571][318,616]"
+        },
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "dev.jason.com.google.android.inputmethod.latin:id/key_pos_space",
+          "bounds": "[111,571][238,616]"
+        }
+      ]
+    },
     "initial_unlabelled_clickable_nodes": [],
     "visible_in_toolbar": "passed",
     "labels_after_tap": [
@@ -172,6 +400,183 @@
       ".",
       "Done"
     ],
+    "panel_layout_paths": {
+      "panel": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        }
+      ],
+      "panel_a": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,116][315,636]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,246][315,376]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[7,248][37,374]"
+        }
+      ],
+      "native_a": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,116][315,636]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,246][315,376]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[7,248][37,374]"
+        }
+      ],
+      "panel_n": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,116][315,636]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,376][315,506]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[209,378][238,504]"
+        }
+      ],
+      "native_n": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,116][315,636]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,376][315,506]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[209,378][238,504]"
+        }
+      ],
+      "panel_space": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,116][315,636]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,506][315,636]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[85,508][233,634]"
+        }
+      ],
+      "native_space": [
+        {
+          "class": "android.widget.FrameLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[0,24][320,640]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,116][315,636]"
+        },
+        {
+          "class": "android.widget.LinearLayout",
+          "id": "",
+          "bounds": "[5,506][315,636]"
+        },
+        {
+          "class": "android.widget.TextView",
+          "id": "",
+          "bounds": "[85,508][233,634]"
+        }
+      ]
+    },
+    "screen_size": "Physical size: 320x640",
     "key_count": 32,
     "airplane_mode": "enabled",
     "snapshots": {
@@ -357,5 +762,5 @@
   "error": "RuntimeError: Khmerlish toolbar panel failed; see sanitized diagnostics",
   "bundle_sha256": "70fd09ef8155cbe478f5898b3074fe96ddaf142ca9cfa53723466b46fe8535b5",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42212558926"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42213142382"
 }
