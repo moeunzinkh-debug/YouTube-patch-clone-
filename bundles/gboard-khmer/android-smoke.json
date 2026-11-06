@@ -12,7 +12,7 @@
   "target_diagnostic_before": {
     "marker": true,
     "toolbar_icon_resource_found": true,
-    "toolbar_position_initialized": false,
+    "toolbar_position_initialized": true,
     "dictionary_asset_present": true,
     "preference": false,
     "runtime_enabled": false,
@@ -89,10 +89,10 @@
       "Downloads",
       "khmerlish-smoke-valid.csv",
       "67 B",
-      "3:12 PM",
+      "3:23 PM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "3:12 PM",
+      "3:23 PM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -101,6 +101,17 @@
     ],
     "export": "passed",
     "delete": "passed",
+    "after_restart_diagnostic": {
+      "marker": true,
+      "toolbar_icon_resource_found": true,
+      "toolbar_position_initialized": true,
+      "dictionary_asset_present": true,
+      "preference": true,
+      "runtime_enabled": true,
+      "registry_entry": true,
+      "synthetic_import_persisted": true,
+      "synthetic_override_deleted": true
+    },
     "error": "RuntimeError: Imported word was not used after restarting Gboard",
     "synthetic_screen_labels_on_failure": [
       "Synthetic Khmerlish test",
@@ -110,5 +121,5 @@
   },
   "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42240317943"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42241890573"
 }
