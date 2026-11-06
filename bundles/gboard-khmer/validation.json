@@ -1,8 +1,8 @@
 {
   "version": "4.0.0-khmerlish-dev.2",
   "experimental": true,
-  "sha256": "b7f59b817786c16abd15ae328636edf62b18a77cad5a3ce5948c6d9f32b7fc66",
-  "size": 8405339,
+  "sha256": "4fd12ece6a3b33c3966b628c17620c9edb2edf70c1bd63898ddd731622eebffa",
+  "size": 8405760,
   "target": "18.5.4.993608717-release-arm64-v8a / 176049702",
   "checks": {
     "existing_43_and_direct_translate_metadata": "passed",
@@ -18,5 +18,5 @@
     "actual_gboard_typing_on_device": "not tested"
   },
   "fixture_sha256": "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42207985169"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42209855048"
 }
