@@ -52,6 +52,7 @@ public final class KhmerlishRuntime {
     public static void onSelection(InputMethodService service, int oldStart, int oldEnd,
             int newStart, int newEnd, int composingStart, int composingEnd) {
         try {
+            KhmerlishAccessPoint.traceController(); // opt-in debug only, no editor text
             if (KhmerlishPanelRuntime.isActive(service)) {
                 resetController();
                 KhmerlishPanelRuntime.onSelection(service, newStart, newEnd, composingStart, composingEnd);

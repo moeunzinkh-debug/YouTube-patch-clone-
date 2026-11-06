@@ -487,7 +487,7 @@ def panel_smoke(report: dict) -> bool:
             # The extension emits fixed stage names and exception types only;
             # never save arbitrary log text or text entered by the test.
             result['toolbar_debug_stages'] = re.findall(
-                r'GboardKhmerlish\s*:\s*((?:catalog|register)_[a-z_]+(?::[A-Za-z]+)?)', log)[-30:]
+                r'GboardKhmerlish\s*:\s*((?:catalog|register|state)_[a-z_0-9]+(?::[A-Za-z]+)?)', log)[-30:]
         except (RuntimeError, OSError, subprocess.TimeoutExpired):
             pass
         if offline:

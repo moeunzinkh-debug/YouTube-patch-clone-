@@ -17,6 +17,7 @@ public final class KhmerlishAccessPoint {
     private static final String TOKEN = "gboard_khmerlish_panel";
     private static final String PREFS = "gboard_khmerlish_panel";
     private static final String PLACED = "toolbar_position_initialized";
+    private static WeakReference<Object> controllerRef = new WeakReference<>(null);
 
     private KhmerlishAccessPoint() {}
 
@@ -91,6 +92,7 @@ public final class KhmerlishAccessPoint {
             stage = "register_descriptor";
             method(controllerClass, "g", void.class, false, descriptor, boolean.class)
                     .invoke(controller, built, false);
+            controllerRef = new WeakReference<>(controller);
             debug("register_descriptor_ok", null);
             stage = "register_position";
             // Put the icon in the visible toolbar once. User reordering/removal
@@ -107,6 +109,65 @@ public final class KhmerlishAccessPoint {
             debug(stage, failure);
         }
     }
+
+    /** Optional synthetic-test diagnostics: booleans only, never editor text. */
+    static void traceController() {
+        if (!Log.isLoggable(TAG, Log.DEBUG)) return;
+        try {
+            Object controller = controllerRef.get();
+            if (controller == null) { debug("state_controller_gone", null); return; }
+            Class<?> controllerClass = controller.getClass();
+            Field helperField = controllerClass.getDeclaredField("g");
+            Field mapField = controllerClass.getDeclaredField("h");
+            Field toolbarField = controllerClass.getDeclaredField("i");
+            Field overflowField = controllerClass.getDeclaredField("w");
+            helperField.setAccessible(true);
+            mapField.setAccessible(true);
+            toolbarField.setAccessible(true);
+            overflowField.setAccessible(true);
+            Object helper = helperField.get(controller);
+            Object map = mapField.get(controller);
+            Method get = map.getClass().getMethod("get", Object.class);
+            get.setAccessible(true);
+            Object descriptor = get.invoke(map, TOKEN);
+            Class<?> orderClass = helper.getClass();
+            Field master = orderClass.getDeclaredField("c");
+            Field order = orderClass.getDeclaredField("e");
+            master.setAccessible(true);
+            order.setAccessible(true);
+            Object masterSet = master.get(helper);
+            Object orderList = order.get(helper);
+            Method orderedMethod = orderList.getClass().getMethod("d");
+            orderedMethod.setAccessible(true);
+            Object ordered = orderedMethod.invoke(orderList);
+            Method sortedMethod = controllerClass.getMethod("w");
+            sortedMethod.setAccessible(true);
+            Object sorted = sortedMethod.invoke(controller);
+            boolean inSorted = false;
+            if (sorted instanceof Collection<?>) {
+                for (Object value : (Collection<?>) sorted) {
+                    if (value != null && TOKEN.equals(value.getClass().getField("b").get(value))) {
+                        inSorted = true;
+                        break;
+                    }
+                }
+            }
+            Object toolbar = toolbarField.get(controller);
+            Object overflow = overflowField.get(controller);
+            Object view = descriptor == null ? null : descriptor.getClass().getField("a").get(descriptor);
+            Log.d(TAG, "state_master_" + flag(masterSet instanceof Set<?> && ((Set<?>) masterSet).contains(TOKEN))
+                    + "_map_" + flag(descriptor != null)
+                    + "_order_" + flag(ordered instanceof Collection<?> && ((Collection<?>) ordered).contains(TOKEN))
+                    + "_sorted_" + flag(inSorted)
+                    + "_toolbar_" + flag(toolbar instanceof Collection<?> && ((Collection<?>) toolbar).contains(TOKEN))
+                    + "_overflow_" + flag(overflow instanceof Collection<?> && ((Collection<?>) overflow).contains(TOKEN))
+                    + "_view_" + flag(view != null));
+        } catch (Throwable failure) {
+            debug("state_exception", failure);
+        }
+    }
+
+    private static int flag(boolean value) { return value ? 1 : 0; }
 
     private static void debug(String stage, Throwable failure) {
         try {
