@@ -79,88 +79,30 @@
     "automatic_override": "passed",
     "panel_override": "passed",
     "edit_and_persist": "passed",
-    "error": "RuntimeError: Import preview did not appear after opening the synthetic file",
+    "import_keep_existing": "passed",
+    "import_replace_conflicts": "passed",
+    "invalid_import_atomic": "passed",
+    "search_personal": "passed",
+    "error": "RuntimeError: adb shell cat /sdcard/Download/khmerlish-personal.tsv failed (exit 1)",
     "synthetic_screen_labels_on_failure": [
-      "Downloads",
-      "Images",
-      "Audio",
-      "Videos",
-      "Files in Downloads",
-      "Downloads",
-      "khmerlish-smoke-invalid.csv",
-      "51 B",
-      "2:55 PM",
-      "khmerlish-smoke-valid.csv",
-      "67 B",
-      "2:55 PM"
+      "‹",
+      "Khmerlish Dictionary",
+      "ឯកសារពាក្យ",
+      "ផ្ទាល់ខ្លួន",
+      "ស្វែងរក Khmerlish ឬ ខ្មែរ",
+      "＋ បន្ថែម",
+      "នាំចូល",
+      "នាំចេញ",
+      "ពាក្យផ្ទាល់ខ្លួន 2 · ប៉ះដើម្បីកែ ឬលុប",
+      "‹",
+      "1 / 1",
+      "›",
+      "nv  →  កម្ពុជា  · ផ្ទាល់ខ្លួន",
+      "zztest  →  សួស្តី  · ផ្ទាល់ខ្លួន"
     ],
-    "synthetic_picker_nodes": [
-      {
-        "text": "Downloads",
-        "content-desc": "",
-        "class": "android.widget.TextView",
-        "bounds": "[0,72][110,120]",
-        "clickable": "false",
-        "enabled": "true",
-        "selected": "false"
-      },
-      {
-        "text": "Files in Downloads",
-        "content-desc": "",
-        "class": "android.widget.TextView",
-        "bounds": "[24,168][248,228]",
-        "clickable": "false",
-        "enabled": "true",
-        "selected": "false"
-      },
-      {
-        "text": "Downloads",
-        "content-desc": "",
-        "class": "android.widget.TextView",
-        "bounds": "[72,34][170,62]",
-        "clickable": "false",
-        "enabled": "true",
-        "selected": "false"
-      },
-      {
-        "text": "",
-        "content-desc": "Preview the file khmerlish-smoke-invalid.csv",
-        "class": "android.widget.FrameLayout",
-        "bounds": "[108,232][156,280]",
-        "clickable": "true",
-        "enabled": "true",
-        "selected": "false"
-      },
-      {
-        "text": "khmerlish-smoke-invalid.csv",
-        "content-desc": "",
-        "class": "android.widget.TextView",
-        "bounds": "[74,372][144,391]",
-        "clickable": "false",
-        "enabled": "true",
-        "selected": "false"
-      },
-      {
-        "text": "",
-        "content-desc": "Preview the file khmerlish-smoke-valid.csv",
-        "class": "android.widget.FrameLayout",
-        "bounds": "[248,232][296,280]",
-        "clickable": "true",
-        "enabled": "true",
-        "selected": "false"
-      },
-      {
-        "text": "khmerlish-smoke-valid.csv",
-        "content-desc": "",
-        "class": "android.widget.TextView",
-        "bounds": "[214,372][284,391]",
-        "clickable": "false",
-        "enabled": "true",
-        "selected": "false"
-      }
-    ]
+    "synthetic_picker_nodes": []
   },
   "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
   "emulator_action_outcome": "failure",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42237783424"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42238933542"
 }
