@@ -9,6 +9,7 @@ unavailable environment is reported as such rather than as a passing test.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 from pathlib import Path
@@ -28,10 +29,12 @@ PACKAGE = common.PACKAGE
 EDITOR_PACKAGE = 'dev.arena.khmerprobe'
 EDITOR_ACTIVITY = 'dev.arena.khmerprobe.AndroidKhmerProbeActivity'
 INSPECTOR_PACKAGE = common.INSPECTOR_PACKAGE
+TARGET_INSPECTOR_PACKAGE = 'dev.arena.gboardtargetprobe'
+TARGET_INSPECTOR = 'dev.arena.khmerprobe.AndroidGboardInspector'
 PREF_KEY = 'pref_khmerlish_to_khmer_enabled'
 
 
-def build_probes(tmp: Path) -> None:
+def build_probes(tmp: Path, fixture_keystore: Path) -> None:
     sdk = Path(os.environ['ANDROID_HOME'])
     android_jar = sdk / 'platforms/android-35/android.jar'
     tools = max((sdk / 'build-tools').iterdir(), key=lambda p: tuple(int(x) for x in re.findall(r'\d+', p.name)))
@@ -40,13 +43,15 @@ def build_probes(tmp: Path) -> None:
     dex.mkdir()
     common.run('javac', '-source', '8', '-target', '8', '-encoding', 'UTF-8', '-cp', str(android_jar),
         '-d', str(classes), str(ROOT / 'tools/gboard-khmer/AndroidKhmerProbeActivity.java'),
+        str(ROOT / 'tools/gboard-khmer/AndroidGboardInspector.java'),
         str(ROOT / 'tools/gboard-translate/AndroidWindowInspector.java'), timeout=90)
     common.run(str(tools / 'd8'), '--min-api', '26', '--lib', str(android_jar), '--output', str(dex),
         *sorted(map(str, classes.rglob('*.class'))), timeout=90)
-    key = tmp / 'probe.keystore'
-    common.run('keytool', '-genkeypair', '-noprompt', '-keystore', str(key), '-storepass', 'android',
-        '-keypass', 'android', '-alias', 'test', '-dname', 'CN=Disposable emulator test', '-keyalg', 'RSA',
-        '-keysize', '2048', '-validity', '2', timeout=45)
+    # The target inspector must have the same temporary test signature as the
+    # synthetic Gboard fixture; this keystore is generated only for this run.
+    key = fixture_keystore
+    if not key.is_file():
+        raise RuntimeError('Disposable fixture signing key is unavailable')
     manifests = {
         'editor': f'''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="{EDITOR_PACKAGE}">
             <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
@@ -57,6 +62,11 @@ def build_probes(tmp: Path) -> None:
             <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
             <application android:label="Synthetic keyboard inspector" />
             <instrumentation android:name="{common.INSPECTOR_RUNNER}" android:targetPackage="{INSPECTOR_PACKAGE}" />
+            </manifest>''',
+        'target_inspector': f'''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="{TARGET_INSPECTOR_PACKAGE}">
+            <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="32" />
+            <application android:label="Disposable Gboard inspector" />
+            <instrumentation android:name="{TARGET_INSPECTOR}" android:targetPackage="{PACKAGE}" />
             </manifest>''',
     }
     for name, manifest_xml in manifests.items():
@@ -72,6 +82,18 @@ def build_probes(tmp: Path) -> None:
         common.run(str(tools / 'apksigner'), 'sign', '--ks', str(key), '--ks-pass', 'pass:android',
             '--key-pass', 'pass:android', '--out', str(signed), str(aligned), timeout=45)
         common.run('adb', 'install', '-r', str(signed), timeout=90)
+
+
+def target_diagnostic(enable: bool = False) -> dict:
+    command = ['adb', 'shell', 'am', 'instrument', '-w', '-r']
+    if enable:
+        command.extend(['-e', 'enable', 'true'])
+    command.append(f'{TARGET_INSPECTOR_PACKAGE}/{TARGET_INSPECTOR}')
+    output = common.run(*command, timeout=90)
+    match = re.search(r'^INSTRUMENTATION_RESULT: diagnostic=([A-Za-z0-9+/=]+)$', output, re.MULTILINE)
+    if not match:
+        raise RuntimeError('Same-signature Gboard diagnostic did not return a result')
+    return json.loads(base64.b64decode(match.group(1)).decode('utf-8'))
 
 
 def install_and_select(apk: Path, report: dict) -> None:
@@ -135,10 +157,23 @@ def find_and_tap(label: str, scroll: bool = True) -> bool:
 def enable_via_settings(report: dict) -> bool:
     command = common.run('adb', 'shell', 'am', 'start', '-n',
         f'{PACKAGE}/com.google.android.apps.inputmethod.latin.preference.SettingsActivity')
+    report['settings_launch'] = command[:300]
     if 'Error:' in command:
         return False
     time.sleep(6)
-    if not find_and_tap('Patches') or not find_and_tap('Khmerlish'):
+    report['settings_initial_labels'] = [
+        n.get('text', '')[:100] for n in ET.fromstring(common.dump_ui()).iter('node')
+        if n.get('text', '').strip()
+    ][:60]
+    report['patches_entry_found'] = find_and_tap('Patches')
+    if not report['patches_entry_found']:
+        return False
+    report['patches_labels'] = [
+        n.get('text', '')[:100] for n in ET.fromstring(common.dump_ui()).iter('node')
+        if n.get('text', '').strip()
+    ][:60]
+    report['khmerlish_entry_found'] = find_and_tap('Khmerlish')
+    if not report['khmerlish_entry_found']:
         return False
     report['settings_entry'] = 'visible in test fixture'
     xml = common.dump_ui()
@@ -225,6 +260,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('fixture_apk', type=Path)
     parser.add_argument('report', type=Path)
+    parser.add_argument('--fixture-keystore', type=Path, required=True)
     args = parser.parse_args()
     report = {
         'environment': 'disposable Android emulator, synthetic text only',
@@ -238,8 +274,9 @@ def main() -> None:
         with tempfile.TemporaryDirectory(prefix='gboard-khmer-smoke-') as directory:
             tmp = Path(directory)
             report['android_api'] = common.run('adb', 'shell', 'getprop', 'ro.build.version.sdk')
-            build_probes(tmp)
             install_and_select(args.fixture_apk, report)
+            build_probes(tmp, args.fixture_keystore)
+            report['target_diagnostic_before'] = target_diagnostic()
             common.run('adb', 'logcat', '-c')
             open_editor()
             time.sleep(5)
@@ -251,8 +288,18 @@ def main() -> None:
             # Before the toggle, synthetic English remains untouched.
             enter('nv', None)
             report['default_off_example'] = 'passed' if editor_text().rstrip().lower() == 'nv' else 'failed'
-            if not enable_via_settings(report) and not enable_via_root(tmp, report):
-                raise RuntimeError('Could not enable Khmerlish in the disposable emulator')
+            enabled = enable_via_settings(report)
+            report['target_diagnostic_after_settings'] = target_diagnostic()
+            if not enabled or not report['target_diagnostic_after_settings'].get('runtime_enabled'):
+                report['target_diagnostic_programmatic_enable'] = target_diagnostic(enable=True)
+                if not report['target_diagnostic_programmatic_enable'].get('runtime_enabled'):
+                    if not enable_via_root(tmp, report):
+                        raise RuntimeError('Could not enable Khmerlish in the disposable emulator')
+                    report['target_diagnostic_after_root'] = target_diagnostic()
+                    if not report['target_diagnostic_after_root'].get('runtime_enabled'):
+                        raise RuntimeError('The Gboard runtime did not observe its enabled setting')
+                else:
+                    report['settings_toggle'] = 'set using same-signature test instrumentation; UI not confirmed'
             open_editor()
             time.sleep(5)
             examples = {'nv na': 'នៅណា', 'kampuchea': 'កម្ពុជា', 'kampu': 'កម្ពុជា',
