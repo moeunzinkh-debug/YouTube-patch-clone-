@@ -1,0 +1,234 @@
+name: Publish Gboard Khmerlish 4.0.5 pre-release
+
+on:
+  push:
+    branches: [arena/f5668a73-youtube-patch-clone]
+    paths:
+      - '.github/workflows/publish-gboard-khmerlish-405.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gboard-khmerlish-405-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Trigger only the pre-release explicitly authorized by the user.
+    if: contains(github.event.head_commit.message, '[publish-gboard-khmer-4.0.5]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: Gboard-v4.0.5
+      RELEASE_TITLE: Gboard Khmerlish v4.0.5 (experimental)
+      EXPECTED_BUNDLE_SHA256: f544803642e868ddac7ebf13ab43a926a7582b4631286f6fda4e9fa66a7507a0
+      EXPECTED_BUNDLE_SIZE: '8427666'
+      ORIGINAL_RELEASE_ID: '426612803'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify branch, unique tag, bundle and complete test reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Ff5668a73-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to publish a stale bundle'; exit 1; }
+          tags="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/$RELEASE_TAG" --jq "[.[] | select(.ref == \"refs/tags/$RELEASE_TAG\")] | length")"
+          releases="$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq "[.[] | select(.tag_name == \"$RELEASE_TAG\")] | length")"
+          test "$tags" = 0 && test "$releases" = 0 || { echo '::error::The requested tag or release already exists'; exit 1; }
+          (cd bundles/gboard-khmer && sha256sum --check gboard-khmerlish-experimental.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib, json, os, zipfile
+          from pathlib import Path
+
+          root = Path('bundles/gboard-khmer')
+          bundle = root / 'gboard-khmerlish-experimental.mpp'
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          build = json.loads((root / 'validation.json').read_text(encoding='utf-8'))
+          listing = json.loads((root / 'patches-list.json').read_text(encoding='utf-8'))
+          android = json.loads((root / 'android-smoke.json').read_text(encoding='utf-8'))
+          unit = build['checks']['khmerlish_unit_tests']
+          panel = android.get('toolbar_panel', {})
+          personal = android.get('personal_dictionary', {})
+          required = (
+              'search_bundled', 'bundled_edit_icon', 'bundled_edit_conversion',
+              'bundled_override_restore', 'bundled_rename_copy', 'add_spaced_phrase',
+              'personal_edit_icon', 'add', 'automatic_override', 'panel_override',
+              'automatic_spaced_phrase', 'panel_spaced_phrase', 'edit_and_persist',
+              'import_keep_existing', 'import_spaced_phrase', 'import_replace_conflicts',
+              'invalid_import_atomic', 'search_personal', 'export', 'delete',
+              'panel_after_restart', 'phrase_after_restart', 'restart_and_delete_fallback',
+          )
+          if digest != os.environ['EXPECTED_BUNDLE_SHA256'] or bundle.stat().st_size != int(os.environ['EXPECTED_BUNDLE_SIZE']):
+              raise SystemExit('The bundle does not match the approved build')
+          if (build['version'] != '4.0.5' or build['experimental'] is not True or build['sha256'] != digest
+                  or build['target'] != '18.5.4.993608717-release-arm64-v8a / 176049702'
+                  or build['checks']['existing_43_and_direct_translate_metadata'] != 'passed'
+                  or build['checks']['morphe_desktop_listing'] != 'passed'
+                  or build['checks']['third_party_prepatched_fixture_application_and_dex_inspection'] != 'passed'
+                  or unit['tests'] != 39 or unit['failures'] or unit['errors'] or unit['skipped']):
+              raise SystemExit('Build verification is incomplete or does not match the bundle')
+          if listing['version'] != '4.0.5' or len(listing['patches']) != 45:
+              raise SystemExit('Incorrect patch listing')
+          names = {patch['name']: patch for patch in listing['patches']}
+          khmerlish = names['Khmerlish to Khmer (experimental)']
+          if (len(names) != 45 or khmerlish['use'] is not False
+                  or names['Direct Google Translate (experimental)']['use'] is not False
+                  or khmerlish['compatiblePackages'] != {
+                      'com.google.android.inputmethod.latin': ['18.5.4.993608717-release-arm64-v8a']}):
+              raise SystemExit('Experimental patch listing, target or defaults changed')
+          with zipfile.ZipFile(bundle) as archive:
+              manifest = archive.read('META-INF/MANIFEST.MF').decode('utf-8').replace('\r\n ', '')
+              if archive.testzip() is not None or '\nVersion: 4.0.5\r\n' not in manifest:
+                  raise SystemExit('Bundle manifest does not declare version 4.0.5')
+              if ('jasonwu1994/Gboard-patches v4.0.0' not in manifest or 'experimental fork' not in manifest
+                      or 'tree/Gboard-v4.0.5/tools/gboard-khmer' not in manifest):
+                  raise SystemExit('Missing experimental/upstream/tagged source provenance')
+          if (android.get('bundle_sha256') != digest or android.get('mode') != 'complete smoke'
+                  or android.get('emulator_action_outcome') != 'success'
+                  or any(android.get(check) != 'passed' for check in
+                         ('fixture_install', 'settings_default_off', 'settings_toggle', 'actual_gboard_typing'))
+                  or panel.get('status') != 'passed' or panel.get('panel_within_native_keyboard') != 'passed'
+                  or len(android.get('examples', {})) != 6
+                  or not all(item.get('passed') for item in android['examples'].values())
+                  or len(panel.get('examples', {})) != 7
+                  or not all(item.get('passed') for item in panel['examples'].values())
+                  or personal.get('status') != 'passed'
+                  or any(personal.get(check) != 'passed' for check in required)):
+              raise SystemExit('Android smoke report is incomplete or does not match the bundle')
+          print('Verified 39 unit tests and the complete Android smoke for', digest)
+          PY
+      - name: Snapshot original Gboard pre-release and stage assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$ORIGINAL_RELEASE_ID" > "$RUNNER_TEMP/original-release.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          original = json.loads((Path(os.environ['RUNNER_TEMP']) / 'original-release.json').read_text())
+          upstream = [a for a in original['assets'] if a['name'] == 'gboard-patches-4.0.0.mpp']
+          if (original['id'] != int(os.environ['ORIGINAL_RELEASE_ID']) or original['tag_name'] != 'Gboard-v4.0.0'
+                  or original['draft'] or not original['prerelease'] or len(upstream) != 1
+                  or upstream[0]['digest'] != 'sha256:fadf54bea20f337a03baddf2bd294c86d254a744456c6e53ee13f4ad25a58716'):
+              raise SystemExit('Original Gboard pre-release has an unexpected identity or upstream asset')
+          PY
+          stage="$RUNNER_TEMP/gboard-405-assets"
+          mkdir -p "$stage"
+          cp bundles/gboard-khmer/gboard-khmerlish-experimental.mpp "$stage/gboard-khmerlish-4.0.5.mpp"
+          (cd "$stage" && sha256sum gboard-khmerlish-4.0.5.mpp > gboard-khmerlish-4.0.5.mpp.sha256)
+          cp bundles/gboard-khmer/patches-list.json "$stage/patches-list.json"
+          cp bundles/gboard-khmer/validation.json "$stage/gboard-khmerlish-validation.json"
+          cp bundles/gboard-khmer/android-smoke.json "$stage/gboard-khmerlish-android-smoke.json"
+          cp bundles/gboard-khmer/khmerlish-personal-example.csv "$stage/khmerlish-personal-example.csv"
+          cp bundles/gboard-khmer/README.md "$stage/gboard-khmerlish-README.md"
+          cp extras/gboard-patches/LICENSE "$stage/LICENSE-Gboard-patches.txt"
+          cp extras/gboard-patches/NOTICE "$stage/NOTICE-Gboard-patches.txt"
+          cp tools/gboard-khmer/overlay/patches/src/main/resources/gboard-khmer/LICENSE.txt "$stage/LICENSE-Khmer-dictionary.txt"
+          test "$(find "$stage" -maxdepth 1 -type f | wc -l)" = 10
+          ! find "$stage" -iname '*.apk' | grep -q .
+          echo "$EXPECTED_BUNDLE_SHA256  $stage/gboard-khmerlish-4.0.5.mpp" | sha256sum --check
+      - name: Create draft with tested bundle and documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Ff5668a73-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced before release creation'; exit 1; }
+          cat > "$RUNNER_TEMP/release-notes.md" <<EOF
+          # Gboard Khmerlish 4.0.5 (សាកល្បង)
+
+          **នេះជា version របស់ fork** ផ្អែកលើ [jasonwu1994/Gboard-patches v4.0.0](https://github.com/jasonwu1994/Gboard-patches/releases/tag/v4.0.0) មិនមែន upstream v4.0.5 ទេ។ វារក្សា upstream 43 patches និង Direct Google Translate experiment; bundle និង release Gboard ចាស់មិនត្រូវបានជំនួស។
+
+          - ទាញយក **gboard-khmerlish-4.0.5.mpp** ហើយបន្ថែមជា **Morphe Manager → Sources → Add patch source → Local**។ កុំបើក Gboard source ចាស់ជាមួយ fork នេះ ព្រោះ patches អាចស្ទួន។
+          - គោលដៅ៖ Gboard **18.5.4.993608717-release-arm64-v8a** / code **176049702**។ ជ្រើស **Khmerlish to Khmer (experimental)** មុន patch។
+          - Offline Khmerlish panel និង automatic conversion គាំទ្រឃ្លាផ្ទាល់ខ្លួនមានដកឃ្លា ដូចជា \`min dg del\`។ Word guide មានរូប ✎ សម្រាប់កែគ្រប់ជួរ។ កែពាក្យដើមជាការកែផ្ទាល់ខ្លួនដែលអាចលុបដើម្បីត្រឡប់ទៅដើម; ប្តូរ Roman key បង្កើតគូថ្មីដោយរក្សាពាក្យដើម។
+          - ក្នុង **Gboard Settings → Patches → Khmerlish → Personal Dictionary & Documents** អាចបន្ថែម/កែ/លុប ស្វែងរក និង import/export UTF-8 CSV/TSV/TXT។ **Export មុន uninstall ឬ clear data** ព្រោះ personal dictionary មិន backup ដោយស្វ័យប្រវត្តិ។
+          - Khmerlish ដំណើរការ offline។ Direct Google Translate ជា patch ផ្សេង; បើប្រើវា អត្ថបទត្រូវផ្ញើទៅ Google។
+          - SHA-256: \`$EXPECTED_BUNDLE_SHA256\`។ [របៀបប្រើ](https://github.com/$GITHUB_REPOSITORY/blob/$RELEASE_TAG/bundles/gboard-khmer/README.md) · [Build 39/39](https://github.com/$GITHUB_REPOSITORY/actions/runs/42321842707) · [Android emulator](https://github.com/$GITHUB_REPOSITORY/actions/runs/42322277323)។
+          - ការសាក Android ប្រើ fixture ភាគីទីបីដែលបាន patch រួច និងចុះហត្ថលេខាថ្មី **មិនមែន stock**។ Stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក; រក្សា keyboard បម្រុង។ មិនមាន APK ក្នុង release នេះទេ។
+          EOF
+          gh release create "$RELEASE_TAG" "$RUNNER_TEMP"/gboard-405-assets/* \
+            --target "$GITHUB_SHA" --title "$RELEASE_TITLE" --prerelease --draft \
+            --notes-file "$RUNNER_TEMP/release-notes.md"
+      - name: Verify all draft asset digests before publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq "[.[] | select(.tag_name == \"$RELEASE_TAG\")]" > "$RUNNER_TEMP/draft-list.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          releases = json.loads((temp / 'draft-list.json').read_text())
+          if len(releases) != 1:
+              raise SystemExit('Expected exactly one new draft release')
+          release = releases[0]
+          if (release['tag_name'] != os.environ['RELEASE_TAG'] or release['name'] != os.environ['RELEASE_TITLE']
+                  or not release['draft'] or not release['prerelease']
+                  or release['target_commitish'] != os.environ['GITHUB_SHA']):
+              raise SystemExit('Draft identity or target differs')
+          staged = {p.name: p for p in (temp / 'gboard-405-assets').iterdir()}
+          remote = {a['name']: a for a in release['assets']}
+          if len(remote) != len(release['assets']) or set(staged) != set(remote):
+              raise SystemExit('Missing, duplicate or unexpected draft assets')
+          for name, local in staged.items():
+              asset = remote[name]
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if asset['state'] != 'uploaded' or asset['size'] != local.stat().st_size or asset.get('digest') != digest:
+                  raise SystemExit('Draft upload differs: ' + name)
+          (temp / 'new-release-id').write_text(str(release['id']))
+          print('All draft assets verified')
+          PY
+      - name: Publish the verified pre-release
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Ff5668a73-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; leaving release as a draft'; exit 1; }
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease
+      - name: Verify public release, download, tag and unchanged original release
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="$(cat "$RUNNER_TEMP/new-release-id")"
+          gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > "$RUNNER_TEMP/new-release-final.json"
+          gh api "repos/$GITHUB_REPOSITORY/releases/$ORIGINAL_RELEASE_ID" > "$RUNNER_TEMP/original-release-final.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/new-tag.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          final = json.loads((temp / 'new-release-final.json').read_text())
+          tag = json.loads((temp / 'new-tag.json').read_text())
+          original = json.loads((temp / 'original-release.json').read_text())
+          original_after = json.loads((temp / 'original-release-final.json').read_text())
+          if (final['draft'] or not final['prerelease'] or final['tag_name'] != os.environ['RELEASE_TAG']
+                  or final['target_commitish'] != os.environ['GITHUB_SHA']
+                  or tag['object']['type'] != 'commit' or tag['object']['sha'] != os.environ['GITHUB_SHA']):
+              raise SystemExit('Published release or source tag does not match the approved commit')
+          for key in ('id', 'tag_name', 'name', 'body', 'draft', 'prerelease', 'target_commitish'):
+              if original[key] != original_after[key]:
+                  raise SystemExit('Original release metadata changed: ' + key)
+          def assets(release):
+              return {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in release['assets']}
+          if assets(original) != assets(original_after):
+              raise SystemExit('Original Gboard release assets changed')
+          staged = {p.name: p for p in (temp / 'gboard-405-assets').iterdir()}
+          uploaded = {a['name']: a for a in final['assets']}
+          if set(staged) != set(uploaded):
+              raise SystemExit('Public asset list differs from the verified draft')
+          for name, local in staged.items():
+              if uploaded[name].get('digest') != 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest():
+                  raise SystemExit('Published asset digest differs: ' + name)
+          print('Published verified pre-release:', final['html_url'])
+          PY
+          mkdir -p "$RUNNER_TEMP/downloaded-gboard-405"
+          gh release download "$RELEASE_TAG" --pattern 'gboard-khmerlish-4.0.5.mpp' \
+            --pattern 'gboard-khmerlish-4.0.5.mpp.sha256' --dir "$RUNNER_TEMP/downloaded-gboard-405"
+          (cd "$RUNNER_TEMP/downloaded-gboard-405" && sha256sum --check gboard-khmerlish-4.0.5.mpp.sha256)
+          echo "$EXPECTED_BUNDLE_SHA256  $RUNNER_TEMP/downloaded-gboard-405/gboard-khmerlish-4.0.5.mpp" | sha256sum --check

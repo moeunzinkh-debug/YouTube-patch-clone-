@@ -1,8 +1,8 @@
 # Gboard Khmerlish → ខ្មែរ (experimental)
 
-មុខងារថ្មីសម្រាប់ [Morphe Manager](https://github.com/MorpheApp/morphe-manager) និង Gboard `18.5.4.993608717-release-arm64-v8a` / code `176049702`។ នេះជា fork សាកល្បងដាច់ដោយឡែក៖ រក្សា upstream Gboard patches 43 និង patch `Direct Google Translate (experimental)` មុន។ Release Gboard ដែលមានស្រាប់មិនត្រូវបានជំនួសទេ។
+មុខងារថ្មីសម្រាប់ [Morphe Manager](https://github.com/MorpheApp/morphe-manager) និង Gboard `18.5.4.993608717-release-arm64-v8a` / code `176049702`។ នេះជា fork សាកល្បង version `4.0.5` ផ្អែកលើ upstream Gboard patches `v4.0.0` (មិនមែន upstream v4.0.5)៖ រក្សា upstream patches 43 និង patch `Direct Google Translate (experimental)` មុន។ Release Gboard ដែលមានស្រាប់មិនត្រូវបានជំនួសទេ។
 
-[ទាញយក `.mpp` សាកល្បង](gboard-khmerlish-experimental.mpp) · [SHA-256](gboard-khmerlish-experimental.mpp.sha256) · [លទ្ធផល build](validation.json) · [ការសាក Android](android-smoke.json)
+[ទាញយក `.mpp` v4.0.5](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/Gboard-v4.0.5/gboard-khmerlish-4.0.5.mpp) · [Pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-v4.0.5) · [SHA-256](gboard-khmerlish-experimental.mpp.sha256) · [លទ្ធផល build](validation.json) · [ការសាក Android](android-smoke.json)
 
 ## របៀបប្រើ
 
@@ -40,7 +40,7 @@
 
 ## លទ្ធផលសាកល្បង
 
-Bundle `4.0.0-khmerlish-dev.4` ឆ្លងកាត់ [build និង unit tests 39/39](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42316753098)។ [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42317327930) បានសាក panel 7/7 និង automatic 6/6 ព្រមទាំងឃ្លាមានដកឃ្លាក្នុងរបៀបទាំងពីរ, រូបកែពាក្យ, កែ/រក្សាពាក្យដើម, ការស្វែងរក, add/edit/delete, import/export និងការប្រើពាក្យក្រោយ restart។ [របាយការណ៍ Android](android-smoke.json) មាន SHA ត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+Bundle `4.0.5` ឆ្លងកាត់ [build និង unit tests 39/39](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42321842707)។ [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42322277323) បានសាក panel 7/7 និង automatic 6/6 ព្រមទាំងឃ្លាមានដកឃ្លាក្នុងរបៀបទាំងពីរ, រូបកែពាក្យ, កែ/រក្សាពាក្យដើម, ការស្វែងរក, add/edit/delete, import/export និងការប្រើពាក្យក្រោយ restart។ [របាយការណ៍ Android](android-smoke.json) មាន SHA ត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 

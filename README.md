@@ -150,7 +150,7 @@ Fork សាកល្បងនេះបន្ថែម toolbar panel សម្រ
 
 [ឯកសារ `.mpp`](bundles/gboard-khmer/gboard-khmerlish-experimental.mpp) · [របៀបប្រើ និងកម្រិត](bundles/gboard-khmer/README.md) · [លទ្ធផល build](bundles/gboard-khmer/validation.json) · [លទ្ធផល Android ចុងក្រោយ](bundles/gboard-khmer/android-smoke.json)
 
-គោលដៅគឺ Gboard `18.5.4.993608717-release-arm64-v8a` ប៉ុណ្ណោះ។ នេះមិនមែនជា release ថ្មីទេ; សូមពិនិត្យលទ្ធផលតេស្ត និងរក្សា keyboard បម្រុង។
+គោលដៅគឺ Gboard `18.5.4.993608717-release-arm64-v8a` ប៉ុណ្ណោះ។ [Pre-release Khmerlish 4.0.5](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-v4.0.5) ជា fork សាកល្បងផ្អែកលើ upstream Gboard patches v4.0.0 មិនជំនួស release ដើមទេ; សូមពិនិត្យលទ្ធផលតេស្ត និងរក្សា keyboard បម្រុង។
 
 </details>
 
