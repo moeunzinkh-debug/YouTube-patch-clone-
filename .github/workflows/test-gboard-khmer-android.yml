@@ -3,7 +3,7 @@ name: Experimental Gboard Khmerlish Android smoke
 on:
   workflow_dispatch:
   push:
-    branches: [arena/f5668a73-youtube-patch-clone]
+    branches: [arena/86d53cf2-youtube-patch-clone]
     paths:
       - 'tools/gboard-khmer/**'
       - '.github/workflows/test-gboard-khmer-android.yml'
@@ -37,7 +37,7 @@ jobs:
           root = Path('bundles/gboard-khmer')
           metadata = json.loads((root / 'validation.json').read_text())
           digest = hashlib.sha256((root / 'gboard-khmerlish-experimental.mpp').read_bytes()).hexdigest()
-          assert metadata['version'] == '4.0.5' and metadata['sha256'] == digest
+          assert metadata['version'] == '4.0.6-khmerlish-dev.1' and metadata['sha256'] == digest
           PY
           python3 tools/gboard-khmer/test_emulator_fixture.py -v
       - name: Make a temporary third-party-derived emulator fixture
@@ -119,7 +119,7 @@ jobs:
           print(json.dumps(data, ensure_ascii=False, indent=2))
           PY
       - name: Save only the sanitized report to this branch
-        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/f5668a73-youtube-patch-clone'
+        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/86d53cf2-youtube-patch-clone'
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'

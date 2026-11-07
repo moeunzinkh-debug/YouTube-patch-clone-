@@ -125,6 +125,32 @@ class WordEditIconTests(unittest.TestCase):
 
 
 class PanelLayoutTests(unittest.TestCase):
+    def test_panel_smoke_switches_between_letters_and_both_symbol_pages(self):
+        mode = ['letters']
+        typed = []
+        pages = {
+            'letters': {'p': (1, 1), 'o': (2, 1), 'khmerlish shift': (90, 1),
+                        'khmerlish symbols': (99, 1)},
+            'symbols': {"'": (3, 1), '_': (4, 1), 'more khmerlish symbols': (98, 1),
+                        'khmerlish symbols': (99, 1)},
+            'more': {'[': (5, 1), 'more khmerlish symbols': (98, 1),
+                     'khmerlish symbols': (99, 1)},
+        }
+        def tap(*args):
+            point = (int(args[-2]), int(args[-1]))
+            if point == (99, 1):
+                mode[0] = 'symbols' if mode[0] == 'letters' else 'letters'
+            elif point == (98, 1):
+                mode[0] = 'more' if mode[0] == 'symbols' else 'symbols'
+            else:
+                typed.append(point)
+        with patch.object(smoke.common, 'inspect_ime_windows', return_value=[]), \
+                patch.object(smoke, 'panel_key_positions', side_effect=lambda _: pages[mode[0]]), \
+                patch.object(smoke.common, 'run', side_effect=tap), patch.object(smoke.time, 'sleep'):
+            smoke.panel_press("p'o_[")
+        self.assertEqual([(1, 1), (3, 1), (2, 1), (4, 1), (5, 1)], typed)
+        self.assertEqual('more', mode[0])
+
     def test_panel_must_remain_inside_native_keyboard_area(self):
         native = {'native_a': [{'id': 'dev.example:id/keyboard_holder', 'bounds': '[0,381][320,616]'}]}
         contained = {'panel': [{'bounds': '[0,381][320,616]'}]}

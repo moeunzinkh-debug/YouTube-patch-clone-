@@ -10,9 +10,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERLAY = ROOT / 'tools/gboard-khmer/overlay'
-VERSION = '4.0.5'
+VERSION = '4.0.6-khmerlish-dev.1'
 PATCH_NAME = 'Khmerlish to Khmer (experimental)'
-SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/Gboard-v4.0.5/tools/gboard-khmer'
+SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/arena/86d53cf2-youtube-patch-clone/tools/gboard-khmer'
 
 
 def replace_once(path: Path, old: str, new: str) -> None:

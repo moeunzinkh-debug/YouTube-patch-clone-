@@ -411,6 +411,14 @@ def enter(text: str, keys: dict[str, tuple[int, int]] | None) -> None:
         time.sleep(2)
 
 
+def enter_apostrophe_word() -> None:
+    # Key events are sent one at a time so Gboard can observe each edit;
+    # passing a bare apostrophe through `adb shell input text` is shell syntax.
+    for command in (('text', 'p'), ('keyevent', '75'), ('text', 'o'), ('keyevent', '62')):
+        common.run('adb', 'shell', 'input', *command)
+        time.sleep(.6)
+    time.sleep(2)
+
 
 def ime_labels(windows: list) -> list[str]:
     # Only disposable, synthetic emulator text is present in this test.
@@ -478,7 +486,8 @@ def panel_key_positions(windows: list) -> dict[str, tuple[int, int]]:
             position = common.center(str(node.get('bounds', '')))
             if position:
                 positions[label.removeprefix('khmerlish key ')] = position
-        elif label in ('khmerlish backspace', 'khmerlish shift', 'done khmerlish'):
+        elif label in ('khmerlish backspace', 'khmerlish shift', 'done khmerlish',
+                       'khmerlish symbols', 'more khmerlish symbols'):
             position = common.center(str(node.get('bounds', '')))
             if position:
                 positions[label] = position
@@ -491,6 +500,19 @@ def panel_press(text: str) -> None:
         # Android may resize/reposition the IME when the editor changes. Never
         # reuse stale coordinates for an actual user-visible soft key.
         current = panel_key_positions(common.inspect_ime_windows())
+        if name not in current:
+            # The 26 physical positions can be letters or either symbol page.
+            # Toggle the mode only when required, and inspect fresh coordinates.
+            if ('khmerlish shift' in current or character.isascii() and character.isalpha()):
+                if 'khmerlish symbols' not in current:
+                    raise RuntimeError('Synthetic Khmerlish symbol switch is missing')
+                common.run('adb', 'shell', 'input', 'tap', *map(str, current['khmerlish symbols']))
+                time.sleep(.3)
+                current = panel_key_positions(common.inspect_ime_windows())
+            if name not in current and 'more khmerlish symbols' in current:
+                common.run('adb', 'shell', 'input', 'tap', *map(str, current['more khmerlish symbols']))
+                time.sleep(.3)
+                current = panel_key_positions(common.inspect_ime_windows())
         if character.isupper():
             if 'khmerlish shift' not in current:
                 raise RuntimeError('Synthetic Khmerlish shift is missing')
@@ -676,6 +698,13 @@ def edit_synthetic_word(roman: str, khmer: str) -> None:
         raise RuntimeError('Saved synthetic entry did not appear')
 
 
+def require_personal_row(roman: str, khmer: str) -> None:
+    # Search rather than assuming every row fits in the emulator viewport.
+    set_synthetic_field('Search Khmerlish or Khmer', roman)
+    if not wait_for_text(roman + '  →  ' + khmer):
+        raise RuntimeError('Synthetic personal entry did not appear: ' + roman)
+
+
 def tap_word_edit_icon(roman: str, personal: bool = False) -> None:
     description = ('Edit personal word ' if personal else 'Edit word ') + roman
     for node in ET.fromstring(common.dump_ui()).iter('node'):
@@ -752,7 +781,8 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
     try:
         # Synthetic UTF-8 documents are created only inside this disposable emulator.
         valid = tmp / 'khmerlish-smoke-valid.csv'
-        valid.write_text('khmerlish,khmer\nnv,កម្ពុជា\nzztest,សួស្តី\nimported multi,ឃ្លានាំចូល\n', encoding='utf-8')
+        valid.write_text('khmerlish,khmer\nnv,កម្ពុជា\nzztest,សួស្តី\nimported multi,ឃ្លានាំចូល\n'
+                         '"#p""o",សញ្ញានាំចូល\n', encoding='utf-8')
         invalid = tmp / 'khmerlish-smoke-invalid.csv'
         invalid.write_text('khmerlish,khmer\nnv,ផ្សេង\ninvalid,English\n', encoding='utf-8')
         for path in (valid, invalid):
@@ -806,6 +836,12 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         edit_synthetic_word('min dg del', 'ឃ្លាកែ')
         result['personal_edit_icon'] = 'passed'
         require_tap('Add personal word')
+        edit_synthetic_word("p'o", 'ប្អូន')
+        result['add_apostrophe_key'] = 'passed'
+        require_tap('Add personal word')
+        edit_synthetic_word('p_o-n+g', 'សញ្ញាពិសេស')
+        result['add_mixed_symbols'] = 'passed'
+        require_tap('Add personal word')
         edit_synthetic_word('nv', 'នាវា')
         result['add'] = 'passed'
 
@@ -844,6 +880,44 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
 
+        open_editor()
+        time.sleep(4)
+        enter_apostrophe_word()
+        if editor_text().rstrip() != 'ប្អូន':
+            raise RuntimeError('Automatic typing ignored the apostrophe personal word')
+        result['automatic_apostrophe_key'] = 'passed'
+        open_editor()
+        time.sleep(4)
+        enter('p_o-n+g', None)
+        if editor_text().rstrip() != 'សញ្ញាពិសេស':
+            raise RuntimeError('Automatic typing ignored underscore, hyphen or plus in a personal word')
+        result['automatic_mixed_symbols'] = 'passed'
+        open_editor()
+        time.sleep(3)
+        if not tap_panel_icon({}):
+            raise RuntimeError('Could not open panel for the apostrophe personal word')
+        panel_press("p'o")
+        if editor_text() != 'ប្អូន':
+            raise RuntimeError('Toolbar panel ignored the apostrophe personal word')
+        result['panel_apostrophe_key'] = 'passed'
+        keys = panel_key_positions(common.inspect_ime_windows())
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+        open_editor()
+        time.sleep(3)
+        if not tap_panel_icon({}):
+            raise RuntimeError('Could not open panel for mixed symbols')
+        panel_press('p_o-n+g')
+        if editor_text() != 'សញ្ញាពិសេស':
+            raise RuntimeError('Toolbar panel ignored underscore, hyphen or plus in a personal word')
+        result['panel_mixed_symbols'] = 'passed'
+        # Exercise the second symbol page with a real panel key as well.
+        panel_press('[')
+        keys = panel_key_positions(common.inspect_ime_windows())
+        if 'more khmerlish symbols' not in keys:
+            raise RuntimeError('Second symbol page did not open')
+        result['second_symbol_page'] = 'passed'
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+
         open_dictionary()
         require_tap('Personal dictionary')
         if not wait_for_text('nv  →  នាវា'):
@@ -852,18 +926,18 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         edit_synthetic_word('nv', 'នឹក')
         result['edit_and_persist'] = 'passed'
         import_document(valid.name)
-        if (not wait_for_text('zztest  →  សួស្តី') or not wait_for_text('nv  →  នឹក')
-                or not wait_for_text('imported multi  →  ឃ្លានាំចូល')):
-            raise RuntimeError('Keep-existing import did not merge as previewed')
+        for roman, khmer in (('zztest', 'សួស្តី'), ('nv', 'នឹក'),
+                              ('imported multi', 'ឃ្លានាំចូល'), ('#p"o', 'សញ្ញានាំចូល')):
+            require_personal_row(roman, khmer)
         result['import_keep_existing'] = 'passed'
         result['import_spaced_phrase'] = 'passed'
+        result['import_quoted_symbols'] = 'passed'
         import_document(valid.name, replace=True)
-        if not wait_for_text('nv  →  កម្ពុជា'):
-            raise RuntimeError('Explicit conflict replacement did not apply')
+        require_personal_row('nv', 'កម្ពុជា')
         result['import_replace_conflicts'] = 'passed'
         import_document(invalid.name, replace=None)
-        if not wait_for_text('nv  →  កម្ពុជា') or not wait_for_text('zztest  →  សួស្តី'):
-            raise RuntimeError('Invalid import changed the personal dictionary')
+        require_personal_row('nv', 'កម្ពុជា')
+        require_personal_row('zztest', 'សួស្តី')
         result['invalid_import_atomic'] = 'passed'
         require_tap('Word guide')
         set_synthetic_field('Search Khmerlish or Khmer', 'zztest')
@@ -898,15 +972,18 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
             raise RuntimeError('The exported synthetic file was not found in device storage')
         exported = common.run('adb', 'shell', 'cat', candidates[0])
         if not all(row in exported for row in ('khmerlish\tkhmer', 'nv\tកម្ពុជា', 'zztest\tសួស្តី',
-                                               'min dg del\tឃ្លាកែ', 'imported multi\tឃ្លានាំចូល')):
+                                               'min dg del\tឃ្លាកែ', 'imported multi\tឃ្លានាំចូល',
+                                               "p'o\tប្អូន", 'p_o-n+g\tសញ្ញាពិសេស',
+                                               '"#p""o"\tសញ្ញានាំចូល')):
             raise RuntimeError('Exported UTF-8 TSV did not contain the synthetic entries')
         result['export'] = 'passed'
+        result['export_quoted_symbols'] = 'passed'
 
+        require_personal_row('nv', 'កម្ពុជា')
         require_tap('Edit personal word nv')
         require_tap('Delete')
         require_tap('Delete')
-        if not wait_for_text('zztest  →  សួស្តី'):
-            raise RuntimeError('Remaining word disappeared after delete')
+        require_personal_row('zztest', 'សួស្តី')
         result['delete'] = 'passed'
         # Stop the target to prove the imported word survives a process restart.
         # Android can switch back to the preinstalled IME when a selected
@@ -953,6 +1030,16 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if editor_text() != 'ឃ្លាកែ':
             raise RuntimeError('Spaced personal phrase did not survive process restart')
         result['phrase_after_restart'] = 'passed'
+        keys = panel_key_positions(common.inspect_ime_windows())
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+        open_editor()
+        time.sleep(4)
+        if not tap_panel_icon({}):
+            raise RuntimeError('Could not open panel for persisted symbol key')
+        panel_press("p'o")
+        if editor_text() != 'ប្អូន':
+            raise RuntimeError('Apostrophe personal word did not survive process restart')
+        result['symbol_after_restart'] = 'passed'
         keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
         open_editor()

@@ -22,6 +22,11 @@ public final class KhmerlishPersonalStoreTest {
         assertTrue(KhmerlishPersonalStore.read(app).isEmpty());
         KhmerlishPersonalStore.save(app, null, null, "NV", " នាវា ");
         assertEquals(Map.of("nv", "នាវា"), KhmerlishPersonalStore.read(app));
+        KhmerlishPersonalStore.save(app, null, null, "P'o", "ប្អូន");
+        assertEquals("ប្អូន", KhmerlishPersonalStore.read(app).get("p'o"));
+        KhmerlishPersonalStore.save(app, "p'o", "ប្អូន", "#p\"o_+", "មិត្ត");
+        assertEquals("មិត្ត", KhmerlishPersonalStore.read(app).get("#p\"o_+"));
+        KhmerlishPersonalStore.delete(app, "#p\"o_+", "មិត្ត");
         KhmerlishPersonalStore.save(app, null, null, "MIN  dg del", "មិនដឹងដែល");
         assertEquals("មិនដឹងដែល", KhmerlishPersonalStore.read(app).get("min dg del"));
         try {

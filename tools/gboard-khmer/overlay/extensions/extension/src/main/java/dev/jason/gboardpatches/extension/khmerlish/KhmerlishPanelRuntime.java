@@ -198,11 +198,14 @@ public final class KhmerlishPanelRuntime {
         final View.OnLayoutChangeListener layoutListener;
         final List<TextView> letterKeys = new ArrayList<>();
         final boolean dark;
+        TextView shiftKey;
+        TextView modeKey;
         int previousAccessibility;
         boolean accessibilityHidden;
         boolean written;
         boolean shift;
         boolean symbols;
+        boolean moreSymbols;
 
         Panel(InputMethodService service, InputConnection connection, EditorInfo editor,
                 KhmerlishDictionary dictionary, FrameLayout parent, View holder) {
@@ -346,9 +349,9 @@ public final class KhmerlishPanelRuntime {
             addLetterRow(keyboard, "asdfghjkl", false);
             addLetterRow(keyboard, "zxcvbnm", true);
             LinearLayout bottom = row(keyboard);
-            TextView mode = key("?123", "Khmerlish symbols", 1.4f);
-            mode.setOnClickListener(v -> { symbols = !symbols; updateKeyLabels(); });
-            bottom.addView(mode, keyParams(1.4f));
+            modeKey = key("?123", "Khmerlish symbols", 1.4f);
+            modeKey.setOnClickListener(v -> { symbols = !symbols; moreSymbols = false; updateKeyLabels(); });
+            bottom.addView(modeKey, keyParams(1.4f));
             addCharacterKey(bottom, ",", 1);
             TextView space = key("space", "Khmerlish key space", 5);
             space.setOnClickListener(v -> insert(" "));
@@ -362,8 +365,12 @@ public final class KhmerlishPanelRuntime {
         void addLetterRow(LinearLayout keyboard, String letters, boolean modifiers) {
             LinearLayout row = row(keyboard);
             if (modifiers) {
-                TextView shiftKey = key("⇧", "Khmerlish shift", 1.3f);
-                shiftKey.setOnClickListener(v -> { shift = !shift; updateKeyLabels(); });
+                shiftKey = key("⇧", "Khmerlish shift", 1.3f);
+                shiftKey.setOnClickListener(v -> {
+                    if (symbols) moreSymbols = !moreSymbols;
+                    else shift = !shift;
+                    updateKeyLabels();
+                });
                 row.addView(shiftKey, keyParams(1.3f));
             }
             for (int i = 0; i < letters.length(); i++) {
@@ -386,7 +393,14 @@ public final class KhmerlishPanelRuntime {
         }
 
         void updateKeyLabels() {
-            String symbolKeys = "1234567890@#$%&*()-+=/!?;:";
+            // Both symbol pages together, plus the comma and period keys,
+            // provide every printable ASCII punctuation character.
+            String symbolKeys = moreSymbols ? KhmerlishPanelKeys.MORE : KhmerlishPanelKeys.PRIMARY;
+            if (modeKey != null) modeKey.setText(symbols ? "ABC" : "?123");
+            if (shiftKey != null) {
+                shiftKey.setText(symbols ? (moreSymbols ? "1/2" : "2/2") : "⇧");
+                shiftKey.setContentDescription(symbols ? "More Khmerlish symbols" : "Khmerlish shift");
+            }
             for (int i = 0; i < letterKeys.size(); i++) {
                 TextView key = letterKeys.get(i);
                 String value = symbols ? String.valueOf(symbolKeys.charAt(i)) : (String) key.getTag();
@@ -446,7 +460,12 @@ public final class KhmerlishPanelRuntime {
             int start = Math.max(0, input.getSelectionStart());
             int end = Math.max(start, input.getSelectionEnd());
             if (end > start) text.delete(start, end);
-            else if (start > 0) text.delete(start - 1, start);
+            else if (start > 0) {
+                int previous = start - 1;
+                if (previous > 0 && Character.isLowSurrogate(text.charAt(previous))
+                        && Character.isHighSurrogate(text.charAt(previous - 1))) previous--;
+                text.delete(previous, start);
+            }
         }
 
         int dp(int value) {
