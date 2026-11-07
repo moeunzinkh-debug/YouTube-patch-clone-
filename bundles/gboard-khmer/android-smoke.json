@@ -1171,11 +1171,20 @@
   "personal_dictionary": {
     "status": "passed",
     "search_bundled": "passed",
+    "bundled_edit_icon": "passed",
+    "bundled_edit_conversion": "passed",
+    "bundled_override_restore": "passed",
+    "bundled_rename_copy": "passed",
+    "add_spaced_phrase": "passed",
+    "personal_edit_icon": "passed",
     "add": "passed",
     "automatic_override": "passed",
     "panel_override": "passed",
+    "automatic_spaced_phrase": "passed",
+    "panel_spaced_phrase": "passed",
     "edit_and_persist": "passed",
     "import_keep_existing": "passed",
+    "import_spaced_phrase": "passed",
     "import_replace_conflicts": "passed",
     "invalid_import_atomic": "passed",
     "search_personal": "passed",
@@ -1184,11 +1193,11 @@
       "Files in Downloads",
       "Downloads",
       "khmerlish-smoke-valid.csv",
-      "67 B",
-      "3:47 PM",
+      "113 B",
+      "12:26 AM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "3:47 PM",
+      "12:26 AM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -1264,9 +1273,10 @@
       "Done"
     ],
     "panel_after_restart": "passed",
+    "phrase_after_restart": "passed",
     "restart_and_delete_fallback": "passed"
   },
-  "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
+  "bundle_sha256": "65b61bb89995a99fd3509956d5ee007c2d01841bca02d4fcf8e72a928b1aa7a6",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42244932669"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42317327930"
 }
