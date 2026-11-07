@@ -14,9 +14,20 @@ public class KhmerlishPersonalDataTest {
         assertEquals("a", KhmerlishPersonalData.roman("A"));
         assertEquals("min dg del", KhmerlishPersonalData.roman("  MIN  dg del  "));
         assertEquals("nv na", KhmerlishPersonalData.roman("nv na"));
-        assertNull(KhmerlishPersonalData.roman("word42"));
+        assertEquals("word42", KhmerlishPersonalData.roman("Word42"));
+        assertEquals("nv-na", KhmerlishPersonalData.roman("NV-Na"));
+        assertEquals("p'o", KhmerlishPersonalData.roman("P'o"));
+        assertEquals("p_o + 🙂", KhmerlishPersonalData.roman(" P_o  +  🙂 "));
+        for (char symbol : "!\"#$%&'()*+,-./:;<=>?@[\\]^{|}~_`".toCharArray()) {
+            assertEquals("a" + symbol + "b", KhmerlishPersonalData.roman("A" + symbol + "B"));
+        }
         assertNull(KhmerlishPersonalData.roman("nv\tna"));
-        assertNull(KhmerlishPersonalData.roman("nv-na"));
+        assertNull(KhmerlishPersonalData.roman("nv\nna"));
+        assertNull(KhmerlishPersonalData.roman("nv\u0000na"));
+        assertNull(KhmerlishPersonalData.roman("nv\u2028na"));
+        assertNull(KhmerlishPersonalData.roman("nv\u00a0na"));
+        assertNull(KhmerlishPersonalData.roman("x" + '\ud800'));
+        assertNull(KhmerlishPersonalData.roman("x" + '\udc00'));
         assertNull(KhmerlishPersonalData.roman("x".repeat(65)));
         assertEquals("សួស្តី", KhmerlishPersonalData.khmer(" សួស្តី "));
         assertEquals("សួស្តី, មិត្ត", KhmerlishPersonalData.khmer("សួស្តី, មិត្ត"));
@@ -39,6 +50,28 @@ public class KhmerlishPersonalDataTest {
         assertEquals("មិត្ត \"ស្អាត\"", entries.get("friend"));
         assertEquals("មិនដឹងដែល", entries.get("min dg del"));
         assertEquals(entries, KhmerlishPersonalData.parse(KhmerlishPersonalData.exportTsv(entries)));
+    }
+
+    @Test public void symbolKeysRoundTripThroughCsvAndTsv() throws Exception {
+        String csv = "khmerlish,khmer\n"
+                + "p'o,ប្អូន\n"
+                + "p_o,ប្អូន\n"
+                + "p+o,ប្អូន\n"
+                + "\"p,o\",ប្អូន\n"
+                + "\"#person\",មនុស្ស\n"
+                + "\"p\"\"o\",ប្អូន\n"
+                + "\"🙂 + friend\",មិត្ត\n";
+        Map<String, String> entries = KhmerlishPersonalData.parse(csv);
+        assertEquals(7, entries.size());
+        assertEquals("ប្អូន", entries.get("p'o"));
+        assertEquals("ប្អូន", entries.get("p,o"));
+        assertEquals("មនុស្ស", entries.get("#person"));
+        assertEquals("ប្អូន", entries.get("p\"o"));
+        assertEquals("មិត្ត", entries.get("🙂 + friend"));
+        String tsv = KhmerlishPersonalData.exportTsv(entries);
+        assertTrue(tsv.contains("\"#person\"\tមនុស្ស"));
+        assertTrue(tsv.contains("\"p\"\"o\"\tប្អូន"));
+        assertEquals(entries, KhmerlishPersonalData.parse(tsv));
     }
 
     @Test public void invalidImportRejectsAllRowsAndDoesNotRevealContent() throws Exception {

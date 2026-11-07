@@ -22,16 +22,24 @@ final class KhmerlishPersonalData {
         String raw = value.trim().toLowerCase(Locale.ROOT);
         StringBuilder result = new StringBuilder(raw.length());
         boolean pendingSpace = false;
-        for (int i = 0; i < raw.length(); i++) {
+        for (int i = 0; i < raw.length();) {
             char c = raw.charAt(i);
-            if (c == ' ') {
-                pendingSpace = true;
-            } else if (c >= 'a' && c <= 'z') {
-                if (pendingSpace && result.length() > 0) result.append(' ');
-                result.append(c);
-                pendingSpace = false;
-            } else {
+            if (Character.isSurrogate(c) && (!Character.isHighSurrogate(c)
+                    || i + 1 >= raw.length() || !Character.isLowSurrogate(raw.charAt(i + 1)))) {
                 return null;
+            }
+            int point = raw.codePointAt(i);
+            i += Character.charCount(point);
+            if (point == ' ') {
+                pendingSpace = true;
+            } else {
+                // Spaces in keys are canonical ASCII spaces. Tabs, line breaks,
+                // other whitespace, controls and malformed UTF-16 are not keys.
+                if (Character.isISOControl(point) || point == 0x2028 || point == 0x2029
+                        || Character.isWhitespace(point) || Character.isSpaceChar(point)) return null;
+                if (pendingSpace && result.length() > 0) result.append(' ');
+                result.appendCodePoint(point);
+                pendingSpace = false;
             }
             if (result.length() > MAX_ROMAN) return null;
         }
@@ -165,7 +173,14 @@ final class KhmerlishPersonalData {
         for (Map.Entry<String, String> entry : entries.entrySet()) {
             String key = roman(entry.getKey()), value = khmer(entry.getValue());
             if (key == null || value == null) throw new IllegalArgumentException("Invalid entry");
-            output.append(key).append('\t');
+            // Quote keys containing quotes or beginning with # so exports
+            // remain parseable and cannot be mistaken for comment lines.
+            if (key.startsWith("#") || key.indexOf('"') >= 0) {
+                output.append('"').append(key.replace("\"", "\"\"")).append('"');
+            } else {
+                output.append(key);
+            }
+            output.append('\t');
             if (value.indexOf('"') >= 0) {
                 output.append('"').append(value.replace("\"", "\"\"")).append('"');
             } else {

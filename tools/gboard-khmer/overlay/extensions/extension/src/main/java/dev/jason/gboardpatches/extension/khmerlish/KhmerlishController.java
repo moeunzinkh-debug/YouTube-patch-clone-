@@ -86,6 +86,21 @@ final class KhmerlishController {
         }
         int length = before.length();
         char last = before.charAt(length - 1);
+        // An explicitly saved key can contain characters which would normally
+        // terminate a word (including punctuation). Keep tracking a possible
+        // personal prefix instead of converting an earlier built-in word.
+        if (!Character.isWhitespace(last)) {
+            int personalStart = personalStart(before, cursor, length, current);
+            if (personalStart >= 0) {
+                int absoluteStart = cursor - (length - personalStart);
+                retainBeforeWord(before, cursor, absoluteStart);
+                if (joinAfter >= 0 && absoluteStart != joinAfter) joinAfter = -1;
+                trackedStart = absoluteStart;
+                trackedEnd = cursor;
+                trackedHash = hashWord(before, personalStart, length);
+                return null;
+            }
+        }
         if (asciiLetter(last)) {
             int start = wordStart(before, length);
             int wordLength = length - start;
@@ -108,7 +123,8 @@ final class KhmerlishController {
             return null;
         }
         int end = length - 1;
-        int start = wordStart(before, end);
+        int start = personalStart(before, cursor, end, current);
+        if (start < 0) start = wordStart(before, end);
         int wordLength = end - start;
         int absoluteStart = cursor - 1 - wordLength;
         if (wordLength == 0) {
@@ -146,6 +162,25 @@ final class KhmerlishController {
         if (last == ' ' && current.hasPhrasePrefix(word)) next.add(new Seed(word, absoluteStart, true));
 
         String replacement = phraseReplacement != null ? phraseReplacement : dictionary.lookup(word, current);
+        String deferredPunctuation = "";
+        if (replacement == null && Character.isWhitespace(last)) {
+            // A punctuation mark may have been held because it could begin a
+            // longer personal key. If that key was not completed, preserve
+            // normal conversion of the preceding word and its punctuation.
+            int suffix = word.length();
+            while (suffix > 0 && punctuationDelimiter(word.charAt(suffix - 1))) suffix--;
+            if (suffix > 0 && suffix < word.length()) {
+                String base = word.substring(0, suffix);
+                boolean letters = true;
+                for (int i = 0; i < base.length(); i++) {
+                    if (!asciiLetter(base.charAt(i))) { letters = false; break; }
+                }
+                if (letters) {
+                    replacement = dictionary.lookup(base, current);
+                    if (replacement != null) deferredPunctuation = word.substring(suffix);
+                }
+            }
+        }
         clearTracked();
         if (replacement == null) {
             joinAfter = -1;
@@ -160,9 +195,10 @@ final class KhmerlishController {
             reset();
             return null;
         }
-        String insert = replacement + last;
+        String insert = replacement + deferredPunctuation + last;
         int newEnd = cursor - delete + insert.length();
-        Edit planned = new Edit(delete, insert, last == ' ' ? newEnd : -1);
+        Edit planned = new Edit(delete, insert,
+                last == ' ' && deferredPunctuation.isEmpty() ? newEnd : -1);
         return new Edit(delete, insert, planned.joinAfter,
                 buildCandidates(next, before, cursor, planned, joining));
     }
@@ -221,6 +257,29 @@ final class KhmerlishController {
         return result;
     }
 
+    /** Find the longest eligible current token prefix of an explicitly saved key. */
+    private int personalStart(CharSequence before, int cursor, int end,
+            KhmerlishDictionary.PersonalSnapshot current) {
+        if (current.entries.isEmpty() || end <= 0 || cursor < before.length()) return -1;
+        int lower = end;
+        while (lower > 0 && end - lower < MAX_WORD
+                && !Character.isWhitespace(before.charAt(lower - 1))) lower--;
+        for (int start = lower; start < end; start++) {
+            // Do not guess the character just outside a truncated editor window,
+            // and do not match a substring inside a URL, number or identifier.
+            if ((start == 0 && cursor > before.length()) || forbiddenPrefix(before, start)
+                    || (start > 0 && Character.isLetterOrDigit(before.charAt(start - 1)))) continue;
+            String token = before.subSequence(start, end).toString().toLowerCase(Locale.ROOT);
+            if (current.hasPrefix(token)) return start;
+            int absoluteStart = cursor - (before.length() - start);
+            for (PhraseCandidate candidate : phrases) {
+                if (candidate.end == absoluteStart && matches(candidate, before, cursor)
+                        && current.hasPrefix(candidate.roman + " " + token)) return start;
+            }
+        }
+        return -1;
+    }
+
     private static int wordStart(CharSequence text, int end) {
         int start = end;
         while (start > 0 && asciiLetter(text.charAt(start - 1))) start--;
@@ -243,8 +302,12 @@ final class KhmerlishController {
     private static boolean isKhmer(char c) { return c >= '\u1780' && c <= '\u17ff'; }
 
     private static boolean delimiter(char c) {
-        return c == ' ' || c == '\n' || c == '\t' || c == '.' || c == ','
-                || c == '!' || c == '?' || c == ';' || c == ':' || c == '\u17d4';
+        return c == ' ' || c == '\n' || c == '\t' || punctuationDelimiter(c);
+    }
+
+    private static boolean punctuationDelimiter(char c) {
+        return c == '.' || c == ',' || c == '!' || c == '?' || c == ';'
+                || c == ':' || c == '\u17d4';
     }
 
     // FNV-1a: track whether the same word was seen during typing, without retaining it.

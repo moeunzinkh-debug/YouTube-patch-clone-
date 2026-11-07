@@ -31,11 +31,11 @@ final class KhmerlishPanelConverter {
                 continue;
             }
             int end = tokenEnd(text, offset);
-            Match phrase = matchPhrase(text, offset, snapshot);
+            Match personal = matchPersonal(text, offset, snapshot);
             Token converted;
-            if (phrase != null) {
-                converted = phrase.token;
-                end = phrase.end;
+            if (personal != null) {
+                converted = personal.token;
+                end = personal.end;
             } else {
                 converted = convertToken(text.substring(offset, end), dictionary, snapshot);
             }
@@ -50,51 +50,48 @@ final class KhmerlishPanelConverter {
         return output.append(pendingWhitespace).toString();
     }
 
-    private static Match matchPhrase(String text, int start, KhmerlishDictionary.PersonalSnapshot snapshot) {
-        int end = tokenEnd(text, start);
-        Part first = part(text.substring(start, end));
-        if (first == null || !first.suffix.isEmpty()) return null;
-        String roman = first.word.toLowerCase(Locale.ROOT);
-        if (!snapshot.hasPhrasePrefix(roman)) return null;
+    /** Match explicit personal keys first, including symbols and multiword keys. */
+    private static Match matchPersonal(String text, int offset, KhmerlishDictionary.PersonalSnapshot snapshot) {
+        int firstEnd = tokenEnd(text, offset);
         Match best = null;
-        while (end + 1 < text.length() && text.charAt(end) == ' '
-                && !Character.isWhitespace(text.charAt(end + 1))) {
-            int nextEnd = tokenEnd(text, end + 1);
-            Part next = part(text.substring(end + 1, nextEnd));
-            if (next == null || !next.prefix.isEmpty()) break;
-            roman += " " + next.word.toLowerCase(Locale.ROOT);
-            if (roman.length() > KhmerlishPersonalData.MAX_ROMAN) break;
-            String value = snapshot.phrase(roman);
-            if (value != null) {
-                best = new Match(nextEnd, new Token(first.prefix + value + next.suffix,
-                        first.prefix.isEmpty() && next.suffix.isEmpty()));
+        int bestLength = -1;
+        for (int start = offset; start < firstEnd; start++) {
+            // Permit ordinary opening punctuation around a saved key, but never
+            // search arbitrary substrings inside an address or identifier.
+            if (start > offset && "([{«“‘\"'".indexOf(text.charAt(start - 1)) < 0) break;
+            for (int end = start + 1; end <= text.length()
+                    && end - start <= KhmerlishPersonalData.MAX_ROMAN; end++) {
+                char added = text.charAt(end - 1);
+                if (Character.isWhitespace(added) && added != ' ') break;
+                String key = text.substring(start, end).toLowerCase(Locale.ROOT);
+                if (!snapshot.hasPrefix(key)) break;
+                String value = snapshot.entries.get(key);
+                if (value == null) continue;
+                int tokenEnd = tokenEnd(text, end);
+                if (!closingSuffix(text, end, tokenEnd)) continue;
+                int length = end - start;
+                if (length <= bestLength) continue;
+                String prefix = text.substring(offset, start);
+                String suffix = text.substring(end, tokenEnd);
+                best = new Match(tokenEnd, new Token(prefix + value + suffix,
+                        prefix.isEmpty() && suffix.isEmpty()));
+                bestLength = length;
             }
-            if (!next.suffix.isEmpty() || !snapshot.hasPhrasePrefix(roman)) break;
-            end = nextEnd;
         }
         return best;
+    }
+
+    private static boolean closingSuffix(String text, int start, int end) {
+        for (int i = start; i < end; i++) {
+            if (".,!?;:)]}»”’\"'\u17d4".indexOf(text.charAt(i)) < 0) return false;
+        }
+        return true;
     }
 
     private static int tokenEnd(String text, int start) {
         int end = start;
         while (end < text.length() && !Character.isWhitespace(text.charAt(end))) end++;
         return end;
-    }
-
-    private static Part part(String token) {
-        if (looksLikeAddressOrCode(token)) return null;
-        int start = 0;
-        while (start < token.length() && !isAsciiLetter(token.charAt(start))) {
-            if ("([{«“‘\"'".indexOf(token.charAt(start)) < 0) return null;
-            start++;
-        }
-        int end = start;
-        while (end < token.length() && isAsciiLetter(token.charAt(end))) end++;
-        if (start == end) return null;
-        for (int i = end; i < token.length(); i++) {
-            if (".,!?;:)]}»”’\"'\u17d4".indexOf(token.charAt(i)) < 0) return null;
-        }
-        return new Part(token.substring(0, start), token.substring(start, end), token.substring(end));
     }
 
     private static Token convertToken(String token, KhmerlishDictionary dictionary,
@@ -138,15 +135,6 @@ final class KhmerlishPanelConverter {
 
     private static boolean isAsciiLetter(char c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-    }
-
-    private static final class Part {
-        final String prefix, word, suffix;
-        Part(String prefix, String word, String suffix) {
-            this.prefix = prefix;
-            this.word = word;
-            this.suffix = suffix;
-        }
     }
 
     private static final class Match {

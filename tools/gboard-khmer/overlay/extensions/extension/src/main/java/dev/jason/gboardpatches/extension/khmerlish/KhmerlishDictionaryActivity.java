@@ -277,7 +277,7 @@ public final class KhmerlishDictionaryActivity extends Activity {
         LinearLayout fields = new LinearLayout(this);
         fields.setOrientation(LinearLayout.VERTICAL);
         fields.setPadding(dp(20), dp(4), dp(20), 0);
-        EditText roman = editor("Khmerlish (a-z និងដកឃ្លា)", "Personal Khmerlish spelling",
+        EditText roman = editor("Khmerlish (អក្សរ សញ្ញា និងដកឃ្លា)", "Personal Khmerlish spelling",
                 KhmerlishPersonalData.MAX_ROMAN);
         EditText khmer = editor("ពាក្យខ្មែរ / Khmer", "Personal Khmer word", KhmerlishPersonalData.MAX_KHMER);
         boolean builtInEntry = original != null && !original.personal;
@@ -291,7 +291,7 @@ public final class KhmerlishDictionaryActivity extends Activity {
                 .setTitle(original == null ? "បន្ថែមពាក្យ / Add word" : "កែពាក្យ / Edit word")
                 .setMessage(builtInEntry
                         ? "ការកែត្រូវរក្សាទុកផ្ទាល់ខ្លួន។ បើប្តូរ Khmerlish នឹងបង្កើតពាក្យថ្មី ហើយពាក្យដើមនៅដដែល។"
-                        : "Khmerlish អក្សរ a-z អាចដកឃ្លា → អត្ថបទខ្មែរ។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាព។")
+                        : "Khmerlish អាចប្រើសញ្ញា និងដកឃ្លា ដូចជា p'o → អត្ថបទខ្មែរ។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាព។")
                 .setView(fields)
                 .setPositiveButton("រក្សាទុក / Save", null)
                 .setNegativeButton("បោះបង់ / Cancel", null);
@@ -302,7 +302,7 @@ public final class KhmerlishDictionaryActivity extends Activity {
                 String key = KhmerlishPersonalData.roman(roman.getText().toString());
                 String value = KhmerlishPersonalData.khmer(khmer.getText().toString());
                 if (key == null) {
-                    roman.setError("ប្រើ a-z និងដកឃ្លា ប៉ុណ្ណោះ (អតិបរមា 64 តួ)");
+                    roman.setError("បញ្ចូលអក្សរ ឬសញ្ញា (អតិបរមា 64 តួ មិនមានបន្ទាត់ថ្មី ឬ tab)");
                     return;
                 }
                 if (value == null) {
@@ -368,7 +368,8 @@ public final class KhmerlishDictionaryActivity extends Activity {
         new AlertDialog.Builder(this)
                 .setTitle("នាំចូលបញ្ជីពាក្យ / Import word list")
                 .setMessage("UTF-8 .txt / .tsv / .csv ប៉ុណ្ណោះ។ មួយជួរមួយគូ៖\n"
-                        + "khmerlish,ខ្មែរ\nKhmerlish ប្រើ a-z និងដកឃ្លា (អតិបរមា 64 តួ)។\n"
+                        + "khmerlish,ខ្មែរ\nKhmerlish អាចប្រើសញ្ញា និងដកឃ្លា (អតិបរមា 64 តួ)។\n"
+                        + "បើ key មាន comma, សញ្ញា quote ឬចាប់ផ្ដើមដោយ # សូមដាក់ក្នុង quote។\n"
                         + "អតិបរមា 5,000 ពាក្យ និង 2.5 MB។ PDF/DOCX មិនគាំទ្រ។\n"
                         + "ពាក្យទំនាស់នឹងរក្សាទុក លុះត្រាតែអ្នកជ្រើសជំនួស។")
                 .setNegativeButton("បោះបង់ / Cancel", null)

@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /** Offline built-in lookup plus an explicitly managed, in-memory personal overlay. */
 final class KhmerlishDictionary {
@@ -22,9 +23,13 @@ final class KhmerlishDictionary {
     static final class PersonalSnapshot {
         final Map<String, String> entries;
         private final Set<String> phrasePrefixes;
+        // Sorted keys permit bounded prefix checks without retaining host text
+        // or allocating every character-level prefix of up to 5,000 entries.
+        private final TreeMap<String, String> ordered;
 
         PersonalSnapshot(Map<String, String> values) {
             entries = Collections.unmodifiableMap(new HashMap<>(values));
+            ordered = new TreeMap<>(entries);
             Set<String> prefixes = new HashSet<>();
             for (String key : entries.keySet()) {
                 for (int space = key.indexOf(' '); space >= 0; space = key.indexOf(' ', space + 1)) {
@@ -35,6 +40,11 @@ final class KhmerlishDictionary {
         }
 
         boolean hasPhrasePrefix(String key) { return phrasePrefixes.contains(key); }
+        boolean hasPrefix(String key) {
+            if (key == null || key.isEmpty() || key.length() > KhmerlishPersonalData.MAX_ROMAN) return false;
+            String next = ordered.ceilingKey(key);
+            return next != null && next.startsWith(key);
+        }
         String phrase(String key) { return key.indexOf(' ') < 0 ? null : entries.get(key); }
     }
 

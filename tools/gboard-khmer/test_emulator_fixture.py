@@ -124,7 +124,73 @@ class WordEditIconTests(unittest.TestCase):
             run.assert_called_once_with('adb', 'shell', 'input', 'tap', '244', '44')
 
 
+class NativeSymbolKeyboardTests(unittest.TestCase):
+    def test_recognizes_native_keys_and_accessible_symbol_names(self):
+        nodes = [
+            {'text': 'p', 'bounds': '[0,0][10,10]'},
+            {'description': 'Symbol keyboard', 'text': '?123', 'bounds': '[10,0][20,10]'},
+            {'description': 'Apostrophe, more characters', 'bounds': '[20,0][30,10]'},
+            {'description': 'Space, English', 'bounds': '[30,0][40,10]'},
+            {'description': 'Alphabet keyboard', 'bounds': '[40,0][50,10]'},
+        ]
+        positions = smoke.native_keyboard_positions(nodes)
+        self.assertEqual((5, 5), positions['p'])
+        self.assertEqual((15, 5), positions['?123'])
+        self.assertEqual((25, 5), positions["'"])
+        self.assertEqual((35, 5), positions[' '])
+        self.assertEqual((45, 5), positions['abc'])
+
+    def test_types_with_real_page_switches(self):
+        mode = ['letters']
+        typed = []
+        pages = {
+            'letters': {'p': (1, 1), 'o': (2, 1), ' ': (3, 1), '?123': (99, 1)},
+            'symbols': {"'": (4, 1), ' ': (3, 1), 'abc': (98, 1), 'more symbols': (97, 1)},
+        }
+        def tap(*args):
+            point = (int(args[-2]), int(args[-1]))
+            if point == (99, 1):
+                mode[0] = 'symbols'
+            elif point == (98, 1):
+                mode[0] = 'letters'
+            else:
+                typed.append(point)
+        with patch.object(smoke.common, 'inspect_ime_windows', return_value=[]), \
+                patch.object(smoke, 'native_keyboard_positions', side_effect=lambda _: pages[mode[0]]), \
+                patch.object(smoke, 'editor_text', return_value='synthetic'), \
+                patch.object(smoke.common, 'run', side_effect=tap), patch.object(smoke.time, 'sleep'):
+            smoke.enter_native_symbols("p'o", {})
+        self.assertEqual([(1, 1), (4, 1), (2, 1), (3, 1)], typed)
+        self.assertEqual('letters', mode[0])
+
+
 class PanelLayoutTests(unittest.TestCase):
+    def test_panel_smoke_switches_between_letters_and_both_symbol_pages(self):
+        mode = ['letters']
+        typed = []
+        pages = {
+            'letters': {'p': (1, 1), 'o': (2, 1), 'khmerlish shift': (90, 1),
+                        'khmerlish symbols': (99, 1)},
+            'symbols': {"'": (3, 1), '_': (4, 1), 'more khmerlish symbols': (98, 1),
+                        'khmerlish symbols': (99, 1)},
+            'more': {'[': (5, 1), 'more khmerlish symbols': (98, 1),
+                     'khmerlish symbols': (99, 1)},
+        }
+        def tap(*args):
+            point = (int(args[-2]), int(args[-1]))
+            if point == (99, 1):
+                mode[0] = 'symbols' if mode[0] == 'letters' else 'letters'
+            elif point == (98, 1):
+                mode[0] = 'more' if mode[0] == 'symbols' else 'symbols'
+            else:
+                typed.append(point)
+        with patch.object(smoke.common, 'inspect_ime_windows', return_value=[]), \
+                patch.object(smoke, 'panel_key_positions', side_effect=lambda _: pages[mode[0]]), \
+                patch.object(smoke.common, 'run', side_effect=tap), patch.object(smoke.time, 'sleep'):
+            smoke.panel_press("p'o_[")
+        self.assertEqual([(1, 1), (3, 1), (2, 1), (4, 1), (5, 1)], typed)
+        self.assertEqual('more', mode[0])
+
     def test_panel_must_remain_inside_native_keyboard_area(self):
         native = {'native_a': [{'id': 'dev.example:id/keyboard_holder', 'bounds': '[0,381][320,616]'}]}
         contained = {'panel': [{'bounds': '[0,381][320,616]'}]}
