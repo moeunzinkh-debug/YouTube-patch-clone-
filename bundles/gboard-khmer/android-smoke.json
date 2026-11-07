@@ -12,7 +12,7 @@
   "target_diagnostic_before": {
     "marker": true,
     "toolbar_icon_resource_found": true,
-    "toolbar_position_initialized": false,
+    "toolbar_position_initialized": true,
     "dictionary_asset_present": true,
     "preference": false,
     "runtime_enabled": false,
@@ -844,7 +844,7 @@
     },
     "screen_size": "Physical size: 320x640",
     "panel_within_native_keyboard": "passed",
-    "key_count": 32,
+    "key_count": 33,
     "airplane_mode": "enabled",
     "snapshots": {
       "n": {
@@ -1177,14 +1177,22 @@
     "bundled_rename_copy": "passed",
     "add_spaced_phrase": "passed",
     "personal_edit_icon": "passed",
+    "add_apostrophe_key": "passed",
+    "add_mixed_symbols": "passed",
     "add": "passed",
     "automatic_override": "passed",
     "panel_override": "passed",
     "automatic_spaced_phrase": "passed",
     "panel_spaced_phrase": "passed",
+    "automatic_apostrophe_key": "passed",
+    "automatic_mixed_symbols": "passed",
+    "panel_apostrophe_key": "passed",
+    "panel_mixed_symbols": "passed",
+    "second_symbol_page": "passed",
     "edit_and_persist": "passed",
     "import_keep_existing": "passed",
     "import_spaced_phrase": "passed",
+    "import_quoted_symbols": "passed",
     "import_replace_conflicts": "passed",
     "invalid_import_atomic": "passed",
     "search_personal": "passed",
@@ -1193,11 +1201,11 @@
       "Files in Downloads",
       "Downloads",
       "khmerlish-smoke-valid.csv",
-      "113 B",
-      "1:16 AM",
+      "155 B",
+      "2:42 AM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "1:16 AM",
+      "2:42 AM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -1205,6 +1213,7 @@
       "/sdcard/Download/khmerlish-personal.tsv.txt"
     ],
     "export": "passed",
+    "export_quoted_symbols": "passed",
     "delete": "passed",
     "after_restart_diagnostic": {
       "marker": true,
@@ -1274,9 +1283,10 @@
     ],
     "panel_after_restart": "passed",
     "phrase_after_restart": "passed",
+    "symbol_after_restart": "passed",
     "restart_and_delete_fallback": "passed"
   },
-  "bundle_sha256": "f544803642e868ddac7ebf13ab43a926a7582b4631286f6fda4e9fa66a7507a0",
+  "bundle_sha256": "9d6d6d9cba8902cd63356b0ecb19c3092e9846e1b2036e98da800ca854ddb443",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42322277323"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42329815738"
 }
