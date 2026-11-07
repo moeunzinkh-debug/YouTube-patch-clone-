@@ -46,7 +46,7 @@
 
 ## លទ្ធផលសាកល្បង
 
-ប្រវត្តិ៖ bundle `4.0.5` ចាស់ឆ្លងកាត់ [build និង unit tests 39/39](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42321842707) និង [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42322277323); លទ្ធផលនោះមិនមែនជាការសាក bundle ថ្មីទេ។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឱ្យត្រូវគ្នានឹង bundle សម្រាប់លទ្ធផលថ្មី។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+Bundle `4.0.6-khmerlish-dev.1` ឆ្លងកាត់ [build និង unit tests 49/49](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42329450561) និង [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42331556221) ដោយ SHA ត្រូវគ្នា។ ការសាករួមមាន `p'o`, `_ - +` ទាំងចុចគ្រាប់ Gboard លើអេក្រង់ក្នុង automatic និងប្រើ panel, ឃ្លា, រក្សាទុកក្រោយ restart និង import/export ដែលមានសញ្ញា។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឱ្យត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 
