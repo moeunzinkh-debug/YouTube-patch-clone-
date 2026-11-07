@@ -71,7 +71,7 @@ class DictionaryTests(unittest.TestCase):
             registry = (dest / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/registry/GboardPatchRegistry.kt').read_text()
             self.assertIn('gboardDirectGoogleTranslatePatch,', registry)
             self.assertIn('gboardKhmerlishPatch,', registry)
-            self.assertIn('version = 4.0.0-khmerlish-dev.3', (dest / 'gradle.properties').read_text())
+            self.assertIn('version = 4.0.0-khmerlish-dev.4', (dest / 'gradle.properties').read_text())
             group = (dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/keyboard/GboardKeyboardToolsSettingsGroupFeature.java').read_text()
             self.assertIn('new GboardCalculatorSettingsFeature(context)', group)
             patch = (dest / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/features/khmerlish/GboardKhmerlishPatch.kt').read_text()

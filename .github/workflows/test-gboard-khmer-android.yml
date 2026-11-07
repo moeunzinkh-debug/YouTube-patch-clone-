@@ -3,7 +3,7 @@ name: Experimental Gboard Khmerlish Android smoke
 on:
   workflow_dispatch:
   push:
-    branches: [arena/383e624b-youtube-patch-clone]
+    branches: [arena/f5668a73-youtube-patch-clone]
     paths:
       - 'tools/gboard-khmer/**'
       - '.github/workflows/test-gboard-khmer-android.yml'
@@ -112,7 +112,7 @@ jobs:
           print(json.dumps(data, ensure_ascii=False, indent=2))
           PY
       - name: Save only the sanitized report to this branch
-        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/383e624b-youtube-patch-clone'
+        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/f5668a73-youtube-patch-clone'
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'

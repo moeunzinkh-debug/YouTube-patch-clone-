@@ -8,7 +8,7 @@ import java.util.Map;
 /** Validated, bounded user-supplied entries. Never logs input or performs I/O. */
 final class KhmerlishPersonalData {
     static final int MAX_ENTRIES = 5000;
-    static final int MAX_ROMAN = 32;
+    static final int MAX_ROMAN = 64;
     static final int MAX_KHMER = 128;
     // Large enough for a worst-case export of MAX_ENTRIES (including quoted
     // fields), while bounding allocations when a document is opened.
@@ -19,12 +19,23 @@ final class KhmerlishPersonalData {
 
     static String roman(String value) {
         if (value == null || containsControl(value)) return null;
-        String result = value.trim().toLowerCase(Locale.ROOT);
-        if (result.isEmpty() || result.length() > MAX_ROMAN) return null;
-        for (int i = 0; i < result.length(); i++) {
-            if (result.charAt(i) < 'a' || result.charAt(i) > 'z') return null;
+        String raw = value.trim().toLowerCase(Locale.ROOT);
+        StringBuilder result = new StringBuilder(raw.length());
+        boolean pendingSpace = false;
+        for (int i = 0; i < raw.length(); i++) {
+            char c = raw.charAt(i);
+            if (c == ' ') {
+                pendingSpace = true;
+            } else if (c >= 'a' && c <= 'z') {
+                if (pendingSpace && result.length() > 0) result.append(' ');
+                result.append(c);
+                pendingSpace = false;
+            } else {
+                return null;
+            }
+            if (result.length() > MAX_ROMAN) return null;
         }
-        return result;
+        return result.length() == 0 ? null : result.toString();
     }
 
     static String khmer(String value) {

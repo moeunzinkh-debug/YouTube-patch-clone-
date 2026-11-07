@@ -7,14 +7,36 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /** Offline built-in lookup plus an explicitly managed, in-memory personal overlay. */
 final class KhmerlishDictionary {
     private static final int MAX_ENTRIES = 30000;
     private final Map<String, String> words;
-    private volatile Map<String, String> personal = Collections.emptyMap();
+    private volatile PersonalSnapshot personal = new PersonalSnapshot(Collections.emptyMap());
+
+    /** Immutable personal entries and prefixes for bounded, longest-phrase matching. */
+    static final class PersonalSnapshot {
+        final Map<String, String> entries;
+        private final Set<String> phrasePrefixes;
+
+        PersonalSnapshot(Map<String, String> values) {
+            entries = Collections.unmodifiableMap(new HashMap<>(values));
+            Set<String> prefixes = new HashSet<>();
+            for (String key : entries.keySet()) {
+                for (int space = key.indexOf(' '); space >= 0; space = key.indexOf(' ', space + 1)) {
+                    prefixes.add(key.substring(0, space));
+                }
+            }
+            phrasePrefixes = Collections.unmodifiableSet(prefixes);
+        }
+
+        boolean hasPhrasePrefix(String key) { return phrasePrefixes.contains(key); }
+        String phrase(String key) { return key.indexOf(' ') < 0 ? null : entries.get(key); }
+    }
 
     private KhmerlishDictionary(Map<String, String> words) {
         this.words = Collections.unmodifiableMap(words);
@@ -46,17 +68,20 @@ final class KhmerlishDictionary {
         return new KhmerlishDictionary(words);
     }
 
-    String lookup(String roman) {
+    String lookup(String roman) { return lookup(roman, personal); }
+
+    String lookup(String roman, PersonalSnapshot snapshot) {
         if (roman == null) return null;
         String key = roman.toLowerCase(Locale.ROOT);
-        String custom = personal.get(key);
+        String custom = snapshot.entries.get(key);
         return custom != null ? custom : words.get(key);
     }
 
+    PersonalSnapshot personalSnapshot() { return personal; }
+
     /** Atomic snapshot swap; readers never touch the database while typing. */
     void setPersonal(Map<String, String> values) {
-        personal = values == null || values.isEmpty() ? Collections.emptyMap()
-                : Collections.unmodifiableMap(new HashMap<>(values));
+        personal = new PersonalSnapshot(values == null ? Collections.emptyMap() : values);
     }
 
     Map<String, String> builtInEntries() { return words; }

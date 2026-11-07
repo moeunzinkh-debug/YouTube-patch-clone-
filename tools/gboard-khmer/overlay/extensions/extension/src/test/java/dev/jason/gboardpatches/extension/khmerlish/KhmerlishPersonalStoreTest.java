@@ -22,6 +22,15 @@ public final class KhmerlishPersonalStoreTest {
         assertTrue(KhmerlishPersonalStore.read(app).isEmpty());
         KhmerlishPersonalStore.save(app, null, null, "NV", " នាវា ");
         assertEquals(Map.of("nv", "នាវា"), KhmerlishPersonalStore.read(app));
+        KhmerlishPersonalStore.save(app, null, null, "MIN  dg del", "មិនដឹងដែល");
+        assertEquals("មិនដឹងដែល", KhmerlishPersonalStore.read(app).get("min dg del"));
+        try {
+            KhmerlishPersonalStore.save(app, null, null, "min dg del", "ខ្មែរ");
+            fail("Normalized phrase duplicates must not overwrite a saved entry");
+        } catch (IllegalArgumentException expected) {
+            assertEquals("duplicate_key", expected.getMessage());
+        }
+        KhmerlishPersonalStore.delete(app, "min dg del", "មិនដឹងដែល");
         File database = new File(app.getNoBackupFilesDir(),
                 "khmerlish_personal_dictionary_v1.db");
         assertTrue(database.isFile());
