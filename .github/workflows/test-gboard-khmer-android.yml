@@ -37,7 +37,7 @@ jobs:
           root = Path('bundles/gboard-khmer')
           metadata = json.loads((root / 'validation.json').read_text())
           digest = hashlib.sha256((root / 'gboard-khmerlish-experimental.mpp').read_bytes()).hexdigest()
-          assert metadata['version'] == '4.0.0-khmerlish-dev.4' and metadata['sha256'] == digest
+          assert metadata['version'] == '4.0.5' and metadata['sha256'] == digest
           PY
           python3 tools/gboard-khmer/test_emulator_fixture.py -v
       - name: Make a temporary third-party-derived emulator fixture
