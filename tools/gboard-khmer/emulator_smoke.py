@@ -786,6 +786,18 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if not wait_for_exact_text('srey  →  ស្រី'):
             raise RuntimeError('Deleting the override did not restore the bundled word')
         result['bundled_override_restore'] = 'passed'
+        tap_word_edit_icon('srey')
+        edit_synthetic_word('srey thmey', 'ស្រីថ្មី')
+        set_synthetic_field('Search Khmerlish or Khmer', 'srey')
+        if not (wait_for_exact_text('srey  →  ស្រី')
+                and wait_for_text('srey thmey  →  ស្រីថ្មី')):
+            raise RuntimeError('Changing a bundled spelling did not preserve the original and create a new pair')
+        result['bundled_rename_copy'] = 'passed'
+        tap_word_edit_icon('srey thmey', personal=True)
+        require_tap('Delete')
+        require_tap('Delete')
+        if not wait_for_exact_text('srey  →  ស្រី'):
+            raise RuntimeError('Original bundled spelling was not preserved after deleting the new pair')
         set_synthetic_field('Search Khmerlish or Khmer', '')
         personal_tab()  # Also opens the Add dialog.
         edit_synthetic_word('min dg del', 'ឃ្លាសាកល្បង')

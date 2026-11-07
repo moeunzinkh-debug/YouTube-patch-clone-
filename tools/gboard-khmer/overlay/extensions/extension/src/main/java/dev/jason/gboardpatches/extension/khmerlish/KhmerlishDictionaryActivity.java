@@ -284,15 +284,13 @@ public final class KhmerlishDictionaryActivity extends Activity {
         if (original != null) {
             roman.setText(original.roman);
             khmer.setText(original.khmer);
-            // Bundled keys are immutable; edits save a reversible local override.
-            if (builtInEntry) roman.setEnabled(false);
         }
         fields.addView(roman);
         fields.addView(khmer);
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(original == null ? "បន្ថែមពាក្យ / Add word" : "កែពាក្យ / Edit word")
                 .setMessage(builtInEntry
-                        ? "កែអត្ថបទខ្មែរ៖ រក្សាទុកជាពាក្យផ្ទាល់ខ្លួន។ លុបវា ដើម្បីត្រឡប់ទៅពាក្យដើម។"
+                        ? "ការកែត្រូវរក្សាទុកផ្ទាល់ខ្លួន។ បើប្តូរ Khmerlish នឹងបង្កើតពាក្យថ្មី ហើយពាក្យដើមនៅដដែល។"
                         : "Khmerlish អក្សរ a-z អាចដកឃ្លា → អត្ថបទខ្មែរ។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាព។")
                 .setView(fields)
                 .setPositiveButton("រក្សាទុក / Save", null)
@@ -320,7 +318,14 @@ public final class KhmerlishDictionaryActivity extends Activity {
                         main.post(() -> {
                             if (destroyed) return;
                             dialog.dismiss();
-                            toast("បានរក្សាទុក / Saved");
+                            boolean renamed = original != null && !original.roman.equals(key);
+                            if (renamed && search.length() > 0) {
+                                search.setText(key);
+                                search.setSelection(search.length());
+                            }
+                            toast(builtInEntry && renamed
+                                    ? "បានបន្ថែមពាក្យថ្មី; ពាក្យដើមនៅដដែល។"
+                                    : "បានរក្សាទុក / Saved");
                             page = 0;
                             scheduleSearch(false);
                         });
