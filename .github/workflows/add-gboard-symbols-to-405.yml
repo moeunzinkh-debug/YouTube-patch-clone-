@@ -1,0 +1,185 @@
+name: Add Gboard Khmerlish symbols bundle to 4.0.5 pre-release
+
+on:
+  push:
+    branches: [arena/86d53cf2-youtube-patch-clone]
+    paths:
+      - '.github/workflows/add-gboard-symbols-to-405.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gboard-khmerlish-405-release
+  cancel-in-progress: false
+
+jobs:
+  add-tested-bundle:
+    # One-shot, user-authorized addition only. Never overwrite existing assets.
+    if: contains(github.event.head_commit.message, '[add-gboard-symbols-405]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: '437238495'
+      RELEASE_TAG: Gboard-v4.0.5
+      ASSET_NAME: gboard-khmerlish-4.0.6-khmerlish-dev.1.mpp
+      EXPECTED_SHA256: 9d6d6d9cba8902cd63356b0ecb19c3092e9846e1b2036e98da800ca854ddb443
+      EXPECTED_SIZE: '8429075'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify the tested bundle and Android report
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F86d53cf2-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to upload a stale bundle'; exit 1; }
+          (cd bundles/gboard-khmer && sha256sum --check gboard-khmerlish-experimental.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib, json, os, zipfile
+          from pathlib import Path
+
+          root = Path('bundles/gboard-khmer')
+          bundle = root / 'gboard-khmerlish-experimental.mpp'
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          build = json.loads((root / 'validation.json').read_text(encoding='utf-8'))
+          listing = json.loads((root / 'patches-list.json').read_text(encoding='utf-8'))
+          android = json.loads((root / 'android-smoke.json').read_text(encoding='utf-8'))
+          unit = build['checks']['khmerlish_unit_tests']
+          panel = android.get('toolbar_panel', {})
+          personal = android.get('personal_dictionary', {})
+          required = (
+              'add_apostrophe_key', 'add_mixed_symbols', 'automatic_apostrophe_key',
+              'automatic_mixed_symbols', 'automatic_apostrophe_soft_keys',
+              'automatic_mixed_symbols_soft_keys', 'panel_apostrophe_key', 'panel_mixed_symbols',
+              'second_symbol_page', 'personal_edit_icon', 'automatic_spaced_phrase',
+              'panel_spaced_phrase', 'import_quoted_symbols', 'export_quoted_symbols',
+              'search_personal', 'symbol_after_restart', 'restart_and_delete_fallback',
+          )
+          if digest != os.environ['EXPECTED_SHA256'] or bundle.stat().st_size != int(os.environ['EXPECTED_SIZE']):
+              raise SystemExit('Bundle does not match the approved artifact')
+          if (build['version'] != '4.0.6-khmerlish-dev.1' or build['experimental'] is not True
+                  or build['sha256'] != digest or build['size'] != bundle.stat().st_size
+                  or build['target'] != '18.5.4.993608717-release-arm64-v8a / 176049702'
+                  or build['run_url'] != f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/42329450561"
+                  or any(build['checks'].get(key) != 'passed' for key in (
+                      'existing_43_and_direct_translate_metadata', 'morphe_desktop_listing',
+                      'third_party_prepatched_fixture_application_and_dex_inspection'))
+                  or unit['tests'] != 49 or unit['failures'] or unit['errors'] or unit['skipped']):
+              raise SystemExit('Build report is incomplete or does not match the artifact')
+          names = {patch['name']: patch for patch in listing['patches']}
+          if (listing['version'] != '4.0.6-khmerlish-dev.1' or len(listing['patches']) != 45
+                  or len(names) != 45 or names['Khmerlish to Khmer (experimental)']['use'] is not False
+                  or names['Direct Google Translate (experimental)']['use'] is not False
+                  or names['Khmerlish to Khmer (experimental)']['compatiblePackages'] != {
+                      'com.google.android.inputmethod.latin': ['18.5.4.993608717-release-arm64-v8a']}):
+              raise SystemExit('Bundle listing, target or patch defaults changed')
+          with zipfile.ZipFile(bundle) as archive:
+              manifest = archive.read('META-INF/MANIFEST.MF').decode('utf-8').replace('\r\n ', '')
+              if archive.testzip() is not None or '\nVersion: 4.0.6-khmerlish-dev.1\r\n' not in manifest:
+                  raise SystemExit('MPP manifest has the wrong embedded version')
+              if 'jasonwu1994/Gboard-patches v4.0.0' not in manifest or 'experimental fork' not in manifest:
+                  raise SystemExit('MPP manifest has incorrect upstream provenance')
+          if (android.get('bundle_sha256') != digest or android.get('mode') != 'complete smoke'
+                  or android.get('emulator_action_outcome') != 'success'
+                  or android.get('run_url') != f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/42331556221"
+                  or any(android.get(key) != 'passed' for key in
+                         ('fixture_install', 'settings_default_off', 'settings_toggle', 'actual_gboard_typing'))
+                  or panel.get('status') != 'passed' or panel.get('panel_within_native_keyboard') != 'passed'
+                  or len(android.get('examples', {})) != 6
+                  or not all(item.get('passed') for item in android['examples'].values())
+                  or len(panel.get('examples', {})) != 7
+                  or not all(item.get('passed') for item in panel['examples'].values())
+                  or personal.get('status') != 'passed'
+                  or any(personal.get(key) != 'passed' for key in required)):
+              raise SystemExit('Android report is incomplete or does not match the artifact')
+          print('Verified 49 tests and Android symbol smoke for', digest)
+          PY
+      - name: Snapshot the existing pre-release and stage new assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-before.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/tag-before.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          before = json.loads((Path(os.environ['RUNNER_TEMP']) / 'release-before.json').read_text())
+          old = [a for a in before['assets'] if a['name'] == 'gboard-khmerlish-4.0.5.mpp']
+          names = [a['name'] for a in before['assets']]
+          target = os.environ['ASSET_NAME']
+          if (before['id'] != int(os.environ['RELEASE_ID']) or before['tag_name'] != os.environ['RELEASE_TAG']
+                  or before['name'] != 'Gboard Khmerlish v4.0.5 (experimental)' or before['draft']
+                  or not before['prerelease'] or len(names) != len(set(names))
+                  or target in names or target + '.sha256' in names
+                  or len(old) != 1 or old[0]['state'] != 'uploaded'
+                  or old[0]['digest'] != 'sha256:f544803642e868ddac7ebf13ab43a926a7582b4631286f6fda4e9fa66a7507a0'):
+              raise SystemExit('The chosen pre-release or its original assets do not match; no upload attempted')
+          PY
+          stage="$RUNNER_TEMP/gboard-symbol-assets"
+          mkdir -p "$stage"
+          cp bundles/gboard-khmer/gboard-khmerlish-experimental.mpp "$stage/$ASSET_NAME"
+          (cd "$stage" && sha256sum "$ASSET_NAME" > "$ASSET_NAME.sha256")
+          (cd "$stage" && sha256sum --check "$ASSET_NAME.sha256")
+          echo "$EXPECTED_SHA256  $stage/$ASSET_NAME" | sha256sum --check
+      - name: Add the two uniquely named assets without overwriting anything
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F86d53cf2-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced before upload'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-preflight.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'release-before.json').read_text())
+          current = json.loads((temp / 'release-preflight.json').read_text())
+          keys = ('id', 'tag_name', 'name', 'body', 'draft', 'prerelease', 'target_commitish')
+          asset_keys = lambda release: {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in release['assets']}
+          if any(before[k] != current[k] for k in keys) or asset_keys(before) != asset_keys(current):
+              raise SystemExit('Release changed after the snapshot; refusing to upload')
+          PY
+          stage="$RUNNER_TEMP/gboard-symbol-assets"
+          gh release upload "$RELEASE_TAG" "$stage/$ASSET_NAME" "$stage/$ASSET_NAME.sha256"
+      - name: Verify the new assets and unchanged release, tag and existing files
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-after.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/tag-after.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'release-before.json').read_text())
+          after = json.loads((temp / 'release-after.json').read_text())
+          tag_before = json.loads((temp / 'tag-before.json').read_text())
+          tag_after = json.loads((temp / 'tag-after.json').read_text())
+          keys = ('id', 'tag_name', 'name', 'body', 'draft', 'prerelease', 'target_commitish')
+          if any(before[key] != after[key] for key in keys) or tag_before['object'] != tag_after['object']:
+              raise SystemExit('Release metadata or its tag changed')
+          old = {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in before['assets']}
+          final = {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in after['assets']}
+          if any(final.get(key) != value for key, value in old.items()):
+              raise SystemExit('A pre-existing release asset changed')
+          staged = {p.name: p for p in (temp / 'gboard-symbol-assets').iterdir()}
+          added = {a['name']: a for a in after['assets'] if a['id'] not in old}
+          if (len(after['assets']) != len(before['assets']) + len(staged)
+                  or len(added) != len(staged) or set(added) != set(staged)):
+              raise SystemExit('Unexpected, duplicate or missing release assets')
+          for name, path in staged.items():
+              asset = added[name]
+              if (asset['state'] != 'uploaded' or asset['size'] != path.stat().st_size
+                      or asset['digest'] != 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()):
+                  raise SystemExit('Uploaded asset digest or size differs: ' + name)
+          print('Verified both new assets; all existing assets and release metadata remain unchanged')
+          PY
+          mkdir -p "$RUNNER_TEMP/downloaded-gboard-symbols"
+          gh release download "$RELEASE_TAG" --pattern "$ASSET_NAME" --pattern "$ASSET_NAME.sha256" \
+            --dir "$RUNNER_TEMP/downloaded-gboard-symbols"
+          (cd "$RUNNER_TEMP/downloaded-gboard-symbols" && sha256sum --check "$ASSET_NAME.sha256")
+          echo "$EXPECTED_SHA256  $RUNNER_TEMP/downloaded-gboard-symbols/$ASSET_NAME" | sha256sum --check
