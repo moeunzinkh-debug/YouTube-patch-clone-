@@ -227,6 +227,15 @@ def wait_for_text(text: str, seconds: int = 15) -> bool:
     return False
 
 
+def wait_for_exact_text(text: str, seconds: int = 15) -> bool:
+    deadline = time.monotonic() + seconds
+    while time.monotonic() < deadline:
+        if text in labels():
+            return True
+        time.sleep(1)
+    return False
+
+
 def require_tap(label: str, scroll: bool = False) -> None:
     if not find_and_tap(label, scroll=scroll):
         raise RuntimeError('Synthetic UI action not found: ' + label)
@@ -667,6 +676,19 @@ def edit_synthetic_word(roman: str, khmer: str) -> None:
         raise RuntimeError('Saved synthetic entry did not appear')
 
 
+def tap_word_edit_icon(roman: str, personal: bool = False) -> None:
+    description = ('Edit personal word ' if personal else 'Edit word ') + roman
+    for node in ET.fromstring(common.dump_ui()).iter('node'):
+        if (node.get('class') == 'android.widget.ImageButton'
+                and node.get('content-desc') == description and node.get('clickable') == 'true'):
+            position = common.center(node.get('bounds', ''))
+            if position:
+                common.run('adb', 'shell', 'input', 'tap', *map(str, position))
+                time.sleep(2)
+                return
+    raise RuntimeError('Visible edit icon not found: ' + description)
+
+
 def tap_synthetic_filename(filename: str) -> bool:
     # Do not tap a thumbnail with content-desc "Preview the file ...": that
     # previews the file instead of choosing it. Use its exact text row.
@@ -730,7 +752,7 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
     try:
         # Synthetic UTF-8 documents are created only inside this disposable emulator.
         valid = tmp / 'khmerlish-smoke-valid.csv'
-        valid.write_text('khmerlish,khmer\nnv,កម្ពុជា\nzztest,សួស្តី\n', encoding='utf-8')
+        valid.write_text('khmerlish,khmer\nnv,កម្ពុជា\nzztest,សួស្តី\nimported multi,ឃ្លានាំចូល\n', encoding='utf-8')
         invalid = tmp / 'khmerlish-smoke-invalid.csv'
         invalid.write_text('khmerlish,khmer\nnv,ផ្សេង\ninvalid,English\n', encoding='utf-8')
         for path in (valid, invalid):
@@ -741,8 +763,49 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if not wait_for_text('srey  →  ស្រី'):
             raise RuntimeError('Built-in searchable word guide returned the wrong result')
         result['search_bundled'] = 'passed'
+        tap_word_edit_icon('srey')
+        set_synthetic_field('Personal Khmer word', 'ស្រីសាកល្បង')
+        require_tap('Save')
+        if not wait_for_text('srey  →  ស្រីសាកល្បង'):
+            raise RuntimeError('Editing a bundled word did not create a personal override')
+        result['bundled_edit_icon'] = 'passed'
+        open_editor()
+        time.sleep(4)
+        enter('srey', None)
+        if editor_text().rstrip() != 'ស្រីសាកល្បង':
+            raise RuntimeError('Edited bundled word was not used by automatic typing')
+        result['bundled_edit_conversion'] = 'passed'
+        open_dictionary()
+        require_tap('Word guide')
+        set_synthetic_field('Search Khmerlish or Khmer', 'srey')
+        if not wait_for_text('srey  →  ស្រីសាកល្បង'):
+            raise RuntimeError('Edited bundled word did not persist')
+        tap_word_edit_icon('srey', personal=True)
+        require_tap('Delete')
+        require_tap('Delete')
+        if not wait_for_exact_text('srey  →  ស្រី'):
+            raise RuntimeError('Deleting the override did not restore the bundled word')
+        result['bundled_override_restore'] = 'passed'
+        tap_word_edit_icon('srey')
+        edit_synthetic_word('srey thmey', 'ស្រីថ្មី')
+        set_synthetic_field('Search Khmerlish or Khmer', 'srey')
+        if not (wait_for_exact_text('srey  →  ស្រី')
+                and wait_for_text('srey thmey  →  ស្រីថ្មី')):
+            raise RuntimeError('Changing a bundled spelling did not preserve the original and create a new pair')
+        result['bundled_rename_copy'] = 'passed'
+        tap_word_edit_icon('srey thmey', personal=True)
+        require_tap('Delete')
+        require_tap('Delete')
+        if not wait_for_exact_text('srey  →  ស្រី'):
+            raise RuntimeError('Original bundled spelling was not preserved after deleting the new pair')
         set_synthetic_field('Search Khmerlish or Khmer', '')
         personal_tab()  # Also opens the Add dialog.
+        edit_synthetic_word('min dg del', 'ឃ្លាសាកល្បង')
+        result['add_spaced_phrase'] = 'passed'
+        tap_word_edit_icon('min dg del', personal=True)
+        edit_synthetic_word('min dg del', 'ឃ្លាកែ')
+        result['personal_edit_icon'] = 'passed'
+        require_tap('Add personal word')
         edit_synthetic_word('nv', 'នាវា')
         result['add'] = 'passed'
 
@@ -764,6 +827,23 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
 
+        open_editor()
+        time.sleep(4)
+        enter('min dg del', None)
+        if editor_text().rstrip() != 'ឃ្លាកែ':
+            raise RuntimeError('Automatic typing ignored the spaced personal phrase')
+        result['automatic_spaced_phrase'] = 'passed'
+        open_editor()
+        time.sleep(3)
+        if not tap_panel_icon({}):
+            raise RuntimeError('Could not open panel for a spaced personal phrase')
+        panel_press('min dg del')
+        if editor_text() != 'ឃ្លាកែ':
+            raise RuntimeError('Toolbar panel ignored the spaced personal phrase')
+        result['panel_spaced_phrase'] = 'passed'
+        keys = panel_key_positions(common.inspect_ime_windows())
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+
         open_dictionary()
         require_tap('Personal dictionary')
         if not wait_for_text('nv  →  នាវា'):
@@ -772,9 +852,11 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         edit_synthetic_word('nv', 'នឹក')
         result['edit_and_persist'] = 'passed'
         import_document(valid.name)
-        if not wait_for_text('zztest  →  សួស្តី') or not wait_for_text('nv  →  នឹក'):
+        if (not wait_for_text('zztest  →  សួស្តី') or not wait_for_text('nv  →  នឹក')
+                or not wait_for_text('imported multi  →  ឃ្លានាំចូល')):
             raise RuntimeError('Keep-existing import did not merge as previewed')
         result['import_keep_existing'] = 'passed'
+        result['import_spaced_phrase'] = 'passed'
         import_document(valid.name, replace=True)
         if not wait_for_text('nv  →  កម្ពុជា'):
             raise RuntimeError('Explicit conflict replacement did not apply')
@@ -815,7 +897,8 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if len(candidates) != 1:
             raise RuntimeError('The exported synthetic file was not found in device storage')
         exported = common.run('adb', 'shell', 'cat', candidates[0])
-        if not all(row in exported for row in ('khmerlish\tkhmer', 'nv\tកម្ពុជា', 'zztest\tសួស្តី')):
+        if not all(row in exported for row in ('khmerlish\tkhmer', 'nv\tកម្ពុជា', 'zztest\tសួស្តី',
+                                               'min dg del\tឃ្លាកែ', 'imported multi\tឃ្លានាំចូល')):
             raise RuntimeError('Exported UTF-8 TSV did not contain the synthetic entries')
         result['export'] = 'passed'
 
@@ -860,6 +943,16 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if editor_text() != 'សួស្តី':
             raise RuntimeError('The restarted panel did not load the imported word')
         result['panel_after_restart'] = 'passed'
+        keys = panel_key_positions(common.inspect_ime_windows())
+        common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
+        open_editor()
+        time.sleep(4)
+        if not tap_panel_icon({}):
+            raise RuntimeError('Could not reopen panel for persisted phrase')
+        panel_press('min dg del')
+        if editor_text() != 'ឃ្លាកែ':
+            raise RuntimeError('Spaced personal phrase did not survive process restart')
+        result['phrase_after_restart'] = 'passed'
         keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, keys['done khmerlish']))
         open_editor()

@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -232,8 +233,8 @@ public final class KhmerlishDictionaryActivity extends Activity {
     private void render(KhmerlishWordGuide.Page found, boolean onlyPersonal) {
         page = found.index;
         status.setText(onlyPersonal
-                ? "ពាក្យផ្ទាល់ខ្លួន " + found.total + " · ប៉ះដើម្បីកែ ឬលុប"
-                : "ពាក្យ " + found.total + " · Khmerlish → ខ្មែរ");
+                ? "ពាក្យផ្ទាល់ខ្លួន " + found.total + " · កែ ឬលុប"
+                : "ពាក្យ " + found.total + " · ចុចរូបកែដើម្បីកែ");
         pageLabel.setText((found.index + 1) + " / " + found.pages);
         previous.setEnabled(found.index > 0);
         next.setEnabled(found.index + 1 < found.pages);
@@ -245,17 +246,26 @@ public final class KhmerlishDictionaryActivity extends Activity {
             results.addView(empty);
         }
         for (KhmerlishWordGuide.Entry entry : found.entries) {
-            TextView row = text(entry.roman + "  →  " + entry.khmer
-                    + (entry.personal ? "  · ផ្ទាល់ខ្លួន" : ""), 16, foreground);
-            row.setPadding(dp(14), dp(12), dp(14), dp(12));
-            row.setMinHeight(dp(50));
+            LinearLayout row = horizontal();
+            row.setPadding(dp(14), dp(2), dp(4), dp(2));
+            row.setMinimumHeight(dp(50));
             row.setBackground(rounded(surface, 10));
-            if (entry.personal) {
-                row.setContentDescription("Edit personal word " + entry.roman + " " + entry.khmer);
-                row.setClickable(true);
-                row.setFocusable(true);
-                row.setOnClickListener(v -> showEditor(entry));
-            }
+            TextView label = text(entry.roman + "  →  " + entry.khmer
+                    + (entry.personal ? "  · ផ្ទាល់ខ្លួន" : ""), 16, foreground);
+            label.setPadding(0, dp(10), dp(4), dp(10));
+            String description = (entry.personal ? "Edit personal word " : "Edit word ") + entry.roman;
+            label.setContentDescription(description + " " + entry.khmer);
+            label.setClickable(true);
+            label.setFocusable(true);
+            label.setOnClickListener(v -> showEditor(entry));
+            row.addView(label, new LinearLayout.LayoutParams(0, -2, 1));
+            ImageButton edit = new ImageButton(this);
+            edit.setImageResource(android.R.drawable.ic_menu_edit);
+            edit.setColorFilter(accent);
+            edit.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+            edit.setContentDescription(description);
+            edit.setOnClickListener(v -> showEditor(entry));
+            row.addView(edit, new LinearLayout.LayoutParams(dp(48), dp(48)));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
             params.bottomMargin = dp(3);
             results.addView(row, params);
@@ -267,8 +277,10 @@ public final class KhmerlishDictionaryActivity extends Activity {
         LinearLayout fields = new LinearLayout(this);
         fields.setOrientation(LinearLayout.VERTICAL);
         fields.setPadding(dp(20), dp(4), dp(20), 0);
-        EditText roman = editor("Khmerlish (a-z មួយពាក្យ)", "Personal Khmerlish spelling", 32);
-        EditText khmer = editor("ពាក្យខ្មែរ / Khmer", "Personal Khmer word", 128);
+        EditText roman = editor("Khmerlish (a-z និងដកឃ្លា)", "Personal Khmerlish spelling",
+                KhmerlishPersonalData.MAX_ROMAN);
+        EditText khmer = editor("ពាក្យខ្មែរ / Khmer", "Personal Khmer word", KhmerlishPersonalData.MAX_KHMER);
+        boolean builtInEntry = original != null && !original.personal;
         if (original != null) {
             roman.setText(original.roman);
             khmer.setText(original.khmer);
@@ -277,18 +289,20 @@ public final class KhmerlishDictionaryActivity extends Activity {
         fields.addView(khmer);
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(original == null ? "បន្ថែមពាក្យ / Add word" : "កែពាក្យ / Edit word")
-                .setMessage("Khmerlish មួយពាក្យ (a-z) → អត្ថបទខ្មែរ។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាព។")
+                .setMessage(builtInEntry
+                        ? "ការកែត្រូវរក្សាទុកផ្ទាល់ខ្លួន។ បើប្តូរ Khmerlish នឹងបង្កើតពាក្យថ្មី ហើយពាក្យដើមនៅដដែល។"
+                        : "Khmerlish អក្សរ a-z អាចដកឃ្លា → អត្ថបទខ្មែរ។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាព។")
                 .setView(fields)
                 .setPositiveButton("រក្សាទុក / Save", null)
                 .setNegativeButton("បោះបង់ / Cancel", null);
-        if (original != null) builder.setNeutralButton("លុប / Delete", null);
+        if (original != null && original.personal) builder.setNeutralButton("លុប / Delete", null);
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(ignored -> {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String key = KhmerlishPersonalData.roman(roman.getText().toString());
                 String value = KhmerlishPersonalData.khmer(khmer.getText().toString());
                 if (key == null) {
-                    roman.setError("ប្រើ a-z មួយពាក្យ ប៉ុណ្ណោះ (អតិបរមា 32)");
+                    roman.setError("ប្រើ a-z និងដកឃ្លា ប៉ុណ្ណោះ (អតិបរមា 64 តួ)");
                     return;
                 }
                 if (value == null) {
@@ -298,12 +312,20 @@ public final class KhmerlishDictionaryActivity extends Activity {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
                 worker.execute(() -> {
                     try {
-                        KhmerlishPersonalStore.save(this, original == null ? null : original.roman,
-                                original == null ? null : original.khmer, key, value);
+                        KhmerlishPersonalStore.save(this,
+                                original != null && original.personal ? original.roman : null,
+                                original != null && original.personal ? original.khmer : null, key, value);
                         main.post(() -> {
                             if (destroyed) return;
                             dialog.dismiss();
-                            toast("បានរក្សាទុក / Saved");
+                            boolean renamed = original != null && !original.roman.equals(key);
+                            if (renamed && search.length() > 0) {
+                                search.setText(key);
+                                search.setSelection(search.length());
+                            }
+                            toast(builtInEntry && renamed
+                                    ? "បានបន្ថែមពាក្យថ្មី; ពាក្យដើមនៅដដែល។"
+                                    : "បានរក្សាទុក / Saved");
                             page = 0;
                             scheduleSearch(false);
                         });
@@ -320,7 +342,7 @@ public final class KhmerlishDictionaryActivity extends Activity {
                     }
                 });
             });
-            if (original != null) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v ->
+            if (original != null && original.personal) dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v ->
                     new AlertDialog.Builder(this).setTitle("លុបពាក្យផ្ទាល់ខ្លួន?")
                             .setMessage("ពាក្យក្នុងវចនានុក្រមដើមនឹងត្រឡប់មកវិញ ប្រសិនបើមាន។")
                             .setNegativeButton("បោះបង់ / Cancel", null)
@@ -346,7 +368,7 @@ public final class KhmerlishDictionaryActivity extends Activity {
         new AlertDialog.Builder(this)
                 .setTitle("នាំចូលបញ្ជីពាក្យ / Import word list")
                 .setMessage("UTF-8 .txt / .tsv / .csv ប៉ុណ្ណោះ។ មួយជួរមួយគូ៖\n"
-                        + "khmerlish,ខ្មែរ\nសរសេរ Khmerlish មួយពាក្យ (a-z) ប៉ុណ្ណោះ។\n"
+                        + "khmerlish,ខ្មែរ\nKhmerlish ប្រើ a-z និងដកឃ្លា (អតិបរមា 64 តួ)។\n"
                         + "អតិបរមា 5,000 ពាក្យ និង 2.5 MB។ PDF/DOCX មិនគាំទ្រ។\n"
                         + "ពាក្យទំនាស់នឹងរក្សាទុក លុះត្រាតែអ្នកជ្រើសជំនួស។")
                 .setNegativeButton("បោះបង់ / Cancel", null)

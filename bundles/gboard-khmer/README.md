@@ -1,8 +1,8 @@
 # Gboard Khmerlish → ខ្មែរ (experimental)
 
-មុខងារថ្មីសម្រាប់ [Morphe Manager](https://github.com/MorpheApp/morphe-manager) និង Gboard `18.5.4.993608717-release-arm64-v8a` / code `176049702`។ នេះជា fork សាកល្បងដាច់ដោយឡែក៖ រក្សា upstream Gboard patches 43 និង patch `Direct Google Translate (experimental)` មុន។ Release Gboard ដែលមានស្រាប់មិនត្រូវបានជំនួសទេ។
+មុខងារថ្មីសម្រាប់ [Morphe Manager](https://github.com/MorpheApp/morphe-manager) និង Gboard `18.5.4.993608717-release-arm64-v8a` / code `176049702`។ នេះជា fork សាកល្បង version `4.0.5` ផ្អែកលើ upstream Gboard patches `v4.0.0` (មិនមែន upstream v4.0.5)៖ រក្សា upstream patches 43 និង patch `Direct Google Translate (experimental)` មុន។ Release Gboard ដែលមានស្រាប់មិនត្រូវបានជំនួសទេ។
 
-[ទាញយក `.mpp` សាកល្បង](gboard-khmerlish-experimental.mpp) · [SHA-256](gboard-khmerlish-experimental.mpp.sha256) · [លទ្ធផល build](validation.json) · [ការសាក Android](android-smoke.json)
+[ទាញយក `.mpp` v4.0.5](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/Gboard-v4.0.5/gboard-khmerlish-4.0.5.mpp) · [Pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-v4.0.5) · [SHA-256](gboard-khmerlish-experimental.mpp.sha256) · [លទ្ធផល build](validation.json) · [ការសាក Android](android-smoke.json)
 
 ## របៀបប្រើ
 
@@ -23,15 +23,16 @@
 
 ## វចនានុក្រមផ្ទាល់ខ្លួន និងឯកសារពាក្យ
 
-ចូល **Gboard Settings → Patches → Khmerlish → ខ្មែរ (experimental) → Personal Dictionary & Documents**។ ផ្ទាំង **ឯកសារពាក្យ / Word guide** អាចស្វែងរកទាំងអក្សរ Khmerlish និងខ្មែរ។ ផ្ទាំង **ផ្ទាល់ខ្លួន / Personal** អាចបន្ថែម ប៉ះលើពាក្យដើម្បីកែ ឬលុប និងនាំចូល/នាំចេញបញ្ជីបាន។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាពលើវចនានុក្រមដើមសម្រាប់ទាំង automatic និង panel; ពេលលុប នឹងត្រឡប់ទៅពាក្យដើមប្រសិនបើមាន។ វាជាវចនានុក្រមដាច់ដោយឡែក មិនមែន Gboard personal dictionary ទេ។
+ចូល **Gboard Settings → Patches → Khmerlish → ខ្មែរ (experimental) → Personal Dictionary & Documents**។ ផ្ទាំង **ឯកសារពាក្យ / Word guide** អាចស្វែងរកទាំងអក្សរ Khmerlish និងខ្មែរ។ ចុចរូប **កែ ✎** ខាងចុងពាក្យណាមួយ ដើម្បីកែ Khmerlish ឬអត្ថបទខ្មែរ។ ការកែពាក្យដើមរក្សាទុកជាពាក្យផ្ទាល់ខ្លួន ហើយអាចលុបការកែ ដើម្បីត្រឡប់ទៅដើម។ បើប្តូរ Khmerlish របស់ពាក្យដើម វានឹងបន្ថែមពាក្យផ្ទាល់ខ្លួនថ្មី ដោយរក្សាពាក្យដើមដដែល។ ផ្ទាំង **ផ្ទាល់ខ្លួន / Personal** អាចបន្ថែម កែឈ្មោះ ឬលុប និងនាំចូល/នាំចេញបញ្ជីបាន។ ពាក្យផ្ទាល់ខ្លួនមានអាទិភាពលើវចនានុក្រមដើមសម្រាប់ទាំង automatic និង panel។ វាជាវចនានុក្រមដាច់ដោយឡែក មិនមែន Gboard personal dictionary ទេ។
 
-- សរសេរ Khmerlish មួយពាក្យជាអក្សរ `a-z` (មិនគិតអក្សរធំ/តូច; អតិបរមា 32 តួ) និងតម្លៃមានអក្សរខ្មែរ (អតិបរមា 128 តួ)។ អាចប្រើ keyboard ខ្មែរ ឬ paste ដើម្បីបញ្ចូលតម្លៃខ្មែរ។
-- នាំចូលតែឯកសារ **UTF-8 `.txt`, `.csv` ឬ `.tsv`** មួយគូក្នុងមួយជួរ ដូចខាងក្រោម។ អាចទាញយក និងកែ [ឯកសារគំរូ CSV](khmerlish-personal-example.csv) នេះ។ មិនគាំទ្រ PDF/DOCX ឬ Khmerlish ច្រើនពាក្យក្នុង key តែមួយទេ។ ឯកសារមិនត្រឹមត្រូវ ឬ key ស្ទួនត្រូវបានបដិសេធទាំងមូល។ អតិបរមា 5,000 គូ និង 2.5 MB ក្នុងឯកសារ; សរុបក្នុងវចនានុក្រមផ្ទាល់ខ្លួនមិនលើស 5,000 គូ។
+- Khmerlish អាចជាពាក្យ ឬឃ្លាដែលមានដកឃ្លា ដូចជា `min dg del`។ ប្រើអក្សរ `a-z` និងដកឃ្លា (មិនគិតអក្សរធំ/តូច; អតិបរមា 64 តួ) និងតម្លៃមានអក្សរខ្មែរ (អតិបរមា 128 តួ)។ ដកឃ្លាស្ទួនក្នុង key ត្រូវបានកាត់ឱ្យនៅតែមួយ។ ពេលវាយ ឃ្លាផ្ទាល់ខ្លួនត្រូវផ្គូផ្គងដោយដកឃ្លាមួយរវាងពាក្យ ហើយមានអាទិភាពលើពាក្យនីមួយៗ។ Automatic បម្លែងឃ្លាបន្ទាប់ពីចុច space ឬសញ្ញាខណ្ឌចុងក្រោយ; panel បង្ហាញភ្លាមៗ។
+- នាំចូលតែឯកសារ **UTF-8 `.txt`, `.csv` ឬ `.tsv`** មួយគូក្នុងមួយជួរ ដូចខាងក្រោម រួមទាំងឃ្លាដែលមានដកឃ្លា។ អាចទាញយក និងកែ [ឯកសារគំរូ CSV](khmerlish-personal-example.csv) នេះ។ មិនគាំទ្រ PDF/DOCX ទេ។ ឯកសារមិនត្រឹមត្រូវ ឬ key ស្ទួនត្រូវបានបដិសេធទាំងមូល។ អតិបរមា 5,000 គូ និង 2.5 MB ក្នុងឯកសារ; សរុបក្នុងវចនានុក្រមផ្ទាល់ខ្លួនមិនលើស 5,000 គូ។
 
   ```csv
   khmerlish,khmer
   soksabay,សុខសប្បាយ
   susdei,សួស្តី
+  min dg del,មិនដឹងដែល
   ```
 
 - មុននាំចូល វាបង្ហាញចំនួនពាក្យថ្មី/ទំនាស់។ ជម្រើសធម្មតា **Keep existing** រក្សាពាក្យផ្ទាល់ខ្លួនចាស់; ជ្រើស **Replace** ប៉ុណ្ណោះទើបជំនួសទំនាស់។ **Export** បង្កើតអត្ថបទ TSV សម្រាប់ backup ដោយដៃ។ កម្មវិធីជ្រើសឯកសារខ្លះអាចបន្ថែម `.txt` ទៅឈ្មោះ; ឯកសារនោះនៅតែនាំចូលវិញបាន។
@@ -39,7 +40,7 @@
 
 ## លទ្ធផលសាកល្បង
 
-[Android 15 emulator សម្រាប់ dev.3](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42244932669) បានសាក panel 7/7 និង automatic 6/6, setting, វចនានុក្រម add/edit/delete, ការស្វែងរក, import រក្សា/ជំនួសពាក្យស្ទួន, បដិសេធឯកសារខូច, export និងការប្រើពាក្យក្រោយ restart។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឲ្យត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+Bundle `4.0.5` ឆ្លងកាត់ [build និង unit tests 39/39](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42321842707)។ [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42322277323) បានសាក panel 7/7 និង automatic 6/6 ព្រមទាំងឃ្លាមានដកឃ្លាក្នុងរបៀបទាំងពីរ, រូបកែពាក្យ, កែ/រក្សាពាក្យដើម, ការស្វែងរក, add/edit/delete, import/export និងការប្រើពាក្យក្រោយ restart។ [របាយការណ៍ Android](android-smoke.json) មាន SHA ត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 

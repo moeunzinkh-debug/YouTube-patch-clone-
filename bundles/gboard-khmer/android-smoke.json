@@ -12,7 +12,7 @@
   "target_diagnostic_before": {
     "marker": true,
     "toolbar_icon_resource_found": true,
-    "toolbar_position_initialized": true,
+    "toolbar_position_initialized": false,
     "dictionary_asset_present": true,
     "preference": false,
     "runtime_enabled": false,
@@ -1171,11 +1171,20 @@
   "personal_dictionary": {
     "status": "passed",
     "search_bundled": "passed",
+    "bundled_edit_icon": "passed",
+    "bundled_edit_conversion": "passed",
+    "bundled_override_restore": "passed",
+    "bundled_rename_copy": "passed",
+    "add_spaced_phrase": "passed",
+    "personal_edit_icon": "passed",
     "add": "passed",
     "automatic_override": "passed",
     "panel_override": "passed",
+    "automatic_spaced_phrase": "passed",
+    "panel_spaced_phrase": "passed",
     "edit_and_persist": "passed",
     "import_keep_existing": "passed",
+    "import_spaced_phrase": "passed",
     "import_replace_conflicts": "passed",
     "invalid_import_atomic": "passed",
     "search_personal": "passed",
@@ -1184,11 +1193,11 @@
       "Files in Downloads",
       "Downloads",
       "khmerlish-smoke-valid.csv",
-      "67 B",
-      "3:47 PM",
+      "113 B",
+      "1:16 AM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "3:47 PM",
+      "1:16 AM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -1264,9 +1273,10 @@
       "Done"
     ],
     "panel_after_restart": "passed",
+    "phrase_after_restart": "passed",
     "restart_and_delete_fallback": "passed"
   },
-  "bundle_sha256": "52554154916a42bf07ec04c7c67b12bd7e71f2367df786c45626f7dc9a842d33",
+  "bundle_sha256": "f544803642e868ddac7ebf13ab43a926a7582b4631286f6fda4e9fa66a7507a0",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42244932669"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42322277323"
 }

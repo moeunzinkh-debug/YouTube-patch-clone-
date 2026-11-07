@@ -112,6 +112,18 @@ class DocumentPickerTests(unittest.TestCase):
             run.assert_called_once_with('adb', 'shell', 'input', 'tap', '249', '382')
 
 
+class WordEditIconTests(unittest.TestCase):
+    def test_taps_the_actual_edit_icon_not_the_label(self):
+        xml = ('<hierarchy><node class="android.widget.TextView" text="srey" '
+               'content-desc="Edit word srey ស្រី" bounds="[10,20][200,70]"/>'
+               '<node class="android.widget.ImageButton" text="" content-desc="Edit word srey" '
+               'clickable="true" bounds="[220,20][268,68]"/></hierarchy>')
+        with patch.object(smoke.common, 'dump_ui', return_value=xml), \
+                patch.object(smoke.common, 'run') as run, patch.object(smoke.time, 'sleep'):
+            smoke.tap_word_edit_icon('srey')
+            run.assert_called_once_with('adb', 'shell', 'input', 'tap', '244', '44')
+
+
 class PanelLayoutTests(unittest.TestCase):
     def test_panel_must_remain_inside_native_keyboard_area(self):
         native = {'native_a': [{'id': 'dev.example:id/keyboard_holder', 'bounds': '[0,381][320,616]'}]}

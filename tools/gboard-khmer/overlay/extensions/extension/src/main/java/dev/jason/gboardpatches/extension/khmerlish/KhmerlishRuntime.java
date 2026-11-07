@@ -83,6 +83,7 @@ public final class KhmerlishRuntime {
                 return;
             }
             if (dictionary == null || !personalReady) {
+                resetController();
                 preload(service);
                 return;
             }

@@ -12,9 +12,12 @@ public class KhmerlishPersonalDataTest {
     @Test public void validatesKeysAndKhmerWithoutAcceptingUnsafeSeparators() {
         assertEquals("soksabay", KhmerlishPersonalData.roman(" SokSabAy "));
         assertEquals("a", KhmerlishPersonalData.roman("A"));
-        assertNull(KhmerlishPersonalData.roman("nv na"));
+        assertEquals("min dg del", KhmerlishPersonalData.roman("  MIN  dg del  "));
+        assertEquals("nv na", KhmerlishPersonalData.roman("nv na"));
         assertNull(KhmerlishPersonalData.roman("word42"));
-        assertNull(KhmerlishPersonalData.roman("x".repeat(33)));
+        assertNull(KhmerlishPersonalData.roman("nv\tna"));
+        assertNull(KhmerlishPersonalData.roman("nv-na"));
+        assertNull(KhmerlishPersonalData.roman("x".repeat(65)));
         assertEquals("សួស្តី", KhmerlishPersonalData.khmer(" សួស្តី "));
         assertEquals("សួស្តី, មិត្ត", KhmerlishPersonalData.khmer("សួស្តី, មិត្ត"));
         assertNull(KhmerlishPersonalData.khmer("hello"));
@@ -28,18 +31,19 @@ public class KhmerlishPersonalDataTest {
                 + "Soksabay,សុខសប្បាយ\n"
                 + "\"srey\",\"ស្រី, ស្អាត\"\n"
                 + "\"friend\",\"មិត្ត \"\"ស្អាត\"\"\"\n"
-                + "nv\tនៅ\n";
+                + "nv\tនៅ\n\"Min Dg Del\",មិនដឹងដែល\n";
         Map<String, String> entries = KhmerlishPersonalData.parse(input);
-        assertEquals(4, entries.size());
+        assertEquals(5, entries.size());
         assertEquals("សុខសប្បាយ", entries.get("soksabay"));
         assertEquals("ស្រី, ស្អាត", entries.get("srey"));
         assertEquals("មិត្ត \"ស្អាត\"", entries.get("friend"));
+        assertEquals("មិនដឹងដែល", entries.get("min dg del"));
         assertEquals(entries, KhmerlishPersonalData.parse(KhmerlishPersonalData.exportTsv(entries)));
     }
 
     @Test public void invalidImportRejectsAllRowsAndDoesNotRevealContent() throws Exception {
         for (String invalid : new String[]{"", "roman,khmer\n", "nv,នៅ\nNA,english\n",
-                "nv,នៅ\nNV,ណា\n", "two words,ខ្មែរ\n", "nv,នៅ,ណា\n",
+                "nv,នៅ\nNV,ណា\n", "two words,ខ្មែរ\nTWO  WORDS,ផ្សេង\n", "nv,នៅ,ណា\n",
                 "nv,\"នៅ\n", "nv,នៅ\u0000\n", "a,ខ្មែរ\rផ្សេង"}) {
             try {
                 KhmerlishPersonalData.parse(invalid);

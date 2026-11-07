@@ -146,11 +146,11 @@ OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភ
 <details>
 <summary>🧪 Gboard Khmerlish → ខ្មែរ (bundle សាកល្បង)</summary>
 
-Fork សាកល្បងនេះបន្ថែម toolbar panel សម្រាប់វាយ Khmerlish ខាងក្រោម និងបង្ហាញអក្សរខ្មែរក្នុង app ខាងលើ ព្រមទាំង setting សម្រាប់បម្លែងពេលវាយធម្មតា។ វាមានវចនានុក្រម offline ផ្ទាល់ខ្លួន បញ្ជីពាក្យអាចស្វែងរក និងនាំចូល/នាំចេញឯកសារអត្ថបទ CSV/TSV។ វាមិនជំនួស Gboard bundle upstream 43 patches ខាងលើទេ។
+Fork សាកល្បងនេះបន្ថែម toolbar panel សម្រាប់វាយ Khmerlish ខាងក្រោម និងបង្ហាញអក្សរខ្មែរក្នុង app ខាងលើ ព្រមទាំង setting សម្រាប់បម្លែងពេលវាយធម្មតា។ វាមានវចនានុក្រម offline ផ្ទាល់ខ្លួនដែលគាំទ្រឃ្លាមានដកឃ្លា ដូចជា `min dg del` បញ្ជីពាក្យអាចស្វែងរកជាមួយរូបកែនៅចុងជួរនីមួយៗ និងនាំចូល/នាំចេញឯកសារអត្ថបទ CSV/TSV។ វាមិនជំនួស Gboard bundle upstream 43 patches ខាងលើទេ។
 
 [ឯកសារ `.mpp`](bundles/gboard-khmer/gboard-khmerlish-experimental.mpp) · [របៀបប្រើ និងកម្រិត](bundles/gboard-khmer/README.md) · [លទ្ធផល build](bundles/gboard-khmer/validation.json) · [លទ្ធផល Android ចុងក្រោយ](bundles/gboard-khmer/android-smoke.json)
 
-គោលដៅគឺ Gboard `18.5.4.993608717-release-arm64-v8a` ប៉ុណ្ណោះ។ នេះមិនមែនជា release ថ្មីទេ; សូមពិនិត្យលទ្ធផលតេស្ត និងរក្សា keyboard បម្រុង។
+គោលដៅគឺ Gboard `18.5.4.993608717-release-arm64-v8a` ប៉ុណ្ណោះ។ [Pre-release Khmerlish 4.0.5](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-v4.0.5) ជា fork សាកល្បងផ្អែកលើ upstream Gboard patches v4.0.0 មិនជំនួស release ដើមទេ; សូមពិនិត្យលទ្ធផលតេស្ត និងរក្សា keyboard បម្រុង។
 
 </details>
 
