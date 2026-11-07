@@ -393,6 +393,61 @@ def keyboard_keys() -> dict[str, tuple[int, int]]:
     return keys
 
 
+def native_keyboard_positions(windows: list) -> dict[str, tuple[int, int]]:
+    """Visible native Gboard keys and page switches, from accessibility bounds."""
+    positions = {}
+    aliases = {
+        'apostrophe': "'", 'single quote': "'", 'underscore': '_',
+        'hyphen': '-', 'minus': '-', 'plus': '+',
+        'alphabet keyboard': 'abc', 'alphabetic keyboard': 'abc',
+        'letters keyboard': 'abc', 'switch to letters': 'abc',
+        'symbol keyboard': '?123', 'symbols keyboard': '?123',
+        'more symbols': 'more symbols', 'more symbols keyboard': 'more symbols',
+    }
+    for node in common.flatten_window_nodes(windows):
+        position = common.center(str(node.get('bounds', '')))
+        if not position:
+            continue
+        for value in (node.get('text', ''), node.get('description', '')):
+            label = str(value).strip().lower()
+            if len(label) == 1 or label in ('abc', '?123', '=\\<', '=<', 'more symbols'):
+                positions.setdefault(label, position)
+            if label == 'space' or label.startswith(('space,', 'space bar')):
+                positions.setdefault(' ', position)
+            for name, key in aliases.items():
+                if label == name or label.startswith(name + ','):
+                    positions.setdefault(key, position)
+    return positions
+
+
+def enter_native_symbols(text: str, report: dict) -> None:
+    """Type synthetic mixed-symbol words using Gboard's real on-screen keys."""
+    trace = report.setdefault('native_symbol_key_trace', [])
+    for character in text + ' ':
+        current = native_keyboard_positions(common.inspect_ime_windows())
+        if character not in current:
+            if character.isascii() and character.isalpha():
+                switches = ('abc',)
+            else:
+                switches = ('?123', '=\\<', '=<', 'more symbols')
+            for _ in range(2):
+                switch = next((name for name in switches if name in current), None)
+                if switch is None:
+                    break
+                trace.append({'switch': switch, 'labels': sorted(current)})
+                common.run('adb', 'shell', 'input', 'tap', *map(str, current[switch]))
+                time.sleep(.6)
+                current = native_keyboard_positions(common.inspect_ime_windows())
+                if character in current:
+                    break
+        if character not in current:
+            trace.append({'missing': character, 'labels': sorted(current)})
+            raise RuntimeError('Native Gboard symbol key is missing: ' + character)
+        common.run('adb', 'shell', 'input', 'tap', *map(str, current[character]))
+        time.sleep(.6)
+        trace.append({'key': character, 'editor': editor_text()})
+
+
 def enter(text: str, keys: dict[str, tuple[int, int]] | None) -> None:
     for word in text.lower().split(' '):
         if keys is None:
@@ -892,6 +947,20 @@ def dictionary_smoke(tmp: Path, report: dict) -> bool:
         if editor_text().rstrip() != 'សញ្ញាពិសេស':
             raise RuntimeError('Automatic typing ignored underscore, hyphen or plus in a personal word')
         result['automatic_mixed_symbols'] = 'passed'
+        # ADB text/key events above exercise InputConnection callbacks, but the
+        # real Gboard soft keyboard has its own composition and symbol pages.
+        open_editor()
+        time.sleep(4)
+        enter_native_symbols("p'o", result)
+        if editor_text().rstrip() != 'ប្អូន':
+            raise RuntimeError('Native Gboard soft keys did not convert the apostrophe word')
+        result['automatic_apostrophe_soft_keys'] = 'passed'
+        open_editor()
+        time.sleep(4)
+        enter_native_symbols('p_o-n+g', result)
+        if editor_text().rstrip() != 'សញ្ញាពិសេស':
+            raise RuntimeError('Native Gboard soft keys did not convert the mixed-symbol word')
+        result['automatic_mixed_symbols_soft_keys'] = 'passed'
         open_editor()
         time.sleep(3)
         if not tap_panel_icon({}):
