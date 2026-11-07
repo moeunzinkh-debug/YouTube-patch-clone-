@@ -40,7 +40,7 @@
 
 ## លទ្ធផលសាកល្បង
 
-[Android 15 emulator សម្រាប់ dev.3](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42244932669) បានសាក panel 7/7 និង automatic 6/6, setting, វចនានុក្រម add/edit/delete, ការស្វែងរក, import រក្សា/ជំនួសពាក្យស្ទួន, បដិសេធឯកសារខូច, export និងការប្រើពាក្យក្រោយ restart។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឲ្យត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+Bundle `4.0.0-khmerlish-dev.4` ឆ្លងកាត់ [build និង unit tests 39/39](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42316753098)។ [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42317327930) បានសាក panel 7/7 និង automatic 6/6 ព្រមទាំងឃ្លាមានដកឃ្លាក្នុងរបៀបទាំងពីរ, រូបកែពាក្យ, កែ/រក្សាពាក្យដើម, ការស្វែងរក, add/edit/delete, import/export និងការប្រើពាក្យក្រោយ restart។ [របាយការណ៍ Android](android-smoke.json) មាន SHA ត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 
