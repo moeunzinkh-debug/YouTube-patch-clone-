@@ -10,7 +10,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = '4.0.0-khmerlish-dev.4'
+VERSION = '4.0.5'
 NAME = 'Khmerlish to Khmer (experimental)'
 PACKAGE = 'com.google.android.inputmethod.latin'
 TARGET = '18.5.4.993608717-release-arm64-v8a'
