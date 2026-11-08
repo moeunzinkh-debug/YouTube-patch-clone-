@@ -1,0 +1,169 @@
+name: Add tested King-Patcher bundle to its pre-release
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - '.github/workflows/add-king-bundle-to-prerelease.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: king-patcher-prerelease-bundle
+  cancel-in-progress: false
+
+jobs:
+  add-bundle:
+    # One-shot, user-authorized addition to the existing pre-release; never clobber assets.
+    if: contains(github.event.head_commit.message, '[add-king-bundle]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: '438150388'
+      RELEASE_TAG: King-Patcher
+      APK_ID: '723503683'
+      APK_SHA256: e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222
+      ASSET_NAME: king-patcher-0.1.0-dev.1.mpp
+      EXPECTED_SHA256: 11ebd305dc6cf6801f9a4403efc87f5fc8d3f789326c22fe8c20415625d2e48e
+      EXPECTED_SIZE: '58877'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Verify the exact tested bundle and source-matched CI runs
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Fdc6d652d-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to upload a stale bundle'; exit 1; }
+          (cd bundles/king-patcher && sha256sum --check bundle.mpp.sha256)
+          common=(tools/king-patcher/project tools/king-patcher/prepare_build.py tools/king-patcher/verify_bundle.py)
+          static="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-king-patcher.yml \
+            "${common[@]}" tools/king-patcher/verify_patched_menu.py .github/workflows/build-king-patcher.yml)"
+          android="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-king-android.yml \
+            "${common[@]}" tools/king-patcher/tests/android .github/workflows/test-king-android.yml)"
+          manager="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-king-manager.yml \
+            "${common[@]}" tools/king-patcher/verify_patched_menu.py tools/king-patcher/tests/manager .github/workflows/test-king-manager.yml)"
+          test "$static" = 42476650563 && test "$android" = 42476819811 && test "$manager" = 42476819817
+          mkdir -p "$RUNNER_TEMP/king-original-bundle"
+          gh run download "$static" --name king-patcher-bundle-static-only --dir "$RUNNER_TEMP/king-original-bundle"
+          (cd "$RUNNER_TEMP/king-original-bundle" && sha256sum --check bundle.mpp.sha256)
+          cmp bundles/king-patcher/bundle.mpp "$RUNNER_TEMP/king-original-bundle/bundle.mpp"
+          python3 tools/king-patcher/verify_bundle.py --mpp bundles/king-patcher/bundle.mpp \
+            --listing "$RUNNER_TEMP/king-original-bundle/patches.txt"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path('bundles/king-patcher')
+          bundle = root / 'bundle.mpp'
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          validation = json.loads((root / 'validation.json').read_text())
+          android = json.loads((root / 'android-smoke.json').read_text())
+          manager = json.loads((root / 'manager-smoke.json').read_text())
+          prefix = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/"
+          if (digest != os.environ['EXPECTED_SHA256'] or bundle.stat().st_size != int(os.environ['EXPECTED_SIZE'])
+                  or validation.get('bundle_version') != '0.1.0-dev.1' or validation.get('bundle_sha256') != digest
+                  or validation.get('static_build') != prefix + '42476650563'
+                  or validation.get('android_test') != prefix + '42476819811'
+                  or validation.get('manager_test') != prefix + '42476819817'):
+              raise SystemExit('Bundle or build provenance differs from the approved artifact')
+          if (android.get('bundle_sha256') != digest or android.get('runtime') != 'passed'
+                  or android.get('run_url') != prefix + '42476819811'
+                  or not android.get('lvl_fixture', '').startswith('classic callback changed from denial')
+                  or not android.get('ui_fixture', '').startswith('manually selected compiled views hidden')
+                  or not android.get('system_file_picker', '').startswith('selected UI input and saved both outputs')):
+              raise SystemExit('Synthetic Android tests do not match the bundle')
+          if (manager.get('bundle_sha256') != digest or manager.get('patch_and_save') != 'passed'
+                  or manager.get('both_opt_in_selectors') != 'selected in Manager'
+                  or manager.get('run_url') != prefix + '42476819817'
+                  or manager.get('target') != 'King-Patcher 12.10.10 / 1980'):
+              raise SystemExit('Manager test does not match the bundle')
+          print('Verified the tested bundle and matching Manager and Android reports:', digest)
+          PY
+      - name: Snapshot the existing pre-release and stage new files
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/king-release-before.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/king-tag-before.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          before = json.loads((Path(os.environ['RUNNER_TEMP']) / 'king-release-before.json').read_text())
+          names = [a['name'] for a in before['assets']]
+          apk = [a for a in before['assets'] if a['id'] == int(os.environ['APK_ID'])]
+          if (before['id'] != int(os.environ['RELEASE_ID']) or before['tag_name'] != os.environ['RELEASE_TAG']
+                  or before['draft'] or not before['prerelease'] or len(names) != len(set(names))
+                  or os.environ['ASSET_NAME'] in names or os.environ['ASSET_NAME'] + '.sha256' in names
+                  or len(apk) != 1 or apk[0]['name'] != 'King.Patcher_12.10.10.apk'
+                  or apk[0]['state'] != 'uploaded' or apk[0]['size'] != 15071570
+                  or apk[0]['digest'] != 'sha256:' + os.environ['APK_SHA256']):
+              raise SystemExit('Pre-release, original APK, or existing assets changed; no upload attempted')
+          PY
+          stage="$RUNNER_TEMP/king-release-assets"
+          mkdir -p "$stage"
+          cp bundles/king-patcher/bundle.mpp "$stage/$ASSET_NAME"
+          (cd "$stage" && sha256sum "$ASSET_NAME" > "$ASSET_NAME.sha256")
+          (cd "$stage" && sha256sum --check "$ASSET_NAME.sha256")
+          echo "$EXPECTED_SHA256  $stage/$ASSET_NAME" | sha256sum --check
+      - name: Add the bundle and checksum without overwriting existing assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Fdc6d652d-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced before upload'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/king-release-preflight.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'king-release-before.json').read_text())
+          current = json.loads((temp / 'king-release-preflight.json').read_text())
+          keys = ('id', 'tag_name', 'name', 'body', 'draft', 'prerelease', 'target_commitish')
+          assets = lambda release: {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in release['assets']}
+          if any(before[k] != current[k] for k in keys) or assets(before) != assets(current):
+              raise SystemExit('Release changed after snapshot; refusing to upload')
+          PY
+          stage="$RUNNER_TEMP/king-release-assets"
+          gh release upload "$RELEASE_TAG" "$stage/$ASSET_NAME" "$stage/$ASSET_NAME.sha256"
+      - name: Verify new assets and unchanged pre-release, tag and original APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/king-release-after.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/king-tag-after.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'king-release-before.json').read_text())
+          after = json.loads((temp / 'king-release-after.json').read_text())
+          tag_before = json.loads((temp / 'king-tag-before.json').read_text())
+          tag_after = json.loads((temp / 'king-tag-after.json').read_text())
+          keys = ('id', 'tag_name', 'name', 'body', 'draft', 'prerelease', 'target_commitish')
+          if any(before[k] != after[k] for k in keys) or tag_before['object'] != tag_after['object']:
+              raise SystemExit('Release metadata or tag changed')
+          old = {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in before['assets']}
+          final = {a['id']: (a['name'], a['size'], a['state'], a['digest']) for a in after['assets']}
+          if any(final.get(i) != value for i, value in old.items()):
+              raise SystemExit('A pre-existing release asset changed')
+          staged = {p.name: p for p in (temp / 'king-release-assets').iterdir()}
+          added = {a['name']: a for a in after['assets'] if a['id'] not in old}
+          if len(after['assets']) != len(before['assets']) + 2 or len(added) != 2 or set(added) != set(staged):
+              raise SystemExit('Unexpected, duplicate or missing release assets')
+          for name, path in staged.items():
+              asset = added[name]
+              expected = 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+              if asset['state'] != 'uploaded' or asset['size'] != path.stat().st_size or asset['digest'] not in (None, expected):
+                  raise SystemExit('Uploaded asset metadata differs: ' + name)
+          print('Both new assets verified; the original APK, tag and release metadata are unchanged')
+          PY
+          mkdir -p "$RUNNER_TEMP/king-release-download"
+          gh release download "$RELEASE_TAG" --pattern "$ASSET_NAME" --pattern "$ASSET_NAME.sha256" \
+            --dir "$RUNNER_TEMP/king-release-download"
+          (cd "$RUNNER_TEMP/king-release-download" && sha256sum --check "$ASSET_NAME.sha256")
+          echo "$EXPECTED_SHA256  $RUNNER_TEMP/king-release-download/$ASSET_NAME" | sha256sum --check
+          echo '::notice::The tested King bundle and checksum were added; the existing APK was not changed.'
