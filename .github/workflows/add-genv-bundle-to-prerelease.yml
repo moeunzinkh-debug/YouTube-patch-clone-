@@ -1,0 +1,151 @@
+name: Add tested GenV patch bundle to its existing pre-release
+
+on:
+  push:
+    branches: [arena/02093a53-youtube-patch-clone]
+    paths:
+      - '.github/workflows/add-genv-bundle-to-prerelease.yml'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: genv-prerelease-bundle
+  cancel-in-progress: false
+
+jobs:
+  add-bundle:
+    # One-shot additive publication. Never move the tag or replace any asset.
+    if: contains(github.event.head_commit.message, '[add-genv-bundle]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: '438248089'
+      RELEASE_TAG: GenV
+      TAG_COMMIT: 616749c0c0cd06169507ac184d4d87238214f1f0
+      APK_ID: '723946916'
+      APK_SHA256: f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e
+      ASSET_NAME: GenV-patches-v0.1.0-dev.1.mpp
+      EXPECTED_SHA256: 818c9b0972515d506d06a6f27e08419e68e1e513ecc07a2194b8fbc91227fe26
+      EXPECTED_SIZE: '16683'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Verify exact bundle and its source-matched test runs
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F02093a53-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing to upload a stale bundle'; exit 1; }
+          (cd bundles/genv && sha256sum --check bundle.mpp.sha256)
+          common=(tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/inspect_genv.py)
+          static="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            "${common[@]}" .github/workflows/build-genv-mpp.yml)"
+          manager="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-genv-manager.yml \
+            "${common[@]}" .github/workflows/build-genv-mpp.yml tools/genv/test_manager.py tools/genv/verify_manager_output.py .github/workflows/test-genv-manager.yml)"
+          android="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-genv-android.yml \
+            "${common[@]}" .github/workflows/build-genv-mpp.yml tools/genv/tests/android .github/workflows/test-genv-android.yml)"
+          test "$static" = 42483563872 && test "$manager" = 42483820583 && test "$android" = 42484074510
+          mkdir -p "$RUNNER_TEMP/genv-original-bundle"
+          gh run download "$static" --name genv-morphe-bundle-static-only --dir "$RUNNER_TEMP/genv-original-bundle"
+          (cd "$RUNNER_TEMP/genv-original-bundle" && sha256sum --check bundle.mpp.sha256)
+          cmp bundles/genv/bundle.mpp "$RUNNER_TEMP/genv-original-bundle/bundle.mpp"
+          python3 tools/genv/verify_bundle.py --mpp bundles/genv/bundle.mpp --listing "$RUNNER_TEMP/genv-original-bundle/patches.txt"
+          python3 - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path('bundles/genv'); bundle=root/'bundle.mpp'; digest=hashlib.sha256(bundle.read_bytes()).hexdigest()
+          v=json.loads((root/'validation.json').read_text()); m=json.loads((root/'manager-smoke.json').read_text()); a=json.loads((root/'android-smoke.json').read_text())
+          prefix=f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/"
+          if (digest != os.environ['EXPECTED_SHA256'] or bundle.stat().st_size != int(os.environ['EXPECTED_SIZE'])
+              or v.get('bundle_version') != '0.1.0-dev.1' or v.get('bundle_sha256') != digest
+              or v.get('static_build') != prefix+'42483563872' or v.get('manager_test') != prefix+'42483820583'
+              or v.get('synthetic_android_test') != prefix+'42484074510'):
+              raise SystemExit('Bundle or source provenance differs from the tested artifact')
+          if (m.get('bundle_sha256') != digest or m.get('manager_patch_incomplete_base') != 'passed'
+              or m.get('ci_run') != prefix+'42483820583' or m.get('app_installed_or_launched') is not False):
+              raise SystemExit('Manager test does not match the bundle')
+          if (a.get('bundle_sha256') != digest or a.get('status') != 'passed'
+              or a.get('ci_run') != prefix+'42484074510' or a.get('before_patch_check_calls_and_init_calls') != [2,1]
+              or a.get('after_patch_check_calls_and_init_calls') != [0,0]
+              or not a.get('wrong_version_code_rejected') or not a.get('changed_opcode_rejected')):
+              raise SystemExit('Synthetic Android test does not match the bundle')
+          print('Verified tested GenV bundle and its reports:', digest)
+          PY
+      - name: Snapshot the pre-release and stage the new files
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/genv-release-before.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/genv-tag-before.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          temp=Path(os.environ['RUNNER_TEMP']); before=json.loads((temp/'genv-release-before.json').read_text()); tag=json.loads((temp/'genv-tag-before.json').read_text())
+          names=[a['name'] for a in before['assets']]; apk=[a for a in before['assets'] if a['id']==int(os.environ['APK_ID'])]
+          if (before['id'] != int(os.environ['RELEASE_ID']) or before['tag_name'] != os.environ['RELEASE_TAG']
+              or before['draft'] or not before['prerelease'] or len(names)!=len(set(names))
+              or os.environ['ASSET_NAME'] in names or os.environ['ASSET_NAME']+'.sha256' in names
+              or tag['object']['type'] != 'commit' or tag['object']['sha'] != os.environ['TAG_COMMIT']
+              or len(apk)!=1 or apk[0]['name']!='GenV_3.7.2.apk' or apk[0]['state']!='uploaded'
+              or apk[0]['size']!=23281657 or apk[0]['digest']!='sha256:'+os.environ['APK_SHA256']):
+              raise SystemExit('Tag, pre-release or existing APK/assets differ; no upload attempted')
+          PY
+          stage="$RUNNER_TEMP/genv-release-assets"
+          mkdir -p "$stage"
+          cp bundles/genv/bundle.mpp "$stage/$ASSET_NAME"
+          (cd "$stage" && sha256sum "$ASSET_NAME" > "$ASSET_NAME.sha256" && sha256sum --check "$ASSET_NAME.sha256")
+          echo "$EXPECTED_SHA256  $stage/$ASSET_NAME" | sha256sum --check
+      - name: Add only the new bundle and checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2F02093a53-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced before upload'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/genv-release-preflight.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          temp=Path(os.environ['RUNNER_TEMP']); before=json.loads((temp/'genv-release-before.json').read_text()); current=json.loads((temp/'genv-release-preflight.json').read_text())
+          keys=('id','tag_name','name','body','draft','prerelease','target_commitish')
+          assets=lambda r:{a['id']:(a['name'],a['size'],a['state'],a['digest']) for a in r['assets']}
+          if any(before[k]!=current[k] for k in keys) or assets(before)!=assets(current):
+              raise SystemExit('Release changed since snapshot; refusing upload')
+          PY
+          stage="$RUNNER_TEMP/genv-release-assets"
+          gh release upload "$RELEASE_TAG" "$stage/$ASSET_NAME" "$stage/$ASSET_NAME.sha256"
+      - name: Verify added assets and the unchanged release, tag and APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/genv-release-after.json"
+          gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" > "$RUNNER_TEMP/genv-tag-after.json"
+          python3 - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          temp=Path(os.environ['RUNNER_TEMP']); before=json.loads((temp/'genv-release-before.json').read_text()); after=json.loads((temp/'genv-release-after.json').read_text())
+          tag_before=json.loads((temp/'genv-tag-before.json').read_text()); tag_after=json.loads((temp/'genv-tag-after.json').read_text())
+          keys=('id','tag_name','name','body','draft','prerelease','target_commitish')
+          if any(before[k]!=after[k] for k in keys) or tag_before['object']!=tag_after['object']:
+              raise SystemExit('Release metadata or tag changed')
+          old={a['id']:(a['name'],a['size'],a['state'],a['digest']) for a in before['assets']}
+          final={a['id']:(a['name'],a['size'],a['state'],a['digest']) for a in after['assets']}
+          if any(final.get(i)!=value for i,value in old.items()): raise SystemExit('A pre-existing asset changed')
+          staged={p.name:p for p in (temp/'genv-release-assets').iterdir()}
+          added={a['name']:a for a in after['assets'] if a['id'] not in old}
+          if len(after['assets'])!=len(before['assets'])+2 or len(added)!=2 or set(added)!=set(staged):
+              raise SystemExit('Unexpected or missing release assets')
+          for name,path in staged.items():
+              asset=added[name]; expected='sha256:'+hashlib.sha256(path.read_bytes()).hexdigest()
+              if asset['state']!='uploaded' or asset['size']!=path.stat().st_size or asset['digest'] not in (None,expected):
+                  raise SystemExit('Uploaded asset metadata differs: '+name)
+          print('New assets verified; original APK, tag and release metadata unchanged')
+          PY
+          mkdir -p "$RUNNER_TEMP/genv-release-download"
+          gh release download "$RELEASE_TAG" --pattern "$ASSET_NAME" --pattern "$ASSET_NAME.sha256" --dir "$RUNNER_TEMP/genv-release-download"
+          (cd "$RUNNER_TEMP/genv-release-download" && sha256sum --check "$ASSET_NAME.sha256")
+          echo "$EXPECTED_SHA256  $RUNNER_TEMP/genv-release-download/$ASSET_NAME" | sha256sum --check
+          echo '::notice::Added the tested GenV MPP and checksum without changing the existing APK or tag.'
