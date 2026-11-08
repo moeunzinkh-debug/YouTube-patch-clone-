@@ -5,6 +5,7 @@ import tempfile
 import unittest
 
 import inspect_apk as inspection
+import trace_api
 import trace_menu
 
 
@@ -58,6 +59,12 @@ class InspectionTests(unittest.TestCase):
             self.assertNotIn('secret text', serialized)
             self.assertIn('<redacted>', serialized)
             self.assertIn('0x7f110144', serialized)
+
+    def test_api_trace_reports_absent_classes_without_guessing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = trace_api.trace(Path(directory))
+            self.assertEqual(len(trace_api.CLASSES), len(result['classes']))
+            self.assertTrue(all(not item['found'] for item in result['classes'].values()))
 
     def test_missing_resources_and_wrong_asset_fail_safely(self):
         with tempfile.TemporaryDirectory() as directory:

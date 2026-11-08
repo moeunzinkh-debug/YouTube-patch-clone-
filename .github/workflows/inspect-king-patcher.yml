@@ -7,6 +7,7 @@ on:
       - 'tools/king-patcher/inspect_apk.py'
       - 'tools/king-patcher/test_inspect_apk.py'
       - 'tools/king-patcher/trace_menu.py'
+      - 'tools/king-patcher/trace_api.py'
       - '.github/workflows/inspect-king-patcher.yml'
 
 permissions:
@@ -64,13 +65,14 @@ jobs:
             exit 1
           fi
           cat "$RUNNER_TEMP/king-trace.log"
+          python3 tools/king-patcher/trace_api.py "$RUNNER_TEMP/king-decoded" "$RUNNER_TEMP/king-api-trace.json"
       - name: Emit bounded sanitized inventory and menu trace
         run: |
           python3 - <<'PY'
           import base64, gzip, os
           from pathlib import Path
           root = Path(os.environ['RUNNER_TEMP'])
-          for prefix, filename in (('KING_INVENTORY', 'king-inventory.json'), ('KING_MENU_TRACE', 'king-menu-trace.json')):
+          for prefix, filename in (('KING_INVENTORY', 'king-inventory.json'), ('KING_MENU_TRACE', 'king-menu-trace.json'), ('KING_API_TRACE', 'king-api-trace.json')):
               data = base64.b64encode(gzip.compress((root / filename).read_bytes())).decode('ascii')
               chunks = [data[i:i + 3900] for i in range(0, len(data), 3900)]
               if len(chunks) > 15:
@@ -84,3 +86,4 @@ jobs:
           path: |
             ${{ runner.temp }}/king-inventory.json
             ${{ runner.temp }}/king-menu-trace.json
+            ${{ runner.temp }}/king-api-trace.json
