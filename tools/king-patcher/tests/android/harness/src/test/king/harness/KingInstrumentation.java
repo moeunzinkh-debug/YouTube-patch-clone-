@@ -330,6 +330,7 @@ public final class KingInstrumentation extends Instrumentation {
             click("2. Select layout elements", 15000);
             click("res/layout/activity_main.xml", 15000);
             click("HIDE-ME", 15000);
+            click("HIDE-EXISTING", 15000);
             click("Save selection", 15000);
             phase("manual node selected");
             createOutput(ui, "3. Create modified APK", "king-ui-fixture.apk");

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import the source-matched King-Patcher MPP and patch a disposable APK in Manager.
+"""Import the fully source-matched King-Patcher MPP and patch a disposable APK in Manager.
 
 No account is used, the target APK is not launched in Manager, and network is disabled.
 """

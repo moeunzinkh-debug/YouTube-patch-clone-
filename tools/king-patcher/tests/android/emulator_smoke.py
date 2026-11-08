@@ -83,8 +83,8 @@ def main() -> None:
         adb('push', str(WORK / 'fixture.apk'), '/sdcard/Download/king-fixture.apk', timeout=120)
         adb('shell', 'am', 'broadcast', '-a', 'android.intent.action.MEDIA_SCANNER_SCAN_FILE', '-d',
             'file:///sdcard/Download/king-fixture.apk')
-        launch_and_check(('DENIED-561', 'KEEP-ME', 'HIDE-ME'))
-        report['baseline_fixture'] = 'denied LVL callback and both UI elements visible'
+        launch_and_check(('DENIED-561', 'KEEP-ME', 'HIDE-ME', 'HIDE-EXISTING'))
+        report['baseline_fixture'] = 'denied LVL callback and all fixture UI elements visible'
         instrument = adb('shell', 'am', 'instrument', '-w', '-r', 'test.king.harness/.KingInstrumentation', timeout=360)
         (WORK / 'instrument.log').write_text(instrument)
         if 'INSTRUMENTATION_RESULT: status=PASS' not in instrument or 'INSTRUMENTATION_CODE: -1' not in instrument:
@@ -108,13 +108,13 @@ def main() -> None:
         report['alignment'] = 'zipalign verification passed including 16 KiB native alignment option'
         adb('uninstall', PACKAGE)
         adb('install', str(WORK / 'lvl-output.apk'), timeout=120)
-        launch_and_check(('LICENSED-256', 'KEEP-ME', 'HIDE-ME'), ('DENIED-561',))
+        launch_and_check(('LICENSED-256', 'KEEP-ME', 'HIDE-ME', 'HIDE-EXISTING'), ('DENIED-561',))
         report['lvl_fixture'] = 'classic callback changed from denial to allow(256) on Android'
         report['dex_integrity'] = 'rewritten DEX SHA-1 and Adler-32 accepted by Android runtime'
         adb('uninstall', PACKAGE)
         adb('install', str(WORK / 'ui-output.apk'), timeout=120)
-        launch_and_check(('DENIED-561', 'KEEP-ME'), ('HIDE-ME',))
-        report['ui_fixture'] = 'manually selected compiled button hidden; unrelated label remains visible'
+        launch_and_check(('DENIED-561', 'KEEP-ME'), ('HIDE-ME', 'HIDE-EXISTING'))
+        report['ui_fixture'] = 'manually selected compiled views hidden with inserted and replaced visibility attributes; unrelated label remains visible'
         report['source_copy'] = 'instrumentation checked original synthetic APK SHA-256 unchanged'
         report['runtime'] = 'passed'
     except BaseException as error:
