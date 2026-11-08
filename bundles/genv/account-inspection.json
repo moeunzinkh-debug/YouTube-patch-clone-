@@ -1,0 +1,1176 @@
+{
+  "scope": "SHA-pinned release base only; read-only, no GenV execution, accounts or Google/GenV requests",
+  "package": "com.ainate.ai.video.generate",
+  "version": "3.7.2",
+  "version_code": 163,
+  "base_sha256": "f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e",
+  "files": {
+    "dex_files": [
+      "classes.dex",
+      "classes2.dex"
+    ],
+    "native_library_count": 0,
+    "flutter_assets_present": true,
+    "flutter_libapp_so_in_base": false,
+    "flutter_kernel_blob_in_base": false,
+    "flutter_text_or_snapshot_assets_scanned": 7,
+    "scanned_asset_bytes": 82918
+  },
+  "named_sdk_class_counts": {
+    "firebase_auth_named_classes": 0,
+    "flutter_firebase_auth_named_classes": 0,
+    "google_signin_named_classes": 6
+  },
+  "fixed_dex_indicator_counts": {
+    "password_word": 2,
+    "username_word": 1
+  },
+  "indicator_method_sites": {
+    "password_word": [
+      "Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;"
+    ],
+    "username_word": [
+      "Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;"
+    ]
+  },
+  "reviewed_username_password_site": {
+    "method": "Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;",
+    "flags": "public static",
+    "instruction_count": 788,
+    "known_words": [
+      {
+        "index": 1,
+        "known_word": "inputaction"
+      },
+      {
+        "index": 5,
+        "known_word": "fields"
+      },
+      {
+        "index": 122,
+        "known_word": "contentcommitmimetypes"
+      },
+      {
+        "index": 166,
+        "known_word": "obscuretext"
+      },
+      {
+        "index": 169,
+        "known_word": "autocorrect"
+      },
+      {
+        "index": 172,
+        "known_word": "enablesuggestions"
+      },
+      {
+        "index": 175,
+        "known_word": "enableimepersonalizedlearning"
+      },
+      {
+        "index": 179,
+        "known_word": "enabledeltamodel"
+      },
+      {
+        "index": 182,
+        "known_word": "textcapitalization"
+      },
+      {
+        "index": 208,
+        "known_word": "inputtype"
+      },
+      {
+        "index": 265,
+        "known_word": "actionlabel"
+      },
+      {
+        "index": 273,
+        "known_word": "autofill"
+      },
+      {
+        "index": 287,
+        "known_word": "uniqueidentifier"
+      },
+      {
+        "index": 290,
+        "known_word": "hints"
+      },
+      {
+        "index": 293,
+        "known_word": "hinttext"
+      },
+      {
+        "index": 301,
+        "known_word": "editingvalue"
+      },
+      {
+        "index": 330,
+        "known_word": "username"
+      },
+      {
+        "index": 336,
+        "known_word": "creditcardnumber"
+      },
+      {
+        "index": 344,
+        "known_word": "newpassword"
+      },
+      {
+        "index": 392,
+        "known_word": "password"
+      },
+      {
+        "index": 408,
+        "known_word": "newusername"
+      },
+      {
+        "index": 448,
+        "known_word": "email"
+      },
+      {
+        "index": 538,
+        "known_word": "addresscity"
+      },
+      {
+        "index": 614,
+        "known_word": "onetimecode"
+      },
+      {
+        "index": 640,
+        "known_word": "password"
+      },
+      {
+        "index": 644,
+        "known_word": "newusername"
+      }
+    ],
+    "events": [
+      {
+        "index": 1,
+        "opcode": "const-string",
+        "known_word": "inputaction"
+      },
+      {
+        "index": 2,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+      },
+      {
+        "index": 5,
+        "opcode": "const-string",
+        "known_word": "fields"
+      },
+      {
+        "index": 6,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->isNull(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 10,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONArray(Ljava/lang/String;)Lorg/json/JSONArray;"
+      },
+      {
+        "index": 12,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->length()I"
+      },
+      {
+        "index": 17,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->getJSONObject(I)Lorg/json/JSONObject;"
+      },
+      {
+        "index": 19,
+        "opcode": "invoke-static",
+        "reference": "Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;"
+      },
+      {
+        "index": 27,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 29,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->hashCode()I"
+      },
+      {
+        "index": 42,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 49,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 56,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 63,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 70,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 77,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 84,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 91,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 99,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 102,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 105,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 108,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 111,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 114,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 117,
+        "opcode": "invoke-static",
+        "reference": "Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;"
+      },
+      {
+        "index": 121,
+        "opcode": "invoke-direct",
+        "reference": "Ljava/util/ArrayList;-><init>()V"
+      },
+      {
+        "index": 122,
+        "opcode": "const-string",
+        "known_word": "contentcommitmimetypes"
+      },
+      {
+        "index": 123,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->isNull(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 128,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONArray(Ljava/lang/String;)Lorg/json/JSONArray;"
+      },
+      {
+        "index": 132,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->length()I"
+      },
+      {
+        "index": 135,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->optString(I)Ljava/lang/String;"
+      },
+      {
+        "index": 137,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 141,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->isNull(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 144,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONArray(Ljava/lang/String;)Lorg/json/JSONArray;"
+      },
+      {
+        "index": 146,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->length()I"
+      },
+      {
+        "index": 150,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->length()I"
+      },
+      {
+        "index": 153,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->optString(I)Ljava/lang/String;"
+      },
+      {
+        "index": 155,
+        "opcode": "invoke-static",
+        "reference": "Ljava/util/Locale;->forLanguageTag(Ljava/lang/String;)Ljava/util/Locale;"
+      },
+      {
+        "index": 166,
+        "opcode": "const-string",
+        "known_word": "obscuretext"
+      },
+      {
+        "index": 167,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 169,
+        "opcode": "const-string",
+        "known_word": "autocorrect"
+      },
+      {
+        "index": 170,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;Z)Z"
+      },
+      {
+        "index": 172,
+        "opcode": "const-string",
+        "known_word": "enablesuggestions"
+      },
+      {
+        "index": 173,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 175,
+        "opcode": "const-string",
+        "known_word": "enableimepersonalizedlearning"
+      },
+      {
+        "index": 176,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 179,
+        "opcode": "const-string",
+        "known_word": "enabledeltamodel"
+      },
+      {
+        "index": 180,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 182,
+        "opcode": "const-string",
+        "known_word": "textcapitalization"
+      },
+      {
+        "index": 183,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+      },
+      {
+        "index": 185,
+        "opcode": "invoke-static",
+        "reference": "Ly/e;->d(I)[I"
+      },
+      {
+        "index": 205,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 208,
+        "opcode": "const-string",
+        "known_word": "inputtype"
+      },
+      {
+        "index": 209,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONObject(Ljava/lang/String;)Lorg/json/JSONObject;"
+      },
+      {
+        "index": 215,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+      },
+      {
+        "index": 218,
+        "opcode": "invoke-static/range",
+        "reference": "Ly/e;->d(I)[I"
+      },
+      {
+        "index": 254,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 259,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;Z)Z"
+      },
+      {
+        "index": 262,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->optBoolean(Ljava/lang/String;Z)Z"
+      },
+      {
+        "index": 264,
+        "opcode": "invoke-direct",
+        "reference": "Lf6/n;-><init>(IZZ)V"
+      },
+      {
+        "index": 265,
+        "opcode": "const-string",
+        "known_word": "actionlabel"
+      },
+      {
+        "index": 266,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->isNull(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 271,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+      },
+      {
+        "index": 273,
+        "opcode": "const-string",
+        "known_word": "autofill"
+      },
+      {
+        "index": 274,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->isNull(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 285,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONObject(Ljava/lang/String;)Lorg/json/JSONObject;"
+      },
+      {
+        "index": 287,
+        "opcode": "const-string",
+        "known_word": "uniqueidentifier"
+      },
+      {
+        "index": 288,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+      },
+      {
+        "index": 290,
+        "opcode": "const-string",
+        "known_word": "hints"
+      },
+      {
+        "index": 291,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONArray(Ljava/lang/String;)Lorg/json/JSONArray;"
+      },
+      {
+        "index": 293,
+        "opcode": "const-string",
+        "known_word": "hinttext"
+      },
+      {
+        "index": 294,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->isNull(Ljava/lang/String;)Z"
+      },
+      {
+        "index": 299,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+      },
+      {
+        "index": 301,
+        "opcode": "const-string",
+        "known_word": "editingvalue"
+      },
+      {
+        "index": 302,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONObject;->getJSONObject(Ljava/lang/String;)Lorg/json/JSONObject;"
+      },
+      {
+        "index": 304,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->length()I"
+      },
+      {
+        "index": 308,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->length()I"
+      },
+      {
+        "index": 311,
+        "opcode": "invoke-virtual",
+        "reference": "Lorg/json/JSONArray;->getString(I)Ljava/lang/String;"
+      },
+      {
+        "index": 314,
+        "opcode": "sget",
+        "reference": "Landroid/os/Build$VERSION;->SDK_INTI"
+      },
+      {
+        "index": 327,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/Object;->getClass()Ljava/lang/Class;"
+      },
+      {
+        "index": 328,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->hashCode()I"
+      },
+      {
+        "index": 330,
+        "opcode": "const-string",
+        "known_word": "username"
+      },
+      {
+        "index": 336,
+        "opcode": "const-string",
+        "known_word": "creditcardnumber"
+      },
+      {
+        "index": 344,
+        "opcode": "const-string",
+        "known_word": "newpassword"
+      },
+      {
+        "index": 353,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 361,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 369,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 377,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 385,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 392,
+        "opcode": "const-string",
+        "known_word": "password"
+      },
+      {
+        "index": 393,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 401,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 408,
+        "opcode": "const-string",
+        "known_word": "newusername"
+      },
+      {
+        "index": 409,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 417,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 425,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 433,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 441,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      },
+      {
+        "index": 448,
+        "opcode": "const-string",
+        "known_word": "email"
+      },
+      {
+        "index": 449,
+        "opcode": "invoke-virtual",
+        "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+      }
+    ]
+  },
+  "reviewed_site_callers": [
+    {
+      "method": "Lf6/i;->onMethodCall(Lg6/m;Lg6/o;)V",
+      "instruction_count": 419,
+      "site_invocations": [
+        {
+          "index": 306,
+          "opcode": "invoke-static",
+          "reference": "Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;"
+        }
+      ],
+      "events": [
+        {
+          "index": 2,
+          "opcode": "iget",
+          "reference": "Lf6/i;->aI"
+        },
+        {
+          "index": 7,
+          "opcode": "iget-object",
+          "reference": "Lf6/i;->bLjava/lang/Object;"
+        },
+        {
+          "index": 9,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 13,
+          "opcode": "iget-object",
+          "reference": "Lg6/m;->aLjava/lang/String;"
+        },
+        {
+          "index": 14,
+          "opcode": "iget-object",
+          "reference": "Lg6/m;->bLjava/lang/Object;"
+        },
+        {
+          "index": 15,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/Object;->getClass()Ljava/lang/Class;"
+        },
+        {
+          "index": 16,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->hashCode()I"
+        },
+        {
+          "index": 27,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 34,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 41,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 48,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 55,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 62,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 69,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 76,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 83,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 90,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->equals(Ljava/lang/Object;)Z"
+        },
+        {
+          "index": 100,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->a()V"
+        },
+        {
+          "index": 102,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 104,
+          "opcode": "iget-object",
+          "reference": "Lg3/o;->aLjava/lang/Object;"
+        },
+        {
+          "index": 106,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->aLandroid/view/View;"
+        },
+        {
+          "index": 107,
+          "opcode": "sget",
+          "reference": "Landroid/os/Build$VERSION;->SDK_INTI"
+        },
+        {
+          "index": 109,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->cLandroid/view/autofill/AutofillManager;"
+        },
+        {
+          "index": 111,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->gLandroid/util/SparseArray;"
+        },
+        {
+          "index": 113,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->fLf6/m;"
+        },
+        {
+          "index": 114,
+          "opcode": "iget-object",
+          "reference": "Lf6/m;->jLo5/t;"
+        },
+        {
+          "index": 115,
+          "opcode": "iget-object",
+          "reference": "Lo5/t;->bLjava/lang/Object;"
+        },
+        {
+          "index": 118,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/View;->getLocationOnScreen([I)V"
+        },
+        {
+          "index": 120,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->mLandroid/graphics/Rect;"
+        },
+        {
+          "index": 121,
+          "opcode": "invoke-direct",
+          "reference": "Landroid/graphics/Rect;-><init>(Landroid/graphics/Rect;)V"
+        },
+        {
+          "index": 124,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/graphics/Rect;->offset(II)V"
+        },
+        {
+          "index": 125,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->cLandroid/view/autofill/AutofillManager;"
+        },
+        {
+          "index": 126,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->hashCode()I"
+        },
+        {
+          "index": 128,
+          "opcode": "invoke-static",
+          "reference": "Lio/flutter/plugin/editing/i;->t(Landroid/view/autofill/AutofillManager;Landroid/view/View;ILandroid/graphics/Rect;)V"
+        },
+        {
+          "index": 131,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->c(Ljava/lang/Object;)V"
+        },
+        {
+          "index": 133,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 135,
+          "opcode": "iget-object",
+          "reference": "Lg3/o;->aLjava/lang/Object;"
+        },
+        {
+          "index": 137,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->aLandroid/view/View;"
+        },
+        {
+          "index": 138,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->eLA2/L;"
+        },
+        {
+          "index": 139,
+          "opcode": "iget",
+          "reference": "LA2/L;->bI"
+        },
+        {
+          "index": 142,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->hLio/flutter/plugin/editing/f;"
+        },
+        {
+          "index": 143,
+          "opcode": "invoke-virtual",
+          "reference": "Lio/flutter/plugin/editing/f;->e(Lio/flutter/plugin/editing/e;)V"
+        },
+        {
+          "index": 144,
+          "opcode": "invoke-virtual",
+          "reference": "Lio/flutter/plugin/editing/j;->d()V"
+        },
+        {
+          "index": 145,
+          "opcode": "iput-object",
+          "reference": "Lio/flutter/plugin/editing/j;->fLf6/m;"
+        },
+        {
+          "index": 146,
+          "opcode": "invoke-virtual",
+          "reference": "Lio/flutter/plugin/editing/j;->e(Lf6/m;)V"
+        },
+        {
+          "index": 148,
+          "opcode": "invoke-direct",
+          "reference": "LA2/L;-><init>(III)V"
+        },
+        {
+          "index": 149,
+          "opcode": "iput-object",
+          "reference": "Lio/flutter/plugin/editing/j;->eLA2/L;"
+        },
+        {
+          "index": 150,
+          "opcode": "iput-object",
+          "reference": "Lio/flutter/plugin/editing/j;->mLandroid/graphics/Rect;"
+        },
+        {
+          "index": 151,
+          "opcode": "sget-object",
+          "reference": "LQ/B;->aLjava/lang/reflect/Field;"
+        },
+        {
+          "index": 152,
+          "opcode": "invoke-static",
+          "reference": "LQ/v;->a(Landroid/view/View;)LQ/Z;"
+        },
+        {
+          "index": 155,
+          "opcode": "iget-object",
+          "reference": "LQ/Z;->aLQ/W;"
+        },
+        {
+          "index": 156,
+          "opcode": "invoke-virtual",
+          "reference": "LQ/W;->r(I)Z"
+        },
+        {
+          "index": 159,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->bLandroid/view/inputmethod/InputMethodManager;"
+        },
+        {
+          "index": 160,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/inputmethod/InputMethodManager;->restartInput(Landroid/view/View;)V"
+        },
+        {
+          "index": 163,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->c(Ljava/lang/Object;)V"
+        },
+        {
+          "index": 165,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 168,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/Boolean;->booleanValue()Z"
+        },
+        {
+          "index": 170,
+          "opcode": "sget",
+          "reference": "Landroid/os/Build$VERSION;->SDK_INTI"
+        },
+        {
+          "index": 172,
+          "opcode": "iget-object",
+          "reference": "Lg3/o;->aLjava/lang/Object;"
+        },
+        {
+          "index": 174,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->cLandroid/view/autofill/AutofillManager;"
+        },
+        {
+          "index": 178,
+          "opcode": "invoke-static",
+          "reference": "Lio/flutter/plugin/editing/i;->r(Landroid/view/autofill/AutofillManager;)V"
+        },
+        {
+          "index": 180,
+          "opcode": "invoke-static",
+          "reference": "Lio/flutter/plugin/editing/i;->D(Landroid/view/autofill/AutofillManager;)V"
+        },
+        {
+          "index": 182,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/Object;->getClass()Ljava/lang/Class;"
+        },
+        {
+          "index": 185,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->c(Ljava/lang/Object;)V"
+        },
+        {
+          "index": 189,
+          "opcode": "invoke-virtual",
+          "reference": "Lorg/json/JSONObject;->getDouble(Ljava/lang/String;)D"
+        },
+        {
+          "index": 192,
+          "opcode": "invoke-virtual",
+          "reference": "Lorg/json/JSONObject;->getDouble(Ljava/lang/String;)D"
+        },
+        {
+          "index": 195,
+          "opcode": "invoke-virtual",
+          "reference": "Lorg/json/JSONObject;->getJSONArray(Ljava/lang/String;)Lorg/json/JSONArray;"
+        },
+        {
+          "index": 200,
+          "opcode": "invoke-virtual",
+          "reference": "Lorg/json/JSONArray;->getDouble(I)D"
+        },
+        {
+          "index": 207,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 211,
+          "opcode": "invoke-virtual/range",
+          "reference": "Lg3/o;->r(DD[D)V"
+        },
+        {
+          "index": 214,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->c(Ljava/lang/Object;)V"
+        },
+        {
+          "index": 216,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/Throwable;->getMessage()Ljava/lang/String;"
+        },
+        {
+          "index": 220,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->b(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V"
+        },
+        {
+          "index": 224,
+          "opcode": "invoke-virtual",
+          "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "index": 226,
+          "opcode": "invoke-virtual",
+          "reference": "Lorg/json/JSONObject;->getString(Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "index": 229,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/String;->isEmpty()Z"
+        },
+        {
+          "index": 233,
+          "opcode": "invoke-direct",
+          "reference": "Landroid/os/Bundle;-><init>()V"
+        },
+        {
+          "index": 234,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/os/BaseBundle;->putString(Ljava/lang/String;Ljava/lang/String;)V"
+        },
+        {
+          "index": 239,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 241,
+          "opcode": "iget-object",
+          "reference": "Lg3/o;->aLjava/lang/Object;"
+        },
+        {
+          "index": 243,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->bLandroid/view/inputmethod/InputMethodManager;"
+        },
+        {
+          "index": 244,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->aLandroid/view/View;"
+        },
+        {
+          "index": 245,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/inputmethod/InputMethodManager;->sendAppPrivateCommand(Landroid/view/View;Ljava/lang/String;Landroid/os/Bundle;)V"
+        },
+        {
+          "index": 248,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->c(Ljava/lang/Object;)V"
+        },
+        {
+          "index": 250,
+          "opcode": "invoke-virtual",
+          "reference": "Ljava/lang/Throwable;->getMessage()Ljava/lang/String;"
+        },
+        {
+          "index": 254,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->b(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V"
+        },
+        {
+          "index": 256,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        },
+        {
+          "index": 258,
+          "opcode": "iget-object",
+          "reference": "Lg3/o;->aLjava/lang/Object;"
+        },
+        {
+          "index": 260,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->bLandroid/view/inputmethod/InputMethodManager;"
+        },
+        {
+          "index": 261,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->aLandroid/view/View;"
+        },
+        {
+          "index": 262,
+          "opcode": "iget-object",
+          "reference": "Lio/flutter/plugin/editing/j;->fLf6/m;"
+        },
+        {
+          "index": 264,
+          "opcode": "iget-object",
+          "reference": "Lf6/m;->gLf6/n;"
+        },
+        {
+          "index": 265,
+          "opcode": "iget",
+          "reference": "Lf6/n;->aI"
+        },
+        {
+          "index": 269,
+          "opcode": "invoke-virtual",
+          "reference": "Lio/flutter/plugin/editing/j;->d()V"
+        },
+        {
+          "index": 270,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/View;->getApplicationWindowToken()Landroid/os/IBinder;"
+        },
+        {
+          "index": 272,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/inputmethod/InputMethodManager;->hideSoftInputFromWindow(Landroid/os/IBinder;I)Z"
+        },
+        {
+          "index": 274,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/View;->requestFocus()Z"
+        },
+        {
+          "index": 275,
+          "opcode": "invoke-virtual",
+          "reference": "Landroid/view/inputmethod/InputMethodManager;->showSoftInput(Landroid/view/View;I)Z"
+        },
+        {
+          "index": 278,
+          "opcode": "invoke-virtual",
+          "reference": "LL5/h;->c(Ljava/lang/Object;)V"
+        },
+        {
+          "index": 280,
+          "opcode": "iget-object",
+          "reference": "Lf6/h;->cLjava/lang/Object;"
+        }
+      ]
+    }
+  ],
+  "fixed_flutter_asset_indicator_counts": {
+    "login_word": 3
+  },
+  "matching_android_string_resource_names": [],
+  "interpretation_limits": [
+    "SDK and generic word matches alone do not establish a usable login, signup, reset, or account-linking feature",
+    "Named classes and method names can be obfuscated; a zero count is not proof of absence",
+    "Flutter AOT code and configuration splits required by the release app are not present in the inspected base",
+    "Backend registration, password reset, website/app account sharing and Google account linking are unknown",
+    "No real app, account, password, server request or Google sign-in was tested"
+  ],
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42536422964"
+}

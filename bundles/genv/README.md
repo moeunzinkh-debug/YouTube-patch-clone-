@@ -42,6 +42,14 @@
 
 **មិនទាន់មាន browser-login patch ទេ។** ត្រូវស្គាល់ផ្លូវ sign-in/callback ផ្លូវការដែល GenV គាំទ្រ ឬឱ្យម្ចាស់ GenV រៀបចំ OAuth និង callback សមស្របជាមុន; ការបើក URL ទៅ Google ប៉ុណ្ណោះមិនមែនជា login ដែលដំណើរការទេ។ កុំផ្ញើ password, authorization code, token ឬ client secret ដើម្បីស៊ើបអង្កេត។
 
+## ពិនិត្យ username/password ក្នុង APK base
+
+ការពិនិត្យ read-only នៃ base 3.7.2 បានរកឃើញពាក្យ `username` និង `password` ក្នុង DEX ប៉ុន្តែការតាមដាន method និង caller បង្ហាញថាវាស្របនឹង **Flutter text input/autofill configuration** មិនមែនជាភស្តុតាងនៃប្រព័ន្ធចុះឈ្មោះ ឬបង្កើត password របស់ GenV ទេ។ វាមាន keys/hints ដូចជា `autofill`, `hints`, `newPassword` និង `newUsername` ដែលស្របនឹង [source Flutter សាធារណៈ](https://github.com/flutter-team-archive/engine/blob/c97a0deccbc139a133fcb7830fc82d330568e4de/shell/platform/android/io/flutter/embedding/engine/systemchannels/TextInputChannel.java); hint ទាំងនេះមិនបញ្ជាក់ថាមានមុខងារកំណត់ password សម្រាប់គណនីទេ។
+
+ក្នុងផ្នែកដែលបានស្កេន មិនឃើញ labels Firebase Auth ដែលបានកំណត់សម្រាប់ signup, password reset និង account linking ទេ។ ការបាត់ labels មិនបញ្ជាក់ថាមុខងារទាំងនោះមិនមានទេ៖ code អាចត្រូវបានប្ដូរឈ្មោះ ឬនៅក្នុងផ្នែកដែលបាត់។ សញ្ញាពាក្យ `login` ក្នុង Flutter assets ក៏មិនបញ្ជាក់ថាផ្លូវ login នោះអាចប្រើបានដែរ។
+
+Base នេះគ្មាន native library រួមទាំង `libapp.so` ដែលផ្ទុក Flutter app code ហើយត្រូវការ splits ដូច្នេះមិនទាន់អាចបញ្ជាក់ថាមាន signup/reset ឬអាចភ្ជាប់ password ទៅ Google account បានទេ។ មិនបានរត់ app សាកគណនី ទាក់ទង server ឬកែ APK ដើមឡើយ។ [របាយការណ៍សញ្ញា និង method ដោយគ្មានទិន្នន័យគណនី](account-inspection.json)។
+
 ## ការសាក និងដែនកំណត់
 
 - Morphe Desktop បានពិនិត្យ bundle និង patch ដាច់ដោយឡែក/រួមគ្នាលើច្បាប់ចម្លង base; DEX strings ផ្សេង និង Binder descriptors មិនត្រូវបានប្ដូរ។ APK ចុះហត្ថលេខាដោយ key ផ្សេងត្រូវបានបដិសេធ។ [License static report](patch-validation.json) · [MicroG static report](microg-static.json)។
