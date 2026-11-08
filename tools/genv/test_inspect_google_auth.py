@@ -28,6 +28,8 @@ class AuthInspectionGuards(unittest.TestCase):
         self.assertEqual([v['algorithm'] for v in values], ['sha1', 'sha256'])
         self.assertEqual(values[0]['label'], 'Signer #1')
         self.assertNotIn('example.com', str(values))
+        tagged = parse_certificate_digests('Signer (minSdkVersion=24, maxSdkVersion=32) #1: certificate SHA-1 digest: ' + 'c' * 40)
+        self.assertNotEqual(tagged[0]['label'], 'other')
 
     def test_js_evidence_is_fixed_counts_only(self):
         self.assertTrue(all(isinstance(needle, bytes) and len(needle) >= 6 for needle in JS_INDICATORS.values()))

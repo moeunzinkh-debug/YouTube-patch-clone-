@@ -32,7 +32,7 @@ def parse_certificate_digests(text: str) -> list[dict[str, str]]:
         m = re.search(r'certificate SHA-(1|256) digest:\s*([a-fA-F0-9]+)', line, re.I)
         if m and len(m[2]) == (40 if m[1] == '1' else 64):
             prefix = line[:m.start()].strip()
-            label = prefix if re.fullmatch(r'[A-Za-z0-9 #=(),.\-]{0,120}', prefix) else 'other'
+            label = prefix if re.fullmatch(r'[A-Za-z0-9 #=(),.\-:\[\]]{0,120}', prefix) else 'other'
             certs.append({'label': label, 'algorithm': 'sha' + m[1], 'digest': m[2].lower()})
     return certs
 
