@@ -18,7 +18,12 @@ TARGET = 'ru.jgaiecip.osuojvyxe'
 
 
 def run(*args: str, timeout: int = 90) -> str:
-    result = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+    try:
+        result = subprocess.run(args, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
+    except subprocess.TimeoutExpired as error:
+        output = error.stdout or ''
+        if isinstance(output, bytes): output = output.decode(errors='replace')
+        raise RuntimeError(f'command timed out after {timeout}s: {args[:3]}\n{output[-5000:]}') from error
     if result.returncode:
         raise RuntimeError(f'command failed ({result.returncode}): {args[:3]}\n{result.stdout[-3000:]}')
     return result.stdout
