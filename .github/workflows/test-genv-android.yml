@@ -2,7 +2,7 @@ name: GenV synthetic PairIP Android runtime test
 
 on:
   push:
-    branches: [arena/02093a53-youtube-patch-clone]
+    branches: [arena/3655779f-youtube-patch-clone]
     paths:
       - 'tools/genv/tests/android/**'
       - '.github/workflows/test-genv-android.yml'
@@ -35,8 +35,8 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/genv-android" "$RUNNER_TEMP/genv-android-bundle"
           run="$(python3 tools/king-patcher/find_successful_run.py \
-            arena/02093a53-youtube-patch-clone build-genv-mpp.yml \
-            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
+            "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/verify_microg_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
           gh run download "$run" --name genv-morphe-bundle-static-only --dir "$RUNNER_TEMP/genv-android-bundle"
           python3 tools/genv/verify_bundle.py --mpp "$RUNNER_TEMP/genv-android-bundle/bundle.mpp" --listing "$RUNNER_TEMP/genv-android-bundle/patches.txt"
       - name: Compile synthetic fixture and check negative fingerprints

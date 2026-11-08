@@ -1,0 +1,82 @@
+name: Test GenV MicroG guard offline on Android
+
+on:
+  push:
+    branches: [arena/3655779f-youtube-patch-clone]
+    paths:
+      - 'tools/genv/tests/microg/**'
+      - '.github/workflows/test-genv-microg.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  microg-guard:
+    if: contains(github.event.head_commit.message, '[genv-microg]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [24, 35]
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch matching MPP and published MicroG, and build disposable probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/genv-microg"
+          mkdir -p "$work/bundle" "$work/fixtures" "$work/release"
+          run="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py \
+            tools/genv/verify_microg_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
+          gh run download "$run" --name genv-morphe-bundle-static-only --dir "$work/bundle"
+          python3 tools/genv/verify_bundle.py --mpp "$work/bundle/bundle.mpp" --listing "$work/bundle/patches.txt"
+          gh release download 7.3.0 --repo MorpheApp/MicroG-RE --pattern microg-7.3.0.apk --dir "$work/release"
+          microg="$work/release/microg-7.3.0.apk"
+          echo '67b794fd5221512a11d5950ec214fc0af0e3a8f72840d01235920729c7e73f5e  '"$microg" | sha256sum --check
+          signer="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n1)"
+          python3 - "$signer" "$microg" <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'tools/genv')
+          from trace_google_auth import signature_lines
+          result = signature_lines(sys.argv[1], Path(sys.argv[2]))
+          assert result['verified'] and any(x['label']=='V3.0 Signer:' and x['algorithm']=='sha256' and
+              x['digest']=='0b6c9515afb195fac59601696ba0a7907a0b217ccf720b43148427ccf64343e7'
+              for x in result['public_certificate_digests']), 'Unexpected published MicroG signer'
+          PY
+          bash tools/genv/tests/microg/prepare.sh "$work/fixtures" "$work/bundle/bundle.mpp"
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Run offline signer, disabled-package, and component-resolution checks
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 8G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/genv/tests/microg/emulator_test.py "$RUNNER_TEMP/genv-microg/fixtures" "$RUNNER_TEMP/genv-microg/bundle/bundle.mpp" "$RUNNER_TEMP/genv-microg/release/microg-7.3.0.apk" "$RUNNER_TEMP/genv-microg/guard-${{ matrix.api }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: genv-microg-guard-api-${{ matrix.api }}
+          if-no-files-found: error
+          path: ${{ runner.temp }}/genv-microg/guard-${{ matrix.api }}.json

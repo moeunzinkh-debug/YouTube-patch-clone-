@@ -26,7 +26,7 @@ def verify_listing(text: str) -> None:
             raise ValueError('Unexpected selector default or compatibility: ' + name)
 
 
-def verify(bundle: Path, listing: str) -> dict:
+def verify_bundle(bundle: Path) -> dict:
     digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
     checksum = bundle.with_name(bundle.name + '.sha256')
     if checksum.read_text().split()[0] != digest:
@@ -51,9 +51,14 @@ def verify(bundle: Path, listing: str) -> dict:
         classes = [name for name in names if name.startswith('app/morphe/patches/') and name.endswith('.class')]
         if not classes or any(not name.startswith('app/morphe/patches/genv/') for name in classes):
             raise ValueError('Unrelated patch classes in GenV-only bundle')
-    verify_listing(listing)
     return {'sha256': digest, 'bytes': bundle.stat().st_size, 'version': VERSION,
             'patches': list(PATCH_DEFAULTS), 'experimental': True}
+
+
+def verify(bundle: Path, listing: str) -> dict:
+    result = verify_bundle(bundle)
+    verify_listing(listing)
+    return result
 
 
 def main() -> None:

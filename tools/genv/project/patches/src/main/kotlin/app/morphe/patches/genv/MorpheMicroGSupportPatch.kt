@@ -1,5 +1,7 @@
 package app.morphe.patches.genv
 
+import app.morphe.patcher.PackageMetadata
+import app.morphe.patcher.apk.ApkSignatureScheme
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.AppTarget
@@ -15,6 +17,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableStringReference
+import java.security.MessageDigest
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 
@@ -25,6 +28,23 @@ private const val GUARD = "Lapp/morphe/extension/genv/MicroGGuard;"
 // V3.0 APK signer (not the distinct source-stamp signer) of the reviewed
 // SHA-pinned GenV 3.7.2 base. This is public certificate metadata, not a key.
 private const val ORIGINAL_GENV_SIGNER_SHA1 = "be4c81d3869d726ea9f0229ab937f2e11ab1ccc7"
+private const val ORIGINAL_GENV_SIGNER_SHA256 = "1a0e59b153bb4ece8744b01850dea4f614e3f42106b65684668eccd5d7cc2f42"
+
+/** Refuse to advertise the reviewed original signer for a different input. */
+private fun verifyGenVSource(metadata: PackageMetadata) {
+    require(metadata.packageName == GENV_PACKAGE && metadata.versionName == "3.7.2" && metadata.versionCode == "163") {
+        "Morphe MicroG support requires the reviewed GenV package, version 3.7.2 and build 163"
+    }
+    val schemes = setOf(ApkSignatureScheme.V2, ApkSignatureScheme.V3, ApkSignatureScheme.V31)
+    val certificates = metadata.signingCertificates.filterKeys { it in schemes }.values.flatten()
+    val digests = certificates.map { certificate ->
+        MessageDigest.getInstance("SHA-256").digest(certificate.encoded)
+            .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+    }.toSet()
+    require(digests == setOf(ORIGINAL_GENV_SIGNER_SHA256)) {
+        "GenV input signing certificate is absent or does not match the reviewed base APK"
+    }
+}
 
 private val genvExtension = bytecodePatch { extendWith("extensions/genv.mpe") }
 
@@ -88,7 +108,10 @@ internal fun addMorpheMicroGManifestEntries(document: Document) {
 }
 
 private val microgManifest = resourcePatch {
-    execute { document("AndroidManifest.xml").use(::addMorpheMicroGManifestEntries) }
+    execute {
+        verifyGenVSource(packageMetadata)
+        document("AndroidManifest.xml").use(::addMorpheMicroGManifestEntries)
+    }
 }
 
 private data class RouteSite(val method: MutableMethod, val index: Int, val register: Int, val original: String)
@@ -130,10 +153,7 @@ val morpheMicroGSupportPatch = bytecodePatch(
         targets = listOf(AppTarget(version = "3.7.2", minSdk = 24, isExperimental = true)),
     ))
     execute {
-        require(packageMetadata.packageName == GENV_PACKAGE && packageMetadata.versionName == "3.7.2" &&
-            packageMetadata.versionCode == "163") {
-            "Morphe MicroG support requires the reviewed GenV package, version 3.7.2 and build 163"
-        }
+        verifyGenVSource(packageMetadata)
         fun strings(method: com.android.tools.smali.dexlib2.iface.Method) = requireNotNull(method.implementation).instructions
             .mapNotNull { ((it as? ReferenceInstruction)?.reference as? StringReference)?.string }
         fun references(method: com.android.tools.smali.dexlib2.iface.Method) = requireNotNull(method.implementation).instructions

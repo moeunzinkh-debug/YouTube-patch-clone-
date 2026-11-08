@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.revanced.android.gms" android:versionCode="1" android:versionName="1">
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="35" />
+    <application android:label="Synthetic WRONG-SIGNER MicroG test">
+        <service android:name="org.microg.gms.auth.signin.AuthSignInService" android:exported="true">
+            <intent-filter><action android:name="app.revanced.android.gms.auth.api.signin.service.START" /><category android:name="android.intent.category.DEFAULT" /></intent-filter>
+        </service>
+        <activity android:name="org.microg.gms.auth.signin.AuthSignInActivity" android:exported="true">
+            <intent-filter><action android:name="app.revanced.android.gms.auth.GOOGLE_SIGN_IN" /><category android:name="android.intent.category.DEFAULT" /></intent-filter>
+        </activity>
+    </application>
+</manifest>

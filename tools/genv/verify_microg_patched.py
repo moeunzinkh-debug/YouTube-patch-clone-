@@ -193,6 +193,7 @@ def verify_contents(source: Path, outputs: list[Path]) -> dict:
         'other_original_dex_strings_unchanged': True, 'binder_descriptors_unchanged': True,
         'microg_signer_and_signin_components_guarded': True, 'original_availability_fallback_preserved': True,
         'original_genv_signer_metadata_sha1': EXPECTED_METADATA['app.revanced.android.gms.SPOOFED_PACKAGE_SIGNATURE'],
+        'source_signer_certificate_checked_before_metadata': True,
         'manifest_only_reviewed_metadata_queries_and_c2dm': True,
         'actual_login_firebase_server_and_complete_split_app_runtime': 'not tested',
     }

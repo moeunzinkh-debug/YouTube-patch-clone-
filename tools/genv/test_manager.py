@@ -214,8 +214,27 @@ def main() -> None:
     announce('GenV patch selection', nodes)
     if not any(matches(n, 'Remove license check') and 'Enabled' in n.get('content-desc', '') for n in nodes):
         raise RuntimeError('GenV license-check patch was not enabled: ' + snapshot(nodes)[:1000])
-    # The final screen must also report exactly one applied patch; it is the
-    # reliable cross-source count when Manager displays other source tabs.
+    microg = 'Morphe MicroG Google sign-in support (experimental)'
+    if not any(matches(n, microg) for n in nodes):
+        # Patch lists can be vertically scrollable on the emulator.
+        adb('shell', 'input', 'swipe', '500', '1100', '500', '400', '500')
+        time.sleep(2)
+        nodes = dump()
+    if not any(matches(n, microg) for n in nodes):
+        adb('shell', 'input', 'swipe', '500', '400', '500', '1200', '500')
+        time.sleep(2)
+        nodes = dump()
+    if not any(matches(n, microg) for n in nodes):
+        raise RuntimeError('New MicroG selector is not visible: ' + snapshot(nodes)[:1200])
+    if any(matches(n, microg) and 'Enabled' in n.get('content-desc', '') for n in nodes):
+        raise RuntimeError('MicroG selector was unexpectedly enabled by default')
+    tap(microg, exact=False)
+    time.sleep(2)
+    nodes = dump()
+    if not any(matches(n, microg) and 'Enabled' in n.get('content-desc', '') for n in nodes):
+        raise RuntimeError('Could not select the opt-in MicroG patch: ' + snapshot(nodes)[:1200])
+    # The final screen must report two applied patches; it is the reliable
+    # cross-source count when Manager displays other source tabs.
     tap('Patch', exact=True)
 
     LAST_STAGE = 'patch the base APK in Manager'
@@ -225,7 +244,7 @@ def main() -> None:
         if any(matches(n, 'Background patching protection') for n in nodes):
             tap('Not now', exact=True)
         elif (any(matches(n, 'Patched', exact=True) for n in nodes)
-              and any(matches(n, '1 patch', exact=True) for n in nodes)
+              and any(matches(n, '2 patches', exact=True) for n in nodes)
               and any(matches(n, 'GenV patches (experimental)') for n in nodes)
               and any(matches(n, 'Save', exact=True) for n in nodes)):
             announce('Manager patch succeeded', nodes)

@@ -2,7 +2,7 @@ name: Test GenV bundle in Morphe Manager
 
 on:
   push:
-    branches: [arena/02093a53-youtube-patch-clone]
+    branches: [arena/3655779f-youtube-patch-clone]
     paths:
       - 'tools/genv/test_manager.py'
       - 'tools/genv/verify_manager_output.py'
@@ -36,8 +36,8 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/genv-manager
           run="$(python3 tools/king-patcher/find_successful_run.py \
-            arena/02093a53-youtube-patch-clone build-genv-mpp.yml \
-            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
+            "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/verify_microg_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
           gh run download "$run" -n genv-morphe-bundle-static-only --dir /tmp/genv-manager
           python3 tools/genv/verify_bundle.py --mpp /tmp/genv-manager/bundle.mpp --listing /tmp/genv-manager/patches.txt
           gh release download v2.3.0-dev.3 --repo MorpheApp/morphe-manager --pattern morphe-manager-2.3.0-dev.3.apk --dir /tmp/genv-manager

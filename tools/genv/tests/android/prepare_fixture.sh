@@ -61,6 +61,20 @@ if run_patch "$work/wrong-shape.apk" "$work/wrong-shape-result.json" "$work/wron
 fi
 grep -q 'GenV initializeLicenseCheck implementation changed or is already patched' "$work/wrong-shape.log"
 
+run_microg() {
+    java -Xmx3g -jar "$cli" patch "$1" --patches "$bundle" --exclusive \
+        -e 'Morphe MicroG Google sign-in support (experimental)' --bytecode-mode FULL --unsigned \
+        --result-file "$2" --out "$3"
+}
+if run_microg "$work/wrong-version.apk" "$work/microg-wrong-version-result.json" "$work/microg-wrong-version-output.apk" > "$work/microg-wrong-version.log" 2>&1; then
+    echo 'MicroG selector accepted the wrong version code' >&2; exit 1
+fi
+grep -q 'requires the reviewed GenV package, version 3.7.2 and build 163' "$work/microg-wrong-version.log"
+if run_microg "$work/fixture-unsigned.apk" "$work/microg-wrong-shape-result.json" "$work/microg-wrong-shape-output.apk" > "$work/microg-wrong-shape.log" 2>&1; then
+    echo 'MicroG selector accepted unrelated bytecode' >&2; exit 1
+fi
+grep -q 'GenV input signing certificate is absent or does not match the reviewed base APK' "$work/microg-wrong-shape.log"
+
 keytool -genkeypair -noprompt -keystore "$work/disposable.jks" -storepass android -keypass android \
     -alias disposable -dname 'CN=Disposable synthetic PairIP test' -keyalg RSA -keysize 2048 -validity 2 >/dev/null 2>&1
 for name in fixture patched; do

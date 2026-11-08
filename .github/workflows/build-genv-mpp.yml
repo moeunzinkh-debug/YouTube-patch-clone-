@@ -131,7 +131,27 @@ jobs:
             exit 1
           fi
           cat "$RUNNER_TEMP/genv-tools/microg-verify.log"
-          echo '::notice::Both selectors tested individually and together; no patched APK was installed, uploaded or published.'
+          # Re-sign a private copy using a disposable key. Identical code and
+          # version must not cause the original signer metadata to be advertised.
+          tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/genv-tools/fixture.jks" -storepass android -keypass android \
+            -alias fixture -dname 'CN=Disposable signer test' -keyalg RSA -keysize 2048 -validity 2 > /dev/null 2>&1
+          "$tools/apksigner" sign --min-sdk-version 24 --ks "$RUNNER_TEMP/genv-tools/fixture.jks" \
+            --ks-pass pass:android --key-pass pass:android --out "$RUNNER_TEMP/genv-tools/wrong-signer.apk" "$input"
+          "$tools/apksigner" verify --min-sdk-version 24 "$RUNNER_TEMP/genv-tools/wrong-signer.apk"
+          if java -Xmx4g -jar "$cli" patch "$RUNNER_TEMP/genv-tools/wrong-signer.apk" \
+              --patches "$RUNNER_TEMP/genv-output/bundle.mpp" --exclusive \
+              -e 'Morphe MicroG Google sign-in support (experimental)' --unsigned --bytecode-mode FULL \
+              --out "$RUNNER_TEMP/genv-tools/wrong-signer-output.apk" \
+              --result-file "$RUNNER_TEMP/genv-tools/wrong-signer.json" > "$RUNNER_TEMP/genv-tools/wrong-signer.log" 2>&1; then
+            echo '::error::MicroG selector accepted an APK signed with a different certificate'
+            exit 1
+          fi
+          if ! grep -q 'GenV input signing certificate is absent or does not match the reviewed base APK' "$RUNNER_TEMP/genv-tools/wrong-signer.log"; then
+            tail -n 40 "$RUNNER_TEMP/genv-tools/wrong-signer.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo '::notice::Both selectors work independently and together; a re-signed input was rejected. No APK was installed, uploaded or published.'
       - uses: actions/upload-artifact@v4
         with:
           name: genv-morphe-bundle-static-only
