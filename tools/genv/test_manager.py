@@ -126,6 +126,9 @@ def wait_for_patch_selection() -> list[dict[str, str]]:
 
 
 def save_patched_apk() -> Path:
+    # Fresh Android 10 images do not always have a Documents directory yet;
+    # find exits nonzero for a missing search root even when Downloads exists.
+    adb('shell', 'mkdir', '-p', '/sdcard/Documents')
     tap('Save', exact=True)
     time.sleep(4)
     nodes, _ = wait_for('SAVE', 45, exact=True)
