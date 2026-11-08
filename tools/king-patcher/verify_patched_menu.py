@@ -33,7 +33,7 @@ def verify(decoded: Path, modes: set[int]) -> None:
                 f'const-string v{scratch+2}, "{title}"',
                 f'const/4 v{scratch+3}, 0x0',
                 f'const-string v{scratch+4}, "{description}"',
-                f'const-string v{scratch+5}, ""',
+                f'const-string v{scratch+5}, "#FFFFFF"',
                 f'const v{scratch+6}, 0x7f080083',
                 f'invoke-direct/range {{v{scratch} .. v{scratch+6}}}, {MODEL}-><init>(ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;I)V',
                 f'invoke-virtual {{v{listing}, v{scratch}}}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z',
@@ -56,7 +56,7 @@ def main() -> None:
     args = parser.parse_args()
     modes = {marker for marker in ITEMS if args.mode == 'both' or (args.mode == 'lvl') == (marker == 0x7e4d0001)}
     verify(args.decoded, modes)
-    print(f'Verified {args.mode} menu IDs, raw labels, empty color strings and dispatcher')
+    print(f'Verified {args.mode} menu IDs, raw labels, valid color strings and dispatcher')
 
 if __name__ == '__main__':
     main()

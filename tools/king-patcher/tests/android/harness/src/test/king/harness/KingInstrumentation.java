@@ -77,6 +77,43 @@ public final class KingInstrumentation extends Instrumentation {
         }
         throw new AssertionError("Could not click UI text: " + text);
     }
+    private boolean hasText(android.view.View view, String text) {
+        if (view instanceof android.widget.TextView && text.contentEquals(((android.widget.TextView) view).getText())) return true;
+        if (view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) if (hasText(group.getChildAt(i), text)) return true;
+        }
+        return false;
+    }
+    private void checkKingRenderer() throws Exception {
+        phase("testing King menu renderer");
+        Throwable[] error = new Throwable[1];
+        runOnMainSync(() -> {
+            try {
+                ClassLoader loader = getTargetContext().getClassLoader();
+                Class<?> model = loader.loadClass("ʽᐧ.ˉ");
+                java.lang.reflect.Constructor<?> modelConstructor = model.getDeclaredConstructor(
+                    int.class, String.class, int.class, String.class, String.class, int.class);
+                modelConstructor.setAccessible(true);
+                java.util.ArrayList<Object> items = new java.util.ArrayList<>();
+                String[] labels = {"Remove license (Google Play LVL)", "Remove insignificant things"};
+                items.add(modelConstructor.newInstance(0x7e4d0001, labels[0], 0, "LVL", "#FFFFFF", 0x7f080083));
+                items.add(modelConstructor.newInstance(0x7e4d0002, labels[1], 0, "UI", "#FFFFFF", 0x7f080083));
+                Class<?> adapterType = loader.loadClass("ʽᐧ.ʽ$ˑˑ");
+                java.lang.reflect.Constructor<?> adapterConstructor = adapterType.getDeclaredConstructor(
+                    android.content.Context.class, int.class, java.util.List.class, boolean.class);
+                adapterConstructor.setAccessible(true);
+                android.widget.ArrayAdapter<?> adapter = (android.widget.ArrayAdapter<?>)
+                    adapterConstructor.newInstance(host, 0x7f0c005a, items, false);
+                for (int i = 0; i < labels.length; i++) {
+                    android.view.View row = adapter.getView(i, null, new android.widget.LinearLayout(host));
+                    if (!hasText(row, labels[i])) throw new AssertionError("Expected menu row label was not rendered: " + labels[i]);
+                }
+            } catch (Throwable failure) { error[0] = failure; }
+        });
+        if (error[0] != null) throw new AssertionError("King menu renderer failed", error[0]);
+        phase("King menu renderer accepted both labels and colors");
+    }
     private Object openTool(int mode) throws Exception {
         Intent intent = new Intent().setClassName(getTargetContext(), "ru.jgaiecip.osuojvyxe.MainActivity")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -87,17 +124,20 @@ public final class KingInstrumentation extends Instrumentation {
         removeMonitor(monitor);
         phase("King host Activity started for mode " + mode);
         if (host == null) throw new AssertionError("King host Activity did not open");
+        if (mode == 2) checkKingRenderer();
         Class<?> menuClass = getTargetContext().getClassLoader().loadClass("ʽٴ.ᐧᐧ");
         java.lang.reflect.Constructor<?> constructor = menuClass.getDeclaredConstructor(); constructor.setAccessible(true);
         Object menu = constructor.newInstance();
         Method dispatch = menuClass.getMethod("ˊᵎ", int.class);
         int id = mode == 1 ? 0x7e4d0001 : 0x7e4d0002;
+        Throwable[] dispatchError = new Throwable[1];
         runOnMainSync(() -> {
             try {
                 dispatch.invoke(menu, id); // Exercise the injected host dispatcher, not just the bridge.
                 host.getFragmentManager().executePendingTransactions();
-            } catch (Exception e) { throw new RuntimeException(e); }
+            } catch (Throwable failure) { dispatchError[0] = failure; }
         });
+        if (dispatchError[0] != null) throw new AssertionError("Patched dispatcher failed", dispatchError[0]);
         phase("dispatcher returned for mode " + mode);
         Object fragment = host.getFragmentManager().findFragmentByTag(TAG);
         if (fragment == null || !fragment.getClass().getName().equals(TOOL)) throw new AssertionError("Tool dialog did not open");

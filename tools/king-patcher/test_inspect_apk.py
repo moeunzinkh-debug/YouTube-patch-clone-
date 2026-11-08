@@ -93,7 +93,7 @@ class InspectionTests(unittest.TestCase):
                     pieces.extend([
                         f'new-instance v{scratch}, Lʽᐧ/ˉ;', f'const v{scratch+1}, 0x{marker:x}',
                         f'const-string v{scratch+2}, "{title}"', f'const/4 v{scratch+3}, 0x0',
-                        f'const-string v{scratch+4}, "{description}"', f'const-string v{scratch+5}, ""',
+                        f'const-string v{scratch+4}, "{description}"', f'const-string v{scratch+5}, "#FFFFFF"',
                         f'const v{scratch+6}, 0x7f080083',
                         f'invoke-direct/range {{v{scratch} .. v{scratch+6}}}, Lʽᐧ/ˉ;-><init>(ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;I)V',
                         f'invoke-virtual {{v{listing}, v{scratch}}}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z',
@@ -109,7 +109,7 @@ class InspectionTests(unittest.TestCase):
             tool.parent.mkdir(parents=True)
             tool.write_text('.class public Lapp/morphe/extension/king/ToolFragment;\n', encoding='utf-8')
             verify_patched_menu.verify(root, set(verify_patched_menu.ITEMS))
-            bad = fragment.read_text(encoding='utf-8').replace('const-string v6, ""', 'const-string v6, "not-a-color"', 1)
+            bad = fragment.read_text(encoding='utf-8').replace('const-string v6, "#FFFFFF"', 'const-string v6, "not-a-color"', 1)
             fragment.write_text(bad, encoding='utf-8')
             with self.assertRaisesRegex(ValueError, 'constructor argument'):
                 verify_patched_menu.verify(root, set(verify_patched_menu.ITEMS))

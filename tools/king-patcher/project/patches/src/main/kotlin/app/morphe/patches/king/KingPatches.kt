@@ -113,7 +113,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.addMenuItem(id: Int, t
             "Reviewed menu allocation changed"
         }
         val v = startRegister
-        // The fifth argument is a color string parsed by King's renderer; keep it empty.
+        // The fifth argument is parsed as an Android color by King's renderer.
         // Scratch registers are uninitialized at this point; the original code assigns them before use.
         method.addInstructions(init + 1, """
             new-instance v$v, $MODEL
@@ -121,7 +121,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.addMenuItem(id: Int, t
             const-string v${v + 2}, "$title"
             const/4 v${v + 3}, 0x0
             const-string v${v + 4}, "$description"
-            const-string v${v + 5}, ""
+            const-string v${v + 5}, "#FFFFFF"
             const v${v + 6}, 0x7f080083
             invoke-direct/range {v$v .. v${v + 6}}, $MODEL-><init>(ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;I)V
             invoke-virtual {v$listRegister, v$v}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
