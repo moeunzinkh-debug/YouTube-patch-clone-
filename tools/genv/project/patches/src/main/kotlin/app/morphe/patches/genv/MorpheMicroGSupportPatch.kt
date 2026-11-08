@@ -213,7 +213,8 @@ val morpheMicroGSupportPatch = bytecodePatch(
         }
         // Return GMS success only when the separately installed Morphe MicroG
         // package has the reviewed signer and exports the sign-in service.
-        // Otherwise execute GenV's original availability check unchanged.
+        // Otherwise retain GenV's original availability control flow; its
+        // reviewed GMS package literals are still routed to Morphe MicroG.
         availability.addInstructionsWithLabels(0, """
             invoke-static/range {p1 .. p1}, $GUARD->isAvailable(Landroid/content/Context;)Z
             move-result v0
