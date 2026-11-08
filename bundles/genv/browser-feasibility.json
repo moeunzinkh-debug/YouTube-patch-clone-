@@ -1,0 +1,43 @@
+{
+  "scope": "SHA-pinned released GenV base only; read-only, no GenV execution, accounts or Google/GenV/Firebase requests",
+  "package": "com.ainate.ai.video.generate",
+  "version": "3.7.2",
+  "version_code": 163,
+  "input_sha256": "f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e",
+  "default_web_client_id_resource_present": true,
+  "default_web_client_id_has_google_client_id_shape": true,
+  "client_id_value_and_type": "not emitted; actual OAuth client configuration unknown",
+  "browsable_view_intent_filters": [],
+  "fixed_google_signin_labels_in_reviewed_bridge_classes": {
+    "flutter_google_signin_pigeon_channel": 9,
+    "method_sign_in": 1,
+    "method_sign_in_silently": 1
+  },
+  "label_method_sites": {
+    "flutter_google_signin_pigeon_channel": [
+      "Lv6/b;->h(Lg6/f;Lv6/b;)V"
+    ],
+    "method_sign_in": [
+      "Lv6/a;->m(Ljava/lang/Object;Lf6/h;)V"
+    ],
+    "method_sign_in_silently": [
+      "Lv6/a;->m(Ljava/lang/Object;Lf6/h;)V"
+    ]
+  },
+  "reviewed_bridge_classes": [
+    "Lv6/a;",
+    "Lv6/b;"
+  ],
+  "dex_files": [
+    "classes.dex",
+    "classes2.dex"
+  ],
+  "flutter_native_libapp_in_base": false,
+  "constraints": [
+    "Base has no required configuration/native splits; Flutter AOT app and full app behavior were not analyzed",
+    "Manifest filters do not establish Google authorized redirect URIs or app-link ownership",
+    "The server exchange, accepted token audience and full login behavior are unknown",
+    "No actual browser login, Google account, network or Huawei device was tested"
+  ],
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42534799765"
+}

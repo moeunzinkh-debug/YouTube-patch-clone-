@@ -14,7 +14,7 @@
 
 ## ភាពឆបគ្នា និងអ្វីដែលបានពិនិត្យ
 
-- គោលដៅតែមួយ៖ `com.ainate.ai.video.generate` **3.7.2**, version code **163**, Android 7.0+ (API 24)។ Selector MicroG ពិនិត្យ package/version, certificate ក្នុង signing block និងទម្រង់ methods/route literals មុនកែ។ វាបដិសេធ APK ដែល certificate ខុស ឬគ្មាន។ ការផ្គូផ្គង certificate នេះមិនមែនជាការផ្ទៀងផ្ទាត់ឯករាជ្យថាឯកសារមកពីអ្នកបង្កើតទេ។
+- គោលដៅតែមួយ៖ `com.ainate.ai.video.generate` **3.7.2**, version code **163**, Android 7.0+ (API 24)។ Selector MicroG ពិនិត្យ package/version, certificate ក្នុង signing block និងទម្រង់ methods/route literals មុនកែ។ វាបដិសេធ APK ដែល certificate ខុស ឬគ្មាន។ ការអាន certificate នេះមិនផ្ទៀងផ្ទាត់ signature គ្រីបតូរបស់ APK ទាំងមូលទេ ហើយក៏មិនមែនជាការផ្ទៀងផ្ទាត់ឯករាជ្យថាឯកសារមកពីអ្នកបង្កើតដែរ។
 - ពិនិត្យ release base ដែលមាន SHA-256 `f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e` និង APK signer SHA-1 `be4c81d3869d726ea9f0229ab937f2e11ab1ccc7` (មិនមែន source-stamp signer)។ MicroG អាចប្រើ package/ស្នាមហត្ថលេខា GenV ដើមដែលបានពិនិត្យសម្រាប់ OAuth ប៉ុន្តែ Google ឬ server អាចនៅតែបដិសេធ។
 - ត្រូវដំឡើង [MorpheApp MicroG-RE](https://github.com/MorpheApp/MicroG-RE) ដោយឡែក។ ការសាកប្រើ signer របស់ release **7.3.0**; certificate ដូចគ្នាក៏បានឃើញនៅ release arm64 **7.2.2**។ Availability guard ត្រួតពិនិត្យ package, signer និង sign-in components; វាមិនទទួលស្គាល់ MicroG build ដែលមាន signer ផ្សេង។ នៅ Android 9+ វាសួរ Package Manager អំពី signing lineage; Android 7–8 ប្រើ signature API ចាស់។ លទ្ធផលនៅតែអាស្រ័យលើ Package Manager និង signature spoofing របស់ឧបករណ៍។
 - Patch ប្ដូរតែ strings/action/account/provider ដែលបានពិនិត្យ និង package visibility ក្នុង manifest; មិនប្ដូរ Binder descriptors ឬ package GenV ទេ។ វាមិនបន្ថែម server របស់ patch ឬទទួល password/token ទេ; login ដំណើរការតាម MicroG និង Google។ ការគាំទ្រ Firebase, notifications និងសេវា GMS ផ្សេងៗមិនត្រូវបានធានា។
@@ -31,10 +31,22 @@
 4. បើក **Morphe MicroG Google sign-in support (experimental)**; អាចជ្រើស ឬដក `Remove license check` ដោយឡែក។ ចុច **Patch**។ ប្រើ MicroG ដែលមានគណនីរួច; មិនចាំបាច់លុប MicroG ឬ YouTube ដែលកំពុងដំណើរការ។
 5. Manager ចុះហត្ថលេខា APK ឡើងវិញ ដូច្នេះវាអាចមិនអាច update លើ app ដើមដែលមាន key ផ្សេង។ បម្រុងទុកទិន្នន័យមុននឹងពិចារណាលុប app ចាស់ ព្រោះការលុបអាចធ្វើឱ្យបាត់ទិន្នន័យ។
 
+បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ សារ error របស់ bundle `0.2.0-dev.1` មិនអាចបែងចែកថា certificate បាត់ ឬខុសទេ ដូច្នេះវាមិនបញ្ជាក់ថា input របស់អ្នកត្រូវបាន sign ឡើងវិញជាក់លាក់ទេ។
+
+<a id="browser-sign-in"></a>
+## លទ្ធភាព Google Sign-In តាម browser
+
+ការចូល Google ក្នុង browser មិនធ្វើឱ្យ GenV ចូលគណនីដោយស្វ័យប្រវត្តិទេ៖ app ត្រូវទទួលលទ្ធផលតាម callback ដែល Google អនុញ្ញាត និងបញ្ចូលលទ្ធផលទៅក្នុង login/session ដែល GenV និង server ទទួលស្គាល់។ វិធីដែលសុវត្ថិភាពត្រូវការការផ្គូផ្គង OAuth client/redirect, ការការពារ state និង PKCE តាមប្រភេទ client ព្រមទាំងដំណើរការ token exchange ត្រឹមត្រូវ។ Google [រឹតបន្តឹង custom URI schemes សម្រាប់ Android](https://developers.googleblog.com/improving-user-safety-in-oauth-flows-through-new-oauth-custom-uri-scheme-restrictions/) ដោយសារហានិភ័យកម្មវិធីក្លែងបន្លំ។
+
+ការពិនិត្យ APK **base ប៉ុណ្ណោះ** បានឃើញ Flutter Google Sign-In bridge និង resource `default_web_client_id` ប៉ុន្តែ **មិនឃើញ VIEW + BROWSABLE intent filter** សម្រាប់ browser callback ក្នុង manifest របស់ base នោះទេ។ Resource នេះមិនបញ្ជាក់ថាមាន redirect ដែលបានអនុញ្ញាត ឬថា server ទទួលស្គាល់ login តាម browser ឡើយ។ Native Flutter app (`libapp.so`) និង splits ពេញមិនមានក្នុង base ដូច្នេះមិនអាចសន្និដ្ឋានពីគ្រប់ផ្លូវ login របស់ app បានទេ។ [របាយការណ៍គ្មានគណនី ឬ token](browser-feasibility.json)។
+
+**មិនទាន់មាន browser-login patch ទេ។** ត្រូវស្គាល់ផ្លូវ sign-in/callback ផ្លូវការដែល GenV គាំទ្រ ឬឱ្យម្ចាស់ GenV រៀបចំ OAuth និង callback សមស្របជាមុន; ការបើក URL ទៅ Google ប៉ុណ្ណោះមិនមែនជា login ដែលដំណើរការទេ។ កុំផ្ញើ password, authorization code, token ឬ client secret ដើម្បីស៊ើបអង្កេត។
+
 ## ការសាក និងដែនកំណត់
 
 - Morphe Desktop បានពិនិត្យ bundle និង patch ដាច់ដោយឡែក/រួមគ្នាលើច្បាប់ចម្លង base; DEX strings ផ្សេង និង Binder descriptors មិនត្រូវបានប្ដូរ។ APK ចុះហត្ថលេខាដោយ key ផ្សេងត្រូវបានបដិសេធ។ [License static report](patch-validation.json) · [MicroG static report](microg-static.json)។
-- Morphe Manager emulator បាននាំចូល bundle និង patch base **មិនពេញលេញ** ដោយជ្រើសទាំងពីរ; DEX និង manifest លទ្ធផលត្រូវបានពិនិត្យ។ [Manager report](manager-smoke.json)។
+- Morphe Manager 2.3.0-dev.3 emulator បាននាំចូល bundle និង patch base **មិនពេញលេញ** ដោយជ្រើសទាំងពីរ; DEX និង manifest លទ្ធផលត្រូវបានពិនិត្យ។ [Manager report](manager-smoke.json)។
+- Morphe Manager **2.5.0 / Patcher 2.3.0**, Android 10 emulator x86_64 បាន patch និងរក្សាទុកដោយជ្រើស MicroG ប៉ុណ្ណោះ លើ release base និង archive សាកល្បងដែលមាន **base តែមួយ**; output ត្រូវបានពិនិត្យ ហើយ license selector មិនត្រូវបានអនុវត្ត។ វាមិនមែន split set ពេញ ឬ input របស់អ្នកទេ ហើយមិនបញ្ជាក់មូលហេតុ error របស់អ្នកទេ។ [លទ្ធផល CI](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42534755374)។
 - Android fixtures សាក PairIP counters និង guard ក្នុង extension ពិត ដោយគ្មានគណនី/បណ្ដាញ; guard ត្រូវបានសាកពេលគ្មាន package, package signer ខុស និង Morphe MicroG 7.3.0។ [PairIP report](android-smoke.json) · [API 24 guard](microg-guard-api24.json) · [API 35 guard](microg-guard-api35.json)។ នេះមិនមែន GenV ពិតទេ។
 - **មិនទាន់បានសាក full split merge, បើក GenV ពិត, Google account chooser/OAuth, Firebase, server acceptance ឬ Huawei របស់អ្នកទេ។** បើនៅ error អាចមានហេតុពី OAuth package/signature restriction, Firebase/network, app server ឬ attestation; កុំសន្យាថា patch អាចដោះស្រាយទាំងនោះ។
 

@@ -28,7 +28,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 - `Remove license check` — បិទ PairIP license entry points ពីរដែលបានពិនិត្យ **ខាង client**; បើកជាមុន។ វាមិនផ្ដល់ subscription, server entitlement ឬរំលង server/Play Integrity attestation ទេ។
 - `Morphe MicroG Google sign-in support (experimental)` — opt-in សម្រាប់ MorpheApp MicroG-RE; ប្ដូរតែផ្លូវសេវា/គណនីដែលបានពិនិត្យ និងមិនធានា Google login ឬ server acceptance។
 
-**Release មានតែ base ដែលត្រូវការ splits និងគ្មាន native libraries**; app GenV ពិត, login និងការរួម splits ពេញមិនទាន់បានសាក។ Bundle ថ្មីនៅ repository; asset v0.1.0 ក្នុង pre-release នៅតែមានតែ license patch។ [របៀបប្រើ និងលទ្ធផល](bundles/genv/README.md) · [Bundle ក្នុង repository](bundles/genv/bundle.mpp) · [SHA-256](bundles/genv/bundle.mpp.sha256) · [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV)
+**Release មានតែ base ដែលត្រូវការ splits និងគ្មាន native libraries**; app GenV ពិត, login និងការរួម splits ពេញមិនទាន់បានសាក។ Browser Google login មិនទាន់មាន patch ទេ៖ [ការពិនិត្យ base និងដែនកំណត់ OAuth](bundles/genv/README.md#browser-sign-in)។ Bundle ថ្មីនៅ repository; asset v0.1.0 ក្នុង pre-release នៅតែមានតែ license patch។ [របៀបប្រើ និងលទ្ធផល](bundles/genv/README.md) · [Bundle ក្នុង repository](bundles/genv/bundle.mpp) · [SHA-256](bundles/genv/bundle.mpp.sha256) · [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV)
 
 </details>
 
