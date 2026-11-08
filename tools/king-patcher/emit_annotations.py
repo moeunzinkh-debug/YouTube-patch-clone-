@@ -9,7 +9,7 @@ from pathlib import Path
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('path', type=Path)
-    parser.add_argument('prefix', choices=('KING_INVENTORY', 'KING_MENU_TRACE', 'KING_API_TRACE'))
+    parser.add_argument('prefix', choices=('KING_INVENTORY', 'KING_MENU_TRACE', 'KING_API_TRACE', 'KING_INTEGRATION'))
     args = parser.parse_args()
     data = base64.b64encode(gzip.compress(args.path.read_bytes())).decode('ascii')
     chunks = [data[index:index + 3900] for index in range(0, len(data), 3900)]

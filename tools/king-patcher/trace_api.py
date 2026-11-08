@@ -20,7 +20,8 @@ CLASSES = (
     'Lorg/jf/dexlib2/immutable/instruction/ImmutableInstruction10x;',
     'Lorg/jf/dexlib2/immutable/reference/ImmutableMethodReference;',
     'Lcom/android/apksig/ApkSigner$Builder;', 'Lcom/android/apksig/ApkSigner$SignerConfig$Builder;',
-    'Lcom/android/apksig/ApkSigner;',
+    'Lcom/android/apksig/ApkSigner;', 'Lcom/android/apksig/ApkVerifier;',
+    'Lcom/android/apksig/ApkVerifier$Builder;', 'Lcom/android/apksig/ApkVerifier$Result;',
 )
 TRACE_BODIES = {'Lʽᐧ/ˉ;', 'Lʽٴ/ᵎ;', 'Lʽᐧ/ˊ$ʻ;', 'Lʽٴ/ᐧᐧ$ʽٴ;'}
 
