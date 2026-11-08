@@ -2,7 +2,7 @@ name: Build and validate the GenV Morphe bundle
 
 on:
   push:
-    branches: [arena/02093a53-youtube-patch-clone]
+    branches: [arena/3655779f-youtube-patch-clone]
     paths:
       - 'tools/genv/project/**'
       - 'tools/genv/prepare_build.py'
@@ -49,7 +49,7 @@ jobs:
         run: |
           set -o pipefail
           cd "$RUNNER_TEMP/genv-build"
-          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/genv-build.log"
+          ./gradlew :patches:test :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/genv-build.log"
       - name: Report build diagnostics
         if: failure()
         shell: bash

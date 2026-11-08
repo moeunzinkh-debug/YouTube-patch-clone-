@@ -6,7 +6,7 @@ import zipfile
 from pathlib import Path
 
 from prepare_build import prepare
-from verify_bundle import NAME, verify_listing
+from verify_bundle import MICROG, NAME, verify_listing
 from verify_patched import ATTACH, CHECK, INITIALIZE, PROVIDER, BILLING, verify_methods, verify_report
 
 
@@ -16,7 +16,8 @@ class GenVToolTests(unittest.TestCase):
             dest = Path(tmp) / 'project'
             prepare(dest)
             patch_dir = dest / 'patches/src/main/kotlin/app/morphe/patches/genv'
-            self.assertEqual([p.name for p in patch_dir.glob('*.kt')], ['RemoveLicenseCheckPatch.kt'])
+            self.assertEqual({p.name for p in patch_dir.glob('*.kt')}, {'RemoveLicenseCheckPatch.kt', 'MorpheMicroGSupportPatch.kt'})
+            self.assertTrue((dest / 'extensions/genv/src/main/java/app/morphe/extension/genv/MicroGGuard.java').is_file())
             self.assertFalse((dest / 'patches/src/main/kotlin/app/morphe/patches/youtube').exists())
             self.assertIn('genv-patches', (dest / 'settings.gradle.kts').read_text())
             with self.assertRaises(ValueError):
@@ -24,9 +25,12 @@ class GenVToolTests(unittest.TestCase):
 
     def test_exact_listing(self):
         text = ('Name: Remove license check\nEnabled: true\nCompatible packages:\n'
+                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n'
+                f'Name: {MICROG}\nEnabled: false\nCompatible packages:\n'
                 '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n')
         verify_listing(text)
         for altered in (text.replace('Enabled: true', 'Enabled: false'),
+                        text.replace('Enabled: false', 'Enabled: true'),
                         text.replace('com.ainate.ai.video.generate', 'com.example.bad'),
                         text.replace('3.7.2', '3.7.1'),
                         text + '\nName: Extra\nEnabled: true\n'):
