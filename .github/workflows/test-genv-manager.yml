@@ -42,7 +42,7 @@ jobs:
           python3 tools/genv/verify_bundle.py --mpp /tmp/genv-manager/bundle.mpp --listing /tmp/genv-manager/patches.txt
           gh release download v2.3.0-dev.3 --repo MorpheApp/morphe-manager --pattern morphe-manager-2.3.0-dev.3.apk --dir /tmp/genv-manager
           gh release download GenV --pattern GenV_3.7.2.apk --dir /tmp/genv-manager
-          echo '02227ed0f5616a2e06e7dc99a9b1c8431f0dcc6014ee8d22e8506cd2e65718ce  /tmp/genv-manager/morphe-manager-2.3.0-dev.3.apk' | sha256sum --check
+          echo '9b9cbd8d3e0c4394f87c1a5675db6ff2e473233e316bf2915f6fe447347e5d96  /tmp/genv-manager/morphe-manager-2.3.0-dev.3.apk' | sha256sum --check
           echo 'f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e  /tmp/genv-manager/GenV_3.7.2.apk' | sha256sum --check
           python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
       - name: Enable KVM for an Android emulator
@@ -57,15 +57,24 @@ jobs:
           api-level: 35
           arch: x86_64
           target: google_apis
+          cores: 2
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 10G
+          emulator-boot-timeout: 600
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: python3 tools/genv/test_manager.py
       - name: Verify Manager output and input integrity
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/genv/verify_manager_output.py /tmp/genv-manager/GenV_3.7.2.apk \
-            /tmp/genv-manager/manager-patched-base.apk /tmp/genv-manager/bundle.mpp /tmp/genv-manager/manager-smoke.json
+          if ! python3 tools/genv/verify_manager_output.py /tmp/genv-manager/GenV_3.7.2.apk \
+            /tmp/genv-manager/manager-patched-base.apk /tmp/genv-manager/bundle.mpp /tmp/genv-manager/manager-smoke.json > /tmp/genv-manager/verify.log 2>&1; then
+            tail -n 20 /tmp/genv-manager/verify.log | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat /tmp/genv-manager/verify.log
           apksigner="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n1)"
           "$apksigner" verify --verbose /tmp/genv-manager/manager-patched-base.apk > /tmp/genv-manager/signature.txt
           echo '::notice::Manager signed the disposable base; required splits, full installation, and GenV runtime were not tested.'
