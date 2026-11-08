@@ -36,6 +36,9 @@ jobs:
           mkdir -p "$RUNNER_TEMP/king-tools" "$RUNNER_TEMP/king-output"
           gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$RUNNER_TEMP/king-tools"
           echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/king-tools/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
+          gh release download v9.8.2 --repo gradle/gradle-distributions --pattern gradle-9.8.2-bin.zip --dir "$RUNNER_TEMP/king-tools"
+          echo '21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607  '"$RUNNER_TEMP/king-tools/gradle-9.8.2-bin.zip" | sha256sum --check
+          sed -i "s|^distributionUrl=.*|distributionUrl=file://$RUNNER_TEMP/king-tools/gradle-9.8.2-bin.zip|" "$RUNNER_TEMP/king-build/gradle/wrapper/gradle-wrapper.properties"
       - name: Build extension and MPP
         shell: bash
         run: |
