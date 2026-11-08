@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
+import android.os.Build;
 
 import java.security.MessageDigest;
 
@@ -35,12 +36,19 @@ public final class MicroGGuard {
         try {
             PackageManager pm = context.getPackageManager();
             if (pm == null) return false;
-            PackageInfo info = pm.getPackageInfo(PACKAGE, PackageManager.GET_SIGNATURES);
+            int flags = Build.VERSION.SDK_INT >= 28 ? 0 : PackageManager.GET_SIGNATURES;
+            PackageInfo info = pm.getPackageInfo(PACKAGE, flags);
             if (info == null || info.applicationInfo == null || !info.applicationInfo.enabled) return false;
-            Signature[] signatures = info.signatures;
-            if (signatures == null || signatures.length != 1) return false;
-            byte[] actual = MessageDigest.getInstance("SHA-256").digest(signatures[0].toByteArray());
-            if (!MessageDigest.isEqual(SIGNER_SHA256, actual)) return false;
+            if (Build.VERSION.SDK_INT >= 28) {
+                // Ask the package manager about the installed signing lineage
+                // rather than relying on the legacy, sometimes spoofed field.
+                if (!pm.hasSigningCertificate(PACKAGE, SIGNER_SHA256, PackageManager.CERT_INPUT_SHA256)) return false;
+            } else {
+                Signature[] signatures = info.signatures;
+                if (signatures == null || signatures.length != 1) return false;
+                byte[] actual = MessageDigest.getInstance("SHA-256").digest(signatures[0].toByteArray());
+                if (!MessageDigest.isEqual(SIGNER_SHA256, actual)) return false;
+            }
 
             ResolveInfo service = pm.resolveService(new Intent(SIGN_IN_SERVICE).setPackage(PACKAGE), 0);
             if (service == null || service.serviceInfo == null || !service.serviceInfo.enabled
