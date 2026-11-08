@@ -1,4 +1,13 @@
 Index: 0
+Name: Morphe MicroG Google sign-in support (experimental)
+Description: Route the reviewed GenV Google sign-in service and account type to MorpheApp MicroG-RE (app.revanced.android.gms). Requires a separately installed, compatible Morphe MicroG and complete GenV splits. OAuth, Firebase, server acceptance and real-device login are not guaranteed.
+Enabled: false
+Compatible packages:
+	Package name: com.ainate.ai.video.generate
+	Compatible versions:
+		3.7.2
+
+Index: 1
 Name: Remove license check
 Description: Disable the reviewed PairIP client-side Play license and installer entry points in GenV 3.7.2 (163). Does not grant purchases, subscriptions, server entitlements or bypass server attestation. Experimental; complete APK splits and device testing are required.
 Enabled: true

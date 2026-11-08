@@ -12,8 +12,9 @@
   ],
   "wrong_version_code_rejected": true,
   "changed_opcode_rejected": true,
-  "bundle_sha256": "818c9b0972515d506d06a6f27e08419e68e1e513ecc07a2194b8fbc91227fe26",
+  "microg_wrong_version_and_unsigned_input_rejected": true,
+  "bundle_sha256": "7a9d5a91a68f310f7b2afe8a899f4073d7159727c383ffd6987124d10172039d",
   "real_genv_installed_or_launched": false,
   "full_app_login_server_attestation_and_purchases": "not tested",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42484074510"
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42515075886"
 }

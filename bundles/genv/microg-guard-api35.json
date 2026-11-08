@@ -1,0 +1,17 @@
+{
+  "status": "passed",
+  "android_emulator_api": "35",
+  "guard_from_actual_mpp_extension_dex": true,
+  "no_package_rejected": true,
+  "same_package_wrong_signer_rejected": true,
+  "official_morphe_microg_7_3_0_universal_accepted": true,
+  "official_signin_service_and_activity_selected": true,
+  "disabled_official_package_rejected_then_enabled": true,
+  "bundle_sha256": "7a9d5a91a68f310f7b2afe8a899f4073d7159727c383ffd6987124d10172039d",
+  "official_microg_apk_sha256": "67b794fd5221512a11d5950ec214fc0af0e3a8f72840d01235920729c7e73f5e",
+  "network_disabled": true,
+  "accounts_used": false,
+  "real_genv_installed_or_launched": false,
+  "oauth_server_acceptance_and_user_device": "not tested",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42515075650"
+}
