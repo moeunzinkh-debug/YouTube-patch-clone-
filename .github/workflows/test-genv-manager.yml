@@ -49,8 +49,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          sdkmanager="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          if ! test -x "$sdkmanager"; then
+            sdkmanager="$(find -L "$ANDROID_HOME/cmdline-tools" -path '*/bin/sdkmanager' -type f | sort -V | tail -n1)"
+          fi
+          test -x "$sdkmanager"
           for attempt in 1 2 3; do
-            if sdkmanager --install 'system-images;android-35;google_apis;x86_64' --channel=0 > /tmp/genv-manager/sdk-image.log 2>&1; then
+            if "$sdkmanager" --install 'system-images;android-35;google_apis;x86_64' --channel=0 > /tmp/genv-manager/sdk-image.log 2>&1; then
               echo 'Emulator image available'
               exit 0
             fi
