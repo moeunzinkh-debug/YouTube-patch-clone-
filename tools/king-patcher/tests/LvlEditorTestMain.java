@@ -67,6 +67,11 @@ public final class LvlEditorTestMain {
             Path input=temp.resolve("classes.dex"), out=temp.resolve("out.dex");
             makeDex(input,Arrays.asList(checker(CHECKER,1),callback(true)));
             byte[] digest=sha(input);
+            DexFile inputDex=DexFileFactory.loadDexFile(input.toFile(),Opcodes.forDexVersion(35));
+            for(ClassDef cls:inputDex.getClasses()) for(Method method:cls.getMethods()) if(method.getImplementation()!=null) {
+                try { for(org.jf.dexlib2.iface.debug.DebugItem ignored:method.getImplementation().getDebugItems()) {} }
+                catch(RuntimeException error) { throw new AssertionError("Invalid fixture debug info: "+cls.getType()+"->"+method.getName()+" registers="+method.getImplementation().getRegisterCount(),error); }
+            }
             check(LvlEditor.patch(Collections.singletonList(input.toFile()),out.toFile())==0,"checker index");
             check(Arrays.equals(digest,sha(input)),"original input unchanged");
             DexFile after=DexFileFactory.loadDexFile(out.toFile(),Opcodes.forDexVersion(35));
