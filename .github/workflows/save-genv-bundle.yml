@@ -1,0 +1,94 @@
+name: Save tested GenV bundle to the working branch
+
+on:
+  push:
+    branches: [arena/02093a53-youtube-patch-clone]
+    paths:
+      - '.github/workflows/save-genv-bundle.yml'
+      - 'bundles/genv/README.md'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  save:
+    if: contains(github.event.head_commit.message, '[genv-save-tested]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Retrieve only successful source-matched results
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/genv-delivery"
+          mkdir -p "$work"/{bundle,manager,android}
+          common=(tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/inspect_genv.py)
+          static="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            "${common[@]}" .github/workflows/build-genv-mpp.yml)"
+          manager="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-genv-manager.yml \
+            "${common[@]}" .github/workflows/build-genv-mpp.yml tools/genv/test_manager.py tools/genv/verify_manager_output.py .github/workflows/test-genv-manager.yml)"
+          android="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-genv-android.yml \
+            "${common[@]}" .github/workflows/build-genv-mpp.yml tools/genv/tests/android .github/workflows/test-genv-android.yml)"
+          gh run download "$static" --name genv-morphe-bundle-static-only --dir "$work/bundle"
+          gh run download "$manager" --name genv-manager-smoke --dir "$work/manager"
+          gh run download "$android" --name genv-synthetic-android-report --dir "$work/android"
+          (cd "$work/bundle" && sha256sum --check bundle.mpp.sha256)
+          python3 tools/genv/verify_bundle.py --mpp "$work/bundle/bundle.mpp" --listing "$work/bundle/patches.txt"
+          python3 - "$work" "$static" "$manager" "$android" <<'PY'
+          import hashlib,json,os,pathlib,sys
+          root=pathlib.Path(sys.argv[1]); static,manager,android=sys.argv[2:]
+          bundle=root/'bundle/bundle.mpp'; digest=hashlib.sha256(bundle.read_bytes()).hexdigest()
+          p=json.loads((root/'bundle/patch-validation.json').read_text())
+          m=json.loads((root/'manager/manager-smoke.json').read_text())
+          a=json.loads((root/'android/android-smoke.json').read_text())
+          assert p.get('status')=='passed_actual_mpp_patch_and_dex_inspection'
+          assert p.get('input_sha256')=='f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e'
+          assert m.get('manager_patch_incomplete_base')=='passed' and m.get('bundle_sha256')==digest
+          assert a.get('status')=='passed' and a.get('bundle_sha256')==digest
+          assert a.get('before_patch_check_calls_and_init_calls')==[2,1] and a.get('after_patch_check_calls_and_init_calls')==[0,0]
+          assert a.get('wrong_version_code_rejected') and a.get('changed_opcode_rejected')
+          result={
+            'bundle_version':'0.1.0-dev.1', 'bundle_sha256':digest, 'bundle_bytes':bundle.stat().st_size,
+            'input_package':'com.ainate.ai.video.generate', 'version':'3.7.2', 'version_code':163,
+            'input_sha256':p['input_sha256'], 'patch':'Remove license check',
+            'static_build':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{static}",
+            'manager_test':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{manager}",
+            'synthetic_android_test':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{android}",
+            'input_limitations':'release asset is an incomplete base APK; required splits and native libraries were not supplied',
+            'real_app_runtime_full_split_merge_login_server_attestation_and_purchases':'not tested',
+          }
+          (root/'validation.json').write_text(json.dumps(result,indent=2)+'\n')
+          PY
+      - name: Save only the MPP and sanitized reports on this session branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = arena/02093a53-youtube-patch-clone
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          if ! git diff --quiet "$GITHUB_SHA" HEAD -- tools/genv/project tools/genv/prepare_build.py \
+              tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/inspect_genv.py \
+              tools/genv/test_manager.py tools/genv/verify_manager_output.py tools/genv/tests/android \
+              .github/workflows/build-genv-mpp.yml .github/workflows/test-genv-manager.yml .github/workflows/test-genv-android.yml; then
+            echo '::error::Relevant sources changed during delivery; refusing to save stale results.'
+            exit 1
+          fi
+          work="$RUNNER_TEMP/genv-delivery"
+          mkdir -p bundles/genv
+          cp "$work/bundle/bundle.mpp" "$work/bundle/bundle.mpp.sha256" "$work/bundle/patches.txt" "$work/bundle/patch-validation.json" bundles/genv/
+          cp "$work/validation.json" bundles/genv/
+          cp "$work/manager/manager-smoke.json" bundles/genv/
+          cp "$work/android/android-smoke.json" bundles/genv/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bundles/genv/{bundle.mpp,bundle.mpp.sha256,patches.txt,patch-validation.json,validation.json,manager-smoke.json,android-smoke.json}
+          if git diff --cached --quiet; then echo 'Bundle already saved'; exit 0; fi
+          git commit -m 'Add tested experimental GenV Morphe bundle [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+          echo '::notice::Saved only the MPP and sanitized reports. The existing GenV APK and tag were not changed.'

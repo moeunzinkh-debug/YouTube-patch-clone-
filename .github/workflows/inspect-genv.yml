@@ -1,0 +1,71 @@
+name: Inspect user-supplied GenV release APK
+
+on:
+  push:
+    branches: [arena/02093a53-youtube-patch-clone]
+    paths:
+      - '.github/workflows/inspect-genv.yml'
+      - 'tools/genv/inspect_genv.py'
+      - 'tools/genv/test_inspect_genv.py'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: contains(github.event.head_commit.message, '[genv-inspect]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Check input and privacy guards
+        run: python3 tools/genv/test_inspect_genv.py -v
+      - name: Inspect the exact release APK without modifying or installing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          mkdir -p "$RUNNER_TEMP/genv"
+          gh release download GenV --pattern GenV_3.7.2.apk --dir "$RUNNER_TEMP/genv"
+          apk="$RUNNER_TEMP/genv/GenV_3.7.2.apk"
+          echo 'f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e  '"$apk" | sha256sum --check
+          tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          test -x "$tools_dir/apksigner"
+          if ! python3 tools/genv/inspect_genv.py "$apk" "$RUNNER_TEMP/genv/report.json" \
+                --apksigner "$tools_dir/apksigner" > "$RUNNER_TEMP/genv/inspect.log" 2>&1; then
+            tail -n 25 "$RUNNER_TEMP/genv/inspect.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/genv/inspect.log"
+      - name: Surface sanitized code and signing metadata only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64,gzip,json,os
+          from pathlib import Path
+          path=Path(os.environ['RUNNER_TEMP'])/'genv/report.json'
+          report=json.loads(path.read_text())
+          def encode(data): return base64.b64encode(gzip.compress(json.dumps(data,ensure_ascii=False).encode())).decode()
+          payload=encode(report)
+          if len(payload)>35000:
+              report['matched_classes']=report['matched_classes'][:60]
+              report['matched_methods']=report['matched_methods'][:80]
+              report['known_license_callers']=report['known_license_callers'][:50]
+              payload=encode(report)
+          chunks=[payload[i:i+3900] for i in range(0,len(payload),3900)]
+          if len(chunks)>10: raise SystemExit('Sanitized report exceeds annotation limit')
+          for i,chunk in enumerate(chunks,1): print(f'::notice::GENV_STATIC {i}/{len(chunks)} {chunk}')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: genv-static-inspection
+          path: ${{ runner.temp }}/genv/report.json
