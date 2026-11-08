@@ -1,0 +1,87 @@
+name: Save tested King-Patcher bundle to the working branch
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - '.github/workflows/save-king-bundle.yml'
+      - 'tools/king-patcher/find_successful_run.py'
+      - 'bundles/king-patcher/README.md'
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  save:
+    if: contains(github.event.head_commit.message, '[king-save-tested]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Retrieve only source-matched successful test artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/king-delivery"
+          mkdir -p "$work"/{bundle,android,manager}
+          common=(tools/king-patcher/project tools/king-patcher/prepare_build.py tools/king-patcher/verify_bundle.py)
+          static="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-king-patcher.yml \
+            "${common[@]}" tools/king-patcher/verify_patched_menu.py .github/workflows/build-king-patcher.yml)"
+          android="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-king-android.yml \
+            "${common[@]}" tools/king-patcher/tests/android .github/workflows/test-king-android.yml)"
+          manager="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" test-king-manager.yml \
+            "${common[@]}" tools/king-patcher/verify_patched_menu.py tools/king-patcher/tests/manager .github/workflows/test-king-manager.yml)"
+          gh run download "$static" --name king-patcher-bundle-static-only --dir "$work/bundle"
+          gh run download "$android" --name king-patcher-android-report --dir "$work/android"
+          gh run download "$manager" --name king-manager-validation --dir "$work/manager"
+          (cd "$work/bundle" && sha256sum --check bundle.mpp.sha256)
+          python3 tools/king-patcher/verify_bundle.py --mpp "$work/bundle/bundle.mpp" --listing "$work/bundle/patches.txt"
+          python3 - "$work" "$static" "$android" "$manager" <<'PY'
+          import hashlib,json,os,pathlib,sys
+          root=pathlib.Path(sys.argv[1]); static,android,manager=sys.argv[2:]
+          bundle=root/'bundle/bundle.mpp'; digest=hashlib.sha256(bundle.read_bytes()).hexdigest()
+          a=json.loads((root/'android/report.json').read_text())
+          m=json.loads((root/'manager/manager-report.json').read_text())
+          assert a.get('runtime') == 'passed' and a.get('bundle_sha256') == digest, 'Android test or bundle hash does not match'
+          assert m.get('patch_and_save') == 'passed' and m.get('bundle_sha256') == digest, 'Manager test or bundle hash does not match'
+          result={
+              'bundle_version':'0.1.0-dev.1', 'bundle_sha256':digest,
+              'king_input':'King-Patcher 12.10.10 / 1980, SHA-256 e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222',
+              'static_build':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{static}",
+              'android_test':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{android}",
+              'manager_test':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{manager}",
+              'physical_devices_and_real_target_apps':'not tested',
+          }
+          (root/'validation.json').write_text(json.dumps(result,indent=2)+'\n')
+          PY
+      - name: Commit only bundle and sanitized reports to the session branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = arena/dc6d652d-youtube-patch-clone
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          if ! git diff --quiet "$GITHUB_SHA" HEAD -- tools/king-patcher/project tools/king-patcher/prepare_build.py \
+              tools/king-patcher/verify_bundle.py tools/king-patcher/verify_patched_menu.py tools/king-patcher/tests \
+              .github/workflows/build-king-patcher.yml .github/workflows/test-king-android.yml .github/workflows/test-king-manager.yml; then
+            echo '::error::Sources changed during delivery; refusing to save stale results.'
+            exit 1
+          fi
+          work="$RUNNER_TEMP/king-delivery"
+          mkdir -p bundles/king-patcher
+          cp "$work/bundle/bundle.mpp" "$work/bundle/bundle.mpp.sha256" bundles/king-patcher/
+          cp "$work/validation.json" bundles/king-patcher/validation.json
+          cp "$work/android/report.json" bundles/king-patcher/android-smoke.json
+          cp "$work/manager/manager-report.json" bundles/king-patcher/manager-smoke.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add bundles/king-patcher/{bundle.mpp,bundle.mpp.sha256,validation.json,android-smoke.json,manager-smoke.json}
+          if git diff --cached --quiet; then echo 'Bundle already saved'; exit 0; fi
+          git commit -m 'Add tested experimental King-Patcher bundle [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
+          echo '::notice::Saved only the Morphe bundle and sanitized reports; no APK or release was changed.'
