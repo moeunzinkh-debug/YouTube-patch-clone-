@@ -28,6 +28,9 @@ class AccountInspectionGuards(unittest.TestCase):
     def test_trace_emits_only_fixed_words_and_reference_shapes(self):
         self.assertEqual(context_label('v0, "password"'), 'password')
         self.assertEqual(context_label('v0, "ProxyHost"'), 'proxyhost')
+        self.assertEqual(context_label('v0, "autofill"'), 'autofill')
+        self.assertEqual(context_label('v0, "uniqueIdentifier"'), 'uniqueidentifier')
+        self.assertEqual(context_label('v0, "newPassword"'), 'newpassword')
         self.assertIsNone(context_label('v0, "password=private"'))
         self.assertIsNone(context_label('v0, "https://example.invalid"'))
         self.assertEqual(safe_trace_reference('v0, Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;'),

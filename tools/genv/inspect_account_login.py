@@ -50,9 +50,18 @@ RESOURCE_NAMES = {
 VALID_SITE = re.compile(r'L[A-Za-z0-9_$/-]+;->[A-Za-z0-9_$<>-]+\([^)]*\)[A-Za-z0-9_$/;\[\]-]+\Z')
 VALID_REFERENCE = re.compile(r'[A-Za-z0-9_$/;()<>.$\[\]:-]{1,260}\Z')
 ACCOUNT_SITE = 'Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;'
-CONTEXT_WORDS = frozenset({'username', 'password', 'host', 'port', 'proxy', 'scheme', 'http', 'https',
-                           'type', 'auth', 'user', 'domain', 'enabled', 'proxyhost', 'proxyport',
-                           'proxyusername', 'proxypassword', 'server', 'email', 'login', 'sign in', 'sign up'})
+CONTEXT_WORDS = frozenset({
+    # Fixed public Flutter text-input configuration and autofill keys/hints.
+    'inputaction', 'fields', 'contentcommitmimetypes', 'obscuretext', 'autocorrect',
+    'enablesuggestions', 'enableimepersonalizedlearning', 'enabledeltamodel',
+    'textcapitalization', 'inputtype', 'actionlabel', 'autofill', 'uniqueidentifier',
+    'hints', 'hinttext', 'editingvalue', 'newpassword', 'newusername', 'onetimecode',
+    'creditcardnumber', 'addresscity', 'email', 'username', 'password',
+    # Other fixed context terms, not arbitrary APK strings.
+    'host', 'port', 'proxy', 'scheme', 'http', 'https', 'type', 'auth', 'user',
+    'domain', 'enabled', 'proxyhost', 'proxyport', 'proxyusername', 'proxypassword',
+    'server', 'login', 'sign in', 'sign up',
+})
 
 
 def safe_trace_reference(operand: str) -> str | None:
@@ -171,7 +180,8 @@ def inspect(path: Path) -> dict:
                     if not VALID_SITE.fullmatch(method_id):
                         continue
                     trace_events = []
-                    calls_site = False
+                    site_invocations = []
+                    known_words = []
                     instruction_count = 0
                     for index, ins in enumerate(method.get_instructions()):
                         instruction_count += 1
@@ -180,14 +190,17 @@ def inspect(path: Path) -> dict:
                         if op.startswith(('invoke-', 'iget', 'iput', 'sget', 'sput')):
                             reference = safe_trace_reference(operand)
                             if reference:
-                                if reference == ACCOUNT_SITE:
-                                    calls_site = True
+                                if reference == ACCOUNT_SITE and op.startswith('invoke-') and len(site_invocations) < 12:
+                                    site_invocations.append({'index': index, 'opcode': op, 'reference': reference})
                                 if len(trace_events) < 100:
                                     trace_events.append({'index': index, 'opcode': op, 'reference': reference})
                         elif op.startswith('const-string'):
                             word = context_label(operand)
-                            if word and len(trace_events) < 100:
-                                trace_events.append({'index': index, 'opcode': op, 'known_word': word})
+                            if word:
+                                if method_id == ACCOUNT_SITE and len(known_words) < 100:
+                                    known_words.append({'index': index, 'known_word': word})
+                                if len(trace_events) < 100:
+                                    trace_events.append({'index': index, 'opcode': op, 'known_word': word})
                         label = None
                         if op.startswith('const-string'):
                             pieces = operand.split(',', 1)
@@ -205,10 +218,11 @@ def inspect(path: Path) -> dict:
                                 sites[label].append(method_id)
                     if method_id == ACCOUNT_SITE:
                         site_trace = {'method': method_id, 'flags': method.get_access_flags_string(),
-                                      'instruction_count': instruction_count, 'events': trace_events}
-                    elif calls_site and len(site_callers) < 12:
+                                      'instruction_count': instruction_count, 'known_words': known_words,
+                                      'events': trace_events}
+                    elif site_invocations and len(site_callers) < 12:
                         site_callers.append({'method': method_id, 'instruction_count': instruction_count,
-                                             'events': trace_events})
+                                             'site_invocations': site_invocations, 'events': trace_events})
             del dex
             gc.collect()
     check_asset(path)
