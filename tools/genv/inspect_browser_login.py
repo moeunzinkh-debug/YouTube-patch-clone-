@@ -168,7 +168,7 @@ def inspect(path: Path) -> dict:
             gc.collect()
     check_asset(path)
     return {
-        'scope': 'SHA-pinned released GenV base only; read-only, no execution, accounts or network requests',
+        'scope': 'SHA-pinned released GenV base only; read-only, no GenV execution, accounts or Google/GenV/Firebase requests',
         'package': PACKAGE, 'version': '3.7.2', 'version_code': 163, 'input_sha256': ASSET_SHA256,
         'default_web_client_id_resource_present': present,
         'default_web_client_id_has_google_client_id_shape': bool(client_ids),
