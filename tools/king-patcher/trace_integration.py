@@ -16,10 +16,10 @@ TARGETS = {
                                               'onCreate(Landroid/os/Bundle;)V'),
     'Lʽᐧ/ʽ;': ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V',
                  'ٴ(Ljava/util/ArrayList;Z)Landroid/widget/ArrayAdapter;'),
-    'Lʽᐧ/ʽ$ˊˊ;': ('run()V',),
-    'Lʽᐧ/ʽ$ˏˏ;': ('run()V',),
-    'Lʽᐧ/ʽ$ˊˊ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
-    'Lʽᐧ/ʽ$ˏˏ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
+    'Lʽᐧ/ʽ$ˊˊ;': ('<init>(Ljava/util/ArrayList;Z)V', 'run()V'),
+    'Lʽᐧ/ʽ$ˏˏ;': ('<init>(Ljava/util/ArrayList;ZLjava/lang/String;)V', 'run()V'),
+    'Lʽᐧ/ʽ$ˊˊ$ʻ;': ('<init>(Lʽᐧ/ʽ$ˊˊ;)V', 'onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V'),
+    'Lʽᐧ/ʽ$ˏˏ$ʻ;': ('<init>(Lʽᐧ/ʽ$ˏˏ;)V', 'onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V'),
     'Lʽᐧ/ʽ$ˑˑ;': ('getView(ILandroid/view/View;Landroid/view/ViewGroup;)Landroid/view/View;',),
 }
 
@@ -55,7 +55,10 @@ def trace(decoded: Path) -> dict:
             elif len(cleaned) > 400:
                 cleaned = cleaned[:400]
             selected[name] = cleaned
-        report[descriptor] = {'found': True, 'header': [scrub(line) for line in header], 'methods': selected}
+        constructors = {name: [scrub(line.strip()) for line in body[:100]]
+                        for name, body in methods.items() if name.startswith('<init>(')} if descriptor.startswith('Lʽᐧ/ʽ$') else {}
+        report[descriptor] = {'found': True, 'header': [scrub(line) for line in header], 'methods': selected,
+                              'constructors': constructors}
     return {'classes': report, 'note': 'String literals are redacted; static trace only.'}
 
 def main() -> None:
