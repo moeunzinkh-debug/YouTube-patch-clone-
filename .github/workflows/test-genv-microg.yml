@@ -1,4 +1,5 @@
 name: Test GenV MicroG guard offline on Android
+# Exercise the actual MPP extension on both the minimum and modern API levels.
 
 on:
   push:

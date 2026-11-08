@@ -1,4 +1,5 @@
 name: GenV synthetic PairIP Android runtime test
+# Uses a synthetic fixture, never the incomplete GenV application.
 
 on:
   push:

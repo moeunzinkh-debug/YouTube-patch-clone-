@@ -217,11 +217,11 @@ def main() -> None:
     microg = 'Morphe MicroG Google sign-in support (experimental)'
     if not any(matches(n, microg) for n in nodes):
         # Patch lists can be vertically scrollable on the emulator.
-        adb('shell', 'input', 'swipe', '500', '1100', '500', '400', '500')
+        adb('shell', 'input', 'swipe', '160', '480', '160', '250', '500')
         time.sleep(2)
         nodes = dump()
     if not any(matches(n, microg) for n in nodes):
-        adb('shell', 'input', 'swipe', '500', '400', '500', '1200', '500')
+        adb('shell', 'input', 'swipe', '160', '250', '160', '480', '500')
         time.sleep(2)
         nodes = dump()
     if not any(matches(n, microg) for n in nodes):
