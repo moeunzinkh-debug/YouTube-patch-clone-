@@ -6,6 +6,7 @@ on:
     paths:
       - 'tools/king-patcher/inspect_apk.py'
       - 'tools/king-patcher/test_inspect_apk.py'
+      - 'tools/king-patcher/trace_menu.py'
       - '.github/workflows/inspect-king-patcher.yml'
 
 permissions:
@@ -57,19 +58,29 @@ jobs:
             exit 1
           fi
           cat "$RUNNER_TEMP/king-inspect.log"
-      - name: Emit bounded sanitized inventory
+          if ! python3 tools/king-patcher/trace_menu.py "$RUNNER_TEMP/king-decoded" \
+            "$RUNNER_TEMP/king-menu-trace.json" > "$RUNNER_TEMP/king-trace.log" 2>&1; then
+            tail -n 20 "$RUNNER_TEMP/king-trace.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/king-trace.log"
+      - name: Emit bounded sanitized inventory and menu trace
         run: |
           python3 - <<'PY'
           import base64, gzip, os
           from pathlib import Path
-          data = base64.b64encode(gzip.compress((Path(os.environ['RUNNER_TEMP']) / 'king-inventory.json').read_bytes())).decode('ascii')
-          chunks = [data[i:i + 3900] for i in range(0, len(data), 3900)]
-          if len(chunks) > 15:
-              raise SystemExit('Inventory exceeds annotation capacity')
-          for index, chunk in enumerate(chunks, 1):
-              print(f'::notice::KING_INVENTORY {index}/{len(chunks)} {chunk}')
+          root = Path(os.environ['RUNNER_TEMP'])
+          for prefix, filename in (('KING_INVENTORY', 'king-inventory.json'), ('KING_MENU_TRACE', 'king-menu-trace.json')):
+              data = base64.b64encode(gzip.compress((root / filename).read_bytes())).decode('ascii')
+              chunks = [data[i:i + 3900] for i in range(0, len(data), 3900)]
+              if len(chunks) > 15:
+                  raise SystemExit(prefix + ' exceeds annotation capacity')
+              for index, chunk in enumerate(chunks, 1):
+                  print(f'::notice::{prefix} {index}/{len(chunks)} {chunk}')
           PY
       - uses: actions/upload-artifact@v4
         with:
           name: king-patcher-static-inventory
-          path: ${{ runner.temp }}/king-inventory.json
+          path: |
+            ${{ runner.temp }}/king-inventory.json
+            ${{ runner.temp }}/king-menu-trace.json

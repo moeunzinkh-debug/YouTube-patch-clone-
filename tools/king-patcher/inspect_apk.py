@@ -112,6 +112,10 @@ def dex_inventory(path: Path) -> dict:
     from androguard.core.dex import DEX
 
     strings, classes, methods = set(), set(), set()
+    libraries = {name: 0 for name in ('dexlib2', 'baksmali', 'apktool', 'apksig', 'bouncycastle', 'reandroid')}
+    prefixes = {'dexlib2': 'Lorg/jf/dexlib2/', 'baksmali': 'Lorg/jf/baksmali/',
+                'apktool': 'Lbrut/androlib/', 'apksig': 'Lcom/android/apksig/',
+                'bouncycastle': 'Lorg/bouncycastle/', 'reandroid': 'Lcom/reandroid/'}
     dex_files = []
     with zipfile.ZipFile(path) as archive:
         for info in archive.infolist():
@@ -126,6 +130,9 @@ def dex_inventory(path: Path) -> dict:
                     strings.add(value)
             for cls in dex.get_classes():
                 klass = cls.get_name()
+                for name, prefix in prefixes.items():
+                    if klass.startswith(prefix):
+                        libraries[name] += 1
                 if MENU.search(klass) and safe(klass):
                     classes.add(klass)
                 for method in cls.get_methods():
@@ -134,18 +141,24 @@ def dex_inventory(path: Path) -> dict:
                         descriptor = re.sub(r'\s+', '', method.get_descriptor())
                         methods.add(f'{klass}->{name}{descriptor}')
     ranked = sorted(strings, key=lambda value: (not bool(SCREEN.search(value)), value))
-    return {'files': dex_files, 'matching_string_count': len(strings), 'strings': ranked[:160],
+    return {'files': dex_files, 'library_class_counts': libraries,
+            'matching_string_count': len(strings), 'strings': ranked[:160],
             'matching_class_count': len(classes), 'classes': sorted(classes)[:160],
             'matching_method_count': len(methods), 'methods': sorted(methods)[:240]}
 
 
 def signature(apksigner: str, path: Path) -> dict:
-    process = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs', str(path)],
-                             text=True, capture_output=True, timeout=120, check=False)
-    output = process.stdout + '\n' + process.stderr
-    digests = sorted(set(re.findall(r'certificate SHA-256 digest:\s*([0-9a-f]{64})', output, re.I)))
-    return {'verified': process.returncode == 0 and bool(digests),
-            'signer_sha256': [value.lower() for value in digests]}
+    checks = {}
+    for label, options in (('manifest_min_sdk', []), ('android_7_plus', ['--min-sdk-version', '24'])):
+        process = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs', *options, str(path)],
+                                 text=True, capture_output=True, timeout=120, check=False)
+        output = process.stdout + '\n' + process.stderr
+        digests = sorted(set(re.findall(r'certificate SHA-256 digest:\s*([0-9a-f]{64})', output, re.I)))
+        messages = [line.strip() for line in output.splitlines()
+                    if line.startswith(('DOES NOT VERIFY', 'ERROR:', 'WARNING:')) and safe(line.strip())]
+        checks[label] = {'verified': process.returncode == 0 and bool(digests),
+                         'signer_sha256': [value.lower() for value in digests], 'messages': messages[:8]}
+    return checks
 
 
 def inspect(path: Path, decoded: Path, apksigner: str) -> dict:

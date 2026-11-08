@@ -5,6 +5,7 @@ import tempfile
 import unittest
 
 import inspect_apk as inspection
+import trace_menu
 
 
 class InspectionTests(unittest.TestCase):
@@ -37,6 +38,26 @@ class InspectionTests(unittest.TestCase):
             references = inspection.smali_references(root, result['screen_candidates'])
             self.assertEqual([{'class': 'Lorg/example/Menu;', 'method': 'show()V',
                                'resource': 'license_menu'}], references['references'])
+
+    def test_menu_trace_fails_closed_and_redacts_string_constants(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaises(ValueError):
+                trace_menu.trace(root)
+            path = root / 'smali/ʽٴ/ᐧᐧ.smali'
+            path.parent.mkdir(parents=True)
+            parts = ['.class public Lʽٴ/ᐧᐧ;', '.super Ljava/lang/Object;']
+            for name in trace_menu.TARGET_METHODS:
+                parts.extend([f'.method public {name}', '    .locals 1',
+                              '    const-string v0, "secret text"',
+                              '    const v0, 0x7f110144', '    return-void', '.end method'])
+            path.write_text('\n'.join(parts), encoding='utf-8')
+            result = trace_menu.trace(root)
+            self.assertEqual(set(trace_menu.TARGET_METHODS), set(result['methods']))
+            serialized = str(result)
+            self.assertNotIn('secret text', serialized)
+            self.assertIn('<redacted>', serialized)
+            self.assertIn('0x7f110144', serialized)
 
     def test_missing_resources_and_wrong_asset_fail_safely(self):
         with tempfile.TemporaryDirectory() as directory:
