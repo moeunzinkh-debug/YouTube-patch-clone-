@@ -47,9 +47,9 @@ def screen_text() -> str:
     raise RuntimeError('Unable to read synthetic fixture screen: ' + last[-500:])
 
 
-def launch_and_check(expected: tuple[str, ...], absent: tuple[str, ...] = ()) -> None:
-    adb('shell', 'am', 'force-stop', PACKAGE)
-    start = adb('shell', 'am', 'start', '-W', '-n', PACKAGE + '/.MainActivity', timeout=60)
+def launch_and_check(expected: tuple[str, ...], absent: tuple[str, ...] = (), package: str = PACKAGE) -> None:
+    adb('shell', 'am', 'force-stop', package)
+    start = adb('shell', 'am', 'start', '-W', '-n', package + '/.MainActivity', timeout=60)
     time.sleep(1)
     text = screen_text()
     for value in expected:
@@ -78,19 +78,21 @@ def main() -> None:
     try:
         adb('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP')
         adb('shell', 'wm', 'dismiss-keyguard')
-        for name in ('king.apk', 'harness.apk', 'fixture.apk'):
+        for name in ('king.apk', 'harness.apk', 'fixture.apk', 'pairip-fixture.apk'):
             adb('install', '-r', str(WORK / name), timeout=120)
         adb('push', str(WORK / 'fixture.apk'), '/sdcard/Download/king-fixture.apk', timeout=120)
         adb('shell', 'am', 'broadcast', '-a', 'android.intent.action.MEDIA_SCANNER_SCAN_FILE', '-d',
             'file:///sdcard/Download/king-fixture.apk')
         launch_and_check(('DENIED-561', 'KEEP-ME', 'HIDE-ME', 'HIDE-EXISTING'))
         report['baseline_fixture'] = 'denied LVL callback and all fixture UI elements visible'
-        instrument = adb('shell', 'am', 'instrument', '-w', '-r', 'test.king.harness/.KingInstrumentation', timeout=360)
+        launch_and_check(('PAIRIP-1-1',), package='test.king.pairip')
+        report['baseline_pairip_fixture'] = 'both synthetic PairIP entry points ran before patching'
+        instrument = adb('shell', 'am', 'instrument', '-w', '-r', 'test.king.harness/.KingInstrumentation', timeout=480)
         (WORK / 'instrument.log').write_text(instrument)
         if 'INSTRUMENTATION_RESULT: status=PASS' not in instrument or 'INSTRUMENTATION_CODE: -1' not in instrument:
             raise AssertionError('Instrumentation failed:\n' + instrument[-6000:])
         report['king_menu_navigation'] = 'renderer and both click listeners tested with synthetic rows; end-to-end navigation not tested'
-        for mode in ('ui', 'lvl'):
+        for mode in ('ui', 'lvl', 'pairip'):
             remote = f'/sdcard/Android/data/{TARGET}/files/king-{mode}-fixture.apk'
             saved = f'/sdcard/Download/king-{mode}-modified.apk'
             adb('pull', remote, str(WORK / f'{mode}-output.apk'), timeout=120)
@@ -100,17 +102,22 @@ def main() -> None:
         original = adb('shell', 'sha256sum', '/sdcard/Download/king-fixture.apk').split()[0]
         if original != hashlib.sha256((WORK / 'fixture.apk').read_bytes()).hexdigest():
             raise AssertionError('Original system-picker input was modified')
-        report['system_file_picker'] = 'selected UI input and saved both outputs in Downloads; saved bytes and original SHA-256 checked'
+        report['system_file_picker'] = 'selected UI input and saved all three outputs in Downloads; saved bytes and original SHA-256 checked'
         ui_signer = verify_signature(WORK / 'ui-output.apk')
         lvl_signer = verify_signature(WORK / 'lvl-output.apk')
-        if ui_signer != lvl_signer: raise AssertionError('Per-install signing key was not stable')
-        report['signature'] = 'Android Keystore signed; v1/v2 verified at API 23+; same key for both outputs'
+        pair_signer = verify_signature(WORK / 'pairip-output.apk')
+        if len({ui_signer, lvl_signer, pair_signer}) != 1: raise AssertionError('Per-install signing key was not stable')
+        report['signature'] = 'Android Keystore signed; v1/v2 verified at API 23+; same key for all outputs'
         report['alignment'] = 'zipalign verification passed including 16 KiB native alignment option'
         adb('uninstall', PACKAGE)
         adb('install', str(WORK / 'lvl-output.apk'), timeout=120)
         launch_and_check(('LICENSED-256', 'KEEP-ME', 'HIDE-ME', 'HIDE-EXISTING'), ('DENIED-561',))
         report['lvl_fixture'] = 'classic callback changed from denial to allow(256) on Android'
         report['dex_integrity'] = 'rewritten DEX SHA-1 and Adler-32 accepted by Android runtime'
+        adb('uninstall', 'test.king.pairip')
+        adb('install', str(WORK / 'pairip-output.apk'), timeout=120)
+        launch_and_check(('PAIRIP-0-0',), ('PAIRIP-1-1',), package='test.king.pairip')
+        report['pairip_fixture'] = 'automatic scan matched reviewed shape in classes2.dex and both synthetic entry points stopped running on Android'
         adb('uninstall', PACKAGE)
         adb('install', str(WORK / 'ui-output.apk'), timeout=120)
         launch_and_check(('DENIED-561', 'KEEP-ME'), ('HIDE-ME', 'HIDE-EXISTING'))

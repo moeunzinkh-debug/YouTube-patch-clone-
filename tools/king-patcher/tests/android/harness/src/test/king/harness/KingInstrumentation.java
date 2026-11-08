@@ -171,7 +171,7 @@ public final class KingInstrumentation extends Instrumentation {
                     int.class, String.class, int.class, String.class, String.class, int.class);
                 modelConstructor.setAccessible(true);
                 java.util.ArrayList<Object> items = new java.util.ArrayList<>();
-                String[] labels = {"Remove license (Google Play LVL)", "Remove insignificant things"};
+                String[] labels = {"Remove license check (automatic)", "Remove insignificant things"};
                 items.add(modelConstructor.newInstance(0x7e4d0001, labels[0], 0, "LVL", "#FFFFFF", 0x7f080083));
                 items.add(modelConstructor.newInstance(0x7e4d0002, labels[1], 0, "UI", "#FFFFFF", 0x7f080083));
                 Class<?> adapterType = loader.loadClass("ʽᐧ.ʽ$ˑˑ");
@@ -234,7 +234,7 @@ public final class KingInstrumentation extends Instrumentation {
                 int.class, String.class, int.class, String.class, String.class, int.class);
         modelCtor.setAccessible(true);
         int id = mode == 1 ? 0x7e4d0001 : 0x7e4d0002;
-        String label = mode == 1 ? "Remove license (Google Play LVL)" : "Remove insignificant things";
+        String label = mode == 1 ? "Remove license check (automatic)" : "Remove insignificant things";
         java.util.ArrayList<Object> items = new java.util.ArrayList<>();
         items.add(modelCtor.newInstance(id, label, 0, "test", "#FFFFFF", 0x7f080083));
         // Invoke each inspected King click listener with its actual item model; it calls the patched dispatcher.
@@ -302,6 +302,10 @@ public final class KingInstrumentation extends Instrumentation {
             StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
             throw new AssertionError("Tool did not produce a verified signed output: " + ((android.widget.TextView) message).getText() + " " + visible);
         }
+        if (filename.equals("king-lvl-fixture.apk") && !"classic LVL".equals(field(activity, "appliedLicenseMethods")))
+            throw new AssertionError("Classic LVL was not identified automatically");
+        if (filename.equals("king-pairip-fixture.apk") && !"reviewed PairIP".equals(field(activity, "appliedLicenseMethods")))
+            throw new AssertionError("PairIP was not identified automatically");
         phase("saving verified output through system document picker");
         openDownloadsInPicker();
         click("SAVE", 15000);
@@ -336,9 +340,15 @@ public final class KingInstrumentation extends Instrumentation {
             createOutput(ui, "3. Create modified APK", "king-ui-fixture.apk");
             Object lvl = openTool(1);
             createOutput(lvl, "2. Create modified APK", "king-lvl-fixture.apk");
-            if (!Arrays.equals(before, sha(input))) throw new AssertionError("Input fixture was modified");
+            if (!Arrays.equals(before, sha(input))) throw new AssertionError("Classic input fixture was modified");
+            input = new File(getTargetContext().getCacheDir(), "king-pairip-input.apk");
+            copy(getContext().getAssets().open("pairip-fixture.apk"), input);
+            byte[] pairBefore = sha(input);
+            Object pair = openTool(1);
+            createOutput(pair, "2. Create modified APK", "king-pairip-fixture.apk");
+            if (!Arrays.equals(pairBefore, sha(input))) throw new AssertionError("PairIP input fixture was modified");
             result.putString("status", "PASS");
-            result.putString("coverage", "Manual layout selection, classic LVL rewrite, host libraries, Android Keystore signing and verification on synthetic APKs");
+            result.putString("coverage", "Manual layouts, automatic classic LVL and PairIP detection, host libraries, Android Keystore signing and verification on synthetic APKs");
             finish(Activity.RESULT_OK, result);
         } catch (Throwable failure) {
             java.io.StringWriter text = new java.io.StringWriter(); failure.printStackTrace(new java.io.PrintWriter(text));

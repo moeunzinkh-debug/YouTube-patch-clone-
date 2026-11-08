@@ -36,7 +36,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/king-classes"
           if ! javac -encoding UTF-8 -cp "$RUNNER_TEMP/king-deps/*" -d "$RUNNER_TEMP/king-classes" \
               tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/{LvlEditor,PairIpEditor,AxmlEditor,ApkArchive}.java \
-              tools/king-patcher/tests/{LvlEditorTestMain,PairIpEditorTestMain,AxmlEditorTestMain,ApkArchiveTestMain}.java > "$RUNNER_TEMP/king-lvl-compile.log" 2>&1; then
+              tools/king-patcher/tests/{LvlEditorTestMain,PairIpEditorTestMain,PairIpReferenceProbe,AxmlEditorTestMain,ApkArchiveTestMain}.java > "$RUNNER_TEMP/king-lvl-compile.log" 2>&1; then
             tail -n 30 "$RUNNER_TEMP/king-lvl-compile.log" | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
@@ -53,3 +53,15 @@ jobs:
             echo "::notice::$(tail -n 1 "$RUNNER_TEMP/king-lvl-test.log")"
           done
           echo '::notice::Only generated fixtures were modified; no real target APK was modified'
+      - name: Probe the current Kimi reference without altering or uploading it
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/king-reference"
+          gh release download Kimi --pattern Kimi_3.1.5.apk --dir "$RUNNER_TEMP/king-reference"
+          apk="$RUNNER_TEMP/king-reference/Kimi_3.1.5.apk"
+          echo '342f26cd189cc925c02849908aff0f6d99cb6327ef95c4d4c7f751e9c0e85081  '"$apk" | sha256sum --check
+          java -Xmx3g -cp "$RUNNER_TEMP/king-classes:$RUNNER_TEMP/king-deps/*" PairIpReferenceProbe "$apk" \
+            | while IFS= read -r line; do echo "::notice::$line"; done

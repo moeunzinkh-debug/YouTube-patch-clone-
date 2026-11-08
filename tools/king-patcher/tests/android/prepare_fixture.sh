@@ -35,6 +35,28 @@ sign "$work/fixture-res/aligned.apk" "$work/fixture.apk"
 "$tools/apksigner" verify --min-sdk-version 23 "$work/fixture.apk"
 cp "$work/fixture.apk" "$work/harness-assets/fixture.apk"
 
+# A separate, synthetic PairIP-shaped target has no classic LVL classes.
+# Compile its Activity against a stub, then assemble the reviewed-shaped entry
+# points in classes2.dex. This proves local autodetection across DEX files.
+mkdir -p "$work"/{pair-stubs,pair-classes,pair-dex,pair-smali,pair-deps}
+cat > "$work/smali-pom.xml" <<'XML'
+<project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion><groupId>test</groupId><artifactId>pairip-fixture</artifactId><version>1</version><dependencies><dependency><groupId>org.smali</groupId><artifactId>smali</artifactId><version>2.3.4</version></dependency></dependencies></project>
+XML
+mvn -q -f "$work/smali-pom.xml" dependency:copy-dependencies -DoutputDirectory="$work/pair-deps"
+javac -encoding UTF-8 -source 8 -target 8 -d "$work/pair-stubs" "$base/pairip-fixture/stubs/com/pairip/licensecheck/LicenseClient.java"
+javac -encoding UTF-8 -source 8 -target 8 -cp "$platform:$work/pair-stubs" -d "$work/pair-classes" \
+  "$base/pairip-fixture/src/test/king/pairip/MainActivity.java"
+mapfile -t pair_classes < <(find "$work/pair-classes" -name '*.class' | sort)
+"$tools/d8" --min-api 23 --lib "$platform" --classpath "$work/pair-stubs" --output "$work/pair-dex" "${pair_classes[@]}"
+java -cp "$work/pair-deps/*" org.jf.smali.Main assemble "$base/pairip-fixture/smali" -o "$work/pair-smali/classes2.dex"
+"$tools/aapt2" link -I "$platform" --manifest "$base/pairip-fixture/AndroidManifest.xml" -o "$work/pair-unsigned.apk"
+(cd "$work/pair-dex" && zip -q -j "$work/pair-unsigned.apk" classes.dex)
+(cd "$work/pair-smali" && zip -q -j "$work/pair-unsigned.apk" classes2.dex)
+"$tools/zipalign" -f -P 16 4 "$work/pair-unsigned.apk" "$work/pair-aligned.apk"
+sign "$work/pair-aligned.apk" "$work/pairip-fixture.apk"
+"$tools/apksigner" verify --min-sdk-version 23 "$work/pairip-fixture.apk"
+cp "$work/pairip-fixture.apk" "$work/harness-assets/pairip-fixture.apk"
+
 "$tools/aapt2" link -I "$platform" --manifest "$base/harness/AndroidManifest.xml" \
   -A "$work/harness-assets" -o "$work/harness-unsigned.apk"
 mapfile -t harness_sources < <(find "$base/harness/src" -name '*.java' | sort)

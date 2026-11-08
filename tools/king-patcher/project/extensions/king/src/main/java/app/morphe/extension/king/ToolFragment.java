@@ -263,7 +263,9 @@ public final class ToolFragment extends DialogFragment {
     private void pickOutput() {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/vnd.android.package-archive")
                 .addCategory(Intent.CATEGORY_OPENABLE)
-                .putExtra(Intent.EXTRA_TITLE, mode == MODE_LVL ? "king-lvl-modified.apk" : "king-ui-modified.apk")
+                .putExtra(Intent.EXTRA_TITLE, mode == MODE_UI ? "king-ui-modified.apk"
+                        : appliedLicenseMethods != null && appliedLicenseMethods.contains("PairIP")
+                        ? "king-pairip-modified.apk" : "king-lvl-modified.apk")
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         try { startActivityForResult(intent, PICK_OUTPUT); }
         catch (ActivityNotFoundException unavailable) { showError("No document save picker is available."); }
