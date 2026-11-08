@@ -35,6 +35,21 @@ public final class PairIpReferenceProbe {
                 System.out.println("REFERENCE_MATCH: reviewed PairIP shape matched in DEX index "+index+"; temporary DEX verified");
             } catch(IOException unrecognized) {
                 System.out.println("REFERENCE_NOT_MATCHED: "+unrecognized.getMessage());
+                // Emit only structural metadata for the two known method names.
+                // No strings, method bodies, account data or APK is published.
+                for(File file:dex){
+                    byte[] magic=new byte[8];try(java.io.FileInputStream in=new java.io.FileInputStream(file)){if(in.read(magic)!=8)throw new IOException("short DEX");}
+                    int version=Integer.parseInt(new String(magic,4,3,java.nio.charset.StandardCharsets.US_ASCII));
+                    org.jf.dexlib2.iface.DexFile loaded=org.jf.dexlib2.DexFileFactory.loadDexFile(file,org.jf.dexlib2.Opcodes.forDexVersion(version));
+                    for(org.jf.dexlib2.iface.ClassDef cls:loaded.getClasses())if(cls.getType().equals("Lcom/pairip/licensecheck/LicenseClient;"))
+                        for(org.jf.dexlib2.iface.Method method:cls.getMethods())if(method.getName().equals("checkLicense")||method.getName().equals("initializeLicenseCheck")){
+                            org.jf.dexlib2.iface.MethodImplementation impl=method.getImplementation();int count=0;String first="none";
+                            if(impl!=null)for(org.jf.dexlib2.iface.instruction.Instruction instruction:impl.getInstructions()){
+                                if(count++==0)first=instruction.getOpcode().name();
+                            }
+                            System.out.println("REFERENCE_SHAPE: "+method.getName()+" registers="+(impl==null?-1:impl.getRegisterCount())+" instructions="+count+" first="+first);
+                        }
+                }
             }
             if(!java.util.Arrays.equals(before,digest(apk)))throw new AssertionError("Reference APK changed");
             System.out.println("REFERENCE_UNCHANGED: no APK was written, installed, or published");

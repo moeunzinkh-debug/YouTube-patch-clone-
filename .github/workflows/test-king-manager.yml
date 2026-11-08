@@ -62,7 +62,7 @@ jobs:
       - name: Enable emulator acceleration
         run: |
           if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
-      - name: Import local bundle and patch a disposable APK in Manager
+      - name: Import the automatic-scanner bundle and patch a disposable King APK in Manager
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35

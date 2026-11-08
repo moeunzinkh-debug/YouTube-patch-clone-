@@ -69,7 +69,7 @@ jobs:
       - name: Enable emulator acceleration
         run: |
           if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM is unavailable'; fi
-      - name: Exercise manual UI, LVL, signing and install on Android 15
+      - name: Exercise manual UI, automatic LVL and PairIP detection, signing and install on Android 15
         id: emulator
         timeout-minutes: 35
         uses: reactivecircus/android-emulator-runner@v2

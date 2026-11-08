@@ -48,9 +48,10 @@ jobs:
           a=json.loads((root/'android/report.json').read_text())
           m=json.loads((root/'manager/manager-report.json').read_text())
           assert a.get('runtime') == 'passed' and a.get('bundle_sha256') == digest, 'Android test or bundle hash does not match'
+          assert 'automatic scan matched reviewed shape' in a.get('pairip_fixture', ''), 'PairIP Android runtime coverage is missing'
           assert m.get('patch_and_save') == 'passed' and m.get('bundle_sha256') == digest, 'Manager test or bundle hash does not match'
           result={
-              'bundle_version':'0.1.0-dev.1', 'bundle_sha256':digest,
+              'bundle_version':'0.1.0-dev.2', 'bundle_sha256':digest,
               'king_input':'King-Patcher 12.10.10 / 1980, SHA-256 e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222',
               'static_build':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{static}",
               'android_test':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{android}",
