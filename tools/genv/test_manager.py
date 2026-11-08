@@ -5,6 +5,7 @@ The input is an incomplete base APK. No GenV account is used, no app is launched
 """
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -14,9 +15,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 INPUT = Path('/tmp/genv-manager')
-MANAGER = INPUT / 'morphe-manager-2.3.0-dev.3.apk'
-APK = INPUT / 'GenV_3.7.2.apk'
+MANAGER = INPUT / os.environ.get('GENV_MANAGER_FILE', 'morphe-manager-2.3.0-dev.3.apk')
+APK = INPUT / os.environ.get('GENV_INPUT_FILE', 'GenV_3.7.2.apk')
+MEDIA_NAME = 'genv-input' + APK.suffix
 BUNDLE = INPUT / 'bundle.mpp'
+MICROG_ONLY = os.environ.get('GENV_MICROG_ONLY') == '1'
 LAST_STAGE = 'startup'
 
 
@@ -131,7 +134,7 @@ def save_patched_apk() -> Path:
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
         candidates = adb('shell', 'find', '/sdcard/Download', '/sdcard/Documents', '-maxdepth', '1', '-type', 'f', '-name', '*.apk').splitlines()
-        candidates = [x for x in candidates if not x.endswith('/genv-input.apk')]
+        candidates = [x for x in candidates if not x.endswith('/' + MEDIA_NAME)]
         if candidates:
             target = INPUT / 'manager-patched-base.apk'
             adb('pull', candidates[-1].strip(), str(target), timeout=180)
@@ -183,7 +186,7 @@ def main() -> None:
     time.sleep(2)
 
     LAST_STAGE = 'open supplied APK in Manager'
-    push_media(APK, 'genv-input.apk')
+    push_media(APK, MEDIA_NAME)
     tap('Apps', exact=True)
     nodes, _ = wait_for('GenV', 60)
     announce('GenV visible in Manager Apps', nodes)
@@ -200,7 +203,7 @@ def main() -> None:
         time.sleep(5)
         nodes = dump()
     announce('Android APK picker', nodes)
-    if not any(matches(n, 'genv-input.apk') for n in nodes):
+    if not any(matches(n, MEDIA_NAME) for n in nodes):
         # The system picker may start in Recent instead of Downloads.
         if any(matches(n, 'Show roots') for n in nodes):
             tap('Show roots')
@@ -209,11 +212,17 @@ def main() -> None:
         nodes, _ = wait_for('Downloads', 30)
         announce('Android storage locations', nodes)
         tap('Downloads', exact=True)
-    tap('genv-input.apk', seconds=45)
+    tap(MEDIA_NAME, seconds=45)
     nodes = wait_for_patch_selection()
     announce('GenV patch selection', nodes)
     if not any(matches(n, 'Remove license check') and 'Enabled' in n.get('content-desc', '') for n in nodes):
         raise RuntimeError('GenV license-check patch was not enabled: ' + snapshot(nodes)[:1000])
+    if MICROG_ONLY:
+        tap('Remove license check', exact=False)
+        time.sleep(2)
+        nodes = dump()
+        if any(matches(n, 'Remove license check') and 'Enabled' in n.get('content-desc', '') for n in nodes):
+            raise RuntimeError('Could not deselect license patch: ' + snapshot(nodes)[:1000])
     microg = 'Morphe MicroG Google sign-in support (experimental)'
     if not any(matches(n, microg) for n in nodes):
         # Patch lists can be vertically scrollable on the emulator.
@@ -233,8 +242,7 @@ def main() -> None:
     nodes = dump()
     if not any(matches(n, microg) and 'Enabled' in n.get('content-desc', '') for n in nodes):
         raise RuntimeError('Could not select the opt-in MicroG patch: ' + snapshot(nodes)[:1200])
-    # The final screen must report two applied patches; it is the reliable
-    # cross-source count when Manager displays other source tabs.
+    # The final screen reports the selected count across all source tabs.
     tap('Patch', exact=True)
 
     LAST_STAGE = 'patch the base APK in Manager'
@@ -244,7 +252,7 @@ def main() -> None:
         if any(matches(n, 'Background patching protection') for n in nodes):
             tap('Not now', exact=True)
         elif (any(matches(n, 'Patched', exact=True) for n in nodes)
-              and any(matches(n, '2 patches', exact=True) for n in nodes)
+              and any(matches(n, '1 patch' if MICROG_ONLY else '2 patches', exact=True) for n in nodes)
               and any(matches(n, 'GenV patches (experimental)') for n in nodes)
               and any(matches(n, 'Save', exact=True) for n in nodes)):
             announce('Manager patch succeeded', nodes)
