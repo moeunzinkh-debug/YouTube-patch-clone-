@@ -1,0 +1,35 @@
+name: Diagnose a GenV emulator test failure
+
+on:
+  push:
+    branches: [arena/3655779f-youtube-patch-clone]
+    paths: ['.github/workflows/diagnose-genv-ci.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    if: contains(github.event.head_commit.message, '[genv-ci-diagnose]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Retrieve the previous failed emulator step, no APKs or account data
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run view 42490216558 --log-failed > "$RUNNER_TEMP/manager-failed.log"
+          python3 - "$RUNNER_TEMP/manager-failed.log" <<'PY'
+          import base64,gzip,pathlib,sys
+          lines=pathlib.Path(sys.argv[1]).read_text(errors='replace').splitlines()
+          # All inputs to that job were public tools and a fresh emulator;
+          # no GenV app or user account was installed or used.
+          text='\n'.join(lines[-100:])
+          payload=base64.b64encode(gzip.compress(text.encode())).decode()
+          for index,start in enumerate(range(0,len(payload),25000),1):
+              print(f'::notice::GENV_MANAGER_FAILED {index} '+payload[start:start+25000])
+          PY

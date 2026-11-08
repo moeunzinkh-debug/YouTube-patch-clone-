@@ -6,7 +6,7 @@ work="${1:?temporary work directory required}"
 bundle="${2:?source-matched MPP required}"
 : "${ANDROID_HOME:?Android SDK required}"
 : "${GH_TOKEN:?GitHub token required}"
-mkdir -p "$work"/{tools,stubs,classes,dex,smali,smali-bad,deps}
+mkdir -p "$work"/{tools,stubs,classes,dex,smali,smali-bad,deps,res/values}
 tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
 platform="$(find "$ANDROID_HOME/platforms" -name android.jar | sort -V | tail -1)"
 test -x "$tools/aapt2" && test -x "$tools/d8" && test -x "$tools/apksigner" && test -f "$platform"
@@ -21,10 +21,13 @@ javac -encoding UTF-8 -source 8 -target 8 -cp "$platform:$work/stubs" -d "$work/
 mapfile -t java_classes < <(find "$work/classes" -name '*.class' | sort)
 "$tools/d8" --min-api 24 --lib "$platform" --classpath "$work/stubs" --output "$work/dex" "${java_classes[@]}"
 java -cp "$work/deps/*" org.jf.smali.Main assemble "$base/smali" -o "$work/smali/classes2.dex"
+# A real resource table is needed when exercising the MicroG resource patch.
+printf '%s\n' '<resources><string name="fixture_name">GenV synthetic PairIP test</string></resources>' > "$work/res/values/strings.xml"
+"$tools/aapt2" compile --dir "$work/res" -o "$work/resources.zip"
 
 make_apk() {
     local manifest="$1" second_dex="$2" output="$3"
-    "$tools/aapt2" link -I "$platform" --manifest "$manifest" -o "$output"
+    "$tools/aapt2" link -I "$platform" --manifest "$manifest" -o "$output" "$work/resources.zip"
     (cd "$work/dex" && zip -q -j "$output" classes.dex)
     zip -q -j "$output" "$second_dex"
 }
