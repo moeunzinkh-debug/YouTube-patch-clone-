@@ -7,6 +7,7 @@ on:
       - 'tools/king-patcher/project/**'
       - 'tools/king-patcher/prepare_build.py'
       - 'tools/king-patcher/verify_bundle.py'
+      - 'tools/king-patcher/verify_patched_menu.py'
       - '.github/workflows/build-king-patcher.yml'
 
 permissions:
@@ -79,6 +80,9 @@ jobs:
           gh release download King-Patcher --pattern 'King.Patcher_12.10.10.apk' --dir "$RUNNER_TEMP/king-tools"
           input="$RUNNER_TEMP/king-tools/King.Patcher_12.10.10.apk"
           echo 'e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222  '"$input" | sha256sum --check
+          gh release download v3.0.3 --repo iBotPeaches/Apktool --pattern apktool_3.0.3.jar --dir "$RUNNER_TEMP/king-tools"
+          apktool="$RUNNER_TEMP/king-tools/apktool_3.0.3.jar"
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  '"$apktool" | sha256sum --check
           cli="$RUNNER_TEMP/king-tools/morphe-desktop-1.20.0-dev.1-all.jar"
           for mode in lvl ui both; do
             selectors=()
@@ -97,7 +101,19 @@ jobs:
               exit 1
             fi
             test -s "$RUNNER_TEMP/king-tools/$mode.apk"
-            echo "::notice::Morphe Desktop applied $mode selector(s) to a disposable King-Patcher copy"
+            python3 - "$input" "$RUNNER_TEMP/king-tools/$mode.apk" <<'PY'
+          import sys, zipfile
+          with zipfile.ZipFile(sys.argv[1]) as original, zipfile.ZipFile(sys.argv[2]) as patched:
+              assert original.read('AndroidManifest.xml') == patched.read('AndroidManifest.xml'), 'Manifest changed'
+          PY
+            java -Xmx3g -jar "$apktool" d -f --no-res "$RUNNER_TEMP/king-tools/$mode.apk" \
+              -o "$RUNNER_TEMP/king-$mode-decoded" > "$RUNNER_TEMP/king-$mode-decode.log" 2>&1
+            if ! python3 tools/king-patcher/verify_patched_menu.py "$RUNNER_TEMP/king-$mode-decoded" "$mode" \
+              > "$RUNNER_TEMP/king-$mode-menu.log" 2>&1; then
+              tail -8 "$RUNNER_TEMP/king-$mode-menu.log" | while IFS= read -r line; do echo "::error::$line"; done
+              exit 1
+            fi
+            echo "::notice::Morphe Desktop applied and structurally verified $mode selector(s); manifest unchanged"
           done
           echo '::notice::No patched APK is published, uploaded, installed or run in this workflow.'
       - uses: actions/upload-artifact@v4

@@ -8,6 +8,7 @@ import inspect_apk as inspection
 import trace_api
 import trace_integration
 import trace_menu
+import verify_patched_menu
 
 
 class InspectionTests(unittest.TestCase):
@@ -79,6 +80,39 @@ class InspectionTests(unittest.TestCase):
             self.assertNotIn('private string', str(result))
             self.assertIn('<redacted>', str(result))
             self.assertFalse(result['classes']['Lʽᐧ/ˊ;']['found'])
+
+    def test_patched_menu_rejects_invalid_color_argument(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fragment = root / 'smali/ʽٴ/ᐧᐧ.smali'
+            fragment.parent.mkdir(parents=True)
+            pieces = ['.class public Lʽٴ/ᐧᐧ;', '.super Ljava/lang/Object;']
+            for name, listing, scratch in [('ˆʻ()V', 0, 1), ('ˆˎ()V', 2, 3)]:
+                pieces.extend([f'.method public {name}', '.locals 14'])
+                for marker, (title, description) in verify_patched_menu.ITEMS.items():
+                    pieces.extend([
+                        f'new-instance v{scratch}, Lʽᐧ/ˉ;', f'const v{scratch+1}, 0x{marker:x}',
+                        f'const-string v{scratch+2}, "{title}"', f'const/4 v{scratch+3}, 0x0',
+                        f'const-string v{scratch+4}, "{description}"', f'const-string v{scratch+5}, ""',
+                        f'const v{scratch+6}, 0x7f080083',
+                        f'invoke-direct/range {{v{scratch} .. v{scratch+6}}}, Lʽᐧ/ˉ;-><init>(ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;I)V',
+                        f'invoke-virtual {{v{listing}, v{scratch}}}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z',
+                    ])
+                pieces.extend(['return-void', '.end method'])
+            pieces.extend(['.method public ˊᵎ(I)V', '.locals 22',
+                           'sget-object v0, Lʽٴ/ᐧᐧ;->ʼﹶ:Lru/jgaiecip/osuojvyxe/MainActivity;',
+                           'move v3, p1',
+                           'invoke-static {v0, v3}, Lapp/morphe/extension/king/MenuBridge;->handle(Landroid/app/Activity;I)Z',
+                           'return-void', '.end method'])
+            fragment.write_text('\n'.join(pieces), encoding='utf-8')
+            tool = root / 'smali/app/morphe/extension/king/ToolFragment.smali'
+            tool.parent.mkdir(parents=True)
+            tool.write_text('.class public Lapp/morphe/extension/king/ToolFragment;\n', encoding='utf-8')
+            verify_patched_menu.verify(root, set(verify_patched_menu.ITEMS))
+            bad = fragment.read_text(encoding='utf-8').replace('const-string v6, ""', 'const-string v6, "not-a-color"', 1)
+            fragment.write_text(bad, encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'constructor argument'):
+                verify_patched_menu.verify(root, set(verify_patched_menu.ITEMS))
 
     def test_missing_resources_and_wrong_asset_fail_safely(self):
         with tempfile.TemporaryDirectory() as directory:

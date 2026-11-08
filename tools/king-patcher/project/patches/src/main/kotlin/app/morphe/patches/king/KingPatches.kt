@@ -12,6 +12,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 private const val PACKAGE = "ru.jgaiecip.osuojvyxe"
@@ -72,9 +73,21 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.addMenuItem(id: Int, t
     val model = mutableClassDefBy(MODEL)
     require(model.fields.any { it.name == "ʻ" && it.type == "I" } &&
         model.fields.any { it.name == "ʼ" && it.type == "Ljava/lang/String;" } &&
-        model.methods.any { method -> method.name == "<init>" && method.returnType == "V" &&
-            method.parameterTypes.map { it.toString() } == listOf("I", "Ljava/lang/String;", "I", "Ljava/lang/String;", "Ljava/lang/String;", "I") }
-    ) { "Reviewed King menu model changed" }
+        model.fields.any { it.name == "ʿ" && it.type == "Ljava/lang/String;" }
+    ) { "Reviewed King menu fields changed" }
+    val rawConstructor = model.methods.singleOrNull { method -> method.name == "<init>" && method.returnType == "V" &&
+        method.parameterTypes.map { it.toString() } == listOf("I", "Ljava/lang/String;", "I", "Ljava/lang/String;", "Ljava/lang/String;", "I")
+    } ?: error("Reviewed raw-label menu constructor missing")
+    val constructorBody = requireNotNull(rawConstructor.implementation)
+    fun assignsString(field: String, from: Int) = constructorBody.instructions.any { instruction ->
+        val registers = instruction as? TwoRegisterInstruction
+        val ref = (instruction as? ReferenceInstruction)?.reference as? FieldReference
+        instruction.opcode == Opcode.IPUT_OBJECT && registers?.registerA == from && registers.registerB == 3 &&
+            ref?.definingClass == MODEL && ref.name == field && ref.type == "Ljava/lang/String;"
+    }
+    require(constructorBody.registerCount == 10 && assignsString("ʼ", 5) && assignsString("ʿ", 8)) {
+        "Reviewed title or color constructor semantics changed"
+    }
     val fragment = mutableClassDefBy(FRAGMENT)
     for ((name, listRegister, startRegister, expectedRegisters) in listOf(
         MenuSpec("ˆʻ", 0, 1, 14), MenuSpec("ˆˎ", 2, 3, 15)
@@ -100,14 +113,15 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.addMenuItem(id: Int, t
             "Reviewed menu allocation changed"
         }
         val v = startRegister
+        // The fifth argument is a color string parsed by King's renderer; keep it empty.
         // Scratch registers are uninitialized at this point; the original code assigns them before use.
         method.addInstructions(init + 1, """
             new-instance v$v, $MODEL
             const v${v + 1}, 0x${id.toString(16)}
             const-string v${v + 2}, "$title"
             const/4 v${v + 3}, 0x0
-            const-string v${v + 4}, ""
-            const-string v${v + 5}, "$description"
+            const-string v${v + 4}, "$description"
+            const-string v${v + 5}, ""
             const v${v + 6}, 0x7f080083
             invoke-direct/range {v$v .. v${v + 6}}, $MODEL-><init>(ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;I)V
             invoke-virtual {v$listRegister, v$v}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
