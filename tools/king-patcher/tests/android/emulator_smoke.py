@@ -49,11 +49,11 @@ def screen_text() -> str:
 
 def launch_and_check(expected: tuple[str, ...], absent: tuple[str, ...] = ()) -> None:
     adb('shell', 'am', 'force-stop', PACKAGE)
-    adb('shell', 'am', 'start', '-W', '-n', PACKAGE + '/.MainActivity', timeout=60)
+    start = adb('shell', 'am', 'start', '-W', '-n', PACKAGE + '/.MainActivity', timeout=60)
     time.sleep(1)
     text = screen_text()
     for value in expected:
-        if value not in text: raise AssertionError(f'Expected fixture UI text {value!r}: {text[:1000]}')
+        if value not in text: raise AssertionError(f'Expected fixture UI text {value!r}; launch={start[-1000:]!r}; screen={text[:1000]!r}')
     for value in absent:
         if value in text: raise AssertionError(f'Unexpected fixture UI text {value!r}: {text[:1000]}')
 
@@ -123,6 +123,8 @@ def main() -> None:
             log = adb('logcat', '-d', '-t', '800', timeout=30)
             relevant = [line for line in log.splitlines() if any(token in line for token in ('FATAL EXCEPTION', 'AndroidRuntime', 'NoSuchMethodError', 'NoClassDefFoundError', 'VerifyError'))]
             report['android_error_excerpt'] = relevant[-20:]
+            crash = adb('logcat', '-b', 'crash', '-d', '-t', '300', timeout=30)
+            report['crash_buffer_excerpt'] = crash[-10000:]
             report['king_launch_excerpt'] = [line[:400] for line in log.splitlines()
                 if TARGET in line and any(word in line.lower() for word in ('start', 'display', 'activity', 'process', 'fatal', 'denied', 'blocked', 'died'))][-25:]
             state = adb('shell', 'dumpsys', 'activity', 'activities', timeout=15)

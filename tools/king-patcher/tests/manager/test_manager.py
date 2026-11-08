@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Import the King-Patcher MPP and patch the original APK in a disposable Manager emulator.
 
-No account is used, the app APK is not launched, and network is disabled.
+No account is used, the target APK is not launched in Manager, and network is disabled.
 """
 from __future__ import annotations
 
