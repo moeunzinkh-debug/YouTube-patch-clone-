@@ -47,8 +47,14 @@ RESOURCE_NAMES = {
     'username', 'password', 'login', 'sign_in', 'sign_up', 'signup',
     'forgot_password', 'reset_password', 'set_password',
 }
-VALID_SITE = re.compile(r'L[A-Za-z0-9_$/-]+;->[A-Za-z0-9_$<>-]+\([^)]*\)[A-Za-z0-9_$/;\[\]-]+\Z')
-VALID_REFERENCE = re.compile(r'[A-Za-z0-9_$/;()<>.$\[\]:-]{1,260}\Z')
+# A DEX method/field descriptor, not a free-form APK operand. Keeping the
+# grammar narrow prevents a URL or arbitrary string in parentheses from being
+# emitted as though it were a method identifier.
+DEX_CLASS = r'L[A-Za-z0-9_$/-]+;'
+DEX_TYPE = rf'(?:\[*[ZBCSIJFD]|\[*{DEX_CLASS})'
+DEX_MEMBER = r'[A-Za-z0-9_$<>-]+'
+VALID_SITE = re.compile(rf'{DEX_CLASS}->{DEX_MEMBER}\((?:{DEX_TYPE})*\)(?:V|{DEX_TYPE})\Z')
+VALID_FIELD = re.compile(rf'{DEX_CLASS}->{DEX_MEMBER}{DEX_TYPE}\Z')
 ACCOUNT_SITE = 'Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;'
 CONTEXT_WORDS = frozenset({
     # Fixed public Flutter text-input configuration and autofill keys/hints.
@@ -69,7 +75,9 @@ def safe_trace_reference(operand: str) -> str | None:
     if not references:
         return None
     value = ''.join(references[-1].split())
-    return value if VALID_REFERENCE.fullmatch(value) else None
+    if len(value) > 260:
+        return None
+    return value if VALID_SITE.fullmatch(value) or VALID_FIELD.fullmatch(value) else None
 
 
 def context_label(operand: str) -> str | None:

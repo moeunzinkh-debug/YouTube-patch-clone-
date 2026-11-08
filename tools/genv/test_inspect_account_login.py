@@ -22,8 +22,10 @@ class AccountInspectionGuards(unittest.TestCase):
 
     def test_method_identifiers_only(self):
         self.assertTrue(VALID_SITE.fullmatch('Lv6/a;->m(Ljava/lang/Object;Lf6/h;)V'))
+        self.assertTrue(VALID_SITE.fullmatch('Lx/Y;->f([[Ljava/lang/String;[B)Ljava/lang/Object;'))
         self.assertIsNone(VALID_SITE.fullmatch('user@example.com'))
         self.assertIsNone(VALID_SITE.fullmatch('Lexample/a;->method()V https://example.invalid'))
+        self.assertIsNone(VALID_SITE.fullmatch('Lexample/a;->method(https://example.invalid)Ljava/lang/Object;'))
 
     def test_trace_emits_only_fixed_words_and_reference_shapes(self):
         self.assertEqual(context_label('v0, "password"'), 'password')
@@ -35,7 +37,10 @@ class AccountInspectionGuards(unittest.TestCase):
         self.assertIsNone(context_label('v0, "https://example.invalid"'))
         self.assertEqual(safe_trace_reference('v0, Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;'),
                          'Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;')
+        self.assertEqual(safe_trace_reference('v0, Lfoo/Bar;->value Ljava/lang/String;'),
+                         'Lfoo/Bar;->valueLjava/lang/String;')
         self.assertIsNone(safe_trace_reference('v0, Lf6/m;->a \'secret\''))
+        self.assertIsNone(safe_trace_reference('v0, Lfoo/Bar;->send(https://example.invalid)Ljava/lang/String;'))
 
 
 if __name__ == '__main__':
