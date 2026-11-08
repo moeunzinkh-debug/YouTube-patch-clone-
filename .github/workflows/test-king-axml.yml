@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           work="$RUNNER_TEMP/axml-fixture"
-          trap 'rc=$?; echo "::error::AXML test failed at line $LINENO"; for f in "$work/list.txt" "$work/dump.txt" "$work/build.log"; do if test -f "$f"; then tail -n 30 "$f" | while IFS= read -r line; do echo "::error::$line"; done; fi; done; exit "$rc"' ERR
+          trap 'rc=$?; echo "::error::AXML test failed at line $LINENO"; if test -f "$work/dump.txt"; then grep -E "visibility|Keep me" "$work/dump.txt" | while IFS= read -r line; do echo "::error::$line"; done || true; fi; if test -f "$work/build.log"; then tail -n 8 "$work/build.log" | while IFS= read -r line; do echo "::error::$line"; done; fi; exit "$rc"' ERR
           sdk="$ANDROID_HOME"
           tools_dir="$(find "$sdk/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
           platform="$(find "$sdk/platforms" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
@@ -74,6 +74,6 @@ jobs:
           PY
           "$tools_dir/aapt2" dump xmltree "$work/modified.apk" --file res/layout/activity_main.xml > "$work/dump.txt"
           cat "$work/dump.txt"
-          test "$(grep -c 'visibility.*(0x010100dc).*0x00000008' "$work/dump.txt")" -eq 2
+          test "$(grep -Ec 'visibility\(0x010100dc\)=(8|0x0*8)$' "$work/dump.txt")" -eq 2
           grep -q 'Keep me' "$work/dump.txt"
           echo '::notice::AAPT2 parsed both modified controls as GONE and the untouched label remains'
