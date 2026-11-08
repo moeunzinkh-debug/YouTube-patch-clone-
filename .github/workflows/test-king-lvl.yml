@@ -53,7 +53,7 @@ jobs:
             echo "::notice::$(tail -n 1 "$RUNNER_TEMP/king-lvl-test.log")"
           done
           echo '::notice::Only generated fixtures were modified; no real target APK was modified'
-      - name: Probe sanitized Kimi PairIP structure without altering or uploading it
+      - name: Check sanitized Kimi PairIP shape after its existing early return
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

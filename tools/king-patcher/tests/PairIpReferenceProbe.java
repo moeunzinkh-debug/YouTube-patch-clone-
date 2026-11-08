@@ -43,11 +43,24 @@ public final class PairIpReferenceProbe {
                     org.jf.dexlib2.iface.DexFile loaded=org.jf.dexlib2.DexFileFactory.loadDexFile(file,org.jf.dexlib2.Opcodes.forDexVersion(version));
                     for(org.jf.dexlib2.iface.ClassDef cls:loaded.getClasses())if(cls.getType().equals("Lcom/pairip/licensecheck/LicenseClient;"))
                         for(org.jf.dexlib2.iface.Method method:cls.getMethods())if(method.getName().equals("checkLicense")||method.getName().equals("initializeLicenseCheck")){
-                            org.jf.dexlib2.iface.MethodImplementation impl=method.getImplementation();int count=0;String first="none";
+                            org.jf.dexlib2.iface.MethodImplementation impl=method.getImplementation();int count=0;String first="none",second="none";
+                            boolean isolated=false,validate=false,fresh=false;
                             if(impl!=null)for(org.jf.dexlib2.iface.instruction.Instruction instruction:impl.getInstructions()){
-                                if(count++==0)first=instruction.getOpcode().name();
+                                if(count==0)first=instruction.getOpcode().name();if(count==1)second=instruction.getOpcode().name();count++;
+                                if(instruction instanceof org.jf.dexlib2.iface.instruction.ReferenceInstruction){
+                                    Object ref=((org.jf.dexlib2.iface.instruction.ReferenceInstruction)instruction).getReference();
+                                    if(ref instanceof org.jf.dexlib2.iface.reference.MethodReference){
+                                        org.jf.dexlib2.iface.reference.MethodReference m=(org.jf.dexlib2.iface.reference.MethodReference)ref;
+                                        isolated|=m.getDefiningClass().equals("Lcom/pairip/licensecheck/LicenseClient;")&&m.getName().equals("isIsolatedProcess")&&m.getReturnType().equals("Z");
+                                        validate|=m.getDefiningClass().equals("Lcom/pairip/licensecheck/LicenseResponseHelper;")&&m.getName().equals("validateResponse");
+                                        fresh|=m.getDefiningClass().equals("Lcom/pairip/licensecheck/LicenseClient;")&&m.getName().equals("initiateFreshLicensingServiceConnection");
+                                    }
+                                }
                             }
-                            System.out.println("REFERENCE_SHAPE: "+method.getName()+" registers="+(impl==null?-1:impl.getRegisterCount())+" instructions="+count+" first="+first);
+                            boolean originalShape=impl!=null&&first.equals("RETURN_VOID")&&
+                                (method.getName().equals("checkLicense")?impl.getRegisterCount()==3&&count==17&&second.equals("CONST_STRING")&&isolated:
+                                 impl.getRegisterCount()==4&&count==30&&second.equals("SGET_OBJECT")&&validate&&fresh);
+                            System.out.println("REFERENCE_SHAPE: "+method.getName()+" registers="+(impl==null?-1:impl.getRegisterCount())+" instructions="+count+" first="+first+" reviewed_original_shape_after_return="+originalShape);
                         }
                 }
             }
