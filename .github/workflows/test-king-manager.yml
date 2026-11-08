@@ -38,7 +38,7 @@ jobs:
             git cat-file -e "$sha^{commit}" 2>/dev/null || git fetch origin "$sha"
             if git diff --quiet "$sha" "$GITHUB_SHA" -- tools/king-patcher/project \
                  tools/king-patcher/prepare_build.py tools/king-patcher/verify_bundle.py; then
-              gh run download "$id" --name king-patcher-morphe-bundle --dir /tmp/king-manager-bundle
+              gh run download "$id" --name king-patcher-bundle-static-only --dir /tmp/king-manager-bundle
               matched="$id"
               break
             fi
@@ -47,6 +47,7 @@ jobs:
           cp /tmp/king-manager-bundle/bundle.mpp /tmp/king-manager/bundle.mpp
           cp /tmp/king-manager-bundle/bundle.mpp.sha256 /tmp/king-manager/bundle.mpp.sha256
           (cd /tmp/king-manager && sha256sum --check bundle.mpp.sha256)
+          python3 tools/king-patcher/verify_bundle.py --mpp /tmp/king-manager/bundle.mpp --listing /tmp/king-manager-bundle/patches.txt
           echo "::notice::Using source-matched static bundle from run $matched"
       - name: Download pinned Manager, input APK and decoder
         shell: bash
