@@ -109,6 +109,10 @@ def main() -> None:
             log = adb('logcat', '-d', '-t', '800', timeout=30)
             relevant = [line for line in log.splitlines() if any(token in line for token in ('FATAL EXCEPTION', 'AndroidRuntime', 'NoSuchMethodError', 'NoClassDefFoundError', 'VerifyError'))]
             report['android_error_excerpt'] = relevant[-20:]
+            report['king_launch_excerpt'] = [line[:400] for line in log.splitlines()
+                if TARGET in line and any(word in line.lower() for word in ('start', 'display', 'activity', 'process', 'fatal', 'denied', 'blocked', 'died'))][-25:]
+            state = adb('shell', 'dumpsys', 'activity', 'activities', timeout=15)
+            report['king_activity_state'] = [line.strip()[:400] for line in state.splitlines() if TARGET in line][-12:]
         except Exception:
             pass
         raise

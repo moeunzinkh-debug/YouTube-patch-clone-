@@ -115,15 +115,19 @@ public final class KingInstrumentation extends Instrumentation {
         phase("King menu renderer accepted both labels and colors");
     }
     private Object openTool(int mode) throws Exception {
-        Intent intent = new Intent().setClassName(getTargetContext(), "ru.jgaiecip.osuojvyxe.MainActivity")
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         phase("launching King host Activity for mode " + mode);
         ActivityMonitor monitor = addMonitor("ru.jgaiecip.osuojvyxe.MainActivity", null, false);
-        getTargetContext().startActivity(intent);
+        // The runner starts in the background on Android 10+; ask UiAutomation's shell
+        // to bring the real Activity forward rather than relying on a blocked launch.
+        try (InputStream stream = new android.os.ParcelFileDescriptor.AutoCloseInputStream(
+                getUiAutomation().executeShellCommand("am start -n ru.jgaiecip.osuojvyxe/.MainActivity -f 0x10000000"))) {
+            byte[] bytes = new byte[1024];
+            while (stream.read(bytes) != -1) { /* drain the command output */ }
+        }
         host = waitForMonitorWithTimeout(monitor, 30000);
         removeMonitor(monitor);
-        phase("King host Activity started for mode " + mode);
         if (host == null) throw new AssertionError("King host Activity did not open");
+        phase("King host Activity started for mode " + mode);
         if (mode == 2) checkKingRenderer();
         Class<?> menuClass = getTargetContext().getClassLoader().loadClass("ʽٴ.ᐧᐧ");
         java.lang.reflect.Constructor<?> constructor = menuClass.getDeclaredConstructor(); constructor.setAccessible(true);
