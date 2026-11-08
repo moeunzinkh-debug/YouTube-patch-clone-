@@ -54,6 +54,7 @@ jobs:
             <Button android:id="@+id/hide_me" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hide me" />
             <TextView android:id="@+id/already_visible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="visible" android:text="Also hide" />
             <TextView android:id="@+id/keep_me" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Keep me" />
+            <TextView android:id="@+id/reference_gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone" android:text="Reference gone" />
           </LinearLayout>
           XML
           "$tools_dir/aapt2" compile -o "$work/compiled" "$work/res/layout/activity_main.xml" 2>&1 | tee "$work/build.log"
@@ -74,6 +75,8 @@ jobs:
           PY
           "$tools_dir/aapt2" dump xmltree "$work/modified.apk" --file res/layout/activity_main.xml > "$work/dump.txt"
           cat "$work/dump.txt"
-          test "$(grep -Ec 'visibility\(0x010100dc\)=(8|0x0*8)$' "$work/dump.txt")" -eq 2
+          # The two edited values must match a third control compiled by AAPT2 from visibility="gone".
+          test "$(grep -Ec 'visibility\(0x010100dc\)=(2|0x0*2)$' "$work/dump.txt")" -eq 3
           grep -q 'Keep me' "$work/dump.txt"
-          echo '::notice::AAPT2 parsed both modified controls as GONE and the untouched label remains'
+          grep -q 'Reference gone' "$work/dump.txt"
+          echo '::notice::AAPT2 parsed both edited visibility enums identically to its own gone reference'

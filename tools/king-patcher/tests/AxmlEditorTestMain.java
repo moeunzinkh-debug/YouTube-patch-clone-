@@ -95,7 +95,7 @@ public final class AxmlEditorTestMain {
             check(nodes.get(1).resourceId==0x7f0a0001,"id");
             byte[] after=AxmlEditor.hide(before,Collections.singleton(1));
             check(i32(after,4)==after.length && (after.length&3)==0,"file length");
-            int[] attr=findVisibility(after,1); check(attr!=null && attr[1]==0x10 && attr[2]==8,"GONE attribute");
+            int[] attr=findVisibility(after,1); check(attr!=null && attr[1]==0x10 && attr[2]==2,"compiled GONE enum (not View.GONE=8)");
             check(attr[0]==1 && attr[3]==1,"sorted attribute and original idIndex");
             check(AxmlEditor.list(after).get(1).text.equals("សួស្តី Hello"),"text preserved");
             check(existing ? after.length==before.length : after.length>before.length,"append versus update");

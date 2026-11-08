@@ -27,6 +27,9 @@ public final class AxmlEditor {
     private static final int ANDROID_VISIBILITY = 0x010100dc;
     private static final int ANDROID_TEXT = 0x0101014f;
     private static final int TYPE_STRING = 0x03, TYPE_INT_DEC = 0x10;
+    // android:visibility is an XML enum (visible=0, invisible=1, gone=2),
+    // not the runtime View.GONE bitmask value 8.
+    private static final int XML_VISIBILITY_GONE = 2;
     private static final String ANDROID_NS = "http://schemas.android.com/apk/res/android";
     private static final int MAX_BYTES = 16 * 1024 * 1024;
 
@@ -337,7 +340,7 @@ public final class AxmlEditor {
         }
         if (found >= 0) {
             byte[] b = original.clone(); int p = offset + found * 20;
-            p32(b, p + 8, NO_INDEX); p16(b, p + 12, 8); b[p + 14] = 0; b[p + 15] = TYPE_INT_DEC; p32(b, p + 16, 8);
+            p32(b, p + 8, NO_INDEX); p16(b, p + 12, 8); b[p + 14] = 0; b[p + 15] = TYPE_INT_DEC; p32(b, p + 16, XML_VISIBILITY_GONE);
             return b;
         }
         if (count == 0xffff) throw new IllegalArgumentException("Too many XML attributes");
@@ -355,7 +358,7 @@ public final class AxmlEditor {
             int v = u16(original, field); if (v != 0 && v > insert) p16(b, field, v + 1);
         }
         p32(b, pos, namespaceIndex); p32(b, pos + 4, visibilityIndex); p32(b, pos + 8, NO_INDEX);
-        p16(b, pos + 12, 8); b[pos + 14] = 0; b[pos + 15] = TYPE_INT_DEC; p32(b, pos + 16, 8);
+        p16(b, pos + 12, 8); b[pos + 14] = 0; b[pos + 15] = TYPE_INT_DEC; p32(b, pos + 16, XML_VISIBILITY_GONE);
         return b;
     }
     public static byte[] hide(byte[] xml, Set<Integer> selected) {
