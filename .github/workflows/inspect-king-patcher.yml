@@ -8,6 +8,7 @@ on:
       - 'tools/king-patcher/test_inspect_apk.py'
       - 'tools/king-patcher/trace_menu.py'
       - 'tools/king-patcher/trace_api.py'
+      - 'tools/king-patcher/trace_integration.py'
       - 'tools/king-patcher/emit_annotations.py'
       - '.github/workflows/inspect-king-patcher.yml'
 
@@ -67,6 +68,7 @@ jobs:
           fi
           cat "$RUNNER_TEMP/king-trace.log"
           python3 tools/king-patcher/trace_api.py "$RUNNER_TEMP/king-decoded" "$RUNNER_TEMP/king-api-trace.json"
+          python3 tools/king-patcher/trace_integration.py "$RUNNER_TEMP/king-decoded" "$RUNNER_TEMP/king-integration.json"
       # GitHub caps annotations per step, so keep the reports separate.
       - name: Emit sanitized inventory
         run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-inventory.json" KING_INVENTORY
@@ -74,6 +76,8 @@ jobs:
         run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-menu-trace.json" KING_MENU_TRACE
       - name: Emit sanitized API trace
         run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-api-trace.json" KING_API_TRACE
+      - name: Emit sanitized integration trace
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-integration.json" KING_INTEGRATION
       - uses: actions/upload-artifact@v4
         with:
           name: king-patcher-static-inventory
@@ -81,3 +85,4 @@ jobs:
             ${{ runner.temp }}/king-inventory.json
             ${{ runner.temp }}/king-menu-trace.json
             ${{ runner.temp }}/king-api-trace.json
+            ${{ runner.temp }}/king-integration.json

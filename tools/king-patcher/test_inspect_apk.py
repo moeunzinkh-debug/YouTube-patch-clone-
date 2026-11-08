@@ -6,6 +6,7 @@ import unittest
 
 import inspect_apk as inspection
 import trace_api
+import trace_integration
 import trace_menu
 
 
@@ -65,6 +66,19 @@ class InspectionTests(unittest.TestCase):
             result = trace_api.trace(Path(directory))
             self.assertEqual(len(trace_api.CLASSES), len(result['classes']))
             self.assertTrue(all(not item['found'] for item in result['classes'].values()))
+
+    def test_integration_trace_redacts_literals(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / 'smali/ʽᐧ/ˉ.smali'
+            path.parent.mkdir(parents=True)
+            path.write_text('.class public Lʽᐧ/ˉ;\n'
+                            '.method public <init>(IILjava/lang/String;I)V\n'
+                            'const-string v0, "private string"\nreturn-void\n.end method\n', encoding='utf-8')
+            result = trace_integration.trace(root)
+            self.assertNotIn('private string', str(result))
+            self.assertIn('<redacted>', str(result))
+            self.assertFalse(result['classes']['Lʽᐧ/ˊ;']['found'])
 
     def test_missing_resources_and_wrong_asset_fail_safely(self):
         with tempfile.TemporaryDirectory() as directory:
