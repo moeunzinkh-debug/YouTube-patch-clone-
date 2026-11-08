@@ -1,0 +1,52 @@
+name: Test King-Patcher classic Google Play LVL editor
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - 'tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/LvlEditor.java'
+      - 'tools/king-patcher/tests/LvlEditorTestMain.java'
+      - '.github/workflows/test-king-lvl.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  lvl:
+    if: contains(github.event.head_commit.message, '[king-lvl-test]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compile against the APK's inspected dexlib2 API
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/king-deps-pom.xml" <<'XML'
+          <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+            <modelVersion>4.0.0</modelVersion><groupId>test</groupId><artifactId>king-lvl-test</artifactId><version>1</version>
+            <dependencies><dependency><groupId>org.smali</groupId><artifactId>dexlib2</artifactId><version>2.3.4</version></dependency></dependencies>
+          </project>
+          XML
+          mvn -q -f "$RUNNER_TEMP/king-deps-pom.xml" dependency:copy-dependencies -DoutputDirectory="$RUNNER_TEMP/king-deps"
+          mkdir -p "$RUNNER_TEMP/king-classes"
+          if ! javac -cp "$RUNNER_TEMP/king-deps/*" -d "$RUNNER_TEMP/king-classes" \
+              tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/LvlEditor.java \
+              tools/king-patcher/tests/LvlEditorTestMain.java > "$RUNNER_TEMP/king-lvl-compile.log" 2>&1; then
+            tail -n 30 "$RUNNER_TEMP/king-lvl-compile.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+      - name: Verify exact matching, rewrite and fail-closed cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! java -cp "$RUNNER_TEMP/king-classes:$RUNNER_TEMP/king-deps/*" LvlEditorTestMain > "$RUNNER_TEMP/king-lvl-test.log" 2>&1; then
+            tail -n 30 "$RUNNER_TEMP/king-lvl-test.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/king-lvl-test.log"
+          echo '::notice::Classic LVL DEX fixture passed rewrite and fail-closed tests; no real target APK was modified'
