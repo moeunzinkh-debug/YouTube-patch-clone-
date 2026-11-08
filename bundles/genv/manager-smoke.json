@@ -1,0 +1,22 @@
+{
+  "manager": "2.3.0-dev.3",
+  "android_emulator": "API 35 x86_64",
+  "input": "GenV release base APK only; required configuration and native splits unavailable",
+  "input_sha256": "f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e",
+  "package": "com.ainate.ai.video.generate",
+  "version": "3.7.2",
+  "version_code": 163,
+  "bundle_version": "0.1.0-dev.1",
+  "bundle_sha256": "818c9b0972515d506d06a6f27e08419e68e1e513ecc07a2194b8fbc91227fe26",
+  "imported_local_source": true,
+  "experimental_app_versions_enabled": true,
+  "selected_patch": "Remove license check",
+  "manager_patch_incomplete_base": "passed",
+  "saved_output_pairip_early_returns_and_selected_controls": "passed",
+  "saved_output_manifest_byte_identical": true,
+  "saved_output_contains_native_libraries": false,
+  "full_split_merge_or_complete_app": "not tested",
+  "app_installed_or_launched": false,
+  "live_login_server_attestation_and_paid_features": "not tested",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42483820583"
+}

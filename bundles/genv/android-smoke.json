@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "fixture": "synthetic counter-only app with reviewed GenV-shaped methods; not the GenV APK",
+  "android_emulator": "API 35 x86_64",
+  "before_patch_check_calls_and_init_calls": [
+    2,
+    1
+  ],
+  "after_patch_check_calls_and_init_calls": [
+    0,
+    0
+  ],
+  "wrong_version_code_rejected": true,
+  "changed_opcode_rejected": true,
+  "bundle_sha256": "818c9b0972515d506d06a6f27e08419e68e1e513ecc07a2194b8fbc91227fe26",
+  "real_genv_installed_or_launched": false,
+  "full_app_login_server_attestation_and_purchases": "not tested",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42484074510"
+}

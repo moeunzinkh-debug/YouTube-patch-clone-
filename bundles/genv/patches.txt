@@ -1,0 +1,8 @@
+Index: 0
+Name: Remove license check
+Description: Disable the reviewed PairIP client-side Play license and installer entry points in GenV 3.7.2 (163). Does not grant purchases, subscriptions, server entitlements or bypass server attestation. Experimental; complete APK splits and device testing are required.
+Enabled: true
+Compatible packages:
+	Package name: com.ainate.ai.video.generate
+	Compatible versions:
+		3.7.2
