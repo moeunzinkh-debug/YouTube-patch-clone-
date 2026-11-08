@@ -48,7 +48,7 @@ public final class ApkArchiveTestMain {
     }
     private static void fixture(Path path,byte[] dex,boolean unsafe) throws Exception {
         try(ZipOutputStream out=new ZipOutputStream(Files.newOutputStream(path))){
-            entry(out,"AndroidManifest.xml",new byte[]{1,2,3},true);
+            entry(out,"AndroidManifest.xml",AxmlEditorTestMain.manifest(false),true);
             entry(out,"classes.dex",dex,true);
             entry(out,"res/ab/layout.xml",AxmlEditorTestMain.xml(true,false),false);
             entry(out,"resources.arsc",new byte[]{7,8,9},true);

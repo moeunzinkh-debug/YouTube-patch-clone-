@@ -262,6 +262,21 @@ public final class AxmlEditor {
         if (depth != 0 || nodes.isEmpty()) throw new IllegalArgumentException("Unbalanced or empty XML");
         return Collections.unmodifiableList(nodes);
     }
+    /** Reject split-only APKs instead of pretending that one split is a complete app. */
+    public static boolean isSplitManifest(byte[] xml) {
+        List<Node> nodes = list(xml); // Also verifies the document structure and attribute encodings.
+        if (!"manifest".equals(nodes.get(0).tag)) throw new IllegalArgumentException("APK manifest root missing");
+        Doc doc = parse(xml);
+        for (Chunk chunk : doc.chunks) if (chunk.type == START_ELEMENT) {
+            byte[] b = chunk.bytes; int offset = attrOffset(b), count = u16(b, 28);
+            for (int i = 0; i < count; i++) {
+                int p = offset + i * 20;
+                if (i32(b, p) == NO_INDEX && "split".equals(string(doc.pool, i32(b, p + 4)))) return true;
+            }
+            return false;
+        }
+        throw new IllegalArgumentException("APK manifest element missing");
+    }
     private static void writeLen8(ByteArrayOutputStream out, int value) {
         if (value < 0 || value > 0x7fff) throw new IllegalArgumentException("String too long");
         if (value >= 0x80) out.write((value >>> 8) | 0x80);

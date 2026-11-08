@@ -61,6 +61,15 @@ public final class AxmlEditorTestMain {
                                     start(1,false,existingVisibility),start(2,true,existingVisibility),end(2),end(1)}) out.write(b,0,b.length);
         byte[] result=out.toByteArray();p32(result,4,result.length);return result;
     }
+    static byte[] manifest(boolean split) {
+        List<String> values=Arrays.asList("manifest", "split", "feature");
+        byte[] root=chunk(0x102,16,split?56:36);
+        p32(root,12,-1);p32(root,16,-1);p32(root,20,0);p16(root,24,20);p16(root,26,20);p16(root,28,split?1:0);
+        if(split){attr(root,36,1,3,2);p32(root,36,-1);}
+        ByteArrayOutputStream out=new ByteArrayOutputStream();
+        for(byte[] b:new byte[][]{chunk(3,8,8),pool(values,true),root,end(0)})out.write(b,0,b.length);
+        byte[] result=out.toByteArray();p32(result,4,result.length);return result;
+    }
     private static int[] findVisibility(byte[] xml, int ordinal) {
         int cursor=8, seen=0; int[] ids=new int[0];
         while(cursor<xml.length) {
@@ -101,6 +110,9 @@ public final class AxmlEditorTestMain {
             byte[] badEnd=before.clone();p32(badEnd,badEnd.length-4,2);
             rejects(()->AxmlEditor.list(badEnd),"mismatched closing tag");
         }
+        check(!AxmlEditor.isSplitManifest(manifest(false)),"single APK manifest");
+        check(AxmlEditor.isSplitManifest(manifest(true)),"split manifest detected");
+        rejects(()->AxmlEditor.isSplitManifest(xml(true,false)),"non-manifest root");
         System.out.println("AxmlEditor: "+checks+" assertions passed");
     }
 }

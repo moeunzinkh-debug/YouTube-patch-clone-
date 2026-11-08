@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,6 +97,10 @@ public final class ApkArchive {
         }
         if (!names.contains("AndroidManifest.xml") || !names.contains("classes.dex"))
             throw new IOException("Single base APK manifest or primary DEX missing");
+        try {
+            if (AxmlEditor.isSplitManifest(read(zip, zip.getEntry("AndroidManifest.xml"), MAX_XML)))
+                throw new IOException("Split APKs are not supported; choose a complete single APK");
+        } catch (IllegalArgumentException invalid) { throw new IOException("Unsupported APK manifest", invalid); }
         return entries;
     }
     private static byte[] read(ZipFile zip, ZipEntry entry, int limit) throws IOException {
@@ -131,7 +134,7 @@ public final class ApkArchive {
         List<Layout> result = new ArrayList<>(); boolean truncated = false; long scanned = 0; int nodes = 0;
         try (ZipFile zip = new ZipFile(apk)) {
             List<ZipEntry> entries = validate(apk, zip);
-            Collections.sort(entries, Comparator.comparing(ZipEntry::getName));
+            Collections.sort(entries, (left, right) -> left.getName().compareTo(right.getName()));
             for (ZipEntry entry : entries) {
                 String name = entry.getName();
                 if (entry.isDirectory() || !name.startsWith("res/") || !name.endsWith(".xml")) continue;

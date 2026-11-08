@@ -1,0 +1,100 @@
+name: Build and statically test King-Patcher Morphe bundle
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - 'tools/king-patcher/project/**'
+      - 'tools/king-patcher/prepare_build.py'
+      - 'tools/king-patcher/verify_bundle.py'
+      - '.github/workflows/build-king-patcher.yml'
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[king-build]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Prepare isolated bundle project
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/king-patcher/test_inspect_apk.py -q
+          python3 tools/king-patcher/prepare_build.py "$RUNNER_TEMP/king-build"
+          mkdir -p "$RUNNER_TEMP/king-tools" "$RUNNER_TEMP/king-output"
+          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$RUNNER_TEMP/king-tools"
+          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$RUNNER_TEMP/king-tools/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
+      - name: Build extension and MPP
+        shell: bash
+        run: |
+          set -o pipefail
+          cd "$RUNNER_TEMP/king-build"
+          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/king-build.log"
+      - name: Report build diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          if test -f "$RUNNER_TEMP/king-build.log"; then
+            grep -E -A 5 '^e:|^error:| error:|What went wrong|Execution failed|Could not|FAILED|FAILURE:' "$RUNNER_TEMP/king-build.log" | tail -45 | while IFS= read -r line; do echo "::error::$line"; done || true
+          fi
+      - name: Verify bundle and selector listing
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t candidates < <(find "$RUNNER_TEMP/king-build/patches/build/libs" -maxdepth 1 -name '*.mpp' -type f)
+          test "${#candidates[@]}" -eq 1
+          cp "${candidates[0]}" "$RUNNER_TEMP/king-output/bundle.mpp"
+          (cd "$RUNNER_TEMP/king-output" && sha256sum bundle.mpp > bundle.mpp.sha256)
+          cli="$RUNNER_TEMP/king-tools/morphe-desktop-1.20.0-dev.1-all.jar"
+          java -Xmx2g -jar "$cli" list-patches --patches "$RUNNER_TEMP/king-output/bundle.mpp" \
+            --with-packages --with-versions --include-experimental --out "$RUNNER_TEMP/king-output/patches.txt"
+          if ! python3 tools/king-patcher/verify_bundle.py --mpp "$RUNNER_TEMP/king-output/bundle.mpp" \
+              --listing "$RUNNER_TEMP/king-output/patches.txt" > "$RUNNER_TEMP/king-verify.log" 2>&1; then
+            tail -30 "$RUNNER_TEMP/king-verify.log" | while IFS= read -r line; do echo "::error::$line"; done
+            sed -n '1,80p' "$RUNNER_TEMP/king-output/patches.txt" | while IFS= read -r line; do echo "::notice::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/king-verify.log"
+          echo '::notice::Both opt-in selectors and extension DEX are present in the King-only MPP'
+      - name: Patch disposable copies of the pinned King APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download King-Patcher --pattern 'King.Patcher_12.10.10.apk' --dir "$RUNNER_TEMP/king-tools"
+          input="$RUNNER_TEMP/king-tools/King.Patcher_12.10.10.apk"
+          echo 'e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222  '"$input" | sha256sum --check
+          cli="$RUNNER_TEMP/king-tools/morphe-desktop-1.20.0-dev.1-all.jar"
+          for mode in lvl ui both; do
+            selectors=()
+            if [[ "$mode" == lvl || "$mode" == both ]]; then selectors+=(-e 'Remove license (new Google Play LVL method)'); fi
+            if [[ "$mode" == ui || "$mode" == both ]]; then selectors+=(-e 'Remove insignificant things (manual UI selection)'); fi
+            if ! java -Xmx4g -jar "$cli" patch "$input" --patches "$RUNNER_TEMP/king-output/bundle.mpp" \
+                 --exclusive "${selectors[@]}" --unsigned --bytecode-mode FULL --result-file "$RUNNER_TEMP/king-output/$mode-result.json" \
+                 --out "$RUNNER_TEMP/king-tools/$mode.apk" > "$RUNNER_TEMP/king-$mode.log" 2>&1; then
+              tail -40 "$RUNNER_TEMP/king-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
+              exit 1
+            fi
+            test -s "$RUNNER_TEMP/king-tools/$mode.apk"
+            echo "::notice::Morphe Desktop applied $mode selector(s) to a disposable King-Patcher copy"
+          done
+          echo '::notice::No patched APK is published, uploaded, installed or run in this workflow.'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: king-patcher-bundle-static-only
+          path: |
+            ${{ runner.temp }}/king-output/bundle.mpp
+            ${{ runner.temp }}/king-output/bundle.mpp.sha256
+            ${{ runner.temp }}/king-output/patches.txt
+            ${{ runner.temp }}/king-output/*-result.json
