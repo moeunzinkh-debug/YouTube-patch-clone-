@@ -29,8 +29,9 @@ val removeLicenseCheckPatch = bytecodePatch(
     ))
 
     execute {
-        require(packageMetadata.versionName == "3.7.2" && packageMetadata.versionCode == "163") {
-            "Remove license check supports only the reviewed GenV 3.7.2 build 163"
+        require(packageMetadata.packageName == "com.ainate.ai.video.generate" &&
+            packageMetadata.versionName == "3.7.2" && packageMetadata.versionCode == "163") {
+            "Remove license check supports only the reviewed GenV package, version 3.7.2 and build 163"
         }
         fun refs(method: com.android.tools.smali.dexlib2.iface.Method) = requireNotNull(method.implementation).instructions
             .mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }

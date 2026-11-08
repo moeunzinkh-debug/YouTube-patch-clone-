@@ -28,6 +28,7 @@ class GenVToolTests(unittest.TestCase):
         verify_listing(text)
         for altered in (text.replace('Enabled: true', 'Enabled: false'),
                         text.replace('com.ainate.ai.video.generate', 'com.example.bad'),
+                        text.replace('3.7.2', '3.7.1'),
                         text + '\nName: Extra\nEnabled: true\n'):
             with self.assertRaises(ValueError):
                 verify_listing(altered)
@@ -43,6 +44,7 @@ class GenVToolTests(unittest.TestCase):
             report.write_text(json.dumps(data))
             verify_report(report, output)
             for changed in ({'failedPatches': [{'name': NAME}]}, {'appliedPatches': []}, {'success': False},
+                            {'packageName': 'com.example.other'}, {'packageVersion': '3.7.1'},
                             {'stepResults': [{'step': 'PATCHING', 'success': True}]}):
                 report.write_text(json.dumps(data | changed))
                 with self.assertRaises(ValueError):
@@ -59,6 +61,10 @@ class GenVToolTests(unittest.TestCase):
         for key in (CHECK, INITIALIZE):
             patched[key].insert(0, ('return-void', ''))
         verify_methods(original, patched)
+        wrong_shape = {key: list(value) for key, value in original.items()}
+        wrong_shape[INITIALIZE].pop()  # The Kimi build has a different 29-instruction implementation.
+        with self.assertRaises(ValueError):
+            verify_methods(wrong_shape, patched)
         for key in (CHECK, INITIALIZE, ATTACH, PROVIDER, BILLING):
             altered = {k: list(value) for k, value in patched.items()}
             altered[key][0] = ('nop', '')

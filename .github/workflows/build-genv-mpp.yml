@@ -88,6 +88,19 @@ jobs:
             exit 1
           fi
           cat "$RUNNER_TEMP/genv-tools/verify.log"
+          # Reapplying to the changed implementation must fail closed, not patch a second time.
+          if java -Xmx4g -jar "$cli" patch "$RUNNER_TEMP/genv-tools/modified-base.apk" \
+              --patches "$RUNNER_TEMP/genv-output/bundle.mpp" --exclusive -e 'Remove license check' \
+              --unsigned --bytecode-mode FULL --out "$RUNNER_TEMP/genv-tools/repatch.apk" \
+              --result-file "$RUNNER_TEMP/genv-tools/repatch-result.json" > "$RUNNER_TEMP/genv-tools/repatch.log" 2>&1; then
+            echo '::error::An already modified implementation was unexpectedly accepted'
+            exit 1
+          fi
+          if ! grep -q 'GenV checkLicense implementation changed or is already patched' "$RUNNER_TEMP/genv-tools/repatch.log"; then
+            tail -n 35 "$RUNNER_TEMP/genv-tools/repatch.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo '::notice::Fail-closed guard rejected an already modified GenV method.'
           echo '::notice::Both PairIP entry points were modified in a disposable base APK; selected controls and manifest were verified.'
           echo '::notice::The source APK requires splits. No APK was installed, uploaded or published.'
       - uses: actions/upload-artifact@v4
