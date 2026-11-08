@@ -89,7 +89,17 @@ public final class KingInstrumentation extends Instrumentation {
             SystemClock.sleep(200);
         }
         SystemClock.sleep(600);
-        if (visible("Show roots")) { click("Show roots", 5000); click("Downloads", 10000); }
+        pickerPhase("picker opened");
+        if (visible("Show roots")) {
+            click("Show roots", 5000); pickerPhase("picker roots");
+            click("Downloads", 10000); pickerPhase("picker Downloads");
+        }
+    }
+    private void pickerPhase(String label) {
+        AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+        StringBuilder texts = new StringBuilder(); collectTexts(root, texts);
+        phase(label + " package=" + (root == null ? "unknown" : root.getPackageName()) + " "
+                + texts.substring(0, Math.min(texts.length(), 650)));
     }
     private void waitForSource(Object fragment) throws Exception {
         long deadline = SystemClock.uptimeMillis() + 45000;
@@ -117,6 +127,8 @@ public final class KingInstrumentation extends Instrumentation {
         if (node == null || out.length() > 2000) return;
         CharSequence text = node.getText();
         if (text != null && text.length() > 0) out.append(text).append(" | ");
+        CharSequence description = node.getContentDescription();
+        if (description != null && description.length() > 0) out.append(description).append(" | ");
         for (int i = 0; i < node.getChildCount(); i++) collectTexts(node.getChild(i), out);
     }
     private boolean hasText(android.view.View view, String text) {
@@ -235,6 +247,7 @@ public final class KingInstrumentation extends Instrumentation {
             click("1. Choose target APK", 15000);
             openDownloadsInPicker();
             click("king-fixture.apk", 15000);
+            pickerPhase("after selecting fixture");
             waitForSource(fragment);
         } else {
             Method load = fragment.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);

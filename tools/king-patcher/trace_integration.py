@@ -11,7 +11,7 @@ TARGETS = {
                  '<init>(ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;I)V'),
     'Lʽᐧ/ˊ;': ('getView(ILandroid/view/View;Landroid/view/ViewGroup;)Landroid/view/View;',),
     'Lʽᐧ/ˊ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
-    'Lʽٴ/ᐧᐧ;': ('ˆʻ()V', 'ˆˎ()V', 'ˊᵎ(I)V'),
+    'Lʽٴ/ᐧᐧ;': ('ˆʻ()V', 'ˆˎ()V', 'ˊᵎ(I)V', 'ˉᵢ(IILandroid/content/Intent;)V'),
     'Lru/jgaiecip/osuojvyxe/MainActivity;': ('onActivityResult(IILandroid/content/Intent;)V',
                                               'onCreate(Landroid/os/Bundle;)V'),
     'Lʽᐧ/ʽ;': ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V',

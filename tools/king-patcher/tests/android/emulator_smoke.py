@@ -126,7 +126,8 @@ def main() -> None:
             report['king_launch_excerpt'] = [line[:400] for line in log.splitlines()
                 if TARGET in line and any(word in line.lower() for word in ('start', 'display', 'activity', 'process', 'fatal', 'denied', 'blocked', 'died'))][-25:]
             state = adb('shell', 'dumpsys', 'activity', 'activities', timeout=15)
-            report['king_activity_state'] = [line.strip()[:400] for line in state.splitlines() if TARGET in line][-12:]
+            report['king_activity_state'] = [line.strip()[:400] for line in state.splitlines()
+                if TARGET in line or re.search(r'\* ActivityRecord\{', line)][-20:]
         except Exception:
             pass
         raise
