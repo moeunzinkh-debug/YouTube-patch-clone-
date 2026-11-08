@@ -1,0 +1,18 @@
+{
+  "environment": "Disposable Android emulator; synthetic APKs; original King release asset untouched",
+  "bundle_sha256": "11ebd305dc6cf6801f9a4403efc87f5fc8d3f789326c22fe8c20415625d2e48e",
+  "king_package": "ru.jgaiecip.osuojvyxe",
+  "runtime": "passed",
+  "morphe_manager_ui": "not tested",
+  "king_menu_navigation": "renderer and both click listeners tested with synthetic rows; end-to-end navigation not tested",
+  "real_target_apps": "not tested",
+  "system_file_picker": "selected UI input and saved both outputs in Downloads; saved bytes and original SHA-256 checked",
+  "baseline_fixture": "denied LVL callback and all fixture UI elements visible",
+  "signature": "Android Keystore signed; v1/v2 verified at API 23+; same key for both outputs",
+  "alignment": "zipalign verification passed including 16 KiB native alignment option",
+  "lvl_fixture": "classic callback changed from denial to allow(256) on Android",
+  "dex_integrity": "rewritten DEX SHA-1 and Adler-32 accepted by Android runtime",
+  "ui_fixture": "manually selected compiled views hidden with inserted and replaced visibility attributes; unrelated label remains visible",
+  "source_copy": "instrumentation checked original synthetic APK SHA-256 unchanged",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42476819811"
+}
