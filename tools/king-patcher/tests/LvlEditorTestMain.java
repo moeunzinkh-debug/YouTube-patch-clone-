@@ -33,7 +33,8 @@ public final class LvlEditorTestMain {
     private static int checks;
     private static void check(boolean ok,String message) { checks++; if(!ok)throw new AssertionError(message); }
     private static ImmutableMethod method(String owner,String name,String parameter,int flags,boolean hasCode) {
-        List<ImmutableMethodParameter> params=Collections.singletonList(new ImmutableMethodParameter(parameter,Collections.emptySet(),"p"));
+        // Abstract interface methods have no code/debug section; omit synthetic parameter names.
+        List<ImmutableMethodParameter> params=Collections.singletonList(new ImmutableMethodParameter(parameter,Collections.emptySet(),null));
         ImmutableMethodImplementation code=hasCode ? new ImmutableMethodImplementation(2,
                 Collections.singletonList(new ImmutableInstruction10x(Opcode.RETURN_VOID)),Collections.emptyList(),Collections.emptyList()) : null;
         return new ImmutableMethod(owner,name,params,"V",flags,Collections.emptySet(),code);
