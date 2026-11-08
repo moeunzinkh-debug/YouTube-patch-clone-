@@ -26,23 +26,42 @@ SELECTED = {
 ANCHORS = {'MetadataValueReader', 'This should never happen.', 'Google Play Services not available'}
 
 
+def parse_certificate_digests(text: str) -> list[dict[str, str]]:
+    certs = []
+    for line in text.splitlines():
+        m = re.search(r'certificate SHA-(1|256) digest:\s*([a-fA-F0-9]+)', line, re.I)
+        if m and len(m[2]) == (40 if m[1] == '1' else 64):
+            prefix = line[:m.start()].strip()
+            label = prefix if re.fullmatch(r'[A-Za-z0-9 #=(),.\-]{0,120}', prefix) else 'other'
+            certs.append({'label': label, 'algorithm': 'sha' + m[1], 'digest': m[2].lower()})
+    return certs
+
+
 def signature_lines(apksigner: str, apk: Path) -> dict:
     result = subprocess.run([apksigner, 'verify', '--verbose', '--print-certs', '--min-sdk-version', '24', str(apk)],
                             check=False, capture_output=True, text=True, timeout=180)
     if result.returncode: raise ValueError('Signature verification failed')
-    certs = []
-    for line in result.stdout.splitlines():
-        m = re.fullmatch(r'\s*((?:Source Stamp )?Signer(?:\s*\([^\r\n]*\))?\s*#?\d*)\s+certificate SHA-(1|256) digest:\s*([a-fA-F0-9]+)\s*', line)
-        if m and len(m[3]) == (40 if m[2] == '1' else 64):
-            certs.append({'label': m[1].strip(), 'algorithm': 'sha' + m[2], 'digest': m[3].lower()})
-    return {'verified': True, 'public_certificate_digests': certs}
+    return {'verified': True, 'public_certificate_digests': parse_certificate_digests(result.stdout + '\n' + result.stderr)}
 
 
 def trace(apk: Path, apksigner: str) -> dict:
+    from androguard.core.apk import APK
     from androguard.core.dex import DEX
     from loguru import logger
+    from inspect_genv import ANDROID
     logger.remove()
     check_asset(apk)
+    manifest_apk = APK(str(apk))
+    manifest = manifest_apk.get_android_manifest_xml()
+    arsc = manifest_apk.get_android_resources()
+    resource_packages = arsc.get_packages_names() if arsc else []
+    auth_activities = []
+    for activity in manifest.findall('./application/activity'):
+        name = activity.get(ANDROID + 'name', '')
+        if re.search(r'auth|signin|sign.?in', name, re.I) and identifier(name):
+            actions = [a.get(ANDROID + 'name') for a in activity.findall('./intent-filter/action')
+                       if a.get(ANDROID + 'name') and extract_route('v0, "' + a.get(ANDROID + 'name') + '"')]
+            auth_activities.append({'name': name, 'exported': activity.get(ANDROID + 'exported'), 'gms_actions': actions})
     found = {}
     anchors = {}
     with zipfile.ZipFile(apk) as archive:
@@ -87,7 +106,8 @@ def trace(apk: Path, apksigner: str) -> dict:
     if set(found) != SELECTED: raise ValueError('Selected GenV methods missing: ' + ', '.join(sorted(SELECTED-set(found))))
     check_asset(apk)
     return {'scope': 'Read-only trace; no account access, credentials, URLs, arbitrary strings, execution or APK upload.',
-            'signature': signature_lines(apksigner, apk), 'selected_methods': found, 'known_anchors': anchors}
+            'signature': signature_lines(apksigner, apk), 'resource_packages': resource_packages,
+            'auth_activities': auth_activities, 'selected_methods': found, 'known_anchors': anchors}
 
 
 def main() -> None:
