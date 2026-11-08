@@ -21,6 +21,17 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
+<summary>🎬 GenV • 1 experimental patch (bundle ដាច់ដោយឡែក)</summary>
+
+គោលដៅដែលបានពិនិត្យ៖ `com.ainate.ai.video.generate` **3.7.2 (163)**, Android 7.0+។
+
+- `Remove license check` — បិទ PairIP license entry points ពីរដែលបានពិនិត្យ **ខាង client**; បើកជាមុន។ វាមិនផ្ដល់ subscription, server entitlement ឬរំលង server/Play Integrity attestation ទេ។
+
+Morphe Manager បាន patch ច្បាប់ចម្លង base APK ក្នុង emulator ហើយ DEX ត្រូវបានពិនិត្យ។ **Release មានតែ base ដែលត្រូវការ splits និងគ្មាន native libraries**; app GenV ពិត និងការរួម splits ពេញមិនទាន់បានសាក។ [របៀបប្រើ និងលទ្ធផល](bundles/genv/README.md) · [Bundle](bundles/genv/bundle.mpp) · [SHA-256](bundles/genv/bundle.mpp.sha256) · [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV)
+
+</details>
+
+<details>
 <summary>🌐 Instant Translate • 5 experimental patches (bundle ដាច់ដោយឡែក)</summary>
 
 គោលដៅ release បច្ចុប្បន្ន `com.spaceship.screen.textcopy` **v7.5.00307 (50350)**។ SEA-LION ក៏រក្សាគោលដៅចាស់ v7.5.00300 (50342) ដែរ។ Patches បិទជាមុន៖

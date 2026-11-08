@@ -1,0 +1,175 @@
+{
+  "scope": "Read-only static inspection; no target APK execution, modification, upload or account access.",
+  "source": {
+    "release_tag": "GenV",
+    "asset_id": 723946916,
+    "filename": "GenV_3.7.2.apk",
+    "bytes": 23281657,
+    "sha256": "f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e"
+  },
+  "package": "com.ainate.ai.video.generate",
+  "version_name": "3.7.2",
+  "version_code": "163",
+  "min_sdk": 24,
+  "target_sdk": "36",
+  "manifest_split": null,
+  "is_split_required": null,
+  "split_metadata": [
+    {
+      "name": "com.android.vending.splits.required",
+      "value": "true",
+      "resource": null
+    },
+    {
+      "name": "com.android.vending.splits",
+      "value": null,
+      "resource": "@7F110004"
+    }
+  ],
+  "application_class": "com.pairip.application.Application",
+  "main_activity": "com.ainate.ai.video.generate.MainActivity",
+  "license_or_billing_permissions": [
+    "com.android.vending.BILLING",
+    "com.android.vending.CHECK_LICENSE"
+  ],
+  "native_libraries": {
+    "count": 0,
+    "abis": [],
+    "flutter": false
+  },
+  "has_flutter_assets": true,
+  "pairip_native_or_vm_entries": [],
+  "dex_files": [
+    {
+      "name": "classes.dex",
+      "bytes": 9145252
+    },
+    {
+      "name": "classes2.dex",
+      "bytes": 205600
+    }
+  ],
+  "license_string_counts": {
+    "classic_service_strings": 3,
+    "licensing_strings": 677,
+    "pairip_strings": 38
+  },
+  "matched_class_count": 119,
+  "matched_method_count": 590,
+  "note": "Code identifiers and manifest permissions alone do not prove a live license check or complete APK.",
+  "signature": {
+    "apksigner_verification_succeeded": true,
+    "min_sdk_tested": 24,
+    "publisher_identity_independently_verified": false
+  },
+  "reviewed_methods": {
+    "Lcom/pairip/application/Application;->attachBaseContext(Landroid/content/Context;)V": {
+      "dex": "classes.dex",
+      "registers": 2,
+      "instruction_count": 3,
+      "opcodes": [
+        "invoke-static",
+        "invoke-super",
+        "return-void"
+      ],
+      "method_references": [
+        "Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V",
+        "Lcom/pairip/application/Application;->attachBaseContext(Landroid/content/Context;)V"
+      ]
+    },
+    "Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V": {
+      "dex": "classes.dex",
+      "registers": 3,
+      "instruction_count": 16,
+      "opcodes": [
+        "const-string",
+        "if-nez",
+        "const-string",
+        "invoke-static",
+        "return-void",
+        "invoke-static",
+        "move-result",
+        "if-eqz",
+        "const-string",
+        "invoke-static",
+        "return-void",
+        "sget-object",
+        "new-instance",
+        "invoke-direct",
+        "invoke-interface",
+        "return-void"
+      ],
+      "method_references": [
+        "Landroid/util/Log;->w(Ljava/lang/String; Ljava/lang/String;)I",
+        "Lcom/pairip/licensecheck/LicenseClient;->isIsolatedProcess()Z",
+        "Landroid/util/Log;->i(Ljava/lang/String; Ljava/lang/String;)I",
+        "Lcom/pairip/licensecheck/LicenseClient$$ExternalSyntheticLambda7;-><init>(Landroid/content/Context;)V",
+        "Lcom/pairip/licensecheck/LicenseClient$ImmediateTaskExecutor;->run(Ljava/lang/Runnable;)V"
+      ]
+    },
+    "Lcom/pairip/licensecheck/LicenseClient;->initializeLicenseCheck()V": {
+      "dex": "classes.dex",
+      "registers": 4,
+      "instruction_count": 30,
+      "opcodes": [
+        "sget-object",
+        "invoke-virtual",
+        "move-result",
+        "const/4",
+        "if-eqz",
+        "const/4",
+        "if-eq",
+        "const/4",
+        "if-eq",
+        "return-void",
+        "invoke-direct",
+        "return-void",
+        "sget-object",
+        "sget-object",
+        "invoke-static",
+        "return-void",
+        "move-exception",
+        "invoke-direct",
+        "return-void",
+        "sget-boolean",
+        "if-eqz",
+        "sget-boolean",
+        "if-nez",
+        "sget-object",
+        "new-instance",
+        "invoke-direct",
+        "invoke-interface",
+        "return-void",
+        "invoke-direct",
+        "return-void"
+      ],
+      "method_references": [
+        "Lcom/pairip/licensecheck/LicenseClient$LicenseCheckState;->ordinal()I",
+        "Lcom/pairip/licensecheck/LicenseClient;->initiateFreshLicensingServiceConnection(Z)V",
+        "Lcom/pairip/licensecheck/LicenseResponseHelper;->validateResponse(Landroid/os/Bundle; Ljava/lang/String;)V",
+        "Lcom/pairip/licensecheck/LicenseClient;->handleError(Lcom/pairip/licensecheck/LicenseCheckException;)V",
+        "Lcom/pairip/licensecheck/LicenseClient$$ExternalSyntheticLambda8;-><init>(Lcom/pairip/licensecheck/LicenseClient;)V",
+        "Lcom/pairip/licensecheck/LicenseClient$ImmediateTaskExecutor;->run(Ljava/lang/Runnable;)V",
+        "Lcom/pairip/licensecheck/LicenseClient;->initiateFreshLicensingServiceConnection(Z)V"
+      ]
+    },
+    "Lcom/pairip/licensecheck/LicenseContentProvider;->onCreate()Z": {
+      "dex": "classes.dex",
+      "registers": 2,
+      "instruction_count": 5,
+      "opcodes": [
+        "invoke-virtual",
+        "move-result-object",
+        "invoke-static",
+        "const/4",
+        "return"
+      ],
+      "method_references": [
+        "Lcom/pairip/licensecheck/LicenseContentProvider;->getContext()Landroid/content/Context;",
+        "Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V"
+      ]
+    }
+  },
+  "inspection_ci": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42483049668",
+  "split_caveat": "The release contains only a base APK with required split metadata and no native libraries. Complete split availability and app runtime were not verified."
+}
