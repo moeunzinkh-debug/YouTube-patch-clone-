@@ -110,6 +110,7 @@ def main() -> None:
         adb('install', str(WORK / 'lvl-output.apk'), timeout=120)
         launch_and_check(('LICENSED-256', 'KEEP-ME', 'HIDE-ME'), ('DENIED-561',))
         report['lvl_fixture'] = 'classic callback changed from denial to allow(256) on Android'
+        report['dex_integrity'] = 'rewritten DEX SHA-1 and Adler-32 accepted by Android runtime'
         adb('uninstall', PACKAGE)
         adb('install', str(WORK / 'ui-output.apk'), timeout=120)
         launch_and_check(('DENIED-561', 'KEEP-ME'), ('HIDE-ME',))
