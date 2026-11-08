@@ -32,5 +32,7 @@ Bundle នេះបន្ថែម tools ពីរទៅក្នុងបញ្
 
 ## ស្ថានភាពតេស្ត
 
-- សូមមើល [validation](validation.json), [Manager report](manager-smoke.json) និង [Android report](android-smoke.json) សម្រាប់លទ្ធផល និង hash របស់ bundle ដែលបានសាក។
-- Bundle នេះនៅសាកល្បង; GenV ពិត, ទូរស័ព្ទពិត និងការចូលតាមម៉ឺនុយ King ពេញលេញមិនទាន់បានសាក។ ការរកឃើញ pattern មិនធានាថា app នឹងដំណើរការ ឬថា license checks ទាំងអស់ត្រូវបានដកចេញទេ។ APK ដើមនៅក្នុង pre-release មិនត្រូវបានកែ ឬជំនួស។
+- [Unit tests](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42481149050) បានសាក classic LVL, PairIP, ករណី unsupported និងការកែទាំងពីរក្នុង DEX តែមួយ ឬច្រើន DEX។ Kimi APK ដែលមានក្នុង release បច្ចុប្បន្នមាន early returns រួចហើយ; ការពិនិត្យ read-only ឃើញរចនាសម្ព័ន្ធពីមុននៅបន្ទាប់ពី returns ទាំងនោះ។ វា **មិនមែនជាតេស្តលើ Kimi ដែលមិនទាន់ patch** ទេ។
+- [Morphe Manager 2.3.0-dev.3](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42481074379) បាន import bundle, ជ្រើស selectors ទាំងពីរ, patch និងរក្សាទុកច្បាប់ចម្លង King។
+- [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42481478700) បានសាកលើ APK សិប្បនិម្មិត៖ រក LVL និង PairIP ដោយស្វ័យប្រវត្តិ, ចុះហត្ថលេខា, រក្សាទុក និងដំឡើង output; PairIP fixture មិនបើក entry points ទាំងពីរបន្ទាប់ពី patch។ ក៏បានសាក UI tool និង menu listeners ប៉ុន្តែមិនទាន់សាកចូលតាមម៉ឺនុយ King ពេញលេញ។
+- សូមមើល [validation](validation.json), [Manager report](manager-smoke.json) និង [Android report](android-smoke.json) សម្រាប់ hash និងលទ្ធផលលម្អិត។ Bundle នេះនៅសាកល្បង; GenV ពិត និងទូរស័ព្ទពិតមិនទាន់បានសាក។ ការរកឃើញ pattern មិនធានាថា app នឹងដំណើរការ ឬថា license checks ទាំងអស់ត្រូវបានដកចេញទេ។ APK ដើមនៅក្នុង pre-release មិនត្រូវបានកែ ឬជំនួស។
