@@ -8,7 +8,9 @@ on:
       - 'tools/genv/prepare_build.py'
       - 'tools/genv/verify_bundle.py'
       - 'tools/genv/verify_patched.py'
+      - 'tools/genv/verify_microg_patched.py'
       - 'tools/genv/test_patch_tools.py'
+      - 'tools/genv/test_microg_verifier.py'
       - 'tools/genv/inspect_genv.py'
       - '.github/workflows/build-genv-mpp.yml'
 
@@ -39,6 +41,7 @@ jobs:
           set -euo pipefail
           python3 tools/genv/test_inspect_genv.py -v
           python3 tools/genv/test_patch_tools.py -v
+          python3 tools/genv/test_microg_verifier.py -v
           python3 tools/genv/prepare_build.py "$RUNNER_TEMP/genv-build"
           mkdir -p "$RUNNER_TEMP/genv-tools" "$RUNNER_TEMP/genv-output"
           gh release download v9.8.2 --repo gradle/gradle-distributions --pattern gradle-9.8.2-bin.zip --dir "$RUNNER_TEMP/genv-tools"
@@ -103,6 +106,32 @@ jobs:
           echo '::notice::Fail-closed guard rejected an already modified GenV method.'
           echo '::notice::Both PairIP entry points were modified in a disposable base APK; selected controls and manifest were verified.'
           echo '::notice::The source APK requires splits. No APK was installed, uploaded or published.'
+      - name: Verify MicroG alone and together with the license selector
+        shell: bash
+        run: |
+          set -euo pipefail
+          cli="$RUNNER_TEMP/genv-tools/morphe-desktop-1.20.0-dev.1-all.jar"
+          input="$RUNNER_TEMP/genv-tools/GenV_3.7.2.apk"
+          for mode in microg both; do
+            selectors=(-e 'Morphe MicroG Google sign-in support (experimental)')
+            if [[ "$mode" == both ]]; then selectors+=(-e 'Remove license check'); fi
+            if ! java -Xmx4g -jar "$cli" patch "$input" --patches "$RUNNER_TEMP/genv-output/bundle.mpp" \
+                --exclusive "${selectors[@]}" --unsigned --bytecode-mode FULL \
+                --out "$RUNNER_TEMP/genv-tools/$mode.apk" --result-file "$RUNNER_TEMP/genv-tools/$mode.json" \
+                > "$RUNNER_TEMP/genv-tools/$mode.log" 2>&1; then
+              tail -n 60 "$RUNNER_TEMP/genv-tools/$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
+              exit 1
+            fi
+          done
+          if ! python3 tools/genv/verify_microg_patched.py "$input" \
+              "$RUNNER_TEMP/genv-tools/microg.apk" "$RUNNER_TEMP/genv-tools/microg.json" \
+              "$RUNNER_TEMP/genv-tools/both.apk" "$RUNNER_TEMP/genv-tools/both.json" \
+              "$RUNNER_TEMP/genv-output/microg-static.json" > "$RUNNER_TEMP/genv-tools/microg-verify.log" 2>&1; then
+            tail -n 30 "$RUNNER_TEMP/genv-tools/microg-verify.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/genv-tools/microg-verify.log"
+          echo '::notice::Both selectors tested individually and together; no patched APK was installed, uploaded or published.'
       - uses: actions/upload-artifact@v4
         with:
           name: genv-morphe-bundle-static-only
@@ -112,3 +141,4 @@ jobs:
             ${{ runner.temp }}/genv-output/bundle.mpp.sha256
             ${{ runner.temp }}/genv-output/patches.txt
             ${{ runner.temp }}/genv-output/patch-validation.json
+            ${{ runner.temp }}/genv-output/microg-static.json
