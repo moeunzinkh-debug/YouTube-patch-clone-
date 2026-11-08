@@ -17,7 +17,10 @@ def prepare(destination: Path) -> None:
         shutil.copy2(ROOT / name, destination / name)
     shutil.copytree(ROOT / 'gradle', destination / 'gradle')
     wrapper = destination / 'gradle/wrapper/gradle-wrapper.properties'
-    wrapper_text = wrapper.read_text().replace('networkTimeout=10000', 'networkTimeout=60000').replace('retries=0', 'retries=2')
+    wrapper_text = (wrapper.read_text().replace('networkTimeout=10000', 'networkTimeout=60000')
+                    .replace('retries=0', 'retries=2')
+                    .replace('https\\://services.gradle.org/distributions/gradle-9.8.2-bin.zip',
+                             'https\\://github.com/gradle/gradle-distributions/releases/download/v9.8.2/gradle-9.8.2-bin.zip'))
     wrapper.write_text(wrapper_text)
     settings = (ROOT / 'settings.gradle.kts').read_text()
     marker = '// Include morphe-patcher as composite builds'
