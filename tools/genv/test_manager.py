@@ -196,6 +196,11 @@ def main() -> None:
     tap('No, I already have it', exact=True)
     time.sleep(4)
     nodes = dump()
+    if any(matches(n, 'Allow Morphe to access photos, media, and files') for n in nodes):
+        # Android 10 shows the legacy storage permission before the picker.
+        tap('Allow', exact=True)
+        time.sleep(4)
+        nodes = dump()
     if any(matches(n, 'Allow access to manage all files') for n in nodes):
         announce('Manager file access prompt', nodes)
         tap('Allow access to manage all files', exact=True)
