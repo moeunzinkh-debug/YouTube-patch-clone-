@@ -278,6 +278,17 @@ public final class KingInstrumentation extends Instrumentation {
         phase("synthetic target loaded for mode " + mode);
         return fragment;
     }
+    private void verifyFailedSelectionClearsPreviousTarget(Object fragment) throws Exception {
+        phase("checking failed selection clears previous target");
+        Method load = fragment.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
+        File missing = new File(getTargetContext().getCacheDir(), "king-nonexistent-fixture.apk"); missing.delete();
+        runOnMainSync(() -> { try { load.invoke(fragment, Uri.fromFile(missing)); } catch (Exception e) { throw new RuntimeException(e); } });
+        waitIdle(fragment, 45000);
+        if (field(fragment, "source") != null || field(fragment, "signed") != null || field(fragment, "inputPackage") != null)
+            throw new AssertionError("Failed selection left the previous APK or signed output active");
+        click("OK", 10000);
+        phase("failed selection safely cleared previous target");
+    }
     private void createOutput(Object activity, String createLabel, String filename) throws Exception {
         phase("requesting signed output " + filename);
         click(createLabel, 15000);
@@ -301,6 +312,7 @@ public final class KingInstrumentation extends Instrumentation {
         File output = new File(external, filename); copy(new FileInputStream(result), output);
         if (!Arrays.equals(sha(result), sha(output))) throw new AssertionError("Test output copy mismatch");
         phase("copied signed output " + filename);
+        if (filename.equals("king-ui-fixture.apk")) verifyFailedSelectionClearsPreviousTarget(activity);
         // King terminates its process when its MainActivity is finished; keep the
         // same real host alive for both experiments and only dismiss our dialog.
         runOnMainSync(() -> { ((DialogFragment) activity).dismissAllowingStateLoss(); host.getFragmentManager().executePendingTransactions(); });

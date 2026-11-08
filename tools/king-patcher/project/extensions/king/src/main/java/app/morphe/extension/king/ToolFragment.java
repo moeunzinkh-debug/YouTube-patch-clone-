@@ -136,10 +136,15 @@ public final class ToolFragment extends DialogFragment {
         file.delete();
     }
     private void load(Uri uri) {
+        // A failed new selection must never leave the previous target or its
+        // signed output active: that could make the user edit the wrong APK.
+        final File previous = session;
+        session = null; source = null; signed = null; inputPackage = null; inputUri = null; layouts = null; selected.clear();
         busy = true; refreshButtons(); status.setText("Reading and checking the selected APK…");
         worker.execute(() -> {
             File newDir = null;
             try {
+                deleteTree(previous);
                 newDir = newSession(); File newSource = new File(newDir, "input.apk");
                 InputStream in = application.getContentResolver().openInputStream(uri);
                 if (in == null) throw new IOException("Cannot read selected APK");
