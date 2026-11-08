@@ -12,6 +12,9 @@ TARGETS = {
     'Lʽᐧ/ˊ;': ('getView(ILandroid/view/View;Landroid/view/ViewGroup;)Landroid/view/View;',),
     'Lʽᐧ/ˊ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
     'Lʽٴ/ᐧᐧ;': ('ˆʻ()V', 'ˆˎ()V', 'ˊᵎ(I)V'),
+    'Lru/jgaiecip/osuojvyxe/MainActivity;': ('onActivityResult(IILandroid/content/Intent;)V',
+                                              'onCreate(Landroid/os/Bundle;)V'),
+    'Lʽᐧ/ʽ;': ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V'),
 }
 
 def trace(decoded: Path) -> dict:
@@ -33,6 +36,12 @@ def trace(decoded: Path) -> dict:
                 cleaned = cleaned[:100]
             elif name in ('ˆʻ()V', 'ˆˎ()V'):
                 cleaned = cleaned[:100] + ['<omitted>'] + cleaned[-70:]
+            elif name in ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V'):
+                indices = {i for i, line in enumerate(cleaned) if any(token in line for token in
+                           ('Lʽᐧ/ˉ;->', 'Landroid/widget/ArrayAdapter;', 'getItem(', 'setText(', 'onItemClick('))}
+                keep = set(range(min(20, len(cleaned))))
+                for i in sorted(indices)[:50]: keep.update(range(max(0, i - 5), min(len(cleaned), i + 6)))
+                cleaned = [f'{i + 1}: {cleaned[i]}' for i in sorted(keep)[:400]]
             elif len(cleaned) > 400:
                 cleaned = cleaned[:400]
             selected[name] = cleaned

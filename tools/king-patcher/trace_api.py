@@ -10,7 +10,8 @@ from trace_menu import find_class, parse_class, scrub, windows
 
 CLASSES = (
     'Lʽᐧ/ˉ;', 'Lʽٴ/ᵎ;', 'Lʽᐧ/ˊ$ʻ;', 'Lʽٴ/ᐧᐧ$ʽٴ;',
-    'Lorg/jf/dexlib2/DexFileFactory;', 'Lorg/jf/dexlib2/Opcodes;',
+    'Lorg/jf/dexlib2/DexFileFactory;', 'Lorg/jf/dexlib2/Opcodes;', 'Lorg/jf/dexlib2/Opcode;',
+    'Lorg/jf/dexlib2/iface/ClassDef;', 'Lorg/jf/dexlib2/iface/reference/MethodReference;',
     'Lorg/jf/dexlib2/rewriter/DexRewriter;', 'Lorg/jf/dexlib2/rewriter/RewriterModule;',
     'Lorg/jf/dexlib2/rewriter/MethodRewriter;', 'Lorg/jf/dexlib2/rewriter/Rewriter;',
     'Lorg/jf/dexlib2/iface/Method;', 'Lorg/jf/dexlib2/immutable/ImmutableMethod;',
