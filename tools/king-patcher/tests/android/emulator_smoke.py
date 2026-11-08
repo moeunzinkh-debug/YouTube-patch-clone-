@@ -66,6 +66,7 @@ def verify_signature(path: Path) -> str:
 def main() -> None:
     report = {'environment': 'Disposable Android emulator; synthetic APKs; original King release asset untouched',
               'king_package': TARGET, 'runtime': 'not completed', 'morphe_manager_ui': 'not tested',
+              'king_menu_navigation': 'not tested; entry bridge invoked directly',
               'real_target_apps': 'not tested', 'system_file_picker': 'not tested'}
     try:
         adb('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP')
