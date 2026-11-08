@@ -8,6 +8,7 @@ on:
       - 'tools/king-patcher/test_inspect_apk.py'
       - 'tools/king-patcher/trace_menu.py'
       - 'tools/king-patcher/trace_api.py'
+      - 'tools/king-patcher/emit_annotations.py'
       - '.github/workflows/inspect-king-patcher.yml'
 
 permissions:
@@ -66,20 +67,13 @@ jobs:
           fi
           cat "$RUNNER_TEMP/king-trace.log"
           python3 tools/king-patcher/trace_api.py "$RUNNER_TEMP/king-decoded" "$RUNNER_TEMP/king-api-trace.json"
-      - name: Emit bounded sanitized inventory and menu trace
-        run: |
-          python3 - <<'PY'
-          import base64, gzip, os
-          from pathlib import Path
-          root = Path(os.environ['RUNNER_TEMP'])
-          for prefix, filename in (('KING_INVENTORY', 'king-inventory.json'), ('KING_MENU_TRACE', 'king-menu-trace.json'), ('KING_API_TRACE', 'king-api-trace.json')):
-              data = base64.b64encode(gzip.compress((root / filename).read_bytes())).decode('ascii')
-              chunks = [data[i:i + 3900] for i in range(0, len(data), 3900)]
-              if len(chunks) > 15:
-                  raise SystemExit(prefix + ' exceeds annotation capacity')
-              for index, chunk in enumerate(chunks, 1):
-                  print(f'::notice::{prefix} {index}/{len(chunks)} {chunk}')
-          PY
+      # GitHub caps annotations per step, so keep the reports separate.
+      - name: Emit sanitized inventory
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-inventory.json" KING_INVENTORY
+      - name: Emit sanitized menu trace
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-menu-trace.json" KING_MENU_TRACE
+      - name: Emit sanitized API trace
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-api-trace.json" KING_API_TRACE
       - uses: actions/upload-artifact@v4
         with:
           name: king-patcher-static-inventory
