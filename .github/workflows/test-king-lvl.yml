@@ -35,8 +35,8 @@ jobs:
           mvn -q -f "$RUNNER_TEMP/king-deps-pom.xml" dependency:copy-dependencies -DoutputDirectory="$RUNNER_TEMP/king-deps"
           mkdir -p "$RUNNER_TEMP/king-classes"
           if ! javac -encoding UTF-8 -cp "$RUNNER_TEMP/king-deps/*" -d "$RUNNER_TEMP/king-classes" \
-              tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/{LvlEditor,AxmlEditor,ApkArchive}.java \
-              tools/king-patcher/tests/{LvlEditorTestMain,AxmlEditorTestMain,ApkArchiveTestMain}.java > "$RUNNER_TEMP/king-lvl-compile.log" 2>&1; then
+              tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/{LvlEditor,PairIpEditor,AxmlEditor,ApkArchive}.java \
+              tools/king-patcher/tests/{LvlEditorTestMain,PairIpEditorTestMain,AxmlEditorTestMain,ApkArchiveTestMain}.java > "$RUNNER_TEMP/king-lvl-compile.log" 2>&1; then
             tail -n 30 "$RUNNER_TEMP/king-lvl-compile.log" | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi
@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for test in LvlEditorTestMain AxmlEditorTestMain ApkArchiveTestMain; do
+          for test in LvlEditorTestMain PairIpEditorTestMain AxmlEditorTestMain ApkArchiveTestMain; do
             if ! java -cp "$RUNNER_TEMP/king-classes:$RUNNER_TEMP/king-deps/*" "$test" > "$RUNNER_TEMP/king-lvl-test.log" 2>&1; then
               tail -n 30 "$RUNNER_TEMP/king-lvl-test.log" | while IFS= read -r line; do echo "::error::$line"; done
               exit 1

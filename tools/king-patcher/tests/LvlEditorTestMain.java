@@ -40,7 +40,7 @@ public final class LvlEditorTestMain {
                 Collections.singletonList(new ImmutableInstruction10x(Opcode.RETURN_VOID)),Collections.emptyList(),Collections.emptyList()) : null;
         return new ImmutableMethod(owner,name,params,"V",flags,Collections.emptySet(),code);
     }
-    private static ClassDef callback(boolean full) {
+    static ClassDef callback(boolean full) {
         List<Method> methods=new ArrayList<>();
         methods.add(method(CALLBACK,"allow","I",0x401,false));
         methods.add(method(CALLBACK,"dontAllow","I",0x401,false));
@@ -48,14 +48,14 @@ public final class LvlEditorTestMain {
         return new ImmutableClassDef(CALLBACK,0x601,"Ljava/lang/Object;",Collections.emptyList(),null,
                 Collections.emptySet(),Collections.emptyList(),methods);
     }
-    private static ClassDef checker(String name,int flags) {
+    static ClassDef checker(String name,int flags) {
         List<Method> methods=new ArrayList<>();
         methods.add(method(name,"checkAccess",CALLBACK,flags,true));
         methods.add(method(name,"unchanged","I",0x1,true));
         return new ImmutableClassDef(name,0x1,"Ljava/lang/Object;",Collections.emptyList(),null,
                 Collections.emptySet(),Collections.emptyList(),methods);
     }
-    private static void makeDex(Path path,List<? extends ClassDef> classes) throws Exception {
+    static void makeDex(Path path,List<? extends ClassDef> classes) throws Exception {
         DexFileFactory.writeDexFile(path.toString(),new ImmutableDexFile(Opcodes.forDexVersion(35),classes));
     }
     static void makeFixture(Path path) throws Exception { makeDex(path,Arrays.asList(checker(CHECKER,1),callback(true))); }

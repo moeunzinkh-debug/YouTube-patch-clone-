@@ -52,6 +52,7 @@ public final class ToolFragment extends DialogFragment {
     private File session, source, signed;
     private Uri inputUri;
     private PackageInfo inputPackage;
+    private String appliedLicenseMethods;
     private ApkArchive.Layouts layouts;
     private TextView status;
     private Button choose, elements, build, save;
@@ -79,12 +80,12 @@ public final class ToolFragment extends DialogFragment {
                     .setMessage("This experimental tool requires Android 6 or newer.")
                     .setPositiveButton("Close", (d, w) -> dismissAllowingStateLoss()).create();
         }
-        String title = mode == MODE_LVL ? "Remove license (Google Play LVL)" : "Remove insignificant UI elements";
+        String title = mode == MODE_LVL ? "Remove license check (automatic)" : "Remove insignificant UI elements";
         LinearLayout root = new LinearLayout(activity); root.setOrientation(LinearLayout.VERTICAL);
         int margin = (int) (16 * getResources().getDisplayMetrics().density + 0.5f); root.setPadding(margin, margin, margin, margin);
         TextView intro = new TextView(activity);
         intro.setText(mode == MODE_LVL
-                ? "Select a single APK file. Only the classic, unobfuscated Google Play LVL checker is supported; other checks are rejected."
+                ? "Select a single APK. Its DEX files are scanned locally for classic unobfuscated Google Play LVL and the reviewed PairIP method. Other, obfuscated, native and server-side checks are not supported; detection does not guarantee the app will work."
                 : "Select a single APK file, then choose compiled layout elements to hide. Runtime-generated, Compose and WebView content is not supported.");
         root.addView(intro);
         choose = new Button(activity); choose.setText("1. Choose target APK"); choose.setOnClickListener(v -> pickInput()); root.addView(choose);
@@ -139,7 +140,7 @@ public final class ToolFragment extends DialogFragment {
         // A failed new selection must never leave the previous target or its
         // signed output active: that could make the user edit the wrong APK.
         final File previous = session;
-        session = null; source = null; signed = null; inputPackage = null; inputUri = null; layouts = null; selected.clear();
+        session = null; source = null; signed = null; inputPackage = null; inputUri = null; layouts = null; appliedLicenseMethods = null; selected.clear();
         busy = true; refreshButtons(); status.setText("Reading and checking the selected APK…");
         worker.execute(() -> {
             File newDir = null;
@@ -223,8 +224,10 @@ public final class ToolFragment extends DialogFragment {
                 .setNegativeButton("Cancel", null).setPositiveButton("Continue", (d, w) -> buildOutput()).show();
     }
     private void buildOutput() {
-        signed = null;
-        busy = true; refreshButtons(); status.setText("Creating and verifying a new APK. Please wait…");
+        signed = null; appliedLicenseMethods = null;
+        busy = true; refreshButtons(); status.setText(mode == MODE_LVL
+                ? "Scanning DEX files locally, then creating and verifying a new APK. Please wait…"
+                : "Creating and verifying a new APK. Please wait…");
         final File dir = session, original = source;
         final Map<String, Set<Integer>> selection = new HashMap<>();
         for (Map.Entry<String, Set<Integer>> item : selected.entrySet()) selection.put(item.getKey(), new HashSet<>(item.getValue()));
@@ -233,18 +236,20 @@ public final class ToolFragment extends DialogFragment {
             try {
                 if (unsigned.exists() && !unsigned.delete()) throw new IOException("Cannot clear previous temporary output");
                 if (result.exists() && !result.delete()) throw new IOException("Cannot clear previous signed output");
+                final String matched;
                 if (mode == MODE_LVL) {
                     if (!work.mkdir()) throw new IOException("Cannot create private DEX working directory");
-                    try { ApkArchive.buildLvl(original, work, unsigned); } finally { deleteTree(work); }
-                } else ApkArchive.buildUi(original, unsigned, selection);
+                    try { matched = ApkArchive.buildLvl(original, work, unsigned); } finally { deleteTree(work); }
+                } else { ApkArchive.buildUi(original, unsigned, selection); matched = null; }
                 ApkSignerBridge.signAndVerify(unsigned, result);
                 PackageInfo parsed = application.getPackageManager().getPackageArchiveInfo(result.getAbsolutePath(), 0);
                 if (parsed == null || !inputPackage.packageName.equals(parsed.packageName)) throw new IOException("Signed output failed package validation");
                 unsigned.delete();
                 main.post(() -> {
                     if (destroyed) return;
-                    signed = result; busy = false; refreshButtons();
-                    status.setText("Signature verified. Choose a NEW destination for the modified APK; do not select the original.");
+                    signed = result; appliedLicenseMethods = matched; busy = false; refreshButtons();
+                    status.setText((matched == null ? "" : "Matched and modified: " + matched + ". Other checks may remain.\n")
+                            + "Signature verified. Choose a NEW destination for the modified APK; do not select the original.");
                     pickOutput();
                 });
             } catch (Exception error) {
@@ -291,7 +296,9 @@ public final class ToolFragment extends DialogFragment {
                 copyLimited(new FileInputStream(signed), target, MAX_APK * 2);
                 InputStream check = application.getContentResolver().openInputStream(destination);
                 if (check == null || !Arrays.equals(before, digest(check))) throw new IOException("Saved file could not be verified");
-                main.post(() -> { if (!destroyed) { busy = false; status.setText("Saved and SHA-256 verified:\n" + destination + "\nOriginal APK was not changed."); refreshButtons(); } });
+                main.post(() -> { if (!destroyed) { busy = false; status.setText("Saved and SHA-256 verified:\n" + destination
+                        + (appliedLicenseMethods == null ? "" : "\nMatched and modified: " + appliedLicenseMethods + ". Other checks may remain.")
+                        + "\nOriginal APK was not changed."); refreshButtons(); } });
             } catch (Exception error) { failAsync(error); }
         });
     }

@@ -9,7 +9,7 @@ from trace_menu import find_class, parse_class
 TARGET = 'Lʽٴ/ᐧᐧ;'
 MODEL = 'Lʽᐧ/ˉ;'
 ITEMS = {
-    0x7e4d0001: ('Remove license (Google Play LVL)', 'New classic LVL method; selected APK only'),
+    0x7e4d0001: ('Remove license check (automatic)', 'Scan for supported LVL and PairIP checks'),
     0x7e4d0002: ('Remove insignificant things', 'Choose compiled layout elements to hide'),
 }
 

@@ -51,6 +51,11 @@ public final class LvlEditor {
 
     private LvlEditor() {}
 
+    /** Signals only that neither classic LVL class was present; not malformed input. */
+    public static final class ClassicNotFoundException extends IOException {
+        ClassicNotFoundException() { super("No unobfuscated classic Google Play LVL checker was found"); }
+    }
+
     private static int version(File file) throws IOException {
         if (!file.isFile() || file.length() < 8 || file.length() > MAX_DEX_SIZE)
             throw new IOException("Invalid or oversized DEX input");
@@ -76,7 +81,7 @@ public final class LvlEditor {
      * header. The inspected King's embedded writer can leave both as zero even
      * when dexlib2 itself can reload the file. Seal them independently.
      */
-    private static void sealDexHeader(File file) throws IOException {
+    static void sealDexHeader(File file) throws IOException {
         try (RandomAccessFile dex = new RandomAccessFile(file, "rw")) {
             if (dex.length() < 112 || dex.length() > MAX_DEX_SIZE) throw new IOException("Invalid rewritten DEX length");
             byte[] buffer = new byte[32768]; int read;
@@ -109,7 +114,7 @@ public final class LvlEditor {
                 throw new IOException("DEX header checksum or SHA-1 is invalid");
         }
     }
-    private static DexFile load(File file) throws IOException {
+    static DexFile load(File file) throws IOException {
         int dexVersion = version(file);
         verifyDexHeader(file);
         return DexFileFactory.loadDexFile(file, Opcodes.forDexVersion(dexVersion));
@@ -197,8 +202,9 @@ public final class LvlEditor {
                 } else if (CALLBACK.equals(cls.getType())) { callbackCount++; validateCallback(cls); }
             }
         }
+        if (checkerCount == 0 && callbackCount == 0) throw new ClassicNotFoundException();
         if (checkerCount != 1 || callbackCount != 1 || checkerDex == null)
-            throw new IOException("Only one unobfuscated classic Google Play LVL checker is supported");
+            throw new IOException("Classic LVL classes are incomplete or duplicated; no changes made");
         final RewriterModule module = new RewriterModule() {
             @Override public Rewriter<Method> getMethodRewriter(Rewriters rewriters) {
                 final Rewriter<Method> original = super.getMethodRewriter(rewriters);

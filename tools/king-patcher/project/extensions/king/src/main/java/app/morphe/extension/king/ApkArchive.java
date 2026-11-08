@@ -175,7 +175,7 @@ public final class ApkArchive {
         rewrite(input, unsignedOutput, replacements);
     }
     /** Extracts only DEX entries into an empty private directory, never into the APK's paths. */
-    public static void buildLvl(File input, File workDirectory, File unsignedOutput) throws IOException {
+    public static String buildLvl(File input, File workDirectory, File unsignedOutput) throws IOException {
         if (workDirectory == null || !workDirectory.isDirectory() || workDirectory.list() == null || workDirectory.list().length != 0)
             throw new IOException("A new empty private working directory is required");
         if (unsignedOutput == null || unsignedOutput.getCanonicalPath().startsWith(workDirectory.getCanonicalPath() + File.separator))
@@ -198,9 +198,28 @@ public final class ApkArchive {
                     files.add(target);
                 }
             }
-            File modified = new File(workDirectory, "modified.dex");
-            int index = LvlEditor.patch(files, modified);
-            rewrite(input, unsignedOutput, Collections.singletonMap(names.get(index), new Source(modified)));
+            // Inspect both supported families, including when they live in the
+            // same DEX. Unknown, incomplete or already modified implementations
+            // never count as a successful removal.
+            Map<String, Source> replacements = new LinkedHashMap<>();
+            boolean classic = false, pairip = false;
+            File classicOutput = new File(workDirectory, "classic-modified.dex");
+            try {
+                int index = LvlEditor.patch(files, classicOutput);
+                files.set(index, classicOutput);
+                replacements.put(names.get(index), new Source(classicOutput));
+                classic = true;
+            } catch (LvlEditor.ClassicNotFoundException absent) { /* Try PairIP too. */ }
+            File pairOutput = new File(workDirectory, "pairip-modified.dex");
+            try {
+                int index = PairIpEditor.patch(files, pairOutput);
+                replacements.put(names.get(index), new Source(pairOutput));
+                pairip = true;
+            } catch (PairIpEditor.PairIpNotFoundException absent) { /* Not a supported PairIP APK. */ }
+            if (!classic && !pairip)
+                throw new IOException("No supported classic LVL or reviewed PairIP license check was found. This APK may use a different, obfuscated, native, or server-side check.");
+            rewrite(input, unsignedOutput, replacements);
+            return classic && pairip ? "classic LVL and reviewed PairIP" : classic ? "classic LVL" : "reviewed PairIP";
         } finally {
             File[] children = workDirectory.listFiles();
             if (children != null) for (File child : children) if (child.isFile()) child.delete();

@@ -133,12 +133,12 @@ private data class MenuSpec(val name: String, val list: Int, val scratch: Int, v
 @Suppress("unused")
 val newPlayLvlPatch = bytecodePatch(
     name = "Remove license (new Google Play LVL method)",
-    description = "Add a new King-Patcher menu entry for selected single APK files using the classic unobfuscated Google Play LVL checker only. The original APK stays untouched; the output is separately signed. Experimental and not yet device-verified.",
+    description = "Add an automatic on-device license-check scanner to King-Patcher. Supports only classic unobfuscated Google Play LVL and the reviewed PairIP client pattern; other checks may remain. Selected single APKs only; output is separately signed. Experimental.",
     default = false,
 ) {
     compatibleWith(compatibility)
     dependsOn(menuDispatcher)
-    execute { addMenuItem(LVL_ID, "Remove license (Google Play LVL)", "New classic LVL method; selected APK only") }
+    execute { addMenuItem(LVL_ID, "Remove license check (automatic)", "Scan for supported LVL and PairIP checks") }
 }
 
 @Suppress("unused")
