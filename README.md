@@ -27,7 +27,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 
 - `Remove license check` — បិទ PairIP license entry points ពីរដែលបានពិនិត្យ **ខាង client**; បើកជាមុន។ វាមិនផ្ដល់ subscription, server entitlement ឬរំលង server/Play Integrity attestation ទេ។
 
-Morphe Manager បាន patch ច្បាប់ចម្លង base APK ក្នុង emulator ហើយ DEX ត្រូវបានពិនិត្យ។ **Release មានតែ base ដែលត្រូវការ splits និងគ្មាន native libraries**; app GenV ពិត និងការរួម splits ពេញមិនទាន់បានសាក។ [របៀបប្រើ និងលទ្ធផល](bundles/genv/README.md) · [Bundle](bundles/genv/bundle.mpp) · [SHA-256](bundles/genv/bundle.mpp.sha256) · [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV)
+Morphe Manager បាន patch ច្បាប់ចម្លង base APK ក្នុង emulator ហើយ DEX ត្រូវបានពិនិត្យ។ **Release មានតែ base ដែលត្រូវការ splits និងគ្មាន native libraries**; app GenV ពិត និងការរួម splits ពេញមិនទាន់បានសាក។ [ទាញយក GenV bundle](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/GenV/GenV-patches-v0.1.0-dev.1.mpp) · [របៀបប្រើ និងលទ្ធផល](bundles/genv/README.md) · [Bundle ក្នុង repository](bundles/genv/bundle.mpp) · [SHA-256](bundles/genv/bundle.mpp.sha256) · [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV)
 
 </details>
 

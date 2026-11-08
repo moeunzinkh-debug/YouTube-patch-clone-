@@ -21,7 +21,7 @@
 
 ## របៀបប្រើ
 
-1. ទាញយក [`bundle.mpp`](bundle.mpp) និង [checksum](bundle.mpp.sha256)។ ក្នុង Morphe Manager ចូល **Sources → Add patch source → Local** ហើយជ្រើស `.mpp`។ Local source មិន update ស្វ័យប្រវត្តិ។
+1. ទាញយក [GenV-patches-v0.1.0-dev.1.mpp ពី pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/GenV/GenV-patches-v0.1.0-dev.1.mpp) និង [checksum](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/GenV/GenV-patches-v0.1.0-dev.1.mpp.sha256) ឬ [`bundle.mpp` ក្នុង repository](bundle.mpp)។ ក្នុង Morphe Manager ចូល **Sources → Add patch source → Local** ហើយជ្រើស `.mpp`។ Local source មិន update ស្វ័យប្រវត្តិ។
 2. នៅ **Sources**, ជ្រើស **GenV patches (experimental)** ហើយបើក **Experimental app versions**។ បើចង់មើល selector ផ្ទាល់ បើក **Settings → Expert mode** ផង។
 3. នៅ **Apps → GenV**, ជ្រើស **No, I already have it** រួចជ្រើសឯកសារ APK/split archive ពេញលេញ ដែលត្រូវនឹង build ខាងលើ។ ពិនិត្យការព្រមានរបស់ Manager និងប្រភពឯកសារ។ ទោះ Manager អាច patch base ក្នុងការសាករបស់យើង ក៏វា **មិនបំពេញ split ដែលបាត់ទេ**។
 4. ពិនិត្យថា **Remove license check** ត្រូវបានជ្រើស រួចចុច **Patch**។ APK ដែល Manager ចុះហត្ថលេខាថ្មីអាចមិនអាច update ពី app ដើមដែលមាន key ផ្សេង។ បម្រុងទុកទិន្នន័យមុនពិចារណាលុប app ចាស់; ការលុបអាចធ្វើឱ្យបាត់ទិន្នន័យ។
@@ -32,6 +32,6 @@
 - [Morphe Manager test](manager-smoke.json) នាំចូល bundle, បើក experimental target និង patch **base ដែលមិនពេញ** ក្នុង Android emulator; លទ្ធផលត្រូវបានពិនិត្យ DEX និង signature ប៉ុន្តែ app ពិតមិនបានដំឡើង ឬបើកទេ។
 - [Synthetic Android test](android-smoke.json) ប្រើ app សិប្បនិម្មិតដែលមាន opcode shape ដូច fingerprint និង counters គ្មានបណ្ដាញ/គណនី។ វាសាកសកម្មភាពមុន/ក្រោយ patch និងបដិសេធ version code ឬ opcode ដែលខុស។ **នេះមិនមែនការសាក runtime របស់ GenV ពិតទេ**។
 - Patch នេះបិទតែ PairIP client entry points ដែលបានពិនិត្យ មិនធានាដក license checks ផ្សេងទៀតទាំងអស់។ វាមិនផ្ដល់ purchase/subscription, server entitlement ឬរំលង server/Play Integrity attestation ទេ។ ការបើក GenV ពិត, login, ការរួម splits និងឥរិយាបថ server/paid features **មិនទាន់បានផ្ទៀងផ្ទាត់**។
-- APK ដើម និង tag `GenV` មិនត្រូវបានកែ ជំនួស ឬផ្លាស់ទី។ ប្រើលើច្បាប់ចម្លង និង app ដែលអ្នកមានសិទ្ធិកែ។
+- APK ដើម និង tag `GenV` មិនត្រូវបានកែ ជំនួស ឬផ្លាស់ទី។ Tag មានស្រាប់ចង្អុលទៅ commit មុន patch ដូច្នេះ source archive នៅ tag នោះ **មិនមាន source ថ្មីនេះទេ**; source បច្ចុប្បន្ននៅ working branch រហូតដល់ merge។ ប្រើលើច្បាប់ចម្លង និង app ដែលអ្នកមានសិទ្ធិកែ។
 
-ប្រភព៖ [`tools/genv/project`](../../tools/genv/project/) · [checksum](bundle.mpp.sha256) · [របាយការណ៍](validation.json)
+Bundle SHA-256: `818c9b0972515d506d06a6f27e08419e68e1e513ecc07a2194b8fbc91227fe26`។ ប្រភព៖ [`tools/genv/project`](../../tools/genv/project/) · [checksum](bundle.mpp.sha256) · [របាយការណ៍](validation.json)
