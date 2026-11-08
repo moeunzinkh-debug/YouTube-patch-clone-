@@ -76,6 +76,27 @@ public final class KingInstrumentation extends Instrumentation {
         StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
         throw new AssertionError("Could not click UI text: " + text + " Visible: " + visible);
     }
+    private void clickExactFile(String filename, long timeout) throws Exception {
+        long end = SystemClock.uptimeMillis() + timeout;
+        while (SystemClock.uptimeMillis() < end) {
+            AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+            if (root != null) for (AccessibilityNodeInfo match : root.findAccessibilityNodeInfosByText(filename)) {
+                CharSequence text = match.getText(), desc = match.getContentDescription();
+                if (!(filename.contentEquals(text == null ? "" : text) || filename.contentEquals(desc == null ? "" : desc))) continue;
+                AccessibilityNodeInfo candidate = match;
+                while (candidate != null) {
+                    if (candidate.isClickable() && candidate.isEnabled()
+                            && candidate.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
+                        SystemClock.sleep(400); return;
+                    }
+                    candidate = candidate.getParent();
+                }
+            }
+            SystemClock.sleep(250);
+        }
+        StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
+        throw new AssertionError("Could not select exact file: " + filename + " Visible: " + visible);
+    }
     private boolean visible(String label) {
         AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
         return root != null && !root.findAccessibilityNodeInfosByText(label).isEmpty();
@@ -246,7 +267,7 @@ public final class KingInstrumentation extends Instrumentation {
             phase("selecting synthetic APK through system document picker");
             click("1. Choose target APK", 15000);
             openDownloadsInPicker();
-            click("king-fixture.apk", 15000);
+            clickExactFile("king-fixture.apk", 15000);
             pickerPhase("after selecting fixture");
             waitForSource(fragment);
         } else {
