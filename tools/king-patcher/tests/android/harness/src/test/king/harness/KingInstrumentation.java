@@ -77,6 +77,12 @@ public final class KingInstrumentation extends Instrumentation {
         }
         throw new AssertionError("Could not click UI text: " + text);
     }
+    private void collectTexts(AccessibilityNodeInfo node, StringBuilder out) {
+        if (node == null || out.length() > 2000) return;
+        CharSequence text = node.getText();
+        if (text != null && text.length() > 0) out.append(text).append(" | ");
+        for (int i = 0; i < node.getChildCount(); i++) collectTexts(node.getChild(i), out);
+    }
     private boolean hasText(android.view.View view, String text) {
         if (view instanceof android.widget.TextView && text.contentEquals(((android.widget.TextView) view).getText())) return true;
         if (view instanceof android.view.ViewGroup) {
@@ -115,34 +121,60 @@ public final class KingInstrumentation extends Instrumentation {
         phase("King menu renderer accepted both labels and colors");
     }
     private Object openTool(int mode) throws Exception {
-        phase("launching King host Activity for mode " + mode);
-        ActivityMonitor monitor = addMonitor("ru.jgaiecip.osuojvyxe.MainActivity", null, false);
-        // The runner starts in the background on Android 10+; ask UiAutomation's shell
-        // to bring the real Activity forward rather than relying on a blocked launch.
-        try (InputStream stream = new android.os.ParcelFileDescriptor.AutoCloseInputStream(
-                getUiAutomation().executeShellCommand("am start -n ru.jgaiecip.osuojvyxe/.MainActivity -f 0x10000000"))) {
-            byte[] bytes = new byte[1024];
-            while (stream.read(bytes) != -1) { /* drain the command output */ }
+        if (host == null) {
+            phase("launching King host Activity for mode " + mode);
+            ActivityMonitor monitor = addMonitor("ru.jgaiecip.osuojvyxe.MainActivity", null, false);
+            // The runner starts in the background on Android 10+; ask UiAutomation's shell
+            // to bring the real Activity forward rather than relying on a blocked launch.
+            try (InputStream stream = new android.os.ParcelFileDescriptor.AutoCloseInputStream(
+                    getUiAutomation().executeShellCommand("am start -n ru.jgaiecip.osuojvyxe/.MainActivity -f 0x10000000"))) {
+                byte[] bytes = new byte[1024];
+                while (stream.read(bytes) != -1) { /* drain the command output */ }
+            }
+            host = waitForMonitorWithTimeout(monitor, 30000);
+            removeMonitor(monitor);
+            if (host == null) throw new AssertionError("King host Activity did not open");
+            phase("King host Activity started for mode " + mode);
+            checkKingRenderer();
         }
-        host = waitForMonitorWithTimeout(monitor, 30000);
-        removeMonitor(monitor);
-        if (host == null) throw new AssertionError("King host Activity did not open");
-        phase("King host Activity started for mode " + mode);
-        if (mode == 2) checkKingRenderer();
-        Class<?> menuClass = getTargetContext().getClassLoader().loadClass("ʽٴ.ᐧᐧ");
+        ClassLoader loader = getTargetContext().getClassLoader();
+        Class<?> menuClass = loader.loadClass("ʽٴ.ᐧᐧ");
         java.lang.reflect.Constructor<?> constructor = menuClass.getDeclaredConstructor(); constructor.setAccessible(true);
         Object menu = constructor.newInstance();
-        Method dispatch = menuClass.getMethod("ˊᵎ", int.class);
+        java.lang.reflect.Field currentMenu = menuClass.getDeclaredField("ʼˋ"); currentMenu.setAccessible(true);
+        Object previousMenu = currentMenu.get(null);
+        Class<?> modelClass = loader.loadClass("ʽᐧ.ˉ");
+        java.lang.reflect.Constructor<?> modelCtor = modelClass.getDeclaredConstructor(
+                int.class, String.class, int.class, String.class, String.class, int.class);
+        modelCtor.setAccessible(true);
         int id = mode == 1 ? 0x7e4d0001 : 0x7e4d0002;
+        String label = mode == 1 ? "Remove license (Google Play LVL)" : "Remove insignificant things";
+        java.util.ArrayList<Object> items = new java.util.ArrayList<>();
+        items.add(modelCtor.newInstance(id, label, 0, "test", "#FFFFFF", 0x7f080083));
+        // Invoke each inspected King click listener with its actual item model; it calls the patched dispatcher.
+        String parentName = mode == 2 ? "ʽᐧ.ʽ$ˊˊ" : "ʽᐧ.ʽ$ˏˏ";
+        Class<?> parent = loader.loadClass(parentName);
+        java.lang.reflect.Constructor<?> parentCtor = mode == 2
+                ? parent.getDeclaredConstructor(java.util.ArrayList.class, boolean.class)
+                : parent.getDeclaredConstructor(java.util.ArrayList.class, boolean.class, String.class);
+        parentCtor.setAccessible(true);
+        Object outer = mode == 2 ? parentCtor.newInstance(items, false) : parentCtor.newInstance(items, false, "test");
+        Class<?> listenerClass = loader.loadClass(parentName + "$ʻ");
+        java.lang.reflect.Constructor<?> listenerCtor = listenerClass.getDeclaredConstructor(parent); listenerCtor.setAccessible(true);
+        Object listener = listenerCtor.newInstance(outer);
+        Method onClick = listenerClass.getDeclaredMethod("onItemClick", android.widget.AdapterView.class,
+                android.view.View.class, int.class, long.class); onClick.setAccessible(true);
         Throwable[] dispatchError = new Throwable[1];
         runOnMainSync(() -> {
             try {
-                dispatch.invoke(menu, id); // Exercise the injected host dispatcher, not just the bridge.
+                currentMenu.set(null, menu);
+                onClick.invoke(listener, null, null, 0, 0L);
                 host.getFragmentManager().executePendingTransactions();
             } catch (Throwable failure) { dispatchError[0] = failure; }
+            finally { try { currentMenu.set(null, previousMenu); } catch (Throwable failure) { dispatchError[0] = failure; } }
         });
-        if (dispatchError[0] != null) throw new AssertionError("Patched dispatcher failed", dispatchError[0]);
-        phase("dispatcher returned for mode " + mode);
+        if (dispatchError[0] != null) throw new AssertionError("King click listener or patched dispatcher failed", dispatchError[0]);
+        phase("King click listener and dispatcher returned for mode " + mode);
         Object fragment = host.getFragmentManager().findFragmentByTag(TAG);
         if (fragment == null || !fragment.getClass().getName().equals(TOOL)) throw new AssertionError("Tool dialog did not open");
         Method load = fragment.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
@@ -162,13 +194,17 @@ public final class KingInstrumentation extends Instrumentation {
         File result = (File) field(activity, "signed");
         if (result == null || !result.isFile() || result.length() == 0) {
             Object message = field(activity, "status");
-            throw new AssertionError("Tool did not produce a verified signed output: " + ((android.widget.TextView) message).getText());
+            StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
+            throw new AssertionError("Tool did not produce a verified signed output: " + ((android.widget.TextView) message).getText() + " " + visible);
         }
         File external = getTargetContext().getExternalFilesDir(null);
         if (external == null) throw new AssertionError("No target app external test directory");
         File output = new File(external, filename); copy(new FileInputStream(result), output);
         if (!Arrays.equals(sha(result), sha(output))) throw new AssertionError("Test output copy mismatch");
-        runOnMainSync(() -> { ((DialogFragment) activity).dismissAllowingStateLoss(); host.getFragmentManager().executePendingTransactions(); host.finish(); });
+        phase("copied signed output " + filename);
+        // King terminates its process when its MainActivity is finished; keep the
+        // same real host alive for both experiments and only dismiss our dialog.
+        runOnMainSync(() -> { ((DialogFragment) activity).dismissAllowingStateLoss(); host.getFragmentManager().executePendingTransactions(); });
         SystemClock.sleep(300);
     }
     @Override public void onStart() {

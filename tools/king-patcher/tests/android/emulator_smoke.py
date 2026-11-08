@@ -71,7 +71,7 @@ def verify_signature(path: Path) -> str:
 def main() -> None:
     report = {'environment': 'Disposable Android emulator; synthetic APKs; original King release asset untouched',
               'king_package': TARGET, 'runtime': 'not completed', 'morphe_manager_ui': 'not tested',
-              'king_menu_navigation': 'not tested; exact injected dispatcher invoked directly',
+              'king_menu_navigation': 'not tested end to end',
               'real_target_apps': 'not tested', 'system_file_picker': 'not tested'}
     try:
         adb('shell', 'input', 'keyevent', 'KEYCODE_WAKEUP')
@@ -84,6 +84,7 @@ def main() -> None:
         (WORK / 'instrument.log').write_text(instrument)
         if 'INSTRUMENTATION_RESULT: status=PASS' not in instrument or 'INSTRUMENTATION_CODE: -1' not in instrument:
             raise AssertionError('Instrumentation failed:\n' + instrument[-6000:])
+        report['king_menu_navigation'] = 'renderer and both click listeners tested with synthetic rows; end-to-end navigation not tested'
         for mode in ('ui', 'lvl'):
             remote = f'/sdcard/Android/data/{TARGET}/files/king-{mode}-fixture.apk'
             adb('pull', remote, str(WORK / f'{mode}-output.apk'), timeout=120)
