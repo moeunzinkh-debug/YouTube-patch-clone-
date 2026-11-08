@@ -62,14 +62,16 @@ def verify_signature(path: Path) -> str:
     dirs = sorted((Path(os.environ['ANDROID_HOME']) / 'build-tools').iterdir(), key=lambda p: [int(x) if x.isdigit() else x for x in re.split(r'([0-9]+)', p.name)])
     tools = dirs[-1]
     output = run(str(tools / 'apksigner'), 'verify', '--min-sdk-version', '23', '--print-certs', str(path), timeout=120)
-    match = re.search(r'Signer #1 certificate SHA-256 digest: ([0-9a-f]+)', output, flags=re.IGNORECASE)
-    if not match: raise AssertionError('No signer fingerprint')
+    signers = {value.lower() for value in re.findall(r'certificate SHA-256 digest:\s*([0-9a-f]{64})', output, flags=re.IGNORECASE)}
+    if len(signers) != 1: raise AssertionError('Expected one signer fingerprint; apksigner output: ' + output[-2500:])
     run(str(tools / 'zipalign'), '-c', '-P', '16', '4', str(path), timeout=120)
-    return match.group(1).lower()
+    return next(iter(signers))
 
 
 def main() -> None:
+    bundle = WORK.parent / 'king-bundle' / 'bundle.mpp'
     report = {'environment': 'Disposable Android emulator; synthetic APKs; original King release asset untouched',
+              'bundle_sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(),
               'king_package': TARGET, 'runtime': 'not completed', 'morphe_manager_ui': 'not tested',
               'king_menu_navigation': 'not tested end to end',
               'real_target_apps': 'not tested', 'system_file_picker': 'not tested'}
@@ -78,6 +80,9 @@ def main() -> None:
         adb('shell', 'wm', 'dismiss-keyguard')
         for name in ('king.apk', 'harness.apk', 'fixture.apk'):
             adb('install', '-r', str(WORK / name), timeout=120)
+        adb('push', str(WORK / 'fixture.apk'), '/sdcard/Download/king-fixture.apk', timeout=120)
+        adb('shell', 'am', 'broadcast', '-a', 'android.intent.action.MEDIA_SCANNER_SCAN_FILE', '-d',
+            'file:///sdcard/Download/king-fixture.apk')
         launch_and_check(('DENIED-561', 'KEEP-ME', 'HIDE-ME'))
         report['baseline_fixture'] = 'denied LVL callback and both UI elements visible'
         instrument = adb('shell', 'am', 'instrument', '-w', '-r', 'test.king.harness/.KingInstrumentation', timeout=360)
@@ -87,7 +92,15 @@ def main() -> None:
         report['king_menu_navigation'] = 'renderer and both click listeners tested with synthetic rows; end-to-end navigation not tested'
         for mode in ('ui', 'lvl'):
             remote = f'/sdcard/Android/data/{TARGET}/files/king-{mode}-fixture.apk'
+            saved = f'/sdcard/Download/king-{mode}-modified.apk'
             adb('pull', remote, str(WORK / f'{mode}-output.apk'), timeout=120)
+            adb('pull', saved, str(WORK / f'{mode}-saved.apk'), timeout=120)
+            if hashlib.sha256((WORK / f'{mode}-output.apk').read_bytes()).digest() != hashlib.sha256((WORK / f'{mode}-saved.apk').read_bytes()).digest():
+                raise AssertionError('System picker output did not match verified APK: ' + mode)
+        original = adb('shell', 'sha256sum', '/sdcard/Download/king-fixture.apk').split()[0]
+        if original != hashlib.sha256((WORK / 'fixture.apk').read_bytes()).hexdigest():
+            raise AssertionError('Original system-picker input was modified')
+        report['system_file_picker'] = 'selected UI input and saved both outputs in Downloads; saved bytes and original SHA-256 checked'
         ui_signer = verify_signature(WORK / 'ui-output.apk')
         lvl_signer = verify_signature(WORK / 'lvl-output.apk')
         if ui_signer != lvl_signer: raise AssertionError('Per-install signing key was not stable')

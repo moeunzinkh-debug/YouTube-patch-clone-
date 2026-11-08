@@ -3,8 +3,6 @@ package test.king.harness;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.Instrumentation;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -77,6 +75,43 @@ public final class KingInstrumentation extends Instrumentation {
         }
         StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
         throw new AssertionError("Could not click UI text: " + text + " Visible: " + visible);
+    }
+    private boolean visible(String label) {
+        AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+        return root != null && !root.findAccessibilityNodeInfosByText(label).isEmpty();
+    }
+    private void openDownloadsInPicker() throws Exception {
+        long deadline = SystemClock.uptimeMillis() + 20000;
+        while (SystemClock.uptimeMillis() < deadline) {
+            AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+            CharSequence pkg = root == null ? null : root.getPackageName();
+            if (pkg != null && pkg.toString().contains("documentsui")) break;
+            SystemClock.sleep(200);
+        }
+        SystemClock.sleep(600);
+        if (visible("Show roots")) { click("Show roots", 5000); click("Downloads", 10000); }
+    }
+    private void waitForSource(Object fragment) throws Exception {
+        long deadline = SystemClock.uptimeMillis() + 45000;
+        while (SystemClock.uptimeMillis() < deadline) {
+            if (field(fragment, "source") != null && !isBusy(fragment)) return;
+            SystemClock.sleep(200);
+        }
+        StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
+        throw new AssertionError("Target APK was not loaded after selection: " + visible);
+    }
+    private void waitForSaved(Object fragment) throws Exception {
+        long deadline = SystemClock.uptimeMillis() + 45000;
+        while (SystemClock.uptimeMillis() < deadline) {
+            String[] message = new String[1];
+            runOnMainSync(() -> { try { message[0] = ((android.widget.TextView) field(fragment, "status")).getText().toString(); }
+                                  catch (Exception e) { message[0] = "status unavailable"; } });
+            if (message[0].startsWith("Saved and SHA-256 verified")) return;
+            if (message[0].startsWith("Operation failed")) break;
+            SystemClock.sleep(200);
+        }
+        StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
+        throw new AssertionError("Saving did not complete: " + visible);
     }
     private void collectTexts(AccessibilityNodeInfo node, StringBuilder out) {
         if (node == null || out.length() > 2000) return;
@@ -195,10 +230,17 @@ public final class KingInstrumentation extends Instrumentation {
         phase("King click listener and dispatcher returned for mode " + mode);
         Object fragment = host.getFragmentManager().findFragmentByTag(TAG);
         if (fragment == null || !fragment.getClass().getName().equals(TOOL)) throw new AssertionError("Tool dialog did not open");
-        Method load = fragment.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
-        runOnMainSync(() -> { try { load.invoke(fragment, Uri.fromFile(input)); } catch (Exception e) { throw new RuntimeException(e); } });
-        waitIdle(fragment, 45000);
-        if (field(fragment, "source") == null) throw new AssertionError("Target APK failed to load");
+        if (mode == 2) {
+            phase("selecting synthetic APK through system document picker");
+            click("1. Choose target APK", 15000);
+            openDownloadsInPicker();
+            click("king-fixture.apk", 15000);
+            waitForSource(fragment);
+        } else {
+            Method load = fragment.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
+            runOnMainSync(() -> { try { load.invoke(fragment, Uri.fromFile(input)); } catch (Exception e) { throw new RuntimeException(e); } });
+            waitForSource(fragment);
+        }
         phase("synthetic target loaded for mode " + mode);
         return fragment;
     }
@@ -215,25 +257,16 @@ public final class KingInstrumentation extends Instrumentation {
             StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
             throw new AssertionError("Tool did not produce a verified signed output: " + ((android.widget.TextView) message).getText() + " " + visible);
         }
+        phase("saving verified output through system document picker");
+        openDownloadsInPicker();
+        click("SAVE", 15000);
+        waitForSaved(activity);
+        phase("system document picker saved and verified " + filename);
         File external = getTargetContext().getExternalFilesDir(null);
         if (external == null) throw new AssertionError("No target app external test directory");
         File output = new File(external, filename); copy(new FileInputStream(result), output);
         if (!Arrays.equals(sha(result), sha(output))) throw new AssertionError("Test output copy mismatch");
         phase("copied signed output " + filename);
-        // Some platform versions launch the system save picker despite the monitor.
-        // Cancel it before moving on to the second dialog.
-        long deadline = SystemClock.uptimeMillis() + 4000;
-        while (SystemClock.uptimeMillis() < deadline) {
-            AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
-            CharSequence pkg = root == null ? null : root.getPackageName();
-            if (pkg != null && pkg.toString().contains("documentsui")) {
-                getUiAutomation().performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
-                SystemClock.sleep(600);
-                phase("cancelled system save picker after direct output copy");
-                break;
-            }
-            SystemClock.sleep(200);
-        }
         // King terminates its process when its MainActivity is finished; keep the
         // same real host alive for both experiments and only dismiss our dialog.
         runOnMainSync(() -> { ((DialogFragment) activity).dismissAllowingStateLoss(); host.getFragmentManager().executePendingTransactions(); });
@@ -243,7 +276,6 @@ public final class KingInstrumentation extends Instrumentation {
         Bundle result = new Bundle();
         try {
             phase("instrumentation started");
-            addMonitor(new IntentFilter(Intent.ACTION_CREATE_DOCUMENT), new ActivityResult(Activity.RESULT_CANCELED, null), true);
             input = new File(getTargetContext().getCacheDir(), "king-synthetic-input.apk");
             copy(getContext().getAssets().open("fixture.apk"), input);
             byte[] before = sha(input);
