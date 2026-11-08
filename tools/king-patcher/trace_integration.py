@@ -20,6 +20,7 @@ TARGETS = {
     'Lʽᐧ/ʽ$ˏˏ;': ('run()V',),
     'Lʽᐧ/ʽ$ˊˊ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
     'Lʽᐧ/ʽ$ˏˏ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
+    'Lʽᐧ/ʽ$ˑˑ;': ('getView(ILandroid/view/View;Landroid/view/ViewGroup;)Landroid/view/View;',),
 }
 
 def trace(decoded: Path) -> dict:
@@ -43,7 +44,8 @@ def trace(decoded: Path) -> dict:
                 cleaned = cleaned[:100] + ['<omitted>'] + cleaned[-70:]
             elif name in ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V',
                           'ٴ(Ljava/util/ArrayList;Z)Landroid/widget/ArrayAdapter;') or (
-                    descriptor in ('Lʽᐧ/ʽ$ˊˊ;', 'Lʽᐧ/ʽ$ˏˏ;') and name == 'run()V'):
+                    descriptor in ('Lʽᐧ/ʽ$ˊˊ;', 'Lʽᐧ/ʽ$ˏˏ;') and name == 'run()V') or (
+                    descriptor == 'Lʽᐧ/ʽ$ˑˑ;' and name.startswith('getView(')):
                 indices = {i for i, line in enumerate(cleaned) if any(token in line for token in
                            ('Lʽᐧ/ˉ;->', 'Landroid/widget/ArrayAdapter;', 'Ljava/util/ArrayList;->get(',
                             'Lʽٴ/ᐧᐧ;->ʽʿ', 'getItem(', 'setText(', 'onItemClick('))}
