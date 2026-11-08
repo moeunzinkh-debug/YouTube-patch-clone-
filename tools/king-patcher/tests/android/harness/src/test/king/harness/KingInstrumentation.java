@@ -81,12 +81,14 @@ public final class KingInstrumentation extends Instrumentation {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         host = startActivitySync(intent);
         if (host == null) throw new AssertionError("King host Activity did not open");
-        Class<?> bridge = getTargetContext().getClassLoader().loadClass("app.morphe.extension.king.MenuBridge");
-        Method handle = bridge.getMethod("handle", Activity.class, int.class);
+        Class<?> menuClass = getTargetContext().getClassLoader().loadClass("ʽٴ.ᐧᐧ");
+        java.lang.reflect.Constructor<?> constructor = menuClass.getDeclaredConstructor(); constructor.setAccessible(true);
+        Object menu = constructor.newInstance();
+        Method dispatch = menuClass.getMethod("ˊᵎ", int.class);
         int id = mode == 1 ? 0x7e4d0001 : 0x7e4d0002;
         runOnMainSync(() -> {
             try {
-                if (!Boolean.TRUE.equals(handle.invoke(null, host, id))) throw new AssertionError("Menu bridge rejected entry");
+                dispatch.invoke(menu, id); // Exercise the injected host dispatcher, not just the bridge.
                 host.getFragmentManager().executePendingTransactions();
             } catch (Exception e) { throw new RuntimeException(e); }
         });

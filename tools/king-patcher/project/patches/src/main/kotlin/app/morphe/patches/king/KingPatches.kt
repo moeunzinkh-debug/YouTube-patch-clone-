@@ -34,6 +34,10 @@ private val menuDispatcher = bytecodePatch {
             "Only the inspected King-Patcher 12.10.10 / 1980 is supported"
         }
         val fragment = mutableClassDefBy(FRAGMENT)
+        require(fragment.fields.any { it.name == "ʼﹶ" && it.type == "Lru/jgaiecip/osuojvyxe/MainActivity;" &&
+            AccessFlags.STATIC.isSet(it.accessFlags) && AccessFlags.PUBLIC.isSet(it.accessFlags) }) {
+            "Reviewed King host Activity field not found"
+        }
         val dispatch = fragment.methods.singleOrNull { method ->
             method.name == "ˊᵎ" && method.returnType == "V" &&
                 method.parameterTypes.map { it.toString() } == listOf("I") && !AccessFlags.STATIC.isSet(method.accessFlags)
@@ -51,8 +55,7 @@ private val menuDispatcher = bytecodePatch {
             (instruction as? com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction)?.narrowLiteral in setOf(LVL_ID, UI_ID)
         }) { "Experimental menu IDs already in use" }
         dispatch.addInstructionsWithLabels(0, """
-            invoke-virtual/range {p0 .. p0}, Landroidx/fragment/app/Fragment;->getActivity()Landroidx/fragment/app/FragmentActivity;
-            move-result-object v0
+            sget-object v0, $FRAGMENT->ʼﹶ:Lru/jgaiecip/osuojvyxe/MainActivity;
             move/from16 v3, p1
             invoke-static {v0, v3}, $BRIDGE->handle(Landroid/app/Activity;I)Z
             move-result v0
