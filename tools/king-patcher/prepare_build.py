@@ -16,6 +16,9 @@ def prepare(destination: Path) -> None:
     for name in ('gradlew', 'gradlew.bat', 'build.gradle.kts'):
         shutil.copy2(ROOT / name, destination / name)
     shutil.copytree(ROOT / 'gradle', destination / 'gradle')
+    wrapper = destination / 'gradle/wrapper/gradle-wrapper.properties'
+    wrapper_text = wrapper.read_text().replace('networkTimeout=10000', 'networkTimeout=60000').replace('retries=0', 'retries=2')
+    wrapper.write_text(wrapper_text)
     settings = (ROOT / 'settings.gradle.kts').read_text()
     marker = '// Include morphe-patcher as composite builds'
     if settings.count(marker) != 1 or settings.count('rootProject.name = "youtube-patch-clone"') != 1:

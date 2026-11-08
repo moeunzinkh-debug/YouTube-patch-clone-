@@ -47,7 +47,8 @@ jobs:
         shell: bash
         run: |
           if test -f "$RUNNER_TEMP/king-build.log"; then
-            grep -E -A 5 '^e:|^error:| error:|What went wrong|Execution failed|Could not|FAILED|FAILURE:' "$RUNNER_TEMP/king-build.log" | tail -45 | while IFS= read -r line; do echo "::error::$line"; done || true
+            grep -Ei -A 5 '^e:|^error:| error:|what went wrong|execution failed|could not|failed|failure:|exception|timeout|timed out' "$RUNNER_TEMP/king-build.log" | tail -45 | while IFS= read -r line; do echo "::error::$line"; done || true
+            tail -15 "$RUNNER_TEMP/king-build.log" | while IFS= read -r line; do echo "::notice::$line"; done
           fi
       - name: Verify bundle and selector listing
         shell: bash
