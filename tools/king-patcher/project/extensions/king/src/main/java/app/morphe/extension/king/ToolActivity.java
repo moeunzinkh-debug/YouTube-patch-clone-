@@ -224,6 +224,9 @@ public final class ToolActivity extends Activity {
                 });
             } catch (Exception error) {
                 unsigned.delete(); result.delete(); deleteTree(work); failAsync(error);
+            } catch (LinkageError incompatible) {
+                unsigned.delete(); result.delete(); deleteTree(work);
+                failAsync(new IOException("The installed King library ABI is incompatible; no APK was exported", incompatible));
             }
         });
     }

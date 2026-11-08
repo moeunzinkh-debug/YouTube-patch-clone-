@@ -1,0 +1,127 @@
+package test.king.harness;
+
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.SystemClock;
+import android.view.accessibility.AccessibilityNodeInfo;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/** Runs inside the disposable patched King's process with its actual embedded libraries. */
+public final class KingInstrumentation extends Instrumentation {
+    private static final String TOOL = "app.morphe.extension.king.ToolActivity";
+    private static final String MODE = "app.morphe.king.MODE";
+    private File input;
+
+    @Override public void onCreate(Bundle arguments) { super.onCreate(arguments); start(); }
+    private static void copy(InputStream source, File target) throws Exception {
+        try (InputStream in = source; OutputStream out = new FileOutputStream(target)) {
+            byte[] buffer = new byte[32768]; int n; while ((n = in.read(buffer)) != -1) if (n > 0) out.write(buffer, 0, n);
+        }
+    }
+    private static byte[] sha(File file) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try (InputStream in = new FileInputStream(file)) { byte[] b = new byte[32768]; int n; while ((n = in.read(b)) != -1) if (n > 0) digest.update(b, 0, n); }
+        return digest.digest();
+    }
+    private static Object field(Object target, String name) throws Exception {
+        Field f = target.getClass().getDeclaredField(name); f.setAccessible(true); return f.get(target);
+    }
+    private boolean isBusy(Activity activity) throws Exception {
+        AtomicBoolean result = new AtomicBoolean();
+        runOnMainSync(() -> { try { result.set((Boolean) field(activity, "busy")); } catch (Exception e) { throw new RuntimeException(e); } });
+        return result.get();
+    }
+    private void waitIdle(Activity activity, long timeout) throws Exception {
+        long end = SystemClock.uptimeMillis() + timeout;
+        while (SystemClock.uptimeMillis() < end) {
+            if (!isBusy(activity)) return;
+            SystemClock.sleep(200);
+        }
+        throw new AssertionError("Timed out waiting for tool operation");
+    }
+    private void click(String text, long timeout) throws Exception {
+        long end = SystemClock.uptimeMillis() + timeout;
+        while (SystemClock.uptimeMillis() < end) {
+            AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+            if (root != null) {
+                List<AccessibilityNodeInfo> matches = root.findAccessibilityNodeInfosByText(text);
+                for (AccessibilityNodeInfo match : matches) {
+                    AccessibilityNodeInfo candidate = match;
+                    while (candidate != null) {
+                        if (candidate.isClickable() && candidate.isEnabled()
+                                && candidate.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
+                            SystemClock.sleep(400); return;
+                        }
+                        candidate = candidate.getParent();
+                    }
+                }
+            }
+            SystemClock.sleep(250);
+        }
+        throw new AssertionError("Could not click UI text: " + text);
+    }
+    private Activity openTool(int mode) throws Exception {
+        Intent intent = new Intent().setClassName(getTargetContext(), TOOL).putExtra(MODE, mode)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Activity activity = startActivitySync(intent);
+        if (activity == null || !activity.getClass().getName().equals(TOOL)) throw new AssertionError("Tool Activity did not open");
+        Method load = activity.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
+        runOnMainSync(() -> { try { load.invoke(activity, Uri.fromFile(input)); } catch (Exception e) { throw new RuntimeException(e); } });
+        waitIdle(activity, 45000);
+        if (field(activity, "source") == null) throw new AssertionError("Target APK failed to load");
+        return activity;
+    }
+    private void createOutput(Activity activity, String createLabel, String filename) throws Exception {
+        click(createLabel, 15000);
+        click("Continue", 15000);
+        waitIdle(activity, 120000);
+        File result = (File) field(activity, "signed");
+        if (result == null || !result.isFile() || result.length() == 0)
+            throw new AssertionError("Tool did not produce a verified signed output; see UI status");
+        File external = getTargetContext().getExternalFilesDir(null);
+        if (external == null) throw new AssertionError("No target app external test directory");
+        File output = new File(external, filename); copy(new FileInputStream(result), output);
+        if (!Arrays.equals(sha(result), sha(output))) throw new AssertionError("Test output copy mismatch");
+        runOnMainSync(activity::finish);
+        SystemClock.sleep(300);
+    }
+    @Override public void onStart() {
+        Bundle result = new Bundle();
+        try {
+            addMonitor(new IntentFilter(Intent.ACTION_CREATE_DOCUMENT), new ActivityResult(Activity.RESULT_CANCELED, null), true);
+            input = new File(getTargetContext().getCacheDir(), "king-synthetic-input.apk");
+            copy(getContext().getAssets().open("fixture.apk"), input);
+            byte[] before = sha(input);
+            Activity ui = openTool(2);
+            click("2. Select layout elements", 15000);
+            click("res/layout/activity_main.xml", 15000);
+            click("HIDE-ME", 15000);
+            click("Save selection", 15000);
+            createOutput(ui, "3. Create modified APK", "king-ui-fixture.apk");
+            Activity lvl = openTool(1);
+            createOutput(lvl, "2. Create modified APK", "king-lvl-fixture.apk");
+            if (!Arrays.equals(before, sha(input))) throw new AssertionError("Input fixture was modified");
+            result.putString("status", "PASS");
+            result.putString("coverage", "Manual layout selection, classic LVL rewrite, host libraries, Android Keystore signing and verification on synthetic APKs");
+            finish(Activity.RESULT_OK, result);
+        } catch (Throwable failure) {
+            java.io.StringWriter text = new java.io.StringWriter(); failure.printStackTrace(new java.io.PrintWriter(text));
+            result.putString("status", "FAIL"); result.putString("error", text.toString());
+            finish(Activity.RESULT_CANCELED, result);
+        }
+    }
+}

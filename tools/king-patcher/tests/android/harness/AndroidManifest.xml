@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="test.king.harness">
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="28"/>
+    <application android:label="King test harness" android:debuggable="true"/>
+    <instrumentation android:name="test.king.harness.KingInstrumentation"
+        android:targetPackage="ru.jgaiecip.osuojvyxe" android:label="Disposable King tool smoke"/>
+</manifest>

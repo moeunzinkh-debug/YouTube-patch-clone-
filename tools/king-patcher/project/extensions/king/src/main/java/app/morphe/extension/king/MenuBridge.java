@@ -16,7 +16,7 @@ public final class MenuBridge {
         try {
             Intent intent = new Intent(activity, ToolActivity.class).putExtra(ToolActivity.EXTRA_MODE, mode);
             activity.startActivity(intent);
-        } catch (RuntimeException error) {
+        } catch (RuntimeException | LinkageError error) {
             Toast.makeText(activity, "Unable to open the experimental APK tool", Toast.LENGTH_LONG).show();
         }
         return true;

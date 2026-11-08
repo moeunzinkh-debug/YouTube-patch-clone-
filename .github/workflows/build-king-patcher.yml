@@ -87,7 +87,13 @@ jobs:
             if ! java -Xmx4g -jar "$cli" patch "$input" --patches "$RUNNER_TEMP/king-output/bundle.mpp" \
                  --exclusive "${selectors[@]}" --unsigned --bytecode-mode FULL --result-file "$RUNNER_TEMP/king-output/$mode-result.json" \
                  --out "$RUNNER_TEMP/king-tools/$mode.apk" > "$RUNNER_TEMP/king-$mode.log" 2>&1; then
-              tail -40 "$RUNNER_TEMP/king-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
+              python3 - "$RUNNER_TEMP/king-$mode.log" "$RUNNER_TEMP/king-output/$mode-result.json" <<'PY'
+          import base64, gzip, pathlib, sys
+          paths = [pathlib.Path(p) for p in sys.argv[1:]]
+          text = '\n'.join('\n'.join(p.read_text(errors='replace').splitlines()[-100:]) for p in paths if p.exists())
+          payload = base64.b64encode(gzip.compress(text.encode())).decode()
+          print('::error::KING_PATCH_LOG ' + payload[:30000])
+          PY
               exit 1
             fi
             test -s "$RUNNER_TEMP/king-tools/$mode.apk"
