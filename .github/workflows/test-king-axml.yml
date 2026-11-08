@@ -1,0 +1,78 @@
+name: Test King-Patcher binary XML editor
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - 'tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/AxmlEditor.java'
+      - 'tools/king-patcher/tests/AxmlEditorTestMain.java'
+      - 'tools/king-patcher/tests/AxmlEditorCli.java'
+      - '.github/workflows/test-king-axml.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  axml:
+    if: contains(github.event.head_commit.message, '[king-axml-test]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Run in-memory binary XML guard tests
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/classes"
+          javac -d "$RUNNER_TEMP/classes" \
+            tools/king-patcher/project/extensions/king/src/main/java/app/morphe/extension/king/AxmlEditor.java \
+            tools/king-patcher/tests/{AxmlEditorTestMain.java,AxmlEditorCli.java}
+          java -cp "$RUNNER_TEMP/classes" AxmlEditorTestMain
+      - name: Test actual AAPT2-compiled Android layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="$ANDROID_HOME"
+          tools_dir="$(find "$sdk/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          platform="$(find "$sdk/platforms" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          test -x "$tools_dir/aapt2" && test -f "$platform/android.jar"
+          work="$RUNNER_TEMP/axml-fixture"
+          mkdir -p "$work/res/layout" "$work/compiled"
+          cat > "$work/AndroidManifest.xml" <<'XML'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="test.king.axml">
+            <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="28" />
+            <application android:label="AXML fixture" />
+          </manifest>
+          XML
+          cat > "$work/res/layout/activity_main.xml" <<'XML'
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+            <Button android:id="@+id/hide_me" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hide me" />
+            <TextView android:id="@+id/already_visible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="visible" android:text="Also hide" />
+            <TextView android:id="@+id/keep_me" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Keep me" />
+          </LinearLayout>
+          XML
+          "$tools_dir/aapt2" compile -o "$work/compiled" "$work/res/layout/activity_main.xml"
+          "$tools_dir/aapt2" link -I "$platform/android.jar" --manifest "$work/AndroidManifest.xml" \
+            -o "$work/original.apk" "$work/compiled/layout_activity_main.xml.flat"
+          unzip -p "$work/original.apk" res/layout/activity_main.xml > "$work/original.xml"
+          java -cp "$RUNNER_TEMP/classes" AxmlEditorCli list "$work/original.xml" | tee "$work/list.txt"
+          grep -q '1 1 Button' "$work/list.txt"
+          java -cp "$RUNNER_TEMP/classes" AxmlEditorCli hide "$work/original.xml" "$work/modified.xml" 1 2
+          python3 - "$work" <<'PY'
+          import sys, zipfile
+          from pathlib import Path
+          work=Path(sys.argv[1])
+          with zipfile.ZipFile(work/'original.apk') as src, zipfile.ZipFile(work/'modified.apk','w') as dst:
+              for info in src.infolist():
+                  data=(work/'modified.xml').read_bytes() if info.filename=='res/layout/activity_main.xml' else src.read(info)
+                  dst.writestr(info,data)
+          PY
+          "$tools_dir/aapt2" dump xmltree "$work/modified.apk" --file res/layout/activity_main.xml > "$work/dump.txt"
+          cat "$work/dump.txt"
+          test "$(grep -c 'visibility.*(0x010100dc).*0x00000008' "$work/dump.txt")" -eq 2
+          grep -q 'Keep me' "$work/dump.txt"
+          echo '::notice::AAPT2 parsed both modified controls as GONE and the untouched label remains'
