@@ -75,7 +75,8 @@ public final class KingInstrumentation extends Instrumentation {
             }
             SystemClock.sleep(250);
         }
-        throw new AssertionError("Could not click UI text: " + text);
+        StringBuilder visible = new StringBuilder(); collectTexts(getUiAutomation().getRootInActiveWindow(), visible);
+        throw new AssertionError("Could not click UI text: " + text + " Visible: " + visible);
     }
     private void collectTexts(AccessibilityNodeInfo node, StringBuilder out) {
         if (node == null || out.length() > 2000) return;
@@ -120,6 +121,22 @@ public final class KingInstrumentation extends Instrumentation {
         if (error[0] != null) throw new AssertionError("King menu renderer failed", error[0]);
         phase("King menu renderer accepted both labels and colors");
     }
+    private void checkKingLvlLibrary() throws Exception {
+        phase("testing King embedded LVL editor ABI");
+        File dex = new File(getTargetContext().getCacheDir(), "king-test-input.dex");
+        File patched = new File(getTargetContext().getCacheDir(), "king-test-output.dex");
+        dex.delete(); patched.delete();
+        try (java.util.zip.ZipFile zip = new java.util.zip.ZipFile(input)) {
+            copy(zip.getInputStream(zip.getEntry("classes.dex")), dex);
+        }
+        try {
+            Class<?> editor = getTargetContext().getClassLoader().loadClass("app.morphe.extension.king.LvlEditor");
+            Method patch = editor.getMethod("patch", java.util.List.class, File.class);
+            patch.invoke(null, java.util.Collections.singletonList(dex), patched);
+            if (!patched.isFile() || patched.length() == 0) throw new AssertionError("LVL editor returned no DEX");
+        } finally { dex.delete(); patched.delete(); }
+        phase("King embedded LVL editor ABI succeeded");
+    }
     private Object openTool(int mode) throws Exception {
         if (host == null) {
             phase("launching King host Activity for mode " + mode);
@@ -136,6 +153,7 @@ public final class KingInstrumentation extends Instrumentation {
             if (host == null) throw new AssertionError("King host Activity did not open");
             phase("King host Activity started for mode " + mode);
             checkKingRenderer();
+            checkKingLvlLibrary();
         }
         ClassLoader loader = getTargetContext().getClassLoader();
         Class<?> menuClass = loader.loadClass("ʽٴ.ᐧᐧ");
@@ -202,6 +220,20 @@ public final class KingInstrumentation extends Instrumentation {
         File output = new File(external, filename); copy(new FileInputStream(result), output);
         if (!Arrays.equals(sha(result), sha(output))) throw new AssertionError("Test output copy mismatch");
         phase("copied signed output " + filename);
+        // Some platform versions launch the system save picker despite the monitor.
+        // Cancel it before moving on to the second dialog.
+        long deadline = SystemClock.uptimeMillis() + 4000;
+        while (SystemClock.uptimeMillis() < deadline) {
+            AccessibilityNodeInfo root = getUiAutomation().getRootInActiveWindow();
+            CharSequence pkg = root == null ? null : root.getPackageName();
+            if (pkg != null && pkg.toString().contains("documentsui")) {
+                getUiAutomation().performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK);
+                SystemClock.sleep(600);
+                phase("cancelled system save picker after direct output copy");
+                break;
+            }
+            SystemClock.sleep(200);
+        }
         // King terminates its process when its MainActivity is finished; keep the
         // same real host alive for both experiments and only dismiss our dialog.
         runOnMainSync(() -> { ((DialogFragment) activity).dismissAllowingStateLoss(); host.getFragmentManager().executePendingTransactions(); });
