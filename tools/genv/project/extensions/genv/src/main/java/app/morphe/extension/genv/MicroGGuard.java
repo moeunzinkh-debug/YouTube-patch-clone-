@@ -14,6 +14,9 @@ public final class MicroGGuard {
     private static final String PACKAGE = "app.revanced.android.gms";
     private static final String SIGN_IN_SERVICE =
             "app.revanced.android.gms.auth.api.signin.service.START";
+    private static final String SIGN_IN_ACTIVITY = "app.revanced.android.gms.auth.GOOGLE_SIGN_IN";
+    private static final String EXPECTED_SERVICE = "org.microg.gms.auth.signin.AuthSignInService";
+    private static final String EXPECTED_ACTIVITY = "org.microg.gms.auth.signin.AuthSignInActivity";
 
     // APK signer certificate of the pinned MorpheApp/MicroG-RE 7.2.2 and 7.3.0
     // arm64 releases (SHA-256), NOT the source-stamp certificate.
@@ -39,10 +42,14 @@ public final class MicroGGuard {
             byte[] actual = MessageDigest.getInstance("SHA-256").digest(signatures[0].toByteArray());
             if (!MessageDigest.isEqual(SIGNER_SHA256, actual)) return false;
 
-            Intent intent = new Intent(SIGN_IN_SERVICE).setPackage(PACKAGE);
-            ResolveInfo result = pm.resolveService(intent, 0);
-            return result != null && result.serviceInfo != null && result.serviceInfo.enabled
-                    && result.serviceInfo.exported && PACKAGE.equals(result.serviceInfo.packageName);
+            ResolveInfo service = pm.resolveService(new Intent(SIGN_IN_SERVICE).setPackage(PACKAGE), 0);
+            if (service == null || service.serviceInfo == null || !service.serviceInfo.enabled
+                    || !service.serviceInfo.exported || !PACKAGE.equals(service.serviceInfo.packageName)
+                    || !EXPECTED_SERVICE.equals(service.serviceInfo.name)) return false;
+            ResolveInfo activity = pm.resolveActivity(new Intent(SIGN_IN_ACTIVITY).setPackage(PACKAGE), 0);
+            return activity != null && activity.activityInfo != null && activity.activityInfo.enabled
+                    && activity.activityInfo.exported && PACKAGE.equals(activity.activityInfo.packageName)
+                    && EXPECTED_ACTIVITY.equals(activity.activityInfo.name);
         } catch (Exception | LinkageError ignored) {
             // No credentials, account data, or exception contents are logged.
             return false;
