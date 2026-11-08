@@ -1,0 +1,77 @@
+name: GenV synthetic PairIP Android runtime test
+
+on:
+  push:
+    branches: [arena/02093a53-youtube-patch-clone]
+    paths:
+      - 'tools/genv/tests/android/**'
+      - '.github/workflows/test-genv-android.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  android:
+    if: contains(github.event.head_commit.message, '[genv-android]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Obtain source-matched tested MPP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/genv-android" "$RUNNER_TEMP/genv-android-bundle"
+          run="$(python3 tools/king-patcher/find_successful_run.py \
+            arena/02093a53-youtube-patch-clone build-genv-mpp.yml \
+            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
+          gh run download "$run" --name genv-morphe-bundle-static-only --dir "$RUNNER_TEMP/genv-android-bundle"
+          python3 tools/genv/verify_bundle.py --mpp "$RUNNER_TEMP/genv-android-bundle/bundle.mpp" --listing "$RUNNER_TEMP/genv-android-bundle/patches.txt"
+      - name: Compile synthetic fixture and check negative fingerprints
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! bash tools/genv/tests/android/prepare_fixture.sh "$RUNNER_TEMP/genv-android" \
+            "$RUNNER_TEMP/genv-android-bundle/bundle.mpp" > "$RUNNER_TEMP/genv-android/setup.log" 2>&1; then
+            python3 - "$RUNNER_TEMP/genv-android" <<'PY'
+          import base64,gzip,pathlib,sys
+          root=pathlib.Path(sys.argv[1]); files=['setup.log','patch.log','wrong-version.log','wrong-shape.log']
+          text='\n'.join('\n'.join((root/f).read_text(errors='replace').splitlines()[-50:]) for f in files if (root/f).exists())
+          print('::error::GENV_SYNTHETIC_SETUP '+base64.b64encode(gzip.compress(text.encode())).decode()[:30000])
+          PY
+            exit 1
+          fi
+          echo '::notice::Synthetic wrong-version and changed-opcode fingerprints were rejected.'
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Execute synthetic baseline and patched fixture, never the real GenV app
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          cores: 2
+          ram-size: 3072M
+          heap-size: 512M
+          disk-size: 8G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/genv/tests/android/emulator_smoke.py "$RUNNER_TEMP/genv-android" "$RUNNER_TEMP/genv-android-bundle/bundle.mpp" "$RUNNER_TEMP/genv-android/android-smoke.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: genv-synthetic-android-report
+          if-no-files-found: error
+          path: ${{ runner.temp }}/genv-android/android-smoke.json

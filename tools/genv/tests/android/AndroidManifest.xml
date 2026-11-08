@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ainate.ai.video.generate" android:versionCode="163" android:versionName="3.7.2">
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="28" />
+    <application android:name="com.pairip.application.Application"
+        android:label="GenV synthetic PairIP test" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <provider android:name="com.pairip.licensecheck.LicenseContentProvider"
+            android:authorities="test.genv.synthetic.provider" android:exported="false" />
+        <activity android:name="test.genv.MainActivity" android:exported="true">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+    </application>
+</manifest>
