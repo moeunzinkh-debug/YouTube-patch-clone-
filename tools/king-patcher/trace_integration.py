@@ -14,9 +14,12 @@ TARGETS = {
     'Lʽٴ/ᐧᐧ;': ('ˆʻ()V', 'ˆˎ()V', 'ˊᵎ(I)V'),
     'Lru/jgaiecip/osuojvyxe/MainActivity;': ('onActivityResult(IILandroid/content/Intent;)V',
                                               'onCreate(Landroid/os/Bundle;)V'),
-    'Lʽᐧ/ʽ;': ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V'),
+    'Lʽᐧ/ʽ;': ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V',
+                 'ٴ(Ljava/util/ArrayList;Z)Landroid/widget/ArrayAdapter;'),
     'Lʽᐧ/ʽ$ˊˊ;': ('run()V',),
     'Lʽᐧ/ʽ$ˏˏ;': ('run()V',),
+    'Lʽᐧ/ʽ$ˊˊ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
+    'Lʽᐧ/ʽ$ˏˏ$ʻ;': ('onItemClick(Landroid/widget/AdapterView;Landroid/view/View;IJ)V',),
 }
 
 def trace(decoded: Path) -> dict:
@@ -38,7 +41,8 @@ def trace(decoded: Path) -> dict:
                 cleaned = cleaned[:100]
             elif name in ('ˆʻ()V', 'ˆˎ()V'):
                 cleaned = cleaned[:100] + ['<omitted>'] + cleaned[-70:]
-            elif name in ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V') or (
+            elif name in ('ʾʾ(Ljava/util/ArrayList;Z)V', 'ʿʿ(Ljava/lang/String;Ljava/util/ArrayList;Z)V',
+                          'ٴ(Ljava/util/ArrayList;Z)Landroid/widget/ArrayAdapter;') or (
                     descriptor in ('Lʽᐧ/ʽ$ˊˊ;', 'Lʽᐧ/ʽ$ˏˏ;') and name == 'run()V'):
                 indices = {i for i, line in enumerate(cleaned) if any(token in line for token in
                            ('Lʽᐧ/ˉ;->', 'Landroid/widget/ArrayAdapter;', 'Ljava/util/ArrayList;->get(',
