@@ -31,7 +31,7 @@ def verify(bundle: Path, listing: str) -> dict:
         extension = archive.read('extensions/king.mpe')
         if 'classes.dex' not in names or not extension.startswith(b'dex\n'):
             raise ValueError('Patch or extension DEX missing')
-        for needed in (b'Lapp/morphe/extension/king/ToolActivity;', b'Lapp/morphe/extension/king/LvlEditor;',
+        for needed in (b'Lapp/morphe/extension/king/ToolFragment;', b'Lapp/morphe/extension/king/LvlEditor;',
                        b'Lapp/morphe/extension/king/AxmlEditor;', b'Lapp/morphe/extension/king/ApkSignerBridge;'):
             if needed not in extension:
                 raise ValueError('Extension class missing')

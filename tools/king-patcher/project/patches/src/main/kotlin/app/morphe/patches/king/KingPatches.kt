@@ -5,7 +5,6 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLa
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.patcher.patch.resourcePatch
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
@@ -14,14 +13,11 @@ import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.TypeReference
-import org.w3c.dom.Element
 
 private const val PACKAGE = "ru.jgaiecip.osuojvyxe"
 private const val FRAGMENT = "Lʽٴ/ᐧᐧ;"
 private const val MODEL = "Lʽᐧ/ˉ;"
 private const val BRIDGE = "Lapp/morphe/extension/king/MenuBridge;"
-private const val ACTIVITY = "app.morphe.extension.king.ToolActivity"
-private const val ANDROID_NS = "http://schemas.android.com/apk/res/android"
 private const val LVL_ID = 0x7e4d0001
 private const val UI_ID = 0x7e4d0002
 private val compatibility = Compatibility(
@@ -31,34 +27,8 @@ private val compatibility = Compatibility(
 
 private val kingExtension = bytecodePatch { extendWith("extensions/king.mpe") }
 
-private val toolManifest = resourcePatch {
-    execute {
-        require(packageMetadata.versionName == "12.10.10" && packageMetadata.versionCode == "1980") {
-            "Only the inspected King-Patcher 12.10.10 / 1980 is supported"
-        }
-        document("AndroidManifest.xml").use { document ->
-            val root = document.documentElement
-            require(root.tagName == "manifest" && root.getAttribute("package") == PACKAGE) { "Unexpected manifest package" }
-            val application = root.getElementsByTagName("application").item(0) as? Element
-                ?: error("Application element missing")
-            val activities = application.getElementsByTagName("activity")
-            require((0 until activities.length).none { index ->
-                val element = activities.item(index) as Element
-                element.getAttributeNS(ANDROID_NS, "name") == ACTIVITY || element.getAttribute("android:name") == ACTIVITY
-            }) { "Experimental tool Activity already exists" }
-            application.appendChild(document.createElement("activity").apply {
-                setAttributeNS(ANDROID_NS, "android:name", ACTIVITY)
-                setAttributeNS(ANDROID_NS, "android:exported", "false")
-                setAttributeNS(ANDROID_NS, "android:configChanges", "orientation|screenSize|keyboardHidden")
-                setAttributeNS(ANDROID_NS, "android:label", "APK patch tools")
-            })
-        }
-    }
-}
-
 private val menuDispatcher = bytecodePatch {
     dependsOn(kingExtension)
-    dependsOn(toolManifest)
     execute {
         require(packageMetadata.versionName == "12.10.10" && packageMetadata.versionCode == "1980") {
             "Only the inspected King-Patcher 12.10.10 / 1980 is supported"

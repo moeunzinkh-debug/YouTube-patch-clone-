@@ -1,6 +1,7 @@
 package test.king.harness;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -22,9 +23,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Runs inside the disposable patched King's process with its actual embedded libraries. */
 public final class KingInstrumentation extends Instrumentation {
-    private static final String TOOL = "app.morphe.extension.king.ToolActivity";
-    private static final String MODE = "app.morphe.king.MODE";
+    private static final String TOOL = "app.morphe.extension.king.ToolFragment";
+    private static final String TAG = "app.morphe.king.tool";
     private File input;
+    private Activity host;
 
     @Override public void onCreate(Bundle arguments) { super.onCreate(arguments); start(); }
     private static void copy(InputStream source, File target) throws Exception {
@@ -40,12 +42,12 @@ public final class KingInstrumentation extends Instrumentation {
     private static Object field(Object target, String name) throws Exception {
         Field f = target.getClass().getDeclaredField(name); f.setAccessible(true); return f.get(target);
     }
-    private boolean isBusy(Activity activity) throws Exception {
+    private boolean isBusy(Object activity) throws Exception {
         AtomicBoolean result = new AtomicBoolean();
         runOnMainSync(() -> { try { result.set((Boolean) field(activity, "busy")); } catch (Exception e) { throw new RuntimeException(e); } });
         return result.get();
     }
-    private void waitIdle(Activity activity, long timeout) throws Exception {
+    private void waitIdle(Object activity, long timeout) throws Exception {
         long end = SystemClock.uptimeMillis() + timeout;
         while (SystemClock.uptimeMillis() < end) {
             if (!isBusy(activity)) return;
@@ -74,18 +76,29 @@ public final class KingInstrumentation extends Instrumentation {
         }
         throw new AssertionError("Could not click UI text: " + text);
     }
-    private Activity openTool(int mode) throws Exception {
-        Intent intent = new Intent().setClassName(getTargetContext(), TOOL).putExtra(MODE, mode)
+    private Object openTool(int mode) throws Exception {
+        Intent intent = new Intent().setClassName(getTargetContext(), "ru.jgaiecip.osuojvyxe.MainActivity")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        Activity activity = startActivitySync(intent);
-        if (activity == null || !activity.getClass().getName().equals(TOOL)) throw new AssertionError("Tool Activity did not open");
-        Method load = activity.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
-        runOnMainSync(() -> { try { load.invoke(activity, Uri.fromFile(input)); } catch (Exception e) { throw new RuntimeException(e); } });
-        waitIdle(activity, 45000);
-        if (field(activity, "source") == null) throw new AssertionError("Target APK failed to load");
-        return activity;
+        host = startActivitySync(intent);
+        if (host == null) throw new AssertionError("King host Activity did not open");
+        Class<?> bridge = getTargetContext().getClassLoader().loadClass("app.morphe.extension.king.MenuBridge");
+        Method handle = bridge.getMethod("handle", Activity.class, int.class);
+        int id = mode == 1 ? 0x7e4d0001 : 0x7e4d0002;
+        runOnMainSync(() -> {
+            try {
+                if (!Boolean.TRUE.equals(handle.invoke(null, host, id))) throw new AssertionError("Menu bridge rejected entry");
+                host.getFragmentManager().executePendingTransactions();
+            } catch (Exception e) { throw new RuntimeException(e); }
+        });
+        Object fragment = host.getFragmentManager().findFragmentByTag(TAG);
+        if (fragment == null || !fragment.getClass().getName().equals(TOOL)) throw new AssertionError("Tool dialog did not open");
+        Method load = fragment.getClass().getDeclaredMethod("load", Uri.class); load.setAccessible(true);
+        runOnMainSync(() -> { try { load.invoke(fragment, Uri.fromFile(input)); } catch (Exception e) { throw new RuntimeException(e); } });
+        waitIdle(fragment, 45000);
+        if (field(fragment, "source") == null) throw new AssertionError("Target APK failed to load");
+        return fragment;
     }
-    private void createOutput(Activity activity, String createLabel, String filename) throws Exception {
+    private void createOutput(Object activity, String createLabel, String filename) throws Exception {
         click(createLabel, 15000);
         click("Continue", 15000);
         waitIdle(activity, 120000);
@@ -96,7 +109,7 @@ public final class KingInstrumentation extends Instrumentation {
         if (external == null) throw new AssertionError("No target app external test directory");
         File output = new File(external, filename); copy(new FileInputStream(result), output);
         if (!Arrays.equals(sha(result), sha(output))) throw new AssertionError("Test output copy mismatch");
-        runOnMainSync(activity::finish);
+        runOnMainSync(() -> { ((DialogFragment) activity).dismissAllowingStateLoss(); host.getFragmentManager().executePendingTransactions(); host.finish(); });
         SystemClock.sleep(300);
     }
     @Override public void onStart() {
@@ -106,13 +119,13 @@ public final class KingInstrumentation extends Instrumentation {
             input = new File(getTargetContext().getCacheDir(), "king-synthetic-input.apk");
             copy(getContext().getAssets().open("fixture.apk"), input);
             byte[] before = sha(input);
-            Activity ui = openTool(2);
+            Object ui = openTool(2);
             click("2. Select layout elements", 15000);
             click("res/layout/activity_main.xml", 15000);
             click("HIDE-ME", 15000);
             click("Save selection", 15000);
             createOutput(ui, "3. Create modified APK", "king-ui-fixture.apk");
-            Activity lvl = openTool(1);
+            Object lvl = openTool(1);
             createOutput(lvl, "2. Create modified APK", "king-lvl-fixture.apk");
             if (!Arrays.equals(before, sha(input))) throw new AssertionError("Input fixture was modified");
             result.putString("status", "PASS");
