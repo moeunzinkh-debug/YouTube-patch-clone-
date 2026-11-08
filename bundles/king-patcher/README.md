@@ -2,7 +2,7 @@
 
 Bundle នេះបន្ថែម tools ពីរទៅក្នុងបញ្ជី **Create Modified APK File** របស់ King-Patcher ដើម្បីកែ APK **កម្មវិធីផ្សេង** ដែលអ្នកជ្រើស។ វាជា `.mpp` សម្រាប់ Morphe Manager មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ វាមិនជំនួស bundle របស់ YouTube ឬ app ផ្សេងៗទេ។
 
-[ទាញយក bundle.mpp](bundle.mpp) · [SHA-256](bundle.mpp.sha256) · [លទ្ធផល build](validation.json) · [Manager](manager-smoke.json) · [Android](android-smoke.json)
+[ទាញយក bundle ពី King-Patcher pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/King-Patcher/king-patcher-0.1.0-dev.1.mpp) · [SHA-256](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/King-Patcher/king-patcher-0.1.0-dev.1.mpp.sha256) · [ច្បាប់ចម្លងក្នុង repository](bundle.mpp) · [លទ្ធផល build](validation.json) · [Manager](manager-smoke.json) · [Android](android-smoke.json)
 
 **គោលដៅតែមួយគត់:** King-Patcher `12.10.10` / version code `1980`, package `ru.jgaiecip.osuojvyxe`; APK ដើមក្នុង [pre-release King-Patcher](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/King-Patcher) មាន SHA-256 `e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222`។ កុំប្រើ APK ដែលបាន patch រួចជាធាតុបញ្ចូល។ Tools ទាំងនេះត្រូវការ Android 6 / API 23 ឬខ្ពស់ជាងនេះ។
 
@@ -16,7 +16,7 @@ Bundle នេះបន្ថែម tools ពីរទៅក្នុងបញ្
 
 ## របៀបប្រើ
 
-1. ក្នុង Morphe Manager ចូល **Sources → Add patch source → Local** ហើយជ្រើស `bundle.mpp` នៃថតនេះ។ បើចាំបាច់ បើក **Experimental app versions** សម្រាប់ source នេះ។
+1. ទាញយក `king-patcher-0.1.0-dev.1.mpp` ពី pre-release។ ក្នុង Morphe Manager ចូល **Sources → Add patch source → Local** ហើយជ្រើសឯកសារនេះ។ បើចាំបាច់ បើក **Experimental app versions** សម្រាប់ source នេះ។
 2. ជ្រើស APK ដើម King-Patcher ដែលមានកំណែ និង hash ខាងលើ បន្ទាប់មកបើក selectors មួយ ឬទាំងពីរ ហើយ patch។ ពួកវាបិទជាមុន ដូច្នេះត្រូវជ្រើសដោយចេតនា។
 3. បន្ទាប់ពីដំឡើង King ដែលបាន patch សូមបើកបញ្ជី **Create Modified APK File** ហើយជ្រើស tool ថ្មី។ ជ្រើស APK គោលដៅតាម file picker; សម្រាប់ UI ត្រូវជ្រើស layout និង elements មុនបង្កើត APK។
 4. ពេលរក្សាទុក សូមជ្រើស **ឯកសារថ្មីផ្សេងពី APK ដើម** ហើយទុកច្បាប់ចម្លងដើម និងទិន្នន័យបម្រុង។ File providers ខ្លះអាចបង្ហាញ URI ខុសគ្នាសម្រាប់ឯកសារតែមួយ ដូច្នេះការការពារកុំឱ្យសរសេរជាន់មិនអាចធានាបានគ្រប់ករណីទេ។
