@@ -48,14 +48,22 @@ def screen_text() -> str:
 
 
 def launch_and_check(expected: tuple[str, ...], absent: tuple[str, ...] = (), package: str = PACKAGE) -> None:
-    adb('shell', 'am', 'force-stop', package)
-    start = adb('shell', 'am', 'start', '-W', '-n', package + '/.MainActivity', timeout=60)
-    time.sleep(1)
-    text = screen_text()
-    for value in expected:
-        if value not in text: raise AssertionError(f'Expected fixture UI text {value!r}; launch={start[-1000:]!r}; screen={text[:1000]!r}')
-    for value in absent:
-        if value in text: raise AssertionError(f'Unexpected fixture UI text {value!r}: {text[:1000]}')
+    last = ''
+    for _ in range(3):
+        adb('shell', 'am', 'force-stop', package)
+        start = adb('shell', 'am', 'start', '-W', '-n', package + '/.MainActivity', timeout=60)
+        time.sleep(2)
+        text = screen_text()
+        # Google API emulator setup can briefly pop an ANR over the test app.
+        # Do not mistake that unrelated system dialog for a fixture failure.
+        if 'com.google.android.googlesdksetup' in text and "isn't responding" in text:
+            adb('shell', 'am', 'force-stop', 'com.google.android.googlesdksetup')
+            last = 'Google SDK setup ANR over fixture'; continue
+        missing = [value for value in expected if value not in text]
+        unexpected = [value for value in absent if value in text]
+        if not missing and not unexpected: return
+        last = f'missing={missing}, unexpected={unexpected}; launch={start[-1000:]!r}; screen={text[:1000]!r}'
+    raise AssertionError('Fixture UI did not match after retries: ' + last)
 
 
 def verify_signature(path: Path) -> str:
