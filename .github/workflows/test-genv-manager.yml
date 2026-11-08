@@ -1,4 +1,5 @@
 name: Test GenV bundle in Morphe Manager
+# Import the source-matched MPP and verify both selectors on a disposable base.
 
 on:
   push:

@@ -26,24 +26,21 @@ def adb(*args: str, timeout: int = 90) -> str:
 
 
 def disable_network() -> None:
-    # A freshly booted old emulator can bring up its services slightly after
-    # boot completion. Retry; if the service is absent entirely, the probe's
-    # ConnectivityManager check below still has to report NETWORK:OFF.
-    for mode, service in (('wifi', 'wifi'), ('data', 'phone')):
-        failure = None
-        for attempt in range(3):
-            try:
-                adb('shell', 'svc', mode, 'disable')
-                failure = None
-                break
-            except RuntimeError as exc:
-                failure = exc
-                if attempt < 2: time.sleep(3)
-        if failure is not None:
-            status = adb('shell', 'service', 'check', service).lower()
-            if 'not found' not in status and 'not declared' not in status:
-                raise failure
-            print(f'::notice::Emulator has no {service} service; checking actual connectivity', flush=True)
+    # Some API 24 emulator images return an error from svc wifi even when no
+    # usable Wi-Fi radio exists. Airplane mode and both svc commands are best
+    # effort; each probe independently checks ConnectivityManager is offline.
+    adb('shell', 'settings', 'put', 'global', 'airplane_mode_on', '1')
+    for command in (
+        ('shell', 'am', 'broadcast', '-a', 'android.intent.action.AIRPLANE_MODE', '--ez', 'state', 'true'),
+        ('shell', 'svc', 'wifi', 'disable'),
+        ('shell', 'svc', 'data', 'disable'),
+    ):
+        try:
+            adb(*command)
+        except RuntimeError:
+            # Offline state is verified by the synthetic app, not assumed from
+            # a shell command's return code. No account is present regardless.
+            pass
 
 
 def read_screen() -> list[dict[str, str]]:
@@ -53,9 +50,11 @@ def read_screen() -> list[dict[str, str]]:
 
 def probe(expected: str) -> None:
     expected += ';NETWORK:OFF'
+    disable_network()
     adb('shell', 'am', 'force-stop', PROBE)
     adb('shell', 'am', 'start', '-n', PROBE + '/test.genv.microg.ProbeActivity')
     deadline = time.monotonic() + 100
+    last_retry = time.monotonic()
     last = []
     while time.monotonic() < deadline:
         try:
@@ -64,6 +63,13 @@ def probe(expected: str) -> None:
                 if node.get('text') == expected:
                     print('::notice::Offline synthetic probe: ' + expected, flush=True)
                     return
+            # A first-boot setup component can re-enable a network after the
+            # previous probe. Reapply airplane mode and refresh this screen.
+            if any(node.get('text', '').startswith('GUARD:') and node.get('text', '').endswith(';NETWORK:ON') for node in last) and time.monotonic() - last_retry > 10:
+                disable_network()
+                adb('shell', 'am', 'force-stop', PROBE)
+                adb('shell', 'am', 'start', '-n', PROBE + '/test.genv.microg.ProbeActivity')
+                last_retry = time.monotonic()
             # Avoid transient first-boot Google setup ANR dialogs covering the probe.
             if any("isn't responding" in node.get('text', '') for node in last):
                 for node in last:
