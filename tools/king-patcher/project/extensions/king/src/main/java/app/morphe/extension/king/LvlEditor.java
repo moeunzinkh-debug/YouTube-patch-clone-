@@ -26,10 +26,14 @@ import org.jf.dexlib2.rewriter.Rewriters;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.Adler32;
 
 /**
  * Experimental, exact-pattern Google Play LVL editor. It handles only the
@@ -63,8 +67,52 @@ public final class LvlEditor {
             throw new IOException("Unsupported DEX version " + version);
         return Integer.parseInt(version);
     }
+    private static MessageDigest sha1() throws IOException {
+        try { return MessageDigest.getInstance("SHA-1"); }
+        catch (NoSuchAlgorithmException unavailable) { throw new IOException("DEX SHA-1 is unavailable", unavailable); }
+    }
+    /**
+     * Android requires the DEX SHA-1 signature and Adler-32 checksum in the
+     * header. The inspected King's embedded writer can leave both as zero even
+     * when dexlib2 itself can reload the file. Seal them independently.
+     */
+    private static void sealDexHeader(File file) throws IOException {
+        try (RandomAccessFile dex = new RandomAccessFile(file, "rw")) {
+            if (dex.length() < 112 || dex.length() > MAX_DEX_SIZE) throw new IOException("Invalid rewritten DEX length");
+            byte[] buffer = new byte[32768]; int read;
+            MessageDigest signature = sha1();
+            dex.seek(32);
+            while ((read = dex.read(buffer)) != -1) if (read > 0) signature.update(buffer, 0, read);
+            dex.seek(12); dex.write(signature.digest());
+            Adler32 checksum = new Adler32();
+            dex.seek(12);
+            while ((read = dex.read(buffer)) != -1) if (read > 0) checksum.update(buffer, 0, read);
+            long value = checksum.getValue();
+            dex.seek(8);
+            for (int i = 0; i < 4; i++) dex.writeByte((int) (value >>> (8 * i)) & 0xff);
+            dex.getFD().sync();
+        }
+    }
+    private static void verifyDexHeader(File file) throws IOException {
+        try (RandomAccessFile dex = new RandomAccessFile(file, "r")) {
+            if (dex.length() < 112 || dex.length() > MAX_DEX_SIZE) throw new IOException("Invalid DEX length");
+            byte[] header = new byte[32]; dex.readFully(header);
+            long expected = 0;
+            for (int i = 0; i < 4; i++) expected |= ((long) header[8 + i] & 0xff) << (8 * i);
+            MessageDigest signature = sha1(); Adler32 checksum = new Adler32();
+            checksum.update(header, 12, 20);
+            byte[] buffer = new byte[32768]; int read;
+            while ((read = dex.read(buffer)) != -1) if (read > 0) {
+                signature.update(buffer, 0, read); checksum.update(buffer, 0, read);
+            }
+            if (checksum.getValue() != expected || !Arrays.equals(Arrays.copyOfRange(header, 12, 32), signature.digest()))
+                throw new IOException("DEX header checksum or SHA-1 is invalid");
+        }
+    }
     private static DexFile load(File file) throws IOException {
-        return DexFileFactory.loadDexFile(file, Opcodes.forDexVersion(version(file)));
+        int dexVersion = version(file);
+        verifyDexHeader(file);
+        return DexFileFactory.loadDexFile(file, Opcodes.forDexVersion(dexVersion));
     }
     private static boolean signature(Method method, String name, String parameter) {
         return method.getName().equals(name) && method.getReturnType().equals("V")
@@ -166,6 +214,7 @@ public final class LvlEditor {
         try {
             DexFile rewritten = new DexRewriter(module).rewriteDexFile(checkerDex);
             DexFileFactory.writeDexFile(output.getAbsolutePath(), rewritten);
+            sealDexHeader(output);
             DexFile verified = load(output);
             int verifiedClasses = 0, verifiedMethods = 0;
             for (ClassDef cls : verified.getClasses()) if (CHECKER.equals(cls.getType())) {

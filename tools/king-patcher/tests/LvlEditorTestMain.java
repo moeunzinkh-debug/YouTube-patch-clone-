@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.Adler32;
 
 /** Creates synthetic DEX files; never reads or publishes a user's app. */
 public final class LvlEditorTestMain {
@@ -59,6 +60,15 @@ public final class LvlEditorTestMain {
     }
     static void makeFixture(Path path) throws Exception { makeDex(path,Arrays.asList(checker(CHECKER,1),callback(true))); }
     private static byte[] sha(Path p) throws Exception { return MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(p)); }
+    private static void validDexHeader(Path path) throws Exception {
+        byte[] bytes=Files.readAllBytes(path);
+        check(bytes.length>=112,"DEX header exists");
+        byte[] expected=MessageDigest.getInstance("SHA-1").digest(Arrays.copyOfRange(bytes,32,bytes.length));
+        check(Arrays.equals(expected,Arrays.copyOfRange(bytes,12,32)),"DEX SHA-1 signature");
+        Adler32 crc=new Adler32(); crc.update(bytes,12,bytes.length-12);
+        long stored=0; for(int i=0;i<4;i++)stored|=((long)bytes[8+i]&0xff)<<(8*i);
+        check(stored==crc.getValue(),"DEX Adler-32 checksum");
+    }
     private static void rejects(List<File> inputs,Path output,String reason) throws Exception {
         try { LvlEditor.patch(inputs,output.toFile()); throw new AssertionError("Should reject "+reason); }
         catch (IOException expected) { checks++; check(!Files.exists(output),"no output on "+reason); }
@@ -68,6 +78,7 @@ public final class LvlEditorTestMain {
         try {
             Path input=temp.resolve("classes.dex"), out=temp.resolve("out.dex");
             makeDex(input,Arrays.asList(checker(CHECKER,1),callback(true)));
+            validDexHeader(input);
             byte[] digest=sha(input);
             DexFile inputDex=DexFileFactory.loadDexFile(input.toFile(),Opcodes.forDexVersion(35));
             for(ClassDef cls:inputDex.getClasses()) for(Method method:cls.getMethods()) if(method.getImplementation()!=null) {
@@ -75,6 +86,7 @@ public final class LvlEditorTestMain {
                 catch(RuntimeException error) { throw new AssertionError("Invalid fixture debug info: "+cls.getType()+"->"+method.getName()+" registers="+method.getImplementation().getRegisterCount(),error); }
             }
             check(LvlEditor.patch(Collections.singletonList(input.toFile()),out.toFile())==0,"checker index");
+            validDexHeader(out);
             check(Arrays.equals(digest,sha(input)),"original input unchanged");
             DexFile after=DexFileFactory.loadDexFile(out.toFile(),Opcodes.forDexVersion(35));
             int seen=0, other=0;
@@ -91,6 +103,15 @@ public final class LvlEditorTestMain {
                 }
             }
             check(seen==1 && other==1,"exact checker edited");
+            Path corrupt=temp.resolve("corrupt.dex");
+            byte[] damaged=Files.readAllBytes(input); damaged[8]^=1; Files.write(corrupt,damaged);
+            rejects(Collections.singletonList(corrupt.toFile()),temp.resolve("corrupt-out.dex"),"incorrect DEX checksum");
+            Path badSignature=temp.resolve("bad-signature.dex");
+            damaged=Files.readAllBytes(input); damaged[12]^=1;
+            Adler32 adjusted=new Adler32(); adjusted.update(damaged,12,damaged.length-12);
+            long adjustedValue=adjusted.getValue(); for(int i=0;i<4;i++)damaged[8+i]=(byte)(adjustedValue>>>(8*i));
+            Files.write(badSignature,damaged);
+            rejects(Collections.singletonList(badSignature.toFile()),temp.resolve("bad-signature-out.dex"),"incorrect DEX SHA-1 signature");
             rejects(Collections.singletonList(out.toFile()),temp.resolve("already.dex"),"already patched checker");
             rejects(Arrays.asList(input.toFile(),input.toFile()),temp.resolve("duplicate.dex"),"duplicate classes");
             Path incomplete=temp.resolve("incomplete.dex");makeDex(incomplete,Arrays.asList(checker(CHECKER,1),callback(false)));
