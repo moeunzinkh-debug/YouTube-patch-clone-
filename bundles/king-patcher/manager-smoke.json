@@ -1,0 +1,15 @@
+{
+  "manager": "2.3.0-dev.3",
+  "android": "API 35 x86_64",
+  "target": "King-Patcher 12.10.10 / 1980",
+  "input_sha256": "e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222",
+  "bundle_sha256": "2ff08e295db5fe027a78b74effbb1896085b1590eb5f8ab5d0febef89b8144a7",
+  "both_opt_in_selectors": "selected in Manager",
+  "patch_and_save": "passed",
+  "output_signature_api_24_plus": "verified",
+  "menu_injection_and_unchanged_manifest": "verified",
+  "manager_output_sha256_for_test": "1907eed1044a62d1be5ba31ce566287bfa82439a801f33e11051f09c1d128064",
+  "manager_output_installed_or_launched": false,
+  "real_target_apps_and_physical_devices": "not tested",
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42481074379"
+}

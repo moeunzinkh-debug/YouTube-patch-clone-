@@ -1,0 +1,12 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="24dp">
+    <TextView android:id="@+id/licence" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="CHECKING"/>
+    <TextView android:id="@+id/keep" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="KEEP-ME"/>
+    <Button android:id="@+id/hide" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="HIDE-ME"/>
+    <TextView android:id="@+id/hide_existing" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:visibility="visible" android:text="HIDE-EXISTING"/>
+</LinearLayout>

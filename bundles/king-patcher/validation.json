@@ -1,0 +1,9 @@
+{
+  "bundle_version": "0.1.0-dev.2",
+  "bundle_sha256": "2ff08e295db5fe027a78b74effbb1896085b1590eb5f8ab5d0febef89b8144a7",
+  "king_input": "King-Patcher 12.10.10 / 1980, SHA-256 e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222",
+  "static_build": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42480811170",
+  "android_test": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42481478700",
+  "manager_test": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42481074379",
+  "physical_devices_and_real_target_apps": "not tested"
+}

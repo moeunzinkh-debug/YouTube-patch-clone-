@@ -1,0 +1,124 @@
+name: Test King-Patcher bundle in Morphe Manager
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - '.github/workflows/test-king-manager.yml'
+      - 'tools/king-patcher/tests/manager/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  manager:
+    if: contains(github.event.head_commit.message, '[king-manager]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Obtain a matching, statically verified bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/king-manager /tmp/king-manager-bundle
+          gh run list --workflow build-king-patcher.yml --branch "$GITHUB_REF_NAME" --status success --limit 30 \
+            --json databaseId,headSha > /tmp/king-manager-runs.json
+          matched=''
+          while read -r id sha; do
+            git cat-file -e "$sha^{commit}" 2>/dev/null || git fetch origin "$sha"
+            if git diff --quiet "$sha" "$GITHUB_SHA" -- tools/king-patcher/project \
+                 tools/king-patcher/prepare_build.py tools/king-patcher/verify_bundle.py; then
+              gh run download "$id" --name king-patcher-bundle-static-only --dir /tmp/king-manager-bundle
+              matched="$id"
+              break
+            fi
+          done < <(python3 -c 'import json; print("\n".join("{} {}".format(r["databaseId"], r["headSha"]) for r in json.load(open("/tmp/king-manager-runs.json"))))')
+          if [ -z "$matched" ]; then echo '::error::No successful build matches the current King project'; exit 1; fi
+          cp /tmp/king-manager-bundle/bundle.mpp /tmp/king-manager/bundle.mpp
+          cp /tmp/king-manager-bundle/bundle.mpp.sha256 /tmp/king-manager/bundle.mpp.sha256
+          (cd /tmp/king-manager && sha256sum --check bundle.mpp.sha256)
+          python3 tools/king-patcher/verify_bundle.py --mpp /tmp/king-manager/bundle.mpp --listing /tmp/king-manager-bundle/patches.txt
+          echo "::notice::Using source-matched static bundle from run $matched"
+      - name: Download pinned Manager, input APK and decoder
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download v2.3.0-dev.3 --repo MorpheApp/morphe-manager --pattern morphe-manager-2.3.0-dev.3.apk --dir /tmp/king-manager
+          gh release download King-Patcher --pattern 'King.Patcher_12.10.10.apk' --dir /tmp/king-manager
+          gh release download v3.0.3 --repo iBotPeaches/Apktool --pattern apktool_3.0.3.jar --dir /tmp/king-manager
+          echo '9b9cbd8d3e0c4394f87c1a5675db6ff2e473233e316bf2915f6fe447347e5d96  /tmp/king-manager/morphe-manager-2.3.0-dev.3.apk' | sha256sum --check
+          echo 'e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222  /tmp/king-manager/King.Patcher_12.10.10.apk' | sha256sum --check
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  /tmp/king-manager/apktool_3.0.3.jar' | sha256sum --check
+      - name: Enable emulator acceleration
+        run: |
+          if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
+      - name: Import the automatic-scanner bundle and patch a disposable King APK in Manager
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          cores: 2
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 10G
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: python3 tools/king-patcher/tests/manager/test_manager.py
+      - name: Verify Manager output without publishing the APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          work=/tmp/king-manager
+          tools="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -1 | xargs dirname)"
+          "$tools/apksigner" verify --min-sdk-version 24 "$work/manager-merged-patched.apk"
+          java -Xmx3g -jar "$work/apktool_3.0.3.jar" d -f --no-res "$work/manager-merged-patched.apk" \
+            -o "$work/decoded" > "$work/decode.log" 2>&1
+          python3 tools/king-patcher/verify_patched_menu.py "$work/decoded" both
+          python3 - "$work" <<'PY'
+          import hashlib, json, os, pathlib, sys, zipfile
+          p = pathlib.Path(sys.argv[1])
+          original, patched, bundle = p/'King.Patcher_12.10.10.apk', p/'manager-merged-patched.apk', p/'bundle.mpp'
+          with zipfile.ZipFile(original) as before, zipfile.ZipFile(patched) as after:
+              assert before.read('AndroidManifest.xml') == after.read('AndroidManifest.xml'), 'Manifest changed'
+          digest = lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
+          report = {
+              'manager': '2.3.0-dev.3', 'android': 'API 35 x86_64',
+              'target': 'King-Patcher 12.10.10 / 1980', 'input_sha256': digest(original),
+              'bundle_sha256': digest(bundle), 'both_opt_in_selectors': 'selected in Manager',
+              'patch_and_save': 'passed', 'output_signature_api_24_plus': 'verified',
+              'menu_injection_and_unchanged_manifest': 'verified',
+              'manager_output_sha256_for_test': digest(patched),
+              'manager_output_installed_or_launched': False,
+              'real_target_apps_and_physical_devices': 'not tested',
+              'run_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          }
+          (p/'manager-report.json').write_text(json.dumps(report, indent=2) + '\n')
+          print('::notice::Manager selected both patches, saved a signed APK and preserved the reviewed menu structure')
+          PY
+      - name: Emit sanitized report
+        if: always()
+        shell: bash
+        run: |
+          if test -s /tmp/king-manager/manager-report.json; then
+            python3 - <<'PY'
+          import base64,gzip
+          print('::notice::KING_MANAGER_REPORT ' + base64.b64encode(gzip.compress(open('/tmp/king-manager/manager-report.json','rb').read())).decode())
+          PY
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: king-manager-validation
+          path: /tmp/king-manager/manager-report.json
+          if-no-files-found: ignore

@@ -1,0 +1,88 @@
+name: Inspect King-Patcher pre-release APK (read only)
+
+on:
+  push:
+    branches: [arena/dc6d652d-youtube-patch-clone]
+    paths:
+      - 'tools/king-patcher/inspect_apk.py'
+      - 'tools/king-patcher/test_inspect_apk.py'
+      - 'tools/king-patcher/trace_menu.py'
+      - 'tools/king-patcher/trace_api.py'
+      - 'tools/king-patcher/trace_integration.py'
+      - 'tools/king-patcher/emit_annotations.py'
+      - '.github/workflows/inspect-king-patcher.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: king-patcher-static-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    if: contains(github.event.head_commit.message, '[king-patcher-inspect]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Test inspection privacy and asset guards
+        run: python3 tools/king-patcher/test_inspect_apk.py -v
+      - name: Download the exact supplied APK and inspect it statically
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          mkdir -p "$RUNNER_TEMP/king-input"
+          gh release download King-Patcher --pattern 'King.Patcher_12.10.10.apk' --dir "$RUNNER_TEMP/king-input"
+          apk="$RUNNER_TEMP/king-input/King.Patcher_12.10.10.apk"
+          echo 'e37e25e0fdb2ea92a1592eec7251488d235136e85d5f4e8400f74f8910f40222  '"$apk" | sha256sum --check
+          gh release download v3.0.3 --repo iBotPeaches/Apktool --pattern apktool_3.0.3.jar --dir "$RUNNER_TEMP/king-input"
+          tool="$RUNNER_TEMP/king-input/apktool_3.0.3.jar"
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  '"$tool" | sha256sum --check
+          if ! java -Xmx3g -jar "$tool" d -f "$apk" -o "$RUNNER_TEMP/king-decoded" > "$RUNNER_TEMP/king-decode.log" 2>&1; then
+            echo '::warning::Apktool resource/code decoding did not finish; reporting available APK metadata only.'
+            tail -n 15 "$RUNNER_TEMP/king-decode.log" | while IFS= read -r line; do echo "::warning::$line"; done
+          fi
+          tools_dir="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          test -x "$tools_dir/apksigner"
+          if ! python3 tools/king-patcher/inspect_apk.py "$apk" "$RUNNER_TEMP/king-decoded" \
+            "$RUNNER_TEMP/king-inventory.json" --apksigner "$tools_dir/apksigner" > "$RUNNER_TEMP/king-inspect.log" 2>&1; then
+            tail -n 25 "$RUNNER_TEMP/king-inspect.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/king-inspect.log"
+          if ! python3 tools/king-patcher/trace_menu.py "$RUNNER_TEMP/king-decoded" \
+            "$RUNNER_TEMP/king-menu-trace.json" > "$RUNNER_TEMP/king-trace.log" 2>&1; then
+            tail -n 20 "$RUNNER_TEMP/king-trace.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/king-trace.log"
+          python3 tools/king-patcher/trace_api.py "$RUNNER_TEMP/king-decoded" "$RUNNER_TEMP/king-api-trace.json"
+          python3 tools/king-patcher/trace_integration.py "$RUNNER_TEMP/king-decoded" "$RUNNER_TEMP/king-integration.json"
+      # GitHub caps annotations per step, so keep the reports separate.
+      - name: Emit sanitized inventory
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-inventory.json" KING_INVENTORY
+      - name: Emit sanitized menu trace
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-menu-trace.json" KING_MENU_TRACE
+      - name: Emit sanitized API trace
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-api-trace.json" KING_API_TRACE
+      - name: Emit sanitized integration trace
+        run: python3 tools/king-patcher/emit_annotations.py "$RUNNER_TEMP/king-integration.json" KING_INTEGRATION
+      - uses: actions/upload-artifact@v4
+        with:
+          name: king-patcher-static-inventory
+          path: |
+            ${{ runner.temp }}/king-inventory.json
+            ${{ runner.temp }}/king-menu-trace.json
+            ${{ runner.temp }}/king-api-trace.json
+            ${{ runner.temp }}/king-integration.json
