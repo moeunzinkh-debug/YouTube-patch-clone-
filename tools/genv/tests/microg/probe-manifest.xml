@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="test.genv.microg" android:versionCode="1" android:versionName="1">
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="35" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <queries><package android:name="app.revanced.android.gms" /></queries>
     <application android:label="Synthetic MicroG guard test" android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity android:name="test.genv.microg.ProbeActivity" android:exported="true">

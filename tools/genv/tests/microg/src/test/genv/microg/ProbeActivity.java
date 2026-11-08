@@ -3,6 +3,8 @@ package test.genv.microg;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.widget.TextView;
 import app.morphe.extension.genv.MicroGGuard;
@@ -20,9 +22,12 @@ public final class ProbeActivity extends Activity {
                 : "org.microg.gms.auth.signin.AuthSignInService".equals(service.serviceInfo.name) ? "AUTH" : "OTHER";
         String activityName = activity == null || activity.activityInfo == null ? "NONE"
                 : "org.microg.gms.auth.signin.AuthSignInActivity".equals(activity.activityInfo.name) ? "AUTH" : "OTHER";
+        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        @SuppressWarnings("deprecation") NetworkInfo active = connectivity == null ? null : connectivity.getActiveNetworkInfo();
+        String network = active != null && active.isConnected() ? "ON" : "OFF";
         TextView result = new TextView(this);
         result.setText("GUARD:" + (MicroGGuard.isAvailable(this) ? "YES" : "NO")
-                + ";SERVICE:" + serviceName + ";ACTIVITY:" + activityName);
+                + ";SERVICE:" + serviceName + ";ACTIVITY:" + activityName + ";NETWORK:" + network);
         result.setTextSize(20);
         setContentView(result);
     }

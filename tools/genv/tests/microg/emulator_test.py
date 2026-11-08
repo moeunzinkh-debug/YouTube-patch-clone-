@@ -21,8 +21,29 @@ MICROG = 'app.revanced.android.gms'
 def adb(*args: str, timeout: int = 90) -> str:
     result = subprocess.run(['adb', *args], capture_output=True, text=True, timeout=timeout)
     if result.returncode:
-        raise RuntimeError(f"adb {' '.join(args[:3])}: {result.stderr[-400:]}")
+        raise RuntimeError(f"adb {' '.join(args[:4])}: {(result.stdout + result.stderr)[-400:]}")
     return result.stdout
+
+
+def disable_network() -> None:
+    # A freshly booted old emulator can bring up its services slightly after
+    # boot completion. Retry; if the service is absent entirely, the probe's
+    # ConnectivityManager check below still has to report NETWORK:OFF.
+    for mode, service in (('wifi', 'wifi'), ('data', 'phone')):
+        failure = None
+        for attempt in range(3):
+            try:
+                adb('shell', 'svc', mode, 'disable')
+                failure = None
+                break
+            except RuntimeError as exc:
+                failure = exc
+                if attempt < 2: time.sleep(3)
+        if failure is not None:
+            status = adb('shell', 'service', 'check', service).lower()
+            if 'not found' not in status and 'not declared' not in status:
+                raise failure
+            print(f'::notice::Emulator has no {service} service; checking actual connectivity', flush=True)
 
 
 def read_screen() -> list[dict[str, str]]:
@@ -31,6 +52,7 @@ def read_screen() -> list[dict[str, str]]:
 
 
 def probe(expected: str) -> None:
+    expected += ';NETWORK:OFF'
     adb('shell', 'am', 'force-stop', PROBE)
     adb('shell', 'am', 'start', '-n', PROBE + '/test.genv.microg.ProbeActivity')
     deadline = time.monotonic() + 100
@@ -61,8 +83,7 @@ def probe(expected: str) -> None:
 
 def main() -> None:
     work, bundle, official, report = map(Path, sys.argv[1:5])
-    adb('shell', 'svc', 'wifi', 'disable')
-    adb('shell', 'svc', 'data', 'disable')
+    disable_network()
     adb('install', '-r', str(work / 'probe.apk'), timeout=180)
     probe('GUARD:NO;SERVICE:NONE;ACTIVITY:NONE')
 
