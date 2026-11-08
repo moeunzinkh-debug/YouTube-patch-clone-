@@ -35,11 +35,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          work="$RUNNER_TEMP/axml-fixture"
+          trap 'rc=$?; echo "::error::AXML test failed at line $LINENO"; for f in "$work/list.txt" "$work/dump.txt" "$work/build.log"; do if test -f "$f"; then tail -n 30 "$f" | while IFS= read -r line; do echo "::error::$line"; done; fi; done; exit "$rc"' ERR
           sdk="$ANDROID_HOME"
           tools_dir="$(find "$sdk/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
           platform="$(find "$sdk/platforms" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
           test -x "$tools_dir/aapt2" && test -f "$platform/android.jar"
-          work="$RUNNER_TEMP/axml-fixture"
           mkdir -p "$work/res/layout" "$work/compiled"
           cat > "$work/AndroidManifest.xml" <<'XML'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="test.king.axml">
@@ -55,9 +56,9 @@ jobs:
             <TextView android:id="@+id/keep_me" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Keep me" />
           </LinearLayout>
           XML
-          "$tools_dir/aapt2" compile -o "$work/compiled" "$work/res/layout/activity_main.xml"
+          "$tools_dir/aapt2" compile -o "$work/compiled" "$work/res/layout/activity_main.xml" 2>&1 | tee "$work/build.log"
           "$tools_dir/aapt2" link -I "$platform/android.jar" --manifest "$work/AndroidManifest.xml" \
-            -o "$work/original.apk" "$work/compiled/layout_activity_main.xml.flat"
+            -o "$work/original.apk" "$work/compiled/layout_activity_main.xml.flat" 2>&1 | tee -a "$work/build.log"
           unzip -p "$work/original.apk" res/layout/activity_main.xml > "$work/original.xml"
           java -cp "$RUNNER_TEMP/classes" AxmlEditorCli list "$work/original.xml" | tee "$work/list.txt"
           grep -q '1 1 Button' "$work/list.txt"
