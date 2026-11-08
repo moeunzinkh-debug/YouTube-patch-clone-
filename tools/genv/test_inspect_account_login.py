@@ -2,7 +2,7 @@
 """Offline tests for allowlisted, credential-free GenV account inspection."""
 import unittest
 
-from inspect_account_login import METHOD_LABELS, VALID_SITE, label_value
+from inspect_account_login import METHOD_LABELS, VALID_SITE, context_label, label_value, safe_trace_reference
 
 
 class AccountInspectionGuards(unittest.TestCase):
@@ -24,6 +24,15 @@ class AccountInspectionGuards(unittest.TestCase):
         self.assertTrue(VALID_SITE.fullmatch('Lv6/a;->m(Ljava/lang/Object;Lf6/h;)V'))
         self.assertIsNone(VALID_SITE.fullmatch('user@example.com'))
         self.assertIsNone(VALID_SITE.fullmatch('Lexample/a;->method()V https://example.invalid'))
+
+    def test_trace_emits_only_fixed_words_and_reference_shapes(self):
+        self.assertEqual(context_label('v0, "password"'), 'password')
+        self.assertEqual(context_label('v0, "ProxyHost"'), 'proxyhost')
+        self.assertIsNone(context_label('v0, "password=private"'))
+        self.assertIsNone(context_label('v0, "https://example.invalid"'))
+        self.assertEqual(safe_trace_reference('v0, Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;'),
+                         'Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;')
+        self.assertIsNone(safe_trace_reference('v0, Lf6/m;->a \'secret\''))
 
 
 if __name__ == '__main__':

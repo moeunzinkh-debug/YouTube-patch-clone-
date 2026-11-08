@@ -48,6 +48,30 @@ RESOURCE_NAMES = {
     'forgot_password', 'reset_password', 'set_password',
 }
 VALID_SITE = re.compile(r'L[A-Za-z0-9_$/-]+;->[A-Za-z0-9_$<>-]+\([^)]*\)[A-Za-z0-9_$/;\[\]-]+\Z')
+VALID_REFERENCE = re.compile(r'[A-Za-z0-9_$/;()<>.$\[\]:-]{1,260}\Z')
+ACCOUNT_SITE = 'Lf6/m;->a(Lorg/json/JSONObject;)Lf6/m;'
+CONTEXT_WORDS = frozenset({'username', 'password', 'host', 'port', 'proxy', 'scheme', 'http', 'https',
+                           'type', 'auth', 'user', 'domain', 'enabled', 'proxyhost', 'proxyport',
+                           'proxyusername', 'proxypassword', 'server', 'email', 'login', 'sign in', 'sign up'})
+
+
+def safe_trace_reference(operand: str) -> str | None:
+    references = re.findall(r'L[A-Za-z0-9_$/-]+;->[^,]+', operand)
+    if not references:
+        return None
+    value = ''.join(references[-1].split())
+    return value if VALID_REFERENCE.fullmatch(value) else None
+
+
+def context_label(operand: str) -> str | None:
+    pieces = operand.split(',', 1)
+    if len(pieces) != 2:
+        return None
+    text = pieces[1].strip()
+    if len(text) < 2 or text[0] != '"' or text[-1] != '"':
+        return None
+    word = text[1:-1].casefold()
+    return word if word in CONTEXT_WORDS else None
 
 
 def label_value(value: str) -> str | None:
@@ -92,6 +116,8 @@ def inspect(path: Path) -> dict:
     sites: dict[str, list[str]] = defaultdict(list)
     class_counts = Counter()
     asset_counts = Counter()
+    site_trace = None
+    site_callers = []
     dex_files = []
     with zipfile.ZipFile(path) as archive:
         infos = archive.infolist()
@@ -144,9 +170,24 @@ def inspect(path: Path) -> dict:
                     method_id = cls_name + '->' + method.get_name() + ''.join(method.get_descriptor().split())
                     if not VALID_SITE.fullmatch(method_id):
                         continue
-                    for ins in method.get_instructions():
+                    trace_events = []
+                    calls_site = False
+                    instruction_count = 0
+                    for index, ins in enumerate(method.get_instructions()):
+                        instruction_count += 1
                         op = ins.get_name()
                         operand = ins.get_output()
+                        if op.startswith(('invoke-', 'iget', 'iput', 'sget', 'sput')):
+                            reference = safe_trace_reference(operand)
+                            if reference:
+                                if reference == ACCOUNT_SITE:
+                                    calls_site = True
+                                if len(trace_events) < 100:
+                                    trace_events.append({'index': index, 'opcode': op, 'reference': reference})
+                        elif op.startswith('const-string'):
+                            word = context_label(operand)
+                            if word and len(trace_events) < 100:
+                                trace_events.append({'index': index, 'opcode': op, 'known_word': word})
                         label = None
                         if op.startswith('const-string'):
                             pieces = operand.split(',', 1)
@@ -162,6 +203,12 @@ def inspect(path: Path) -> dict:
                             dex_counts[label] += 1
                             if method_id not in sites[label] and len(sites[label]) < 12:
                                 sites[label].append(method_id)
+                    if method_id == ACCOUNT_SITE:
+                        site_trace = {'method': method_id, 'flags': method.get_access_flags_string(),
+                                      'instruction_count': instruction_count, 'events': trace_events}
+                    elif calls_site and len(site_callers) < 12:
+                        site_callers.append({'method': method_id, 'instruction_count': instruction_count,
+                                             'events': trace_events})
             del dex
             gc.collect()
     check_asset(path)
@@ -180,6 +227,8 @@ def inspect(path: Path) -> dict:
                                    ('firebase_auth_named_classes', 'flutter_firebase_auth_named_classes', 'google_signin_named_classes')},
         'fixed_dex_indicator_counts': dict(sorted(dex_counts.items())),
         'indicator_method_sites': dict(sorted(sites.items())),
+        'reviewed_username_password_site': site_trace,
+        'reviewed_site_callers': site_callers,
         'fixed_flutter_asset_indicator_counts': {k: v for k, v in sorted(asset_counts.items()) if v},
         'matching_android_string_resource_names': resources,
         'interpretation_limits': [
