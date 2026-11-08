@@ -57,6 +57,7 @@ public final class LvlEditorTestMain {
     private static void makeDex(Path path,List<? extends ClassDef> classes) throws Exception {
         DexFileFactory.writeDexFile(path.toString(),new ImmutableDexFile(Opcodes.forDexVersion(35),classes));
     }
+    static void makeFixture(Path path) throws Exception { makeDex(path,Arrays.asList(checker(CHECKER,1),callback(true))); }
     private static byte[] sha(Path p) throws Exception { return MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(p)); }
     private static void rejects(List<File> inputs,Path output,String reason) throws Exception {
         try { LvlEditor.patch(inputs,output.toFile()); throw new AssertionError("Should reject "+reason); }

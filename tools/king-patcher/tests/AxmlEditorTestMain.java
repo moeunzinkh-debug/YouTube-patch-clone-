@@ -52,7 +52,7 @@ public final class AxmlEditorTestMain {
         return b;
     }
     private static byte[] end(int name) { byte[] b=chunk(0x103,16,24); p32(b,12,-1);p32(b,16,-1);p32(b,20,name);return b; }
-    private static byte[] xml(boolean utf8,boolean existingVisibility) {
+    static byte[] xml(boolean utf8,boolean existingVisibility) {
         List<String> values=existingVisibility
             ? Arrays.asList("http://schemas.android.com/apk/res/android","LinearLayout","Button","id","text","សួស្តី Hello","visibility")
             : Arrays.asList("http://schemas.android.com/apk/res/android","LinearLayout","Button","id","text","សួស្តី Hello");
