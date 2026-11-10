@@ -39,6 +39,7 @@ jobs:
             --out /tmp/simsimi-926/patches.txt
           python3 tools/simsimi/verify_listing.py /tmp/simsimi-926/patches.txt
       - name: Apply actual current bundle to 9.2.6
+        continue-on-error: true
         run: |
           set -o pipefail
           java -Xmx4g -jar /tmp/simsimi-926/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-926/Simsimi_9.2.6.apk \
@@ -55,15 +56,11 @@ jobs:
             --unsigned -o /tmp/simsimi-926/patched.apk -r /tmp/simsimi-926/patch-result.json \
             2>&1 | tee /tmp/simsimi-926/patch.log
           sha256sum /tmp/simsimi-926/patched.apk
-      - name: Print diagnostic result
+      - name: Publish API-readable diagnostic result
         if: always()
         run: |
-          echo '--- static report ---'
-          test ! -f /tmp/simsimi-926/report.json || cat /tmp/simsimi-926/report.json
-          echo '--- Morphe patch result ---'
-          test ! -f /tmp/simsimi-926/patch-result.json || cat /tmp/simsimi-926/patch-result.json
-          echo '--- Morphe log tail ---'
-          test ! -f /tmp/simsimi-926/patch.log || tail -n 100 /tmp/simsimi-926/patch.log
+          python3 tools/simsimi/publish_926_findings.py \
+            /tmp/simsimi-926/report.json /tmp/simsimi-926/patch.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
