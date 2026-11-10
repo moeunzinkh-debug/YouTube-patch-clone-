@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-06T19:20:09Z",
+  "generatedAt": "2026-11-10T14:47:58Z",
   "generator": "youtube-version-advisor/1.0.0",
   "youtubePackage": "com.google.android.youtube",
   "local": {
@@ -59,84 +59,98 @@
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-11-06T19:20:09Z"
+    "checkedAt": "2026-11-10T14:47:58Z"
   },
   "upstream": {
     "label": "Upstream Morphe patch bundle (latest)",
     "source": "MorpheApp/morphe-patches@main",
-    "patchVersion": "2.1.0",
-    "patchCount": 200,
+    "patchVersion": "2.2.0",
+    "patchCount": 202,
     "versions": [
+      {
+        "version": "21.45.82",
+        "minSdk": 29,
+        "experimental": true,
+        "patchCount": 114,
+        "androidMin": "10"
+      },
       {
         "version": "21.44.528",
         "minSdk": 29,
         "experimental": true,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "10"
       },
       {
         "version": "21.43.523",
         "minSdk": 29,
         "experimental": true,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "10"
       },
       {
         "version": "21.30.216",
         "minSdk": 29,
         "experimental": false,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "10"
       },
       {
         "version": "21.28.208",
         "minSdk": 29,
         "experimental": false,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "10"
       },
       {
         "version": "21.23.492",
         "minSdk": 28,
         "experimental": false,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "9"
       },
       {
         "version": "20.51.39",
         "minSdk": 28,
         "experimental": false,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "9"
       },
       {
         "version": "20.26.46",
         "minSdk": 26,
         "experimental": false,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "8.0"
       }
     ],
-    "checkedAt": "2026-11-06T19:20:09Z",
-    "manifestSha": "cd27d6c646dfc11b5d50b8646a3db5c85d1b4337",
+    "checkedAt": "2026-11-10T14:47:58Z",
+    "manifestSha": "287493f72072df7fd6ac46435d33011822a2ab4d",
     "url": "https://github.com/MorpheApp/morphe-patches/blob/main/patches-list.json",
-    "etag": "\"cd27d6c646dfc11b5d50b8646a3db5c85d1b4337\"",
+    "etag": "\"287493f72072df7fd6ac46435d33011822a2ab4d\"",
     "synced": true,
     "release": {
-      "tag": "v2.1.0",
-      "name": "v2.1.0",
-      "publishedAt": "2026-11-06T14:15:16Z",
-      "url": "https://github.com/MorpheApp/morphe-patches/releases/tag/v2.1.0",
-      "etag": "\"a93e45e15fa775af82f66458ef112df26167b58e1560fb430870cd28d7b04731\""
+      "tag": "v2.2.0",
+      "name": "v2.2.0",
+      "publishedAt": "2026-11-10T14:41:45Z",
+      "url": "https://github.com/MorpheApp/morphe-patches/releases/tag/v2.2.0",
+      "etag": "\"93d646bcca632eaf21e15611fdee7ad290a5890de4eedb045a6639ea35580832\""
     }
   },
   "changes": {
     "added": [
       {
+        "version": "21.45.82",
+        "minSdk": 29,
+        "experimental": true,
+        "patchCount": 114,
+        "androidMin": "10"
+      },
+      {
         "version": "21.44.528",
         "minSdk": 29,
         "experimental": true,
-        "patchCount": 113,
+        "patchCount": 114,
         "androidMin": "10"
       }
     ],
