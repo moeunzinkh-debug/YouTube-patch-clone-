@@ -27,7 +27,7 @@ PULL = "Lapp/morphe/extension/simsimi/PullRefresh;"
 SCREEN = "Lapp/morphe/extension/simsimi/ConversationScreen;"
 QUICK = "Lapp/morphe/extension/simsimi/QuickReturn;"
 TAPS = "Lapp/morphe/extension/simsimi/ChatTabDoubleTap;"
-HOOK = PULL + "->onTouch(Landroid/app/Activity;Landroid/view/MotionEvent;)V"
+HOOK = PULL + "->onTouch("
 
 
 def sha256(path: Path) -> str:
@@ -50,6 +50,8 @@ def inspect(path: Path) -> dict:
         "version_name": identity[1],
         "version_code": identity[2],
         "main_activity_dispatch_calls_pull_refresh": False,
+        "any_method_calls_pull_refresh_on_touch": False,
+        "pull_refresh_on_touch_call_count": 0,
         "pull_refresh_class_present": False,
         "conversation_screen_guard_class_present": False,
         "pull_refresh_has_reload_method": False,
@@ -75,8 +77,11 @@ def inspect(path: Path) -> dict:
                     if not method.get_code():
                         continue
                     outputs = [instruction.get_output() for instruction in method.get_instructions()]
+                    calls = sum(HOOK in value for value in outputs)
+                    result["pull_refresh_on_touch_call_count"] += calls
+                    result["any_method_calls_pull_refresh_on_touch"] |= calls > 0
                     if owner == ACTIVITY and method.get_name() == "dispatchTouchEvent":
-                        result["main_activity_dispatch_calls_pull_refresh"] |= any(HOOK in value for value in outputs)
+                        result["main_activity_dispatch_calls_pull_refresh"] |= calls > 0
                     if owner == PULL:
                         result["pull_refresh_calls_reload"] |= any(PULL + "->reload(" in value for value in outputs)
                         fixed = ("SimSimi pull-to-reload patch", "Reloading Conversation")
@@ -95,6 +100,7 @@ def main() -> None:
         raise ValueError("Original release base hash changed")
     hook_keys = (
         "main_activity_dispatch_calls_pull_refresh",
+        "any_method_calls_pull_refresh_on_touch",
         "pull_refresh_class_present",
         "conversation_screen_guard_class_present",
         "pull_refresh_has_reload_method",
