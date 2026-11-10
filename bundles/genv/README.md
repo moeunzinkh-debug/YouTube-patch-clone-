@@ -33,6 +33,12 @@
 
 បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ សារ error របស់ bundle `0.2.0-dev.1` មិនអាចបែងចែកថា certificate បាត់ ឬខុសទេ ដូច្នេះវាមិនបញ្ជាក់ថា input របស់អ្នកត្រូវបាន sign ឡើងវិញជាក់លាក់ទេ។
 
+## ផ្លូវ Google Sign-In ទៅ MicroG RE
+
+ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE; វាមិនមែនជាភស្តុតាងថា guard បានជោគជ័យលើឧបករណ៍របស់អ្នក ឬថា GenV បានទទួល session ទេ។ បើ guard មិនទទួល package, signer ឬ sign-in components វាត្រឡប់ទៅ availability control flow ដើម ដែល routing literals ត្រូវបានប្ដូររួច។
+
+ការសាកបន្ថែមលើ Android emulator API 24, 29 និង 35 ប្រើ **synthetic caller** និង parcel គ្មាន options/គណនី៖ caller ដែល package មិនត្រូវត្រូវបាន MicroG បដិសេធ ហើយ caller ដែលត្រូវបានបញ្ជូនទៅផ្ទាំងបន្ថែមគណនីរបស់ MicroG នៅពេលគ្មានគណនី។ វាប្រើ guard ពី MPP ពិត ប៉ុន្តែមិនបានរត់ GenV ឬសាក account chooser, OAuth, server និង Huawei ពិតទេ។ [របាយការណ៍សង្ខេប](microg-handoff.json)។
+
 <a id="browser-sign-in"></a>
 ## លទ្ធភាព Google Sign-In តាម browser
 
