@@ -27,9 +27,15 @@ actual = {name: enabled.lower() == 'true' for name, enabled in zip(names, enable
 if actual != EXPECTED:
     raise SystemExit('SimSimi selector names or defaults changed unexpectedly')
 package_count = listing.count('Package name: com.ismaker.android.simsimi')
-version_count = listing.count('9.2.3')
-if package_count != len(EXPECTED) or version_count < len(EXPECTED):
+version_counts = {version: listing.count(version) for version in ('9.2.3', '9.2.6')}
+expected_version_counts = {'9.2.3': len(EXPECTED), '9.2.6': len(EXPECTED)}
+if package_count != len(EXPECTED) or any(
+        version_counts[version] < count for version, count in expected_version_counts.items()):
     details = ' | '.join(line.strip() for line in listing.splitlines()
-                         if 'package' in line.lower() or 'version' in line.lower() or '9.2.3' in line)
-    raise SystemExit(f'Unexpected SimSimi compatibility: package entries={package_count}, version mentions={version_count}; {details[:2000]}')
-print('Morphe lists 11 preserved selectors and opt-in Quick Return for SimSimi 9.2.3')
+                         if 'package' in line.lower() or 'version' in line.lower()
+                         or any(version in line for version in version_counts))
+    raise SystemExit(
+        f'Unexpected SimSimi compatibility: package entries={package_count}, '
+        f'version mentions={version_counts}; {details[:2000]}'
+    )
+print('Morphe lists all 12 selectors with separately pinned targets for SimSimi 9.2.3 and 9.2.6')

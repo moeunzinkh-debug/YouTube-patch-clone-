@@ -13,7 +13,7 @@ with zipfile.ZipFile(bundle) as archive:
     assert archive.testzip() is None, 'Corrupt archive'
     names = archive.namelist()
     manifest = archive.read('META-INF/MANIFEST.MF').decode().replace('\r', '')
-    assert 'Version: 0.4.0-dev.1\n' in manifest, manifest
+    assert 'Version: 0.5.0-dev.3\n' in manifest, manifest
     assert 'Patcher-Version: 2.0.0\n' in manifest, manifest
     assert 'app/morphe/patches/simsimi/AdGatePatchKt.class' in names
     assert 'app/morphe/patches/simsimi/AdGateTransform.class' in names
@@ -21,6 +21,7 @@ with zipfile.ZipFile(bundle) as archive:
     assert 'app/morphe/patches/simsimi/PullRefreshPatchKt.class' in names
     quick_class = archive.read('app/morphe/patches/simsimi/QuickReturnPatchKt.class')
     assert b'Quick return: double-tap Chat (experimental)' in quick_class, 'Missing Quick Return selector'
+    assert b'9.2.3' in quick_class and b'9.2.6' in quick_class, 'Missing dual-version Quick Return compatibility'
     assert 'app/morphe/patches/simsimi/MicroGServicePatchKt.class' in names
     extension = archive.read('extensions/simsimi.mpe')
     assert extension.startswith(b'dex\n') and b'PullRefresh' in extension and b'PullGesture' in extension

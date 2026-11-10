@@ -1,12 +1,12 @@
 # SimSimi patches — កំណែសាកល្បង ដាច់ដោយឡែកពី YouTube
 
-**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.4.0-dev.1**។ សម្រាប់ **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, version code `1119001`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
+**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.5.0-dev.3**។ សម្រាប់ **SimSimi 9.2.3 និង 9.2.6** (`com.ismaker.android.simsimi`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
 
-**ស្ថានភាពសំខាន់៖** បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
+**ស្ថានភាពសំខាន់៖** 9.2.3 បានឆ្លង static application checks ពី build មុន។ 9.2.6 មាន Hermes និង native mapping ដាច់ដោយឡែក ហើយ CI អនុវត្ត actual MPP លើ APK 9.2.6 ដែលបាន upload។ Device runtime នៅតែមិនទាន់សាកល្បង។ បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
 
 ## របៀបសាកល្បង
 
-1. Import `bundles/simsimi/bundle.mpp` ជា local source ក្នុង Morphe Manager ហើយជ្រើស APK ដើម SimSimi 9.2.3។ បើមានជម្រើស **Experimental app versions** ក្នុង Sources សូមបើកសម្រាប់ bundle នេះ។ កុំប្រើ APK ដែលបាន patch រួចជាធាតុបញ្ចូល។
+1. Import `bundles/simsimi/bundle.mpp` ជា local source ក្នុង Morphe Manager ហើយជ្រើស APK ដើម SimSimi 9.2.3 ឬ 9.2.6។ បើមានជម្រើស **Experimental app versions** ក្នុង Sources សូមបើកសម្រាប់ bundle នេះ។ កុំប្រើ APK ដែលបាន patch រួចជាធាតុបញ្ចូល។
 2. ដើម្បីសាក Quick Return សូម **បើក `Quick return: double-tap Chat (experimental)`** ក្នុងបញ្ជី patches៖ វាបិទជាមុន និងមិនតម្រូវឱ្យបើក Pull Refresh ឡើយ។
 3. Patch និងដំឡើងជាមួយ ABI/config splits ដែលត្រូវគ្នា និងចុះហត្ថលេខាដោយ key ដូចគ្នាទាំង base និង splits។ ចូលបញ្ជី **Conversation ជាភាសាអង់គ្លេស**, អូសចុះក្រោម ហើយចុចរូប Chat ខាងក្រោម **ពីរដងជាប់គ្នា**។ គោលបំណងគឺឱ្យបញ្ជីត្រឡប់ទៅលើ ដោយមិន reload app។
 4. បើចង់សាកមុខងារ Membership សូម **បើក selectors ទាំង ៦** ដែលមានពាក្យ `client only` ក្នុងតារាងខាងក្រោម៖ ពួកវាបិទជាមុន និងត្រូវការ `Unlock membership UI` ជា dependency។ សម្រាប់រូបថត និង read receipt សូមផ្ទៀងផ្ទាត់ជាមួយអ្នកទទួលពិត។
@@ -19,10 +19,10 @@
 |---|---|---|
 | Disable ad eligibility (experimental) | On | បិទ shared `canShowAds` gate; មិនទាន់បញ្ជាក់ថាលុប ads SDK ទាំងអស់។ |
 | Unlock membership UI (client only, experimental) | On | ផ្ដល់ `hasMembership=true` ក្នុង client UI និង listener ដោយ clone ស្ថានភាព។ មិនបង្កើតការជាវ ឬសិទ្ធិនៅម៉ាស៊ីនមេ។ |
-| Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ មិនមែនក្នុងបន្ទប់ឆាត។ វា reload React runtime ទាំងមូល មិនសម្លាប់ app និងមិនមែន refresh តែទិន្នន័យបញ្ជីទេ។ |
+| Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ។ កំណែថ្មីតម្រូវឱ្យមាន `ACTION_MOVE` ពិត និងពិនិត្យថាអេក្រង់នៅតែជា Conversation ពីរដងក្រោយ navigation settle ដូច្នេះការចូលបន្ទប់ chat មិនត្រូវ reload។ វា reload React runtime ទាំងមូលដោយមិនសម្លាប់ app។ |
 | Quick return: double-tap Chat (experimental) | Off | ចុច Chat ខាងក្រោមពីរដង នៅបញ្ជី Conversation ដើម្បីអូសបញ្ជីទៅដើមភ្លាមៗ ដោយមិន reload។ ចុចតែមួយនៅតែប្រើផ្លូវដើម; ការប្រើលើទូរសព្ទមិនទាន់សាកល្បង។ |
 | MicroG RE service routing (experimental) | Off | ប្ដូរផ្លូវ native GMS ទៅ `app.revanced.android.gms`; ត្រូវដំឡើង MicroG RE ដាច់ដោយឡែក។ វា **មិនជួសជុល FCM push ទេ**៖ action និង permission មិនត្រូវនឹង RE 7.3.0-dev.2 ដែលបានពិនិត្យ។ [ព័ត៌មានលម្អិត](../../docs/simsimi/huawei-notifications.md)។ |
-| Daily bonus without video (client path, experimental) | Off | ជ្រើសផ្លូវ membership ដែលមានស្រាប់ដោយមិនផ្ទុកវីដេអូ។ Server reward និង error នៅដដែល; មិនធានាការទទួលរង្វាន់។ |
+| Daily bonus without video (client path, experimental) | Off | គាំទ្រ 9.2.3 និង 9.2.6។ សម្រាប់ 9.2.6 វាបង្ខំ branch `membershipStatus` ទៅ `loadMembershipAdmob` ដែលមានស្រាប់ ខណៈ `currentAdmobState`, server reward request និង error handling នៅដដែល។ មិនក្លែង ad completion និងមិនធានារង្វាន់ពី server។ |
 | Conversation level controls (client only, experimental) | Off | ជ្រើស member branch ក្នុងសកម្មភាពប្ដូរ Freetalk level និងទុកសំណើរក្សាទុកកម្រិតទៅ server ដដែល។ មិនធានាប្រធានបទដែល server ផ្ដល់។ |
 | Profile photo controls (client only, experimental) | Off | ជ្រើសផ្លូវបើក photo picker ជំនួសអេក្រង់ជាវ; ការផ្ទុក និងរក្សាទុករូបអាស្រ័យលើ server។ |
 | Custom group cover controls (client only, experimental) | Off | បើក custom-cover picker និងប្រើ client membership flag ក្នុងទិន្នន័យ group។ មិនផ្ដល់ភាពជាម្ចាស់បន្ទប់ ឬសិទ្ធិ upload លើ server។ |
@@ -52,4 +52,4 @@ Combined output Hermes SHA-256: `97bbf6a26444dd5755173800eae31579e972df1d1e54777
 
 APK ដើមដែលបានផ្ដល់ជា base APK មាន `splits.required=true` និងគ្មាន native libraries។ ការដំឡើងត្រូវមាន ABI/config splits ដែលត្រូវគ្នា និង signature ដូចគ្នា; ការលុប metadata មិនបង្កើត libraries ទេ។
 
-ប្រភពនៅ `tools/simsimi/project` និង workflow នៅ `.github/workflows/build-simsimi-mpp.yml`។ ការកែ Hermes បដិសេធ bytecode ដែលមិនត្រូវ SHA-256 ដើម; Quick Return ក៏ពិនិត្យលេខ version/build និង native click handlers ដែរ។ ទិន្នន័យវិភាគនៅ `docs/simsimi/feature-gates.json`, `docs/simsimi/membership-targets.json` និង `docs/simsimi/quick-return-navigation.json`។ មិនបានបង្កើត SimSimi bundle release ថ្មី ហើយ bundle YouTube មិនបានផ្លាស់ប្ដូរ។
+ប្រភពនៅ `tools/simsimi/project` និង workflow នៅ `.github/workflows/build-simsimi-mpp.yml`។ ការកែ Hermes សម្រាប់ 9.2.3 និង 9.2.6 ប្រើ exact profiles ដាច់ដោយឡែក និងបដិសេធ payload មិនស្គាល់។ Quick Return ប្រើ bottom-navigation targets ដាច់ដោយឡែកសម្រាប់ version ទាំងពីរ និងពិនិត្យ click handlers មុន inject។ ទិន្នន័យវិភាគនៅ `docs/simsimi/feature-gates.json`, `docs/simsimi/membership-targets.json` និង `docs/simsimi/quick-return-navigation.json`។ មិនបានបង្កើត SimSimi bundle release ថ្មី ហើយ bundle YouTube មិនបានផ្លាស់ប្ដូរ។

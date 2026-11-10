@@ -9,91 +9,88 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class AdGateTransformTest {
-    @Test fun listenerPrefixUsesTheActualHermes96Call1Opcode() {
-        // Call1 is 0x51, not generic Call (0x50). Four bytes: dest, callee, this.
-        assertContentEquals(byteArrayOf(0x51,3,3,2), AdGateTransform.clientMembershipEvents.copyOfRange(0x15,0x19))
-        assertContentEquals(byteArrayOf(0x08,2,3,0x08,2,2), AdGateTransform.clientMembershipEvents.copyOfRange(0x1b,0x21))
+    private fun source() = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+    private fun assertFooter(bytes: ByteArray) {
+        val end = bytes.size - 20
+        assertContentEquals(MessageDigest.getInstance("SHA-1").digest(bytes.copyOfRange(0, end)), bytes.copyOfRange(end, bytes.size))
     }
-    @Test fun sixFeatureGatesAreExactAndComposeWithTheExistingPatches() {
-        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+
+    @Test fun recognizesOnlyThePinned923Or926Payload() {
+        val source = source()
+        assertTrue(AdGateTransform.profileVersion(source) in setOf("9.2.3", "9.2.6"))
+        assertTrue(source.size in setOf(AdGateTransform.EXPECTED_SIZE, AdGateTransform.V926_EXPECTED_SIZE))
+        assertFooter(source)
+    }
+
+    @Test fun sixFeatureGatesAreExactAndCompose() {
+        val source = source()
         assertEquals(6, AdGateTransform.featureKeys.size)
         for (key in AdGateTransform.featureKeys) {
-            val patched = AdGateTransform.patchFeature(source,key)
-            val ranges = AdGateTransform.featureOffsets(key)
-            val changed = (0 until source.size-20).filter { source[it] != patched[it] }
+            val patched = AdGateTransform.patchFeature(source, key)
+            val ranges = AdGateTransform.targetOffsets(key, source)
+            val changed = (0 until source.size - 20).filter { source[it] != patched[it] }
             assertTrue(changed.isNotEmpty())
             assertTrue(changed.all { offset -> ranges.any { offset in it } })
-            assertFailsWith<IllegalArgumentException> { AdGateTransform.patchFeature(patched,key) }
+            assertFailsWith<IllegalArgumentException> { AdGateTransform.patchFeature(patched, key) }
+            assertFooter(patched)
         }
-        val base = AdGateTransform.patchDailyBonus(AdGateTransform.patchMembership(AdGateTransform.patch(source)))
-        val all = AdGateTransform.featureKeys.fold(base) { bytes, key -> AdGateTransform.patchFeature(bytes,key) }
-        val reversedFeatures = AdGateTransform.featureKeys.reversed().fold(source) { bytes, key -> AdGateTransform.patchFeature(bytes,key) }
-        val reversed = AdGateTransform.patch(AdGateTransform.patchMembership(AdGateTransform.patchDailyBonus(reversedFeatures)))
-        assertContentEquals(all,reversed)
-        assertEquals(source.size, all.size)
-        assertContentEquals(MessageDigest.getInstance("SHA-1").digest(all.copyOfRange(0,all.size-20)),all.copyOfRange(all.size-20,all.size))
-        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".features").writeBytes(all) }
-    }
-    @Test fun dailyBonusUsesExistingNonVideoFlowAndComposesInEveryOrder() {
-        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
-        val daily = AdGateTransform.patchDailyBonus(source)
-        val offset = AdGateTransform.DAILY_BONUS_OFFSET
-        assertContentEquals(byteArrayOf(120,1,118,1,120,1), daily.copyOfRange(offset,offset+6))
-        assertTrue((0 until source.size-20).filter { source[it] != daily[it] }.all { it in offset until offset+6 })
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patchDailyBonus(daily) }
-        val transforms: List<(ByteArray) -> ByteArray> = listOf(AdGateTransform::patch, AdGateTransform::patchMembership, AdGateTransform::patchDailyBonus)
-        val expected = transforms.fold(source) { bytes, transform -> transform(bytes) }
-        for (order in listOf(listOf(0,1,2),listOf(0,2,1),listOf(1,0,2),listOf(1,2,0),listOf(2,0,1),listOf(2,1,0))) {
-            assertContentEquals(expected, order.fold(source) { bytes, index -> transforms[index](bytes) })
+        val transforms = buildList<(ByteArray) -> ByteArray> {
+            add(AdGateTransform::patch)
+            add(AdGateTransform::patchMembership)
+            AdGateTransform.featureKeys.forEach { key -> add { AdGateTransform.patchFeature(it, key) } }
+            if (AdGateTransform.supportsTarget("daily_bonus", source)) add(AdGateTransform::patchDailyBonus)
         }
-        assertEquals(source.size, expected.size)
-        assertContentEquals(MessageDigest.getInstance("SHA-1").digest(expected.copyOfRange(0, expected.size-20)), expected.copyOfRange(expected.size-20,expected.size))
-        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".all").writeBytes(expected) }
+        val forward = transforms.fold(source) { bytes, transform -> transform(bytes) }
+        val reverse = transforms.reversed().fold(source) { bytes, transform -> transform(bytes) }
+        assertContentEquals(forward, reverse)
+        assertEquals(source.size, forward.size)
+        assertFooter(forward)
+        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it + ".features").writeBytes(forward) }
     }
-    @Test fun membershipIsComposableAndDoesNotRewriteOtherCode() {
-        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+
+    @Test fun membershipAndAdTransformsTouchOnlyTheirReviewedRegions() {
+        val source = source()
         val membership = AdGateTransform.patchMembership(source)
-        val both = AdGateTransform.patch(membership)
-        assertContentEquals(both, AdGateTransform.patchMembership(AdGateTransform.patch(source)))
-        assertContentEquals(AdGateTransform.clientMembership, membership.copyOfRange(AdGateTransform.MEMBERSHIP_OFFSET, AdGateTransform.MEMBERSHIP_OFFSET+201))
-        assertContentEquals(AdGateTransform.clientMembershipEvents, membership.copyOfRange(AdGateTransform.MEMBERSHIP_EVENTS_OFFSET, AdGateTransform.MEMBERSHIP_EVENTS_OFFSET+95))
-        assertEquals(source.size, both.size)
-        val changed = (0 until source.size-20).filter { source[it] != both[it] }
-        assertTrue(changed.all { it == AdGateTransform.GATE_OFFSET || it in AdGateTransform.MEMBERSHIP_OFFSET until AdGateTransform.MEMBERSHIP_OFFSET+201 || it in AdGateTransform.MEMBERSHIP_EVENTS_OFFSET until AdGateTransform.MEMBERSHIP_EVENTS_OFFSET+95 })
+        val ad = AdGateTransform.patch(source)
+        val membershipRanges = AdGateTransform.targetOffsets("membership", source)
+        val adRanges = AdGateTransform.targetOffsets("ads", source)
+        val membershipChanges = (0 until source.size - 20).filter { source[it] != membership[it] }
+        val adChanges = (0 until source.size - 20).filter { source[it] != ad[it] }
+        assertTrue(membershipChanges.isNotEmpty())
+        assertTrue(membershipChanges.all { offset -> membershipRanges.any { offset in it } })
+        assertTrue(adChanges.isNotEmpty())
+        assertTrue(adChanges.all { offset -> adRanges.any { offset in it } })
+        assertContentEquals(
+            AdGateTransform.patch(AdGateTransform.patchMembership(source)),
+            AdGateTransform.patchMembership(AdGateTransform.patch(source))
+        )
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patchMembership(membership) }
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(both) }
-        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it+".combined").writeBytes(both) }
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(ad) }
+        assertFooter(membership)
+        assertFooter(ad)
     }
-    @Test fun rejectsUnexpectedPayload() {
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(byteArrayOf()) }
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(ByteArray(AdGateTransform.EXPECTED_SIZE)) }
+
+    @Test fun dailyBonusUsesThePinnedMembershipLoaderBranchOnBothVersions() {
+        val source = source()
+        assertTrue(AdGateTransform.supportsTarget("daily_bonus", source))
+        val daily = AdGateTransform.patchDailyBonus(source)
+        val ranges = AdGateTransform.targetOffsets("daily_bonus", source)
+        val changed = (0 until source.size - 20).filter { source[it] != daily[it] }
+        assertTrue(changed.isNotEmpty())
+        assertTrue(changed.all { offset -> ranges.any { offset in it } })
+        assertFooter(daily)
     }
+
     @Test fun rejectsForeignChangesEvenWithARecomputedHermesFooter() {
-        val source = File(System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact fixture required")).readBytes()
+        val source = source()
         fun changedAt(offset: Int): ByteArray = source.copyOf().also { changed ->
             changed[offset] = (changed[offset].toInt() xor 1).toByte()
             val digest = MessageDigest.getInstance("SHA-1")
-            digest.update(changed, 0, changed.size-20)
-            digest.digest().copyInto(changed, changed.size-20)
+            digest.update(changed, 0, changed.size - 20)
+            digest.digest().copyInto(changed, changed.size - 20)
         }
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(byteArrayOf()) }
+        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(ByteArray(source.size)) }
         assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(changedAt(100)) }
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(changedAt(AdGateTransform.GATE_OFFSET+1)) }
-    }
-    @Test fun patchesExactUploadedPayloadWithoutMovingOffsets() {
-        val fixture = System.getenv("SIMSIMI_HBC_FIXTURE") ?: error("Exact APK fixture is required in CI")
-        val source = File(fixture).readBytes()
-        val pristine = source.copyOf()
-        val patched = AdGateTransform.patch(source)
-        assertContentEquals(pristine, source)
-        assertEquals(source.size, patched.size)
-        assertEquals(121, patched[AdGateTransform.GATE_OFFSET].toInt())
-        val end = source.size - 20
-        val changed = (0 until end).filter { source[it] != patched[it] }
-        assertEquals(listOf(AdGateTransform.GATE_OFFSET), changed)
-        assertContentEquals(MessageDigest.getInstance("SHA-1").digest(patched.copyOfRange(0, end)), patched.copyOfRange(end, patched.size))
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(patched) }
-        assertFailsWith<IllegalArgumentException> { AdGateTransform.patch(source.copyOf().also { it[100] = (it[100].toInt() xor 1).toByte() }) }
-        assertTrue(AdGateTransform.sha256(patched) != AdGateTransform.ORIGINAL_SHA256)
-        System.getenv("SIMSIMI_PATCHED_HBC")?.let { File(it).writeBytes(patched) }
     }
 }

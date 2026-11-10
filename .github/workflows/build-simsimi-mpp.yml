@@ -1,7 +1,7 @@
 name: Build experimental SimSimi-only patch bundle
 on:
   push:
-    branches: [arena/0b9fd265-youtube-patch-clone]
+    branches: [arena/2d29b958-youtube-patch-clone]
     paths: ['tools/simsimi/project/**', 'tools/simsimi/tests/**', 'tools/simsimi/prepare_build.py', 'tools/simsimi/verify_bundle.py', 'tools/simsimi/verify_listing.py', 'tools/simsimi/verify_feature_hbc.py', 'tools/simsimi/verify_patched_apk.py', 'tools/simsimi/verify_quick_apk.py', 'tools/simsimi/write_build_status.py', 'docs/simsimi/feature-gates.json', '.github/workflows/build-simsimi-mpp.yml']
 concurrency:
   group: simsimi-build-${{ github.ref }}
@@ -24,9 +24,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p /tmp/simsimi-input
-          gh release download Simsimi --pattern base.2.apk --dir /tmp/simsimi-input
-          echo 'f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70  /tmp/simsimi-input/base.2.apk' | sha256sum --check
-          unzip -p /tmp/simsimi-input/base.2.apk assets/index.android.bundle > /tmp/simsimi-input/original.hbc
+          gh release download Simsimi --pattern Simsimi_9.2.6.apk --dir /tmp/simsimi-input
+          echo '756ffb436399d6f74b2f05b234b89a9d7b15ba40bbbcb3c7b6ff2913a288556e  /tmp/simsimi-input/Simsimi_9.2.6.apk' | sha256sum --check
+          unzip -p /tmp/simsimi-input/Simsimi_9.2.6.apk assets/index.android.bundle > /tmp/simsimi-input/original.hbc
           python3 tools/simsimi/prepare_build.py /tmp/simsimi-build
       - name: Test existing pull gesture and Quick Return without consuming tab events
         run: |
@@ -51,12 +51,22 @@ jobs:
         run: |
           set -o pipefail
           cd /tmp/simsimi-build
-          ./gradlew :patches:test :patches:buildAndroid --no-daemon --stacktrace 2>&1 | tee /tmp/simsimi-build.log
+          ./gradlew :patches:test :patches:buildAndroid --no-daemon --stacktrace --info 2>&1 | tee /tmp/simsimi-build.log
       - name: Report errors
         if: failure()
         run: |
-          grep -E '^e:|^error:|Unresolved reference|Cannot infer|Overload resolution ambiguity' /tmp/simsimi-build.log | head -35 | while IFS= read -r line; do echo "::error::$line"; done || true
+          grep -E '^e:|^error:|Unresolved reference|Cannot infer|Overload resolution ambiguity|AdGateTransformTest|AssertionError|IllegalArgumentException|IllegalStateException' /tmp/simsimi-build.log | head -60 | while IFS= read -r line; do echo "::error::$line"; done || true
           grep -E -A 5 'What went wrong|Execution failed|Unsupported|mismatch' /tmp/simsimi-build.log | head -25 | while IFS= read -r line; do echo "::error::$line"; done || true
+          python3 - <<'PY'
+          import pathlib, xml.etree.ElementTree as ET
+          for path in pathlib.Path('/tmp/simsimi-build').glob('**/test-results/**/*.xml'):
+              root = ET.parse(path).getroot()
+              for case in root.iter('testcase'):
+                  failure = case.find('failure')
+                  if failure is not None:
+                      message = (failure.get('message') or failure.text or 'unknown test failure').replace('%', '%25').replace('\n', '%0A').replace('\r', '%0D')
+                      print(f"::error title={case.get('classname')}.{case.get('name')}::{message}")
+          PY
           jar="$(find "$HOME/.gradle/caches" -name 'morphe-patcher-2.0.0.jar' | head -1)"
           if test -n "$jar"; then
             javap -classpath "$jar" app.morphe.patcher.patch.BytecodePatchContext | grep -E 'classDefForEach|getAllClasses|classDefBy|ClassDefs|Classes' | while IFS= read -r line; do echo "::notice::$line"; done
@@ -91,7 +101,7 @@ jobs:
             while IFS= read -r line; do echo "::error::$line"; done < /tmp/simsimi-list-check.log
             exit 1
           fi
-          java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/base.2.apk \
+          java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/Simsimi_9.2.6.apk \
             -p bundles/simsimi/bundle.mpp -e "Quick return: double-tap Chat (experimental)" -e "MicroG RE service routing (experimental)" -e "Daily bonus without video (client path, experimental)" -e "Conversation level controls (client only, experimental)" -e "Profile photo controls (client only, experimental)" -e "Custom group cover controls (client only, experimental)" -e "Photo sending controls (client only, experimental)" -e "Read receipt display (client only, experimental)" -e "Membership item controls (client only, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
             -r /tmp/simsimi-input/patch-result.json 2>&1 | tee /tmp/simsimi-patch.log
           python3 -m pip install 'androguard==4.1.3'
@@ -103,7 +113,7 @@ jobs:
         run: |
           set -euo pipefail
           desktop=/tmp/simsimi-input/morphe-desktop-1.19.1-all.jar
-          base=/tmp/simsimi-input/base.2.apk
+          base=/tmp/simsimi-input/Simsimi_9.2.6.apk
           for mode in quick pull; do
             if [ "$mode" = quick ]; then
               selector='Quick return: double-tap Chat (experimental)'

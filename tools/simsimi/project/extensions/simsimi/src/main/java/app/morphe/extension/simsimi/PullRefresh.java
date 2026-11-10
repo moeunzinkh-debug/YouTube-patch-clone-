@@ -14,6 +14,10 @@ import java.util.WeakHashMap;
 
 /** Reloads the existing React runtime; does not kill the process or add an overlay. */
 public final class PullRefresh {
+    // Two observations after ACTION_UP allow React Navigation to finish a
+    // pending room transition before we decide whether to reload the list.
+    private static final long FIRST_SETTLE_DELAY_MS = 350;
+    private static final long SECOND_SETTLE_DELAY_MS = 350;
     private static final WeakHashMap<Activity, PullGesture> gestures = new WeakHashMap<>();
     private PullRefresh() { }
     public static void onTouch(Activity activity, MotionEvent event) {
@@ -32,12 +36,15 @@ public final class PullRefresh {
                             && !scrollableAt(root, event.getRawX(), event.getRawY());
                     state.down(event.getX(), event.getY(), event.getEventTime(), density, allowed);
                     break;
+                case MotionEvent.ACTION_MOVE:
+                    state.move(event.getX(), event.getY(), event.getEventTime(), density,
+                            isConversationScreen(activity.getWindow().getDecorView()));
+                    break;
                 case MotionEvent.ACTION_UP:
+                    View releaseRoot = activity.getWindow().getDecorView();
                     if (state.up(event.getX(), event.getY(), event.getEventTime(), density)
-                            && isConversationScreen(activity.getWindow().getDecorView())) {
-                        activity.getWindow().getDecorView().post(() -> {
-                            if (isConversationScreen(activity.getWindow().getDecorView())) reload(activity);
-                        });
+                            && isStableConversation(activity, releaseRoot)) {
+                        scheduleStableConversationReload(activity, releaseRoot);
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
@@ -49,6 +56,21 @@ public final class PullRefresh {
         } catch (Exception error) {
             Log.w("SimSimiPatch", "Pull-to-reload gesture failed", error);
         }
+    }
+    private static void scheduleStableConversationReload(Activity activity, View root) {
+        root.postDelayed(() -> {
+            if (!isStableConversation(activity, root)) return;
+            root.postDelayed(() -> {
+                if (isStableConversation(activity, root)) reload(activity);
+            }, SECOND_SETTLE_DELAY_MS);
+        }, FIRST_SETTLE_DELAY_MS);
+    }
+    private static boolean isStableConversation(Activity activity, View expectedRoot) {
+        if (activity == null || expectedRoot == null || activity.isFinishing() || activity.isDestroyed()) return false;
+        View currentRoot = activity.getWindow().getDecorView();
+        return currentRoot == expectedRoot && expectedRoot.isShown()
+                && !(activity.getCurrentFocus() instanceof EditText)
+                && isConversationScreen(expectedRoot);
     }
     private static boolean isConversationScreen(View root) {
         return ConversationScreen.allows(screenFlags(root));
