@@ -6,8 +6,8 @@
   "package": "com.ainate.ai.video.generate",
   "version": "3.7.2",
   "version_code": 163,
-  "bundle_version": "0.2.0-dev.1",
-  "bundle_sha256": "7a9d5a91a68f310f7b2afe8a899f4073d7159727c383ffd6987124d10172039d",
+  "bundle_version": "0.2.0-dev.2",
+  "bundle_sha256": "04ba2e5d8ffa41c65fc687c4c0be08530c9fd5e719a252e85f3020ad16018bdb",
   "imported_local_source": true,
   "experimental_app_versions_enabled": true,
   "selected_patches": [
@@ -22,5 +22,5 @@
   "full_split_merge_or_complete_app": "not tested",
   "app_installed_or_launched": false,
   "live_login_server_attestation_and_paid_features": "not tested",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42515075666"
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42815283969"
 }

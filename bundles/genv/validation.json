@@ -1,7 +1,7 @@
 {
-  "bundle_version": "0.2.0-dev.1",
-  "bundle_sha256": "7a9d5a91a68f310f7b2afe8a899f4073d7159727c383ffd6987124d10172039d",
-  "bundle_bytes": 51230,
+  "bundle_version": "0.2.0-dev.2",
+  "bundle_sha256": "04ba2e5d8ffa41c65fc687c4c0be08530c9fd5e719a252e85f3020ad16018bdb",
+  "bundle_bytes": 53622,
   "input_package": "com.ainate.ai.video.generate",
   "version": "3.7.2",
   "version_code": 163,
@@ -10,10 +10,10 @@
     "Remove license check",
     "Morphe MicroG Google sign-in support (experimental)"
   ],
-  "static_build": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42490893861",
-  "manager_test": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42515075666",
-  "synthetic_android_test": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42515075886",
-  "offline_microg_guard_android_24_35": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42515075650",
+  "static_build": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42813965756",
+  "manager_test": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42815283969",
+  "synthetic_android_test": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42815284101",
+  "offline_microg_guard_android_24_35": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42814446107",
   "input_limitations": "release asset is an incomplete base APK; required splits and native libraries were not supplied",
   "real_app_runtime_full_split_merge_live_login_server_attestation_and_purchases": "not tested"
 }

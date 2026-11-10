@@ -10,6 +10,7 @@
   "binder_descriptors_unchanged": true,
   "microg_signer_and_signin_components_guarded": true,
   "original_availability_control_flow_retained_with_routed_literals": true,
+  "interactive_guard_and_mode_instruction_sequence_verified": true,
   "original_genv_signer_metadata_sha1": "be4c81d3869d726ea9f0229ab937f2e11ab1ccc7",
   "source_signer_certificate_checked_before_metadata": true,
   "manifest_only_reviewed_metadata_queries_and_c2dm": true,
