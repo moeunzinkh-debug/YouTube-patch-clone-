@@ -1,6 +1,6 @@
 # SimSimi patches — កំណែសាកល្បង ដាច់ដោយឡែកពី YouTube
 
-**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.5.0-dev.2**។ សម្រាប់ **SimSimi 9.2.3 និង 9.2.6** (`com.ismaker.android.simsimi`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
+**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.5.0-dev.3**។ សម្រាប់ **SimSimi 9.2.3 និង 9.2.6** (`com.ismaker.android.simsimi`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
 
 **ស្ថានភាពសំខាន់៖** 9.2.3 បានឆ្លង static application checks ពី build មុន។ 9.2.6 មាន Hermes និង native mapping ដាច់ដោយឡែក ហើយ CI អនុវត្ត actual MPP លើ APK 9.2.6 ដែលបាន upload។ Device runtime នៅតែមិនទាន់សាកល្បង។ បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
 
@@ -22,7 +22,7 @@
 | Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ។ កំណែថ្មីតម្រូវឱ្យមាន `ACTION_MOVE` ពិត និងពិនិត្យថាអេក្រង់នៅតែជា Conversation ពីរដងក្រោយ navigation settle ដូច្នេះការចូលបន្ទប់ chat មិនត្រូវ reload។ វា reload React runtime ទាំងមូលដោយមិនសម្លាប់ app។ |
 | Quick return: double-tap Chat (experimental) | Off | ចុច Chat ខាងក្រោមពីរដង នៅបញ្ជី Conversation ដើម្បីអូសបញ្ជីទៅដើមភ្លាមៗ ដោយមិន reload។ ចុចតែមួយនៅតែប្រើផ្លូវដើម; ការប្រើលើទូរសព្ទមិនទាន់សាកល្បង។ |
 | MicroG RE service routing (experimental) | Off | ប្ដូរផ្លូវ native GMS ទៅ `app.revanced.android.gms`; ត្រូវដំឡើង MicroG RE ដាច់ដោយឡែក។ វា **មិនជួសជុល FCM push ទេ**៖ action និង permission មិនត្រូវនឹង RE 7.3.0-dev.2 ដែលបានពិនិត្យ។ [ព័ត៌មានលម្អិត](../../docs/simsimi/huawei-notifications.md)។ |
-| Daily bonus without video (client path, experimental) | Off | **9.2.3 ប៉ុណ្ណោះ**។ Flow 9.2.6 ប្ដូរទៅ `currentAdmobState` ដូច្នេះវាមិនកែ daily bonus លើ 9.2.6 ទេ។ បើ Morphe Manager រក្សា selection ចាស់ វានឹងធ្វើ safe no-op ជំនួសឱ្យ error ឬក្លែង ad completion។ |
+| Daily bonus without video (client path, experimental) | Off | គាំទ្រ 9.2.3 និង 9.2.6។ សម្រាប់ 9.2.6 វាបង្ខំ branch `membershipStatus` ទៅ `loadMembershipAdmob` ដែលមានស្រាប់ ខណៈ `currentAdmobState`, server reward request និង error handling នៅដដែល។ មិនក្លែង ad completion និងមិនធានារង្វាន់ពី server។ |
 | Conversation level controls (client only, experimental) | Off | ជ្រើស member branch ក្នុងសកម្មភាពប្ដូរ Freetalk level និងទុកសំណើរក្សាទុកកម្រិតទៅ server ដដែល។ មិនធានាប្រធានបទដែល server ផ្ដល់។ |
 | Profile photo controls (client only, experimental) | Off | ជ្រើសផ្លូវបើក photo picker ជំនួសអេក្រង់ជាវ; ការផ្ទុក និងរក្សាទុករូបអាស្រ័យលើ server។ |
 | Custom group cover controls (client only, experimental) | Off | បើក custom-cover picker និងប្រើ client membership flag ក្នុងទិន្នន័យ group។ មិនផ្ដល់ភាពជាម្ចាស់បន្ទប់ ឬសិទ្ធិ upload លើ server។ |

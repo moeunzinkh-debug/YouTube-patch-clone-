@@ -26,17 +26,9 @@ if len(names) != len(EXPECTED) or len(enabled) != len(EXPECTED) or len(set(names
 actual = {name: enabled.lower() == 'true' for name, enabled in zip(names, enabled)}
 if actual != EXPECTED:
     raise SystemExit('SimSimi selector names or defaults changed unexpectedly')
-blocks = {match.group(1): match.group(0) for match in re.finditer(
-    r'^Name: ([^\r\n]+)$.*?(?=^Name: |\Z)', listing, flags=re.MULTILINE | re.DOTALL
-)}
-daily = blocks['Daily bonus without video (client path, experimental)']
-compatible_tail = daily.split('Compatible versions:', 1)[1]
-if not re.search(r'^\s*9\.2\.3\s*$', compatible_tail, flags=re.MULTILINE) or re.search(
-        r'^\s*9\.2\.6\s*$', compatible_tail, flags=re.MULTILINE):
-    raise SystemExit('Daily bonus must remain 9.2.3-only because the 9.2.6 flow changed')
 package_count = listing.count('Package name: com.ismaker.android.simsimi')
 version_counts = {version: listing.count(version) for version in ('9.2.3', '9.2.6')}
-expected_version_counts = {'9.2.3': len(EXPECTED), '9.2.6': len(EXPECTED) - 1}
+expected_version_counts = {'9.2.3': len(EXPECTED), '9.2.6': len(EXPECTED)}
 if package_count != len(EXPECTED) or any(
         version_counts[version] < count for version, count in expected_version_counts.items()):
     details = ' | '.join(line.strip() for line in listing.splitlines()
@@ -46,4 +38,4 @@ if package_count != len(EXPECTED) or any(
         f'Unexpected SimSimi compatibility: package entries={package_count}, '
         f'version mentions={version_counts}; {details[:2000]}'
     )
-print('Morphe lists 12 selectors for 9.2.3 and 11 remapped selectors for 9.2.6; changed daily-bonus flow stays 9.2.3-only')
+print('Morphe lists all 12 selectors with separately pinned targets for SimSimi 9.2.3 and 9.2.6')

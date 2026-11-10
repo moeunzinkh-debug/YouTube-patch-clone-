@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AdGateTransformTest {
@@ -71,16 +70,15 @@ class AdGateTransformTest {
         assertFooter(ad)
     }
 
-    @Test fun dailyBonusRemainsFailClosedOnTheChanged926Flow() {
+    @Test fun dailyBonusUsesThePinnedMembershipLoaderBranchOnBothVersions() {
         val source = source()
-        if (AdGateTransform.profileVersion(source) == "9.2.3") {
-            val daily = AdGateTransform.patchDailyBonus(source)
-            assertTrue((0 until source.size - 20).any { source[it] != daily[it] })
-            assertFooter(daily)
-        } else {
-            assertFalse(AdGateTransform.supportsTarget("daily_bonus", source))
-            assertContentEquals(source, AdGateTransform.patchDailyBonus(source))
-        }
+        assertTrue(AdGateTransform.supportsTarget("daily_bonus", source))
+        val daily = AdGateTransform.patchDailyBonus(source)
+        val ranges = AdGateTransform.targetOffsets("daily_bonus", source)
+        val changed = (0 until source.size - 20).filter { source[it] != daily[it] }
+        assertTrue(changed.isNotEmpty())
+        assertTrue(changed.all { offset -> ranges.any { offset in it } })
+        assertFooter(daily)
     }
 
     @Test fun rejectsForeignChangesEvenWithARecomputedHermesFooter() {

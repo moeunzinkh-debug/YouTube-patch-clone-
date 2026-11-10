@@ -79,7 +79,8 @@ object AdGateTransform {
         ) + v923Features),
         Profile("9.2.6", V926_EXPECTED_SIZE, V926_ORIGINAL_SHA256, linkedMapOf(
             "ads" to listOf(region(17288798, "78005c00", "79005c00")),
-            "membership" to listOf(Region(17277342, v926OriginalMembership, v926ClientMembership), Region(17278563, v926OriginalMembershipEvents, v926ClientMembershipEvents))
+            "membership" to listOf(Region(17277342, v926OriginalMembership, v926ClientMembership), Region(17278563, v926OriginalMembershipEvents, v926ClientMembershipEvents)),
+            "daily_bonus" to listOf(region(23505891, "3701010245f4", "780176017801"))
         ) + v926Features)
     )
 
@@ -128,8 +129,7 @@ object AdGateTransform {
 
     fun patch(original: ByteArray): ByteArray = apply(original, "ads")
     fun patchMembership(original: ByteArray): ByteArray = apply(original, "membership")
-    fun patchDailyBonus(original: ByteArray): ByteArray =
-        if (supportsTarget("daily_bonus", original)) apply(original, "daily_bonus") else original.copyOf()
+    fun patchDailyBonus(original: ByteArray): ByteArray = apply(original, "daily_bonus")
     fun patchFeature(original: ByteArray, feature: String): ByteArray = apply(original, feature)
     internal fun featureOffsets(feature: String): List<IntRange> = v923Features.getValue(feature).map {
         it.offset until it.offset + it.original.size

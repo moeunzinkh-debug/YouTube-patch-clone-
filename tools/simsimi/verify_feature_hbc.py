@@ -17,6 +17,8 @@ if sha == '203256d3824cfbc449d110fca1601095ecf283f555079407d03a2f46ca0c7489':
     version = '9.2.3'
     gates = old_gates
     membership_ids = (6838, 6846)
+    daily = {'function_id': 22097, 'relative_offset': 19, 'offset': 23509841,
+             'original': '3701010243f4', 'replacement': '780176017801'}
 elif sha == 'ae1029cfbc61343b27b8f849a21a50df2b22b2cca361bad8aac1c70f069d8e36':
     version = '9.2.6'
     gates = [
@@ -33,6 +35,8 @@ elif sha == 'ae1029cfbc61343b27b8f849a21a50df2b22b2cca361bad8aac1c70f069d8e36':
         {'feature': 'item_controls', 'function_id': 22158, 'relative_offset': 17, 'offset': 23519138, 'original': '3602000287', 'replacement': '7802080202'},
     ]
     membership_ids = (6838, 6846)
+    daily = {'function_id': 22095, 'relative_offset': 19, 'offset': 23505891,
+             'original': '3701010245f4', 'replacement': '780176017801'}
 else:
     raise AssertionError(f'Unknown original Hermes payload: {sha}')
 
@@ -56,6 +60,13 @@ for gate in gates:
     assert old_code[:relative] == new_code[:relative]
     assert old_code[relative + size:] == new_code[relative + size:]
 
+daily_before, daily_after = bytes.fromhex(daily['original']), bytes.fromhex(daily['replacement'])
+daily_offset = daily['offset']
+assert original[daily_offset:daily_offset + len(daily_before)] == daily_before
+assert patched[daily_offset:daily_offset + len(daily_after)] == daily_after
+daily_lines = [repr(ins) for ins in parse_hbc_bytecode(reader.function_headers[daily['function_id']], reader)]
+assert any(line.startswith(f"{daily['relative_offset']:08x}: <LoadConstTrue>") for line in daily_lines)
+
 listener = reader.function_headers[membership_ids[1]]
 listener_lines = [repr(ins) for ins in parse_hbc_bytecode(listener, reader)]
 assert any("'getMembershipObject'" in line for line in listener_lines)
@@ -76,6 +87,7 @@ print(json.dumps({
     'decoded_feature_regions': len(gates),
     'decoded_feature_function_ids': sorted({g['function_id'] for g in gates}),
     'listener_uses_cloned_membership': True,
+    'daily_bonus_membership_loader_branch_decoded': True,
     'changed_bytes_before_footer': len(changed),
     'device_runtime_tested': False,
 }, indent=2))

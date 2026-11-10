@@ -48,12 +48,15 @@ val membershipUiPatch = resourcePatch(
 @Suppress("unused")
 val dailyBonusPatch = resourcePatch(
     name = "Daily bonus without video (client path, experimental)",
-    description = "SimSimi 9.2.3 only. Selects its existing membership non-video daily-bonus loader. The 9.2.6 flow changed to currentAdmobState, so a persisted Manager selection is safely ignored on 9.2.6 rather than failing or fabricating ad completion. Keeps server state, reward requests and errors unchanged; device testing required.",
+    description = "Selects the existing membership daily-bonus loader without the non-membership video branch on SimSimi 9.2.3 and 9.2.6. The 9.2.6 target is remapped to the membershipStatus branch before loadMembershipAdmob; currentAdmobState, server reward requests and errors remain intact. Does not fabricate ad completion or guarantee rewards; device testing required.",
     default = false
 ) {
     compatibleWith(Compatibility(
         name = "SimSimi", packageName = "com.ismaker.android.simsimi",
-        targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
+        targets = listOf(
+            AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true),
+            AppTarget(version = "9.2.6", minSdk = 24, isExperimental = true)
+        )
     ))
     execute {
         val payload = get("assets/index.android.bundle")
