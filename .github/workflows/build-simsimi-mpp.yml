@@ -24,9 +24,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p /tmp/simsimi-input
-          gh release download Simsimi --pattern base.2.apk --dir /tmp/simsimi-input
-          echo 'f18da384232c8e918e1073fd2e95cde6dda9bda2a34f4f90bb527ca95ea8af70  /tmp/simsimi-input/base.2.apk' | sha256sum --check
-          unzip -p /tmp/simsimi-input/base.2.apk assets/index.android.bundle > /tmp/simsimi-input/original.hbc
+          gh release download Simsimi --pattern Simsimi_9.2.6.apk --dir /tmp/simsimi-input
+          echo '756ffb436399d6f74b2f05b234b89a9d7b15ba40bbbcb3c7b6ff2913a288556e  /tmp/simsimi-input/Simsimi_9.2.6.apk' | sha256sum --check
+          unzip -p /tmp/simsimi-input/Simsimi_9.2.6.apk assets/index.android.bundle > /tmp/simsimi-input/original.hbc
           python3 tools/simsimi/prepare_build.py /tmp/simsimi-build
       - name: Test existing pull gesture and Quick Return without consuming tab events
         run: |
@@ -91,8 +91,8 @@ jobs:
             while IFS= read -r line; do echo "::error::$line"; done < /tmp/simsimi-list-check.log
             exit 1
           fi
-          java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/base.2.apk \
-            -p bundles/simsimi/bundle.mpp -e "Quick return: double-tap Chat (experimental)" -e "MicroG RE service routing (experimental)" -e "Daily bonus without video (client path, experimental)" -e "Conversation level controls (client only, experimental)" -e "Profile photo controls (client only, experimental)" -e "Custom group cover controls (client only, experimental)" -e "Photo sending controls (client only, experimental)" -e "Read receipt display (client only, experimental)" -e "Membership item controls (client only, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
+          java -Xmx4g -jar /tmp/simsimi-input/morphe-desktop-1.19.1-all.jar patch /tmp/simsimi-input/Simsimi_9.2.6.apk \
+            -p bundles/simsimi/bundle.mpp -e "Quick return: double-tap Chat (experimental)" -e "MicroG RE service routing (experimental)" -e "Conversation level controls (client only, experimental)" -e "Profile photo controls (client only, experimental)" -e "Custom group cover controls (client only, experimental)" -e "Photo sending controls (client only, experimental)" -e "Read receipt display (client only, experimental)" -e "Membership item controls (client only, experimental)" --unsigned -o /tmp/simsimi-input/patched.apk \
             -r /tmp/simsimi-input/patch-result.json 2>&1 | tee /tmp/simsimi-patch.log
           python3 -m pip install 'androguard==4.1.3'
           if ! python3 tools/simsimi/verify_patched_apk.py /tmp/simsimi-input/patched.apk /tmp/simsimi-input/patched.hbc.features bundles/simsimi/morphe-validation.json > /tmp/simsimi-output-check.log 2>&1; then
@@ -103,7 +103,7 @@ jobs:
         run: |
           set -euo pipefail
           desktop=/tmp/simsimi-input/morphe-desktop-1.19.1-all.jar
-          base=/tmp/simsimi-input/base.2.apk
+          base=/tmp/simsimi-input/Simsimi_9.2.6.apk
           for mode in quick pull; do
             if [ "$mode" = quick ]; then
               selector='Quick return: double-tap Chat (experimental)'

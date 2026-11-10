@@ -200,14 +200,14 @@ Morphe Desktop បាន patch និង rebuild APK Telegram Web 12.10.1 ដែ
 <details>
 <summary>🗨️ SimSimi • 12 experimental patches (separate bundle)</summary>
 
-For **SimSimi 9.2.3 or experimental assumed-compatible 9.2.6**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
+For **SimSimi 9.2.3 or statically remapped experimental 9.2.6**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
 into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
 
 - **Disable ad eligibility (experimental)** — shared ad gate, not proven complete SDK removal.
 - **Unlock membership UI (client only, experimental)** — client UI status only, not a server subscription.
 - **Pull down to restart chat (experimental)** — English Conversation list only; requires a real drag and two delayed stable-list checks so opening a chat does not trigger React reload.
 - **Quick return: double-tap Chat (experimental)** — opt-in; double-tap the selected bottom Chat tab to scroll the English Conversation list to the top, without reloading. Normal tab clicks continue unchanged.
-- **Daily bonus without video (client path, experimental)** — opt-in existing non-video flow; server reward is not guaranteed.
+- **Daily bonus without video (client path, experimental)** — SimSimi 9.2.3 only; the changed 9.2.6 `currentAdmobState` flow is intentionally unsupported rather than faking ad completion.
 - **MicroG RE service routing (experimental)** — opt-in native routing, not full GMS compatibility. It does not fix FCM push; the inspected RE 7.3.0-dev.2 APK has action/permission mismatches ([diagnosis](docs/simsimi/huawei-notifications.md)).
 - **Conversation level controls (client only, experimental)** — opt-in member slider path; server level/topic handling remains authoritative.
 - **Profile photo controls (client only, experimental)** — opt-in profile picker path; server upload still required.

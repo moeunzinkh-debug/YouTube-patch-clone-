@@ -8,13 +8,14 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
-private const val BOTTOM_BAR = "Lcom/aurelhubert/ahbottomnavigation/i;"
+private const val BOTTOM_BAR_923 = "Lcom/aurelhubert/ahbottomnavigation/i;"
+private const val BOTTOM_BAR_926 = "Lcom/aurelhubert/ahbottomnavigation/a;"
 private const val QUICK_RETURN = "Lapp/morphe/extension/simsimi/QuickReturn;"
 
 @Suppress("unused")
 val quickReturnPatch = bytecodePatch(
     name = "Quick return: double-tap Chat (experimental)",
-    description = "Double-tap the already-selected Chat tab to scroll the English Conversation list to the top. Does not reload the app, consume the original tap, or scroll inside a chat room. Supports SimSimi 9.2.3 and assumed-compatible 9.2.6; 9.2.6 requires device testing.",
+    description = "Double-tap the already-selected Chat tab to scroll the English Conversation list to the top. Does not reload the app, consume the original tap, or scroll inside a chat room. Uses separately verified native click targets for SimSimi 9.2.3 and 9.2.6; device runtime testing is still required.",
     default = false
 ) {
     compatibleWith(Compatibility(
@@ -29,7 +30,15 @@ val quickReturnPatch = bytecodePatch(
         check(packageMetadata.versionName in setOf("9.2.3", "9.2.6")) {
             "Quick return supports only SimSimi 9.2.3 and 9.2.6"
         }
-        val bar = mutableClassDefBy(BOTTOM_BAR)
+        val is926 = packageMetadata.versionName == "9.2.6"
+        val bottomBar = if (is926) BOTTOM_BAR_926 else BOTTOM_BAR_923
+        val bridgeNames = if (is926) setOf("a", "b") else setOf("b", "f")
+        val listenerOwners = if (is926) {
+            setOf("Lcom/reactnativenavigation/customrow/d;", "Le6/a;")
+        } else {
+            setOf("Lcom/aurelhubert/ahbottomnavigation/a;", "Lcom/aurelhubert/ahbottomnavigation/b;")
+        }
+        val bar = mutableClassDefBy(bottomBar)
         require(bar.superclass == "Landroid/widget/FrameLayout;") { "Unsupported bottom navigation class" }
         require(bar.methods.any {
             it.name == "getCurrentItem" && it.parameterTypes.isEmpty() && it.returnType == "I" &&
@@ -41,20 +50,19 @@ val quickReturnPatch = bytecodePatch(
             "lambda\$createClassicItems\$5" to "updateItems",
             "lambda\$createSmallItems\$6" to "updateSmallItems"
         )
-        val bridgeNames = setOf("b", "f")
         val bridgeTargets = bar.methods.filter { method ->
             method.name in bridgeNames && AccessFlags.STATIC.isSet(method.accessFlags) &&
-                method.parameterTypes.map { it.toString() } == listOf(BOTTOM_BAR, "I", "Landroid/view/View;") && method.returnType == "V"
+                method.parameterTypes.map { it.toString() } == listOf(bottomBar, "I", "Landroid/view/View;") && method.returnType == "V"
         }.flatMap { method ->
             requireNotNull(method.implementation).instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
-        }.filter { it.definingClass == BOTTOM_BAR && it.name in clickHandlers.keys }.map { it.name }.toSet()
+        }.filter { it.definingClass == bottomBar && it.name in clickHandlers.keys }.map { it.name }.toSet()
         require(bridgeTargets == clickHandlers.keys) { "Bottom-tab click listener bridges do not match" }
-        val listenerBridges = setOf("Lcom/aurelhubert/ahbottomnavigation/a;", "Lcom/aurelhubert/ahbottomnavigation/b;").map { owner ->
+        val listenerBridges = listenerOwners.map { owner ->
             val listener = mutableClassDefBy(owner)
             require("Landroid/view/View\$OnClickListener;" in listener.interfaces) { "Bottom-tab listener interface missing" }
             val callback = listener.methods.single { it.name == "onClick" && it.parameterTypes.map { type -> type.toString() } == listOf("Landroid/view/View;") && it.returnType == "V" }
             requireNotNull(callback.implementation).instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
-                .single { it.definingClass == BOTTOM_BAR && it.name in bridgeNames }.name
+                .single { it.definingClass == bottomBar && it.name in bridgeNames }.name
         }.toSet()
         require(listenerBridges == bridgeNames) { "Bottom-tab click dispatch does not match" }
 
@@ -70,7 +78,7 @@ val quickReturnPatch = bytecodePatch(
             require(implementation.registerCount in 3..16) { "Unsupported bottom-tab click register layout" }
             val refs = implementation.instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
             require(refs.any {
-                it.definingClass == BOTTOM_BAR && it.name == originalUpdate &&
+                it.definingClass == bottomBar && it.name == originalUpdate &&
                     it.parameterTypes.map { type -> type.toString() } == listOf("I", "Z") && it.returnType == "V"
             }) { "Bottom-tab click update path changed: $name" }
             require(refs.none { it.definingClass == QUICK_RETURN }) { "Quick return hook is already installed" }

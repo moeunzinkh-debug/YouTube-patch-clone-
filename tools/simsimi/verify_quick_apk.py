@@ -15,7 +15,10 @@ from loguru import logger
 logger.remove()
 original, combined, quick_only, pull_only, report_path = map(Path, sys.argv[1:6])
 CONTROLLER = 'Lcom/reactnativenavigation/viewcontrollers/bottomtabs/BottomTabsController;'
-BAR = 'Lcom/aurelhubert/ahbottomnavigation/i;'
+BARS = {
+    '9.2.3': 'Lcom/aurelhubert/ahbottomnavigation/i;',
+    '9.2.6': 'Lcom/aurelhubert/ahbottomnavigation/a;',
+}
 ACTIVITY = 'Lcom/ismaker/android/simsimi/MainActivity;'
 QUICK = 'Lapp/morphe/extension/simsimi/QuickReturn;'
 TAPS = 'Lapp/morphe/extension/simsimi/ChatTabDoubleTap;'
@@ -33,10 +36,14 @@ def file_hash(archive, name):
 
 def inspect(path):
     apk = APK(str(path))
-    if (apk.get_package(), apk.get_androidversion_name(), apk.get_androidversion_code()) != (
-            'com.ismaker.android.simsimi', '9.2.3', '1119001'):
+    version = apk.get_androidversion_name()
+    expected_codes = {'9.2.3': '1119001', '9.2.6': '1125001'}
+    if (apk.get_package(), apk.get_androidversion_code()) != (
+            'com.ismaker.android.simsimi', expected_codes.get(version)):
         raise AssertionError('Unexpected SimSimi package/version')
-    found = {'methods': {}, 'pull_hook': False, 'quick_class': False, 'tap_class': False}
+    bar = BARS[version]
+    found = {'methods': {}, 'pull_hook': False, 'quick_class': False, 'tap_class': False,
+             'version': version, 'bar': bar}
     with zipfile.ZipFile(path) as archive:
         found['hermes_sha256'] = file_hash(archive, 'assets/index.android.bundle')
         for name in archive.namelist():
@@ -47,14 +54,14 @@ def inspect(path):
                 owner = cls.get_name()
                 found['quick_class'] |= owner == QUICK
                 found['tap_class'] |= owner == TAPS
-                if owner not in (BAR, CONTROLLER, ACTIVITY):
+                if owner not in (bar, CONTROLLER, ACTIVITY):
                     continue
                 for method in cls.get_methods():
                     if not method.get_code():
                         continue
                     desc = method.get_descriptor().replace(' ', '')
                     key = (owner, method.get_name(), desc)
-                    if ((owner == BAR and method.get_name() in HANDLERS + ('setCurrentItem',)) or
+                    if ((owner == bar and method.get_name() in HANDLERS + ('setCurrentItem',)) or
                             (owner == CONTROLLER and method.get_name() == 'onTabSelected' and desc == '(IZ)Z')):
                         assert key not in found['methods'], f'Duplicate method: {key}'
                         found['methods'][key] = {
@@ -65,8 +72,8 @@ def inspect(path):
                         found['pull_hook'] |= any(PULL in item.get_output() for item in method.get_instructions())
             del dex
             gc.collect()
-    expected = {(BAR, name, '(ILandroid/view/View;)V') for name in HANDLERS} | {
-        (BAR, 'setCurrentItem', '(I)V'), (BAR, 'setCurrentItem', '(IZ)V'),
+    expected = {(bar, name, '(ILandroid/view/View;)V') for name in HANDLERS} | {
+        (bar, 'setCurrentItem', '(I)V'), (bar, 'setCurrentItem', '(IZ)V'),
         (CONTROLLER, 'onTabSelected', '(IZ)Z'),
     }
     assert set(found['methods']) == expected, f'Unexpected native navigation methods: {set(found["methods"])}'
@@ -74,12 +81,18 @@ def inspect(path):
 
 
 def check_navigation(old, new, enabled):
+    if 'version' in old or 'version' in new:
+        assert old['version'] == new['version'] and old['bar'] == new['bar']
+    bar = old.get('bar') or next(
+        key[0] for key in old['methods']
+        if key[1] == 'lambda$createClassicItems$5'
+    )
     for key, original_method in old['methods'].items():
         method = new['methods'][key]
         assert original_method['registers'] == method['registers'], f'Register layout changed: {key}'
         original_code, actual = original_method['instructions'], method['instructions']
         hooks = [i for i, (_, text) in enumerate(actual) if 'QuickReturn;->onTabClicked(' in text]
-        is_click_handler = key[0] == BAR and key[1] in HANDLERS
+        is_click_handler = key[0] == bar and key[1] in HANDLERS
         if enabled and is_click_handler:
             assert hooks == [0], f'Expected one first-instruction Quick Return click hook: {key}'
             assert actual[0][0] == 'invoke-static', 'Quick Return hook must be a static call'
@@ -105,7 +118,7 @@ assert pull['pull_hook'], 'Existing pull-to-reload hook missing when selected al
 assert quick['hermes_sha256'] == stock['hermes_sha256'] == pull['hermes_sha256'], 'Standalone native patches unexpectedly changed Hermes bytecode'
 report = {
     'engine': 'Morphe Desktop v1.19.1',
-    'input': 'Original uploaded SimSimi 9.2.3 base APK; matching split APKs are required for installation.',
+    'input': f'Original uploaded SimSimi {stock["version"]} APK.',
     'quick_return_with_pull_reload': 'passed_static_apk_inspection',
     'quick_return_without_pull_reload': 'passed_static_apk_inspection',
     'pull_reload_without_quick_return': 'passed_static_apk_inspection',

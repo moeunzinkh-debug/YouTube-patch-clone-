@@ -20,8 +20,15 @@ assert 'app.revanced.android.gms.EXTENDED_ACCESS' in apk.get_permissions()
 manifest = apk.get_android_manifest_xml()
 ns = '{http://schemas.android.com/apk/res/android}'
 assert manifest.xpath("./queries/package[@android:name='app.revanced.android.gms']", namespaces={'android': ns[1:-1]})
-assert any(e.get(ns+'name') == 'com.android.vending.splits.required' and e.get(ns+'value') == 'true' for e in manifest.iter('meta-data'))
+report['input_requires_splits'] = any(
+    e.get(ns+'name') == 'com.android.vending.splits.required' and e.get(ns+'value') == 'true'
+    for e in manifest.iter('meta-data')
+)
 report['microg_permission_and_visibility'] = True
+version = apk.get_androidversion_name()
+bar_class = {'9.2.3': 'Lcom/aurelhubert/ahbottomnavigation/i;',
+             '9.2.6': 'Lcom/aurelhubert/ahbottomnavigation/a;'}[version]
+report['target_version'] = version
 with zipfile.ZipFile(patched) as z:
     actual = z.read('assets/index.android.bundle')
     assert actual == expected.read_bytes(), 'Morphe output differs from the tested combined Hermes transforms'
@@ -58,7 +65,7 @@ with zipfile.ZipFile(patched) as z:
                     if cls.get_name() == 'Lcom/ismaker/android/simsimi/MainActivity;' and method.get_name() == 'dispatchTouchEvent':
                         if 'Lapp/morphe/extension/simsimi/PullRefresh;->onTouch(' in text:
                             hook_found = True
-                    if cls.get_name() == 'Lcom/aurelhubert/ahbottomnavigation/i;' and method.get_name() in ('lambda$createClassicItems$5', 'lambda$createSmallItems$6'):
+                    if cls.get_name() == bar_class and method.get_name() in ('lambda$createClassicItems$5', 'lambda$createSmallItems$6'):
                         if 'Lapp/morphe/extension/simsimi/QuickReturn;->onTabClicked(' in text:
                             quick_hooks_found.add(method.get_name())
     assert hook_found and runtime_found, 'Missing native touch hook or runtime extension'
