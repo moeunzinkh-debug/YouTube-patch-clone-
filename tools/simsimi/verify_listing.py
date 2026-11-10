@@ -27,7 +27,7 @@ actual = {name: enabled.lower() == 'true' for name, enabled in zip(names, enable
 if actual != EXPECTED:
     raise SystemExit('SimSimi selector names or defaults changed unexpectedly')
 blocks = {match.group(1): match.group(0) for match in re.finditer(
-    r'^Name: (.+)$.*?(?=^Name: |\Z)', listing, flags=re.MULTILINE | re.DOTALL
+    r'^Name: ([^\r\n]+)$.*?(?=^Name: |\Z)', listing, flags=re.MULTILINE | re.DOTALL
 )}
 daily = blocks['Daily bonus without video (client path, experimental)']
 compatible_tail = daily.split('Compatible versions:', 1)[1]
