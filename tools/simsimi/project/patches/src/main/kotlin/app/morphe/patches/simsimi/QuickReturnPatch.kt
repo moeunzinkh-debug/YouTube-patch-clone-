@@ -14,17 +14,20 @@ private const val QUICK_RETURN = "Lapp/morphe/extension/simsimi/QuickReturn;"
 @Suppress("unused")
 val quickReturnPatch = bytecodePatch(
     name = "Quick return: double-tap Chat (experimental)",
-    description = "Double-tap the already-selected Chat tab to scroll the English Conversation list to the top. Does not reload the app, consume the original tap, or scroll inside a chat room. Exact SimSimi 9.2.3 only; device testing required.",
+    description = "Double-tap the already-selected Chat tab to scroll the English Conversation list to the top. Does not reload the app, consume the original tap, or scroll inside a chat room. Supports SimSimi 9.2.3 and assumed-compatible 9.2.6; 9.2.6 requires device testing.",
     default = false
 ) {
     compatibleWith(Compatibility(
         name = "SimSimi", packageName = "com.ismaker.android.simsimi",
-        targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
+        targets = listOf(
+            AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true),
+            AppTarget(version = "9.2.6", minSdk = 24, isExperimental = true)
+        )
     ))
     dependsOn(simSimiExtensionPatch)
     execute {
-        check(packageMetadata.versionName == "9.2.3" && packageMetadata.versionCode == "1119001") {
-            "Quick return supports only the reviewed SimSimi 9.2.3 build 1119001"
+        check(packageMetadata.versionName in setOf("9.2.3", "9.2.6")) {
+            "Quick return supports only SimSimi 9.2.3 and 9.2.6"
         }
         val bar = mutableClassDefBy(BOTTOM_BAR)
         require(bar.superclass == "Landroid/widget/FrameLayout;") { "Unsupported bottom navigation class" }

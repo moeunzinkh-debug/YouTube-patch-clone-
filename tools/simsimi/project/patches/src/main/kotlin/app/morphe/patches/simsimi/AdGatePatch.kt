@@ -7,12 +7,15 @@ import app.morphe.patcher.patch.resourcePatch
 @Suppress("unused")
 val adEligibilityPatch = resourcePatch(
     name = "Disable ad eligibility (experimental)",
-    description = "Makes the exact SimSimi 9.2.3 canShowAds gate return false. Not a complete ad remover; does not grant rewards or membership. Device testing required."
+    description = "Makes the SimSimi 9.2.3/9.2.6 canShowAds gate return false. Not a complete ad remover; does not grant rewards or membership. Device testing required."
 ) {
     compatibleWith(Compatibility(
         name = "SimSimi",
         packageName = "com.ismaker.android.simsimi",
-        targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
+        targets = listOf(
+            AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true),
+            AppTarget(version = "9.2.6", minSdk = 24, isExperimental = true)
+        )
     ))
     execute {
         val payload = get("assets/index.android.bundle")
@@ -30,7 +33,10 @@ val membershipUiPatch = resourcePatch(
     compatibleWith(Compatibility(
         name = "SimSimi",
         packageName = "com.ismaker.android.simsimi",
-        targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
+        targets = listOf(
+            AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true),
+            AppTarget(version = "9.2.6", minSdk = 24, isExperimental = true)
+        )
     ))
     execute {
         val payload = get("assets/index.android.bundle")
@@ -47,7 +53,10 @@ val dailyBonusPatch = resourcePatch(
 ) {
     compatibleWith(Compatibility(
         name = "SimSimi", packageName = "com.ismaker.android.simsimi",
-        targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
+        targets = listOf(
+            AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true),
+            AppTarget(version = "9.2.6", minSdk = 24, isExperimental = true)
+        )
     ))
     execute {
         val payload = get("assets/index.android.bundle")

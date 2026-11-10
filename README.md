@@ -200,7 +200,7 @@ Morphe Desktop បាន patch និង rebuild APK Telegram Web 12.10.1 ដែ
 <details>
 <summary>🗨️ SimSimi • 12 experimental patches (separate bundle)</summary>
 
-For **SimSimi 9.2.3**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
+For **SimSimi 9.2.3 or experimental assumed-compatible 9.2.6**, import [`bundles/simsimi/bundle.mpp`](bundles/simsimi/bundle.mpp)
 into Morphe Manager. This bundle is separate from YouTube `patch.mpp`.
 
 - **Disable ad eligibility (experimental)** — shared ad gate, not proven complete SDK removal.

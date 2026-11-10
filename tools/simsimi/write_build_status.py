@@ -8,6 +8,8 @@ from pathlib import Path
 folder = Path('bundles/simsimi')
 status_path = folder / 'build-status.json'
 status = json.loads(status_path.read_text())
+status.pop('target_version', None)
+status.pop('target_version_code', None)
 quick = json.loads((folder / 'quick-validation.json').read_text())
 for key in ('quick_return_with_pull_reload', 'quick_return_without_pull_reload', 'pull_reload_without_quick_return'):
     if quick[key] != 'passed_static_apk_inspection':
@@ -18,7 +20,10 @@ patches = status['implemented_patches']
 if name not in patches:
     patches.append(name)
 status.update({
-    'version': '0.4.0-dev.2',
+    'version': '0.4.0-dev.3',
+    'target_versions': ['9.2.3', '9.2.6'],
+    'target_version_codes': {'9.2.3': '1119001', '9.2.6': 'unverified'},
+    'compatibility_note': '9.2.3 is statically verified. 9.2.6 is user-requested assumed compatibility and has not been inspected or patched in CI.',
     'ci_run': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
     'bundle_sha256': hashlib.sha256(bundle).hexdigest(),
     'bundle_bytes': len(bundle),
@@ -26,7 +31,8 @@ status.update({
     'pull_reload_scope': 'English Conversation list only. Requires a real ACTION_MOVE and two stable delayed Conversation checks before React reload; opening a chat must not reload. Device behavior remains unverified.',
 })
 status['tests'].update({
-    'morphe_selector_names_defaults_and_compatibility': 'passed_12_selectors_quick_return_opt_in',
+    'morphe_selector_names_defaults_and_compatibility': 'passed_12_selectors_listing_9.2.3_and_9.2.6_quick_return_opt_in',
+    'simsimi_9.2.6_actual_apk_application': 'not_run_assumed_compatible_user_requested',
     'pull_gesture_java_harness': 'passed_15_checks_including_navigation_transition_rejection',
     'pull_reload_apk_guard_sequence': 'passed_move_and_two_delayed_stability_checks',
     'quick_return_double_tap_host_harness': 'passed_20_checks',

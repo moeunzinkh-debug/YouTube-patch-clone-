@@ -22,7 +22,10 @@ val pullRefreshPatch = bytecodePatch(
 ) {
     compatibleWith(Compatibility(
         name = "SimSimi", packageName = "com.ismaker.android.simsimi",
-        targets = listOf(AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true))
+        targets = listOf(
+            AppTarget(version = "9.2.3", minSdk = 24, isExperimental = true),
+            AppTarget(version = "9.2.6", minSdk = 24, isExperimental = true)
+        )
     ))
     dependsOn(simSimiExtensionPatch)
     execute {

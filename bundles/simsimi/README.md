@@ -1,12 +1,12 @@
 # SimSimi patches — កំណែសាកល្បង ដាច់ដោយឡែកពី YouTube
 
-**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.4.0-dev.2**។ សម្រាប់ **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, version code `1119001`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
+**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.4.0-dev.3**។ សម្រាប់ **SimSimi 9.2.3 និង 9.2.6** (`com.ismaker.android.simsimi`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
 
-**ស្ថានភាពសំខាន់៖** បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
+**ស្ថានភាពសំខាន់៖** 9.2.3 បានឆ្លង static application checks។ 9.2.6 ត្រូវបានបន្ថែមតាមសំណើអ្នកប្រើដោយសន្មតថា internals មិនផ្លាស់ប្ដូរ ប៉ុន្តែមិនទាន់មាន APK 9.2.6 សម្រាប់ static verification ឬ device test ទេ។ បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
 
 ## របៀបសាកល្បង
 
-1. Import `bundles/simsimi/bundle.mpp` ជា local source ក្នុង Morphe Manager ហើយជ្រើស APK ដើម SimSimi 9.2.3។ បើមានជម្រើស **Experimental app versions** ក្នុង Sources សូមបើកសម្រាប់ bundle នេះ។ កុំប្រើ APK ដែលបាន patch រួចជាធាតុបញ្ចូល។
+1. Import `bundles/simsimi/bundle.mpp` ជា local source ក្នុង Morphe Manager ហើយជ្រើស APK ដើម SimSimi 9.2.3 ឬ 9.2.6។ បើមានជម្រើស **Experimental app versions** ក្នុង Sources សូមបើកសម្រាប់ bundle នេះ។ កុំប្រើ APK ដែលបាន patch រួចជាធាតុបញ្ចូល។
 2. ដើម្បីសាក Quick Return សូម **បើក `Quick return: double-tap Chat (experimental)`** ក្នុងបញ្ជី patches៖ វាបិទជាមុន និងមិនតម្រូវឱ្យបើក Pull Refresh ឡើយ។
 3. Patch និងដំឡើងជាមួយ ABI/config splits ដែលត្រូវគ្នា និងចុះហត្ថលេខាដោយ key ដូចគ្នាទាំង base និង splits។ ចូលបញ្ជី **Conversation ជាភាសាអង់គ្លេស**, អូសចុះក្រោម ហើយចុចរូប Chat ខាងក្រោម **ពីរដងជាប់គ្នា**។ គោលបំណងគឺឱ្យបញ្ជីត្រឡប់ទៅលើ ដោយមិន reload app។
 4. បើចង់សាកមុខងារ Membership សូម **បើក selectors ទាំង ៦** ដែលមានពាក្យ `client only` ក្នុងតារាងខាងក្រោម៖ ពួកវាបិទជាមុន និងត្រូវការ `Unlock membership UI` ជា dependency។ សម្រាប់រូបថត និង read receipt សូមផ្ទៀងផ្ទាត់ជាមួយអ្នកទទួលពិត។
@@ -52,4 +52,4 @@ Combined output Hermes SHA-256: `97bbf6a26444dd5755173800eae31579e972df1d1e54777
 
 APK ដើមដែលបានផ្ដល់ជា base APK មាន `splits.required=true` និងគ្មាន native libraries។ ការដំឡើងត្រូវមាន ABI/config splits ដែលត្រូវគ្នា និង signature ដូចគ្នា; ការលុប metadata មិនបង្កើត libraries ទេ។
 
-ប្រភពនៅ `tools/simsimi/project` និង workflow នៅ `.github/workflows/build-simsimi-mpp.yml`។ ការកែ Hermes បដិសេធ bytecode ដែលមិនត្រូវ SHA-256 ដើម; Quick Return ក៏ពិនិត្យលេខ version/build និង native click handlers ដែរ។ ទិន្នន័យវិភាគនៅ `docs/simsimi/feature-gates.json`, `docs/simsimi/membership-targets.json` និង `docs/simsimi/quick-return-navigation.json`។ មិនបានបង្កើត SimSimi bundle release ថ្មី ហើយ bundle YouTube មិនបានផ្លាស់ប្ដូរ។
+ប្រភពនៅ `tools/simsimi/project` និង workflow នៅ `.github/workflows/build-simsimi-mpp.yml`។ ការកែ Hermes នៅតែបដិសេធ bytecode ដែលមិនត្រូវ SHA-256 ដើម ដូច្នេះបើ payload របស់ 9.2.6 ផ្លាស់ប្ដូរ Hermes selectors នឹង fail closed ជំនួសឱ្យកែ target ខុស។ Quick Return ទទួល version 9.2.3/9.2.6 ហើយនៅតែពិនិត្យ native click handlers។ ទិន្នន័យវិភាគនៅ `docs/simsimi/feature-gates.json`, `docs/simsimi/membership-targets.json` និង `docs/simsimi/quick-return-navigation.json`។ មិនបានបង្កើត SimSimi bundle release ថ្មី ហើយ bundle YouTube មិនបានផ្លាស់ប្ដូរ។
