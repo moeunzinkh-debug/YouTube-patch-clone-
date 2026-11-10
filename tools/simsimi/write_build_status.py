@@ -20,10 +20,10 @@ patches = status['implemented_patches']
 if name not in patches:
     patches.append(name)
 status.update({
-    'version': '0.5.0-dev.1',
+    'version': '0.5.0-dev.2',
     'target_versions': ['9.2.3', '9.2.6'],
     'target_version_codes': {'9.2.3': '1119001', '9.2.6': '1125001'},
-    'compatibility_note': '9.2.6 has a separately reviewed Hermes/native profile and is applied by CI to the exact uploaded APK. Daily bonus remains 9.2.3-only because its 9.2.6 flow changed.',
+    'compatibility_note': '9.2.6 has a separately reviewed Hermes/native profile and is applied by CI to the exact uploaded APK. Daily bonus remains 9.2.3-only because its 9.2.6 flow changed; a persisted selection is verified as a safe no-op on 9.2.6.',
     'input_constraint': 'CI input is the exact uploaded SimSimi 9.2.6 APK (SHA-256 756ffb436399d6f74b2f05b234b89a9d7b15ba40bbbcb3c7b6ff2913a288556e). Device installation/runtime is not tested.',
     'ci_run': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
     'bundle_sha256': hashlib.sha256(bundle).hexdigest(),
@@ -33,7 +33,7 @@ status.update({
 })
 status['tests'].update({
     'morphe_selector_names_defaults_and_compatibility': 'passed_12_selectors_for_9.2.3_and_11_for_9.2.6_daily_bonus_923_only',
-    'simsimi_9.2.6_actual_apk_application': 'passed_combined_quick_only_pull_only_static_output',
+    'simsimi_9.2.6_actual_apk_application': 'passed_combined_with_persisted_daily_bonus_safe_noop_plus_quick_only_pull_only_static_output',
     'pull_gesture_java_harness': 'passed_15_checks_including_navigation_transition_rejection',
     'pull_reload_apk_guard_sequence': 'passed_move_and_two_delayed_stability_checks',
     'quick_return_double_tap_host_harness': 'passed_20_checks',

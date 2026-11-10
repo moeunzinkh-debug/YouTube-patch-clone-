@@ -48,7 +48,7 @@ val membershipUiPatch = resourcePatch(
 @Suppress("unused")
 val dailyBonusPatch = resourcePatch(
     name = "Daily bonus without video (client path, experimental)",
-    description = "SimSimi 9.2.3 only. Selects its existing membership non-video daily-bonus loader. The 9.2.6 flow changed to currentAdmobState and is intentionally unsupported rather than fabricating ad completion. Keeps server state, reward requests and errors unchanged; device testing required.",
+    description = "SimSimi 9.2.3 only. Selects its existing membership non-video daily-bonus loader. The 9.2.6 flow changed to currentAdmobState, so a persisted Manager selection is safely ignored on 9.2.6 rather than failing or fabricating ad completion. Keeps server state, reward requests and errors unchanged; device testing required.",
     default = false
 ) {
     compatibleWith(Compatibility(

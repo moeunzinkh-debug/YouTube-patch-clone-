@@ -79,7 +79,7 @@ class AdGateTransformTest {
             assertFooter(daily)
         } else {
             assertFalse(AdGateTransform.supportsTarget("daily_bonus", source))
-            assertFailsWith<IllegalStateException> { AdGateTransform.patchDailyBonus(source) }
+            assertContentEquals(source, AdGateTransform.patchDailyBonus(source))
         }
     }
 

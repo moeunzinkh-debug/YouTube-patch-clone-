@@ -128,7 +128,8 @@ object AdGateTransform {
 
     fun patch(original: ByteArray): ByteArray = apply(original, "ads")
     fun patchMembership(original: ByteArray): ByteArray = apply(original, "membership")
-    fun patchDailyBonus(original: ByteArray): ByteArray = apply(original, "daily_bonus")
+    fun patchDailyBonus(original: ByteArray): ByteArray =
+        if (supportsTarget("daily_bonus", original)) apply(original, "daily_bonus") else original.copyOf()
     fun patchFeature(original: ByteArray, feature: String): ByteArray = apply(original, feature)
     internal fun featureOffsets(feature: String): List<IntRange> = v923Features.getValue(feature).map {
         it.offset until it.offset + it.original.size
