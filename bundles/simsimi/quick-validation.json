@@ -1,6 +1,6 @@
 {
   "engine": "Morphe Desktop v1.19.1",
-  "input": "Original uploaded SimSimi 9.2.3 base APK; matching split APKs are required for installation.",
+  "input": "Original uploaded SimSimi 9.2.6 APK.",
   "quick_return_with_pull_reload": "passed_static_apk_inspection",
   "quick_return_without_pull_reload": "passed_static_apk_inspection",
   "pull_reload_without_quick_return": "passed_static_apk_inspection",

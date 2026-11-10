@@ -1,10 +1,10 @@
 {
-  "version": "0.4.0-dev.3",
+  "version": "0.5.0-dev.1",
   "status": "experimental_actual_mpp_applied_static_output_verified",
   "package": "com.ismaker.android.simsimi",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42825926727",
-  "bundle_sha256": "e0c5aa0c5b2abf2efc89b67302199f0479e8749166e0704029ee180ae5124a4a",
-  "bundle_bytes": 70070,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42832870604",
+  "bundle_sha256": "93385e279830f668b2034efcfac005b7b10233cdeafb63c8130e6c7cfab2ddc8",
+  "bundle_bytes": 79213,
   "implemented_patches": [
     "Disable ad eligibility (experimental)",
     "Unlock membership UI (client only, experimental)",
@@ -34,14 +34,14 @@
     "six_feature_backend_entitlements": "not_verified",
     "unlimited_or_free_server_items": "not_implemented_or_verified",
     "full_gms_microg_re_compatibility": "not_verified",
-    "morphe_selector_names_defaults_and_compatibility": "passed_12_selectors_listing_9.2.3_and_9.2.6_quick_return_opt_in",
+    "morphe_selector_names_defaults_and_compatibility": "passed_12_selectors_for_9.2.3_and_11_for_9.2.6_daily_bonus_923_only",
     "quick_return_double_tap_host_harness": "passed_20_checks",
     "quick_return_android_stubs_host_harness": "passed_15_checks_not_android_runtime",
     "quick_return_apk_comparator_unit_tests": "passed_7_tests_on_synthetic_methods",
     "quick_return_morphe_application_matrix": "passed_combined_quick_only_pull_only_static_output",
     "quick_return_device_runtime": "not_run",
     "pull_reload_apk_guard_sequence": "passed_move_and_two_delayed_stability_checks",
-    "simsimi_9.2.6_actual_apk_application": "not_run_assumed_compatible_user_requested"
+    "simsimi_9.2.6_actual_apk_application": "passed_combined_quick_only_pull_only_static_output"
   },
   "pending_features": [
     "device_runtime_testing_of_six_feature_selectors",
@@ -54,7 +54,7 @@
     "daily_bonus_server_acceptance_device_verification",
     "quick_return_bottom_tab_and_scroll_on_device"
   ],
-  "input_constraint": "Uploaded base declares splits.required=true and contains no native libraries. Matching split APKs are required for installation testing.",
+  "input_constraint": "CI input is the exact uploaded SimSimi 9.2.6 APK (SHA-256 756ffb436399d6f74b2f05b234b89a9d7b15ba40bbbcb3c7b6ff2913a288556e). Device installation/runtime is not tested.",
   "release_published": false,
   "youtube_bundle_changed": false,
   "pull_reload_scope": "English Conversation list only. Requires a real ACTION_MOVE and two stable delayed Conversation checks before React reload; opening a chat must not reload. Device behavior remains unverified.",
@@ -76,7 +76,7 @@
   ],
   "target_version_codes": {
     "9.2.3": "1119001",
-    "9.2.6": "unverified"
+    "9.2.6": "1125001"
   },
-  "compatibility_note": "9.2.3 is statically verified. 9.2.6 is user-requested assumed compatibility and has not been inspected or patched in CI."
+  "compatibility_note": "9.2.6 has a separately reviewed Hermes/native profile and is applied by CI to the exact uploaded APK. Daily bonus remains 9.2.3-only because its 9.2.6 flow changed."
 }
