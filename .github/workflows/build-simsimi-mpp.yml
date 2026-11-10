@@ -57,6 +57,16 @@ jobs:
         run: |
           grep -E '^e:|^error:|Unresolved reference|Cannot infer|Overload resolution ambiguity' /tmp/simsimi-build.log | head -35 | while IFS= read -r line; do echo "::error::$line"; done || true
           grep -E -A 5 'What went wrong|Execution failed|Unsupported|mismatch' /tmp/simsimi-build.log | head -25 | while IFS= read -r line; do echo "::error::$line"; done || true
+          python3 - <<'PY'
+          import pathlib, xml.etree.ElementTree as ET
+          for path in pathlib.Path('/tmp/simsimi-build/patches/build/test-results/test').glob('*.xml'):
+              root = ET.parse(path).getroot()
+              for case in root.iter('testcase'):
+                  failure = case.find('failure')
+                  if failure is not None:
+                      message = (failure.get('message') or failure.text or 'unknown test failure').replace('%', '%25').replace('\n', '%0A').replace('\r', '%0D')
+                      print(f"::error title={case.get('classname')}.{case.get('name')}::{message}")
+          PY
           jar="$(find "$HOME/.gradle/caches" -name 'morphe-patcher-2.0.0.jar' | head -1)"
           if test -n "$jar"; then
             javap -classpath "$jar" app.morphe.patcher.patch.BytecodePatchContext | grep -E 'classDefForEach|getAllClasses|classDefBy|ClassDefs|Classes' | while IFS= read -r line; do echo "::notice::$line"; done
