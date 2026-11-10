@@ -71,6 +71,7 @@ def main() -> None:
         'after_patch_check_calls_and_init_calls': [0, 0],
         'wrong_version_code_rejected': True,
         'changed_opcode_rejected': True,
+        'microg_wrong_version_and_unsigned_input_rejected': True,
         'bundle_sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(),
         'real_genv_installed_or_launched': False,
         'full_app_login_server_attestation_and_purchases': 'not tested',

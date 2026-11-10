@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "android_emulator_api": "24",
+  "guard_from_actual_mpp_extension_dex": true,
+  "no_package_rejected": true,
+  "same_package_wrong_signer_rejected": true,
+  "official_morphe_microg_7_3_0_universal_accepted": true,
+  "official_signin_service_and_activity_selected": true,
+  "disabled_official_package_rejected_then_enabled": true,
+  "synthetic_stale_mode_refreshed_only_with_actual_guard_acceptance": true,
+  "synthetic_mode_note": "synthetic fixture mirrors the injected decision; it is not GenV code",
+  "synthetic_mismatched_caller_rejected": true,
+  "synthetic_caller_reached_microg_empty_account_activity": true,
+  "synthetic_handoff_scope": "null-options test parcel, no account, no authentication; not the GenV app or its code",
+  "bundle_sha256": "04ba2e5d8ffa41c65fc687c4c0be08530c9fd5e719a252e85f3020ad16018bdb",
+  "official_microg_apk_sha256": "67b794fd5221512a11d5950ec214fc0af0e3a8f72840d01235920729c7e73f5e",
+  "network_disabled": true,
+  "accounts_used": false,
+  "real_genv_installed_or_launched": false,
+  "oauth_server_acceptance_and_user_device": "not tested",
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42814446107"
+}

@@ -6,7 +6,7 @@ work="${1:?temporary work directory required}"
 bundle="${2:?source-matched MPP required}"
 : "${ANDROID_HOME:?Android SDK required}"
 : "${GH_TOKEN:?GitHub token required}"
-mkdir -p "$work"/{tools,stubs,classes,dex,smali,smali-bad,deps}
+mkdir -p "$work"/{tools,stubs,classes,dex,smali,smali-bad,deps,res/values}
 tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
 platform="$(find "$ANDROID_HOME/platforms" -name android.jar | sort -V | tail -1)"
 test -x "$tools/aapt2" && test -x "$tools/d8" && test -x "$tools/apksigner" && test -f "$platform"
@@ -21,10 +21,13 @@ javac -encoding UTF-8 -source 8 -target 8 -cp "$platform:$work/stubs" -d "$work/
 mapfile -t java_classes < <(find "$work/classes" -name '*.class' | sort)
 "$tools/d8" --min-api 24 --lib "$platform" --classpath "$work/stubs" --output "$work/dex" "${java_classes[@]}"
 java -cp "$work/deps/*" org.jf.smali.Main assemble "$base/smali" -o "$work/smali/classes2.dex"
+# A real resource table is needed when exercising the MicroG resource patch.
+printf '%s\n' '<resources><string name="fixture_name">GenV synthetic PairIP test</string></resources>' > "$work/res/values/strings.xml"
+"$tools/aapt2" compile --dir "$work/res" -o "$work/resources.zip"
 
 make_apk() {
     local manifest="$1" second_dex="$2" output="$3"
-    "$tools/aapt2" link -I "$platform" --manifest "$manifest" -o "$output"
+    "$tools/aapt2" link -I "$platform" --manifest "$manifest" -o "$output" "$work/resources.zip"
     (cd "$work/dex" && zip -q -j "$output" classes.dex)
     zip -q -j "$output" "$second_dex"
 }
@@ -60,6 +63,20 @@ if run_patch "$work/wrong-shape.apk" "$work/wrong-shape-result.json" "$work/wron
     echo 'Changed instruction shape was accepted' >&2; exit 1
 fi
 grep -q 'GenV initializeLicenseCheck implementation changed or is already patched' "$work/wrong-shape.log"
+
+run_microg() {
+    java -Xmx3g -jar "$cli" patch "$1" --patches "$bundle" --exclusive \
+        -e 'Morphe MicroG Google sign-in support (experimental)' --bytecode-mode FULL --unsigned \
+        --result-file "$2" --out "$3"
+}
+if run_microg "$work/wrong-version.apk" "$work/microg-wrong-version-result.json" "$work/microg-wrong-version-output.apk" > "$work/microg-wrong-version.log" 2>&1; then
+    echo 'MicroG selector accepted the wrong version code' >&2; exit 1
+fi
+grep -q 'requires the reviewed GenV package, version 3.7.2 and build 163' "$work/microg-wrong-version.log"
+if run_microg "$work/fixture-unsigned.apk" "$work/microg-wrong-shape-result.json" "$work/microg-wrong-shape-output.apk" > "$work/microg-wrong-shape.log" 2>&1; then
+    echo 'MicroG selector accepted unrelated bytecode' >&2; exit 1
+fi
+grep -q 'GenV input signing certificate metadata is missing' "$work/microg-wrong-shape.log"
 
 keytool -genkeypair -noprompt -keystore "$work/disposable.jks" -storepass android -keypass android \
     -alias disposable -dname 'CN=Disposable synthetic PairIP test' -keyalg RSA -keysize 2048 -validity 2 >/dev/null 2>&1

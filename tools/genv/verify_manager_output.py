@@ -9,6 +9,7 @@ from pathlib import Path
 from inspect_genv import ASSET_SHA256, check_asset
 from verify_bundle import verify_bundle
 from verify_patched import read_methods, verify_methods
+from verify_microg_patched import verify_contents
 
 
 def main() -> None:
@@ -21,6 +22,7 @@ def main() -> None:
     check_asset(args.base)
     bundle = verify_bundle(args.bundle)
     verify_methods(read_methods(args.base), read_methods(args.patched))
+    microg = verify_contents(args.base, [args.patched])
     with zipfile.ZipFile(args.base) as source, zipfile.ZipFile(args.patched) as output:
         native = [name for name in output.namelist() if name.startswith('lib/') and name.endswith('.so')]
         if native: raise ValueError('Expected an incomplete base APK without native split libraries')
@@ -33,8 +35,10 @@ def main() -> None:
         'package': 'com.ainate.ai.video.generate', 'version': '3.7.2', 'version_code': 163,
         'bundle_version': bundle['version'], 'bundle_sha256': bundle['sha256'],
         'imported_local_source': True, 'experimental_app_versions_enabled': True,
-        'selected_patch': 'Remove license check', 'manager_patch_incomplete_base': 'passed',
+        'selected_patches': ['Remove license check', 'Morphe MicroG Google sign-in support (experimental)'],
+        'manager_patch_incomplete_base': 'passed',
         'saved_output_pairip_early_returns_and_selected_controls': 'passed',
+        'saved_output_microg_routing_and_manifest': microg['status'],
         'saved_output_manifest_byte_identical': manifest_same,
         'saved_output_contains_native_libraries': False,
         'full_split_merge_or_complete_app': 'not tested',
@@ -44,6 +48,6 @@ def main() -> None:
     }
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(result, indent=2) + '\n')
-    print('Manager saved an incomplete base with the two expected PairIP edits; runtime not tested')
+    print('Manager saved an incomplete base with PairIP and reviewed MicroG changes; runtime not tested')
 
 if __name__ == '__main__': main()

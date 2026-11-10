@@ -1,0 +1,23 @@
+{
+  "scope": "Offline, synthetic intent/parcel probe using the MPP guard; no GenV APK/app code, user accounts or login requests",
+  "status": "passed_synthetic_handoff",
+  "android_emulator_apis": [
+    24,
+    29,
+    35
+  ],
+  "reference_microg_package": "app.revanced.android.gms",
+  "reference_microg_release": "7.3.0",
+  "guard_from_reviewed_mpp_extension": true,
+  "mismatched_synthetic_caller_rejected": true,
+  "synthetic_correct_caller_reached_microg_empty_account_activity": true,
+  "synthetic_options": "null; not GenV options or an authenticated request",
+  "network_disabled": true,
+  "accounts_used": false,
+  "real_genv_installed_or_executed": false,
+  "actual_account_picker_oauth_backend_and_huawei": "not tested",
+  "real_genv_error_cause": "unknown",
+  "static_trace_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42810464459",
+  "synthetic_test_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42811101262",
+  "synthetic_test_commit": "5e34537b04a806257d8f696af1d36cca8e160c6a"
+}

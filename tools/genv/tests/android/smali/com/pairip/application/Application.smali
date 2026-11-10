@@ -13,3 +13,14 @@
     invoke-super {p0, p1}, Landroid/app/Application;->attachBaseContext(Landroid/content/Context;)V
     return-void
 .end method
+
+# Initialize once per synthetic process instead of once per Activity creation;
+# first-boot emulator configuration can recreate Activities nondeterministically.
+.method public onCreate()V
+    .registers 2
+    invoke-super {p0}, Landroid/app/Application;->onCreate()V
+    new-instance v0, Lcom/pairip/licensecheck/LicenseClient;
+    invoke-direct {v0}, Lcom/pairip/licensecheck/LicenseClient;-><init>()V
+    invoke-virtual {v0}, Lcom/pairip/licensecheck/LicenseClient;->initializeLicenseCheck()V
+    return-void
+.end method

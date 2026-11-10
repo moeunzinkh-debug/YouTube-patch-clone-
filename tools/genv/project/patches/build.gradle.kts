@@ -5,7 +5,7 @@ group = "app.morphe"
 patches {
     about {
         name = "GenV patches (experimental)"
-        description = "Standalone exact-version GenV client-side license-check patch."
+        description = "Standalone exact-version GenV license-check and experimental Morphe MicroG sign-in patches."
         source = "https://github.com/moeunzinkh-debug/YouTube-patch-clone-"
         author = "YouTube Patch Clone contributors"
         contact = "https://github.com/moeunzinkh-debug/YouTube-patch-clone-"

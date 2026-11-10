@@ -2,13 +2,15 @@ name: Build and validate the GenV Morphe bundle
 
 on:
   push:
-    branches: [arena/02093a53-youtube-patch-clone]
+    branches: [arena/3655779f-youtube-patch-clone]
     paths:
       - 'tools/genv/project/**'
       - 'tools/genv/prepare_build.py'
       - 'tools/genv/verify_bundle.py'
       - 'tools/genv/verify_patched.py'
+      - 'tools/genv/verify_microg_patched.py'
       - 'tools/genv/test_patch_tools.py'
+      - 'tools/genv/test_microg_verifier.py'
       - 'tools/genv/inspect_genv.py'
       - '.github/workflows/build-genv-mpp.yml'
 
@@ -39,6 +41,7 @@ jobs:
           set -euo pipefail
           python3 tools/genv/test_inspect_genv.py -v
           python3 tools/genv/test_patch_tools.py -v
+          python3 tools/genv/test_microg_verifier.py -v
           python3 tools/genv/prepare_build.py "$RUNNER_TEMP/genv-build"
           mkdir -p "$RUNNER_TEMP/genv-tools" "$RUNNER_TEMP/genv-output"
           gh release download v9.8.2 --repo gradle/gradle-distributions --pattern gradle-9.8.2-bin.zip --dir "$RUNNER_TEMP/genv-tools"
@@ -49,7 +52,7 @@ jobs:
         run: |
           set -o pipefail
           cd "$RUNNER_TEMP/genv-build"
-          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/genv-build.log"
+          ./gradlew :patches:test :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/genv-build.log"
       - name: Report build diagnostics
         if: failure()
         shell: bash
@@ -103,6 +106,52 @@ jobs:
           echo '::notice::Fail-closed guard rejected an already modified GenV method.'
           echo '::notice::Both PairIP entry points were modified in a disposable base APK; selected controls and manifest were verified.'
           echo '::notice::The source APK requires splits. No APK was installed, uploaded or published.'
+      - name: Verify MicroG alone and together with the license selector
+        shell: bash
+        run: |
+          set -euo pipefail
+          cli="$RUNNER_TEMP/genv-tools/morphe-desktop-1.20.0-dev.1-all.jar"
+          input="$RUNNER_TEMP/genv-tools/GenV_3.7.2.apk"
+          for mode in microg both; do
+            selectors=(-e 'Morphe MicroG Google sign-in support (experimental)')
+            if [[ "$mode" == both ]]; then selectors+=(-e 'Remove license check'); fi
+            if ! java -Xmx4g -jar "$cli" patch "$input" --patches "$RUNNER_TEMP/genv-output/bundle.mpp" \
+                --exclusive "${selectors[@]}" --unsigned --bytecode-mode FULL \
+                --out "$RUNNER_TEMP/genv-tools/$mode.apk" --result-file "$RUNNER_TEMP/genv-tools/$mode.json" \
+                > "$RUNNER_TEMP/genv-tools/$mode.log" 2>&1; then
+              tail -n 60 "$RUNNER_TEMP/genv-tools/$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
+              exit 1
+            fi
+          done
+          if ! python3 tools/genv/verify_microg_patched.py "$input" \
+              "$RUNNER_TEMP/genv-tools/microg.apk" "$RUNNER_TEMP/genv-tools/microg.json" \
+              "$RUNNER_TEMP/genv-tools/both.apk" "$RUNNER_TEMP/genv-tools/both.json" \
+              "$RUNNER_TEMP/genv-output/microg-static.json" > "$RUNNER_TEMP/genv-tools/microg-verify.log" 2>&1; then
+            tail -n 30 "$RUNNER_TEMP/genv-tools/microg-verify.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          cat "$RUNNER_TEMP/genv-tools/microg-verify.log"
+          # Re-sign a private copy using a disposable key. Identical code and
+          # version must not cause the original signer metadata to be advertised.
+          tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          keytool -genkeypair -noprompt -keystore "$RUNNER_TEMP/genv-tools/fixture.jks" -storepass android -keypass android \
+            -alias fixture -dname 'CN=Disposable signer test' -keyalg RSA -keysize 2048 -validity 2 > /dev/null 2>&1
+          "$tools/apksigner" sign --min-sdk-version 24 --ks "$RUNNER_TEMP/genv-tools/fixture.jks" \
+            --ks-pass pass:android --key-pass pass:android --out "$RUNNER_TEMP/genv-tools/wrong-signer.apk" "$input"
+          "$tools/apksigner" verify --min-sdk-version 24 "$RUNNER_TEMP/genv-tools/wrong-signer.apk"
+          if java -Xmx4g -jar "$cli" patch "$RUNNER_TEMP/genv-tools/wrong-signer.apk" \
+              --patches "$RUNNER_TEMP/genv-output/bundle.mpp" --exclusive \
+              -e 'Morphe MicroG Google sign-in support (experimental)' --unsigned --bytecode-mode FULL \
+              --out "$RUNNER_TEMP/genv-tools/wrong-signer-output.apk" \
+              --result-file "$RUNNER_TEMP/genv-tools/wrong-signer.json" > "$RUNNER_TEMP/genv-tools/wrong-signer.log" 2>&1; then
+            echo '::error::MicroG selector accepted an APK signed with a different certificate'
+            exit 1
+          fi
+          if ! grep -q 'GenV input signing certificate does not match the reviewed base APK' "$RUNNER_TEMP/genv-tools/wrong-signer.log"; then
+            tail -n 40 "$RUNNER_TEMP/genv-tools/wrong-signer.log" | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          fi
+          echo '::notice::Both selectors work independently and together; a re-signed input was rejected. No APK was installed, uploaded or published.'
       - uses: actions/upload-artifact@v4
         with:
           name: genv-morphe-bundle-static-only
@@ -112,3 +161,4 @@ jobs:
             ${{ runner.temp }}/genv-output/bundle.mpp.sha256
             ${{ runner.temp }}/genv-output/patches.txt
             ${{ runner.temp }}/genv-output/patch-validation.json
+            ${{ runner.temp }}/genv-output/microg-static.json
