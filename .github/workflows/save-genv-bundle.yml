@@ -65,10 +65,11 @@ jobs:
               assert test.get('android_emulator_api')==str(api)
               assert all(test.get(key) is True for key in ('guard_from_actual_mpp_extension_dex','no_package_rejected',
                   'same_package_wrong_signer_rejected','official_morphe_microg_7_3_0_universal_accepted',
-                  'official_signin_service_and_activity_selected','disabled_official_package_rejected_then_enabled'))
+                  'official_signin_service_and_activity_selected','disabled_official_package_rejected_then_enabled',
+                  'synthetic_stale_mode_refreshed_only_with_actual_guard_acceptance'))
               assert test.get('official_microg_apk_sha256')=='67b794fd5221512a11d5950ec214fc0af0e3a8f72840d01235920729c7e73f5e'
           result={
-            'bundle_version':'0.2.0-dev.1', 'bundle_sha256':digest, 'bundle_bytes':bundle.stat().st_size,
+            'bundle_version':'0.2.0-dev.2', 'bundle_sha256':digest, 'bundle_bytes':bundle.stat().st_size,
             'input_package':'com.ainate.ai.video.generate', 'version':'3.7.2', 'version_code':163,
             'input_sha256':p['input_sha256'], 'patches':['Remove license check','Morphe MicroG Google sign-in support (experimental)'],
             'static_build':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{static}",
