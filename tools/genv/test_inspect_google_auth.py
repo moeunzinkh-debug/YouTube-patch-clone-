@@ -54,6 +54,7 @@ class AuthInspectionGuards(unittest.TestCase):
             Instruction('if-eqz', 'v1, +2h', branch=2),
             Instruction('const/16', 'v2, 100000'),
             Instruction('return', 'v1'),
+            Instruction('add-int/lit8', 'v1, v0, -1'),
         ])
         self.assertNotIn('password', str(rows))
         self.assertNotIn('example.org', str(rows))
@@ -61,5 +62,6 @@ class AuthInspectionGuards(unittest.TestCase):
         self.assertEqual(rows[2]['small_integer'], 3)
         self.assertEqual(rows[3]['target_index'], 5)
         self.assertNotIn('small_integer', rows[4])
+        self.assertEqual(rows[6]['small_integer'], -1)
 
 if __name__ == '__main__': unittest.main()

@@ -15,6 +15,8 @@ from inspect_account_login import safe_trace_reference
 FLOW_SELECTED = {
     'Lf3/a;->h()I',
     'Lf3/a;->e()Landroid/content/Intent;',
+    'Lg3/j;->a(Landroid/content/Context;Lcom/google/android/gms/auth/api/signin/GoogleSignInOptions;)Landroid/content/Intent;',
+    'Lcom/google/android/gms/auth/api/signin/internal/SignInHubActivity;->onCreate(Landroid/os/Bundle;)V',
 }
 
 SELECTED = {
@@ -39,7 +41,7 @@ ANCHORS = {'MetadataValueReader', 'This should never happen.', 'Google Play Serv
 def sanitized_flow(instructions) -> list[dict]:
     """Emit only control flow, register names, small integers and safe references.
 
-    This is limited to two fixed, short SDK methods. Arbitrary string literals,
+    This is limited to four fixed SDK methods. Arbitrary string literals,
     URLs, client IDs and account data are never included in the output.
     """
     offsets = {}
@@ -62,13 +64,16 @@ def sanitized_flow(instructions) -> list[dict]:
             target = offsets.get(offset + 2 * ins.get_ref_off())
             if target is not None:
                 item['target_index'] = target
+        numeric_operand = None
         if opcode.startswith('const') and not opcode.startswith(('const-string', 'const-class')):
-            match = re.fullmatch(r'v\d+,\s*(-?(?:0x[\da-f]+|\d+))', operand, re.I)
-            if match:
-                literal = match.group(1)
-                number = int(literal, 16 if literal.lstrip('-').lower().startswith('0x') else 10)
-                if -16 <= number <= 16:
-                    item['small_integer'] = number
+            numeric_operand = re.fullmatch(r'v\d+,\s*(-?(?:0x[\da-f]+|\d+))', operand, re.I)
+        elif opcode.endswith(('/lit8', '/lit16')):
+            numeric_operand = re.fullmatch(r'v\d+,\s*v\d+,\s*(-?(?:0x[\da-f]+|\d+))', operand, re.I)
+        if numeric_operand:
+            literal = numeric_operand.group(1)
+            number = int(literal, 16 if literal.lstrip('-').lower().startswith('0x') else 10)
+            if -16 <= number <= 16:
+                item['small_integer'] = number
         if opcode.startswith('const-string'):
             route = extract_route(operand)
             if route:
