@@ -105,13 +105,29 @@ for dex_bytes in apk.get_all_dex():
             "interfaces": cls.get_interfaces(), "methods": methods,
         })
 
+extra_functions = []
+for fid in (21172, 25715, 31003):
+    header = reader.function_headers[fid]
+    extra_functions.append({
+        "function_id": fid, "name": reader.strings[header.functionName],
+        "offset": header.offset, "size": header.bytecodeSizeInBytes,
+        "frame_size": header.frameSize,
+        "bytecode_hex": payload[header.offset:header.offset + header.bytecodeSizeInBytes].hex(),
+        "disassembly": [repr(ins) for ins in parse_hbc_bytecode(header, reader)],
+    })
+
 result = {
     "source_sha256": __import__("hashlib").sha256(source.read_bytes()).hexdigest(),
     "hermes": {
         "size": len(payload), "sha256": __import__("hashlib").sha256(payload).hexdigest(),
         "function_count": len(reader.function_headers), "string_count": len(reader.strings),
+        "selected_string_ids": {
+            name: reader.strings.index(name) for name in
+            ("Object", "assign", "currentMembershipStatus", "getMembershipObject", "hasMembership")
+        },
     },
     "hermes_targets": mapped,
+    "extra_functions": extra_functions,
     "bottom_navigation_classes": nav_classes,
     "scope": "Read-only candidate mapping. A target is not accepted until exact transform and patched-output verification pass.",
 }
