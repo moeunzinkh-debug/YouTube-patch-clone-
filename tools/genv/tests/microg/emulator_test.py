@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Offline runtime test: exact MPP guard, fake signer and published MicroG only.
+"""Offline test of the MPP guard and a synthetic MicroG sign-in handoff.
 
 Never installs or opens GenV, never uses accounts, and records no credentials.
+The synthetic test deliberately stops at MicroG's empty-account UI: it does
+not authenticate or prove the real GenV app's behavior.
 """
 from __future__ import annotations
 import hashlib
@@ -87,6 +89,56 @@ def probe(expected: str) -> None:
     raise RuntimeError(f'Expected {expected}; observed {fixed[:2]}')
 
 
+def wait_handoff_result(expected: str) -> None:
+    deadline = time.monotonic() + 100
+    last = []
+    while time.monotonic() < deadline:
+        try:
+            last = read_screen()
+            if any(node.get('text') == expected for node in last):
+                print('::notice::Offline synthetic handoff: ' + expected, flush=True)
+                return
+            time.sleep(2)
+        except (RuntimeError, ET.ParseError):
+            time.sleep(2)
+    fixed = [n.get('text', '') for n in last if n.get('text', '').startswith('HANDOFF:')]
+    raise RuntimeError(f'Expected fixed handoff result; observed {fixed[:2]}')
+
+
+def start_handoff(mismatch: bool) -> None:
+    disable_network()
+    adb('shell', 'am', 'force-stop', PROBE)
+    adb('shell', 'am', 'start', '-n', PROBE + '/test.genv.microg.HandoffProbeActivity',
+        '--ez', 'mismatch', 'true' if mismatch else 'false')
+
+
+def has_microg_account(account_dump: str) -> bool:
+    return bool(re.search(r'Account\s*\{[^}]*\btype\s*=\s*app\.revanced(?:\s|,|\})', account_dump))
+
+
+def assert_no_microg_account() -> None:
+    # The emulator is disposable. Never print the account-manager dump; abort
+    # instead if an actual account of MicroG's type is unexpectedly present.
+    if has_microg_account(adb('shell', 'dumpsys', 'account')):
+        raise RuntimeError('MicroG account unexpectedly present in synthetic emulator')
+
+
+def wait_empty_account_screen() -> None:
+    target = MICROG + '/org.microg.gms.auth.login.LoginActivity'
+    deadline = time.monotonic() + 100
+    while time.monotonic() < deadline:
+        # Only compare fixed package/activity identifiers in memory. Do not
+        # record the activity dump or any UI contents from the sign-in screen.
+        activities = adb('shell', 'dumpsys', 'activity', 'activities')
+        resumed = [line for line in activities.splitlines() if any(
+            marker in line for marker in ('mResumedActivity', 'topResumedActivity', 'mFocusedActivity', 'Resumed:'))]
+        if any(target in line for line in resumed):
+            print('::notice::Synthetic caller reached MicroG empty-account activity offline.', flush=True)
+            return
+        time.sleep(2)
+    raise RuntimeError('Synthetic caller did not reach the expected MicroG empty-account activity')
+
+
 def main() -> None:
     work, bundle, official, report = map(Path, sys.argv[1:5])
     disable_network()
@@ -104,6 +156,19 @@ def main() -> None:
     probe('GUARD:NO;SERVICE:NONE;ACTIVITY:NONE')
     adb('shell', 'pm', 'enable', MICROG)
     probe('GUARD:YES;SERVICE:AUTH;ACTIVITY:AUTH')
+
+    # No real account or credential is present. A mismatching caller must be
+    # rejected; the correct synthetic caller should reach MicroG's add-account
+    # activity, without filling it or proceeding to a real authentication.
+    assert_no_microg_account()
+    start_handoff(mismatch=True)
+    wait_handoff_result('HANDOFF:MISMATCH_REJECTED;NETWORK:OFF')
+    start_handoff(mismatch=False)
+    wait_empty_account_screen()
+    adb('shell', 'am', 'force-stop', MICROG)
+    adb('shell', 'am', 'force-stop', PROBE)
+    assert_no_microg_account()
+
     api = adb('shell', 'getprop', 'ro.build.version.sdk').strip()
     result = {
         'status': 'passed', 'android_emulator_api': api,
@@ -112,6 +177,9 @@ def main() -> None:
         'official_morphe_microg_7_3_0_universal_accepted': True,
         'official_signin_service_and_activity_selected': True,
         'disabled_official_package_rejected_then_enabled': True,
+        'synthetic_mismatched_caller_rejected': True,
+        'synthetic_caller_reached_microg_empty_account_activity': True,
+        'synthetic_handoff_scope': 'null-options test parcel, no account, no authentication; not the GenV app or its code',
         'bundle_sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(),
         'official_microg_apk_sha256': hashlib.sha256(official.read_bytes()).hexdigest(),
         'network_disabled': True, 'accounts_used': False, 'real_genv_installed_or_launched': False,

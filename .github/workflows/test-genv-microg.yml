@@ -1,5 +1,5 @@
-name: Test GenV MicroG guard offline on Android
-# Exercise the actual MPP extension on both the minimum and modern API levels.
+name: Test GenV MicroG guard and synthetic handoff offline on Android
+# Exercise the actual MPP guard and a credential-free synthetic handoff, never GenV.
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [24, 35]
+        api: [24, 29, 35]
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -40,6 +40,7 @@ jobs:
           set -euo pipefail
           work="$RUNNER_TEMP/genv-microg"
           mkdir -p "$work/bundle" "$work/fixtures" "$work/release"
+          python3 tools/genv/tests/microg/test_emulator_helpers.py -v
           run="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-genv-mpp.yml \
             tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py \
             tools/genv/verify_microg_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
@@ -63,7 +64,7 @@ jobs:
       - name: Enable emulator acceleration
         run: |
           if test -e /dev/kvm; then sudo chmod 666 /dev/kvm; else echo '::warning::KVM unavailable'; fi
-      - name: Run offline signer, disabled-package, and component-resolution checks
+      - name: Run offline signer, component-resolution, and synthetic handoff checks
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api }}

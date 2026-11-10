@@ -6,5 +6,7 @@
         <activity android:name="test.genv.microg.ProbeActivity" android:exported="true">
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
         </activity>
+        <activity android:name="test.genv.microg.HandoffProbeActivity" android:exported="true" />
+        <activity android:name="test.genv.microg.SyntheticHubActivity" android:exported="false" />
     </application>
 </manifest>

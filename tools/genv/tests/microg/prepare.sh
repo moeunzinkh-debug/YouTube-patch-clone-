@@ -11,7 +11,8 @@ platform="$(find "$ANDROID_HOME/platforms" -name android.jar | sort -V | tail -1
 test -x "$tools/aapt2" && test -x "$tools/d8" && test -x "$tools/apksigner" && test -f "$platform"
 
 javac -encoding UTF-8 -source 8 -target 8 -cp "$platform" -d "$work/stubs" "$base/stubs/app/morphe/extension/genv/MicroGGuard.java"
-javac -encoding UTF-8 -source 8 -target 8 -cp "$platform:$work/stubs" -d "$work/probe-classes" "$base/src/test/genv/microg/ProbeActivity.java"
+mapfile -t probe_java < <(find "$base/src" -name '*.java' | sort)
+javac -encoding UTF-8 -source 8 -target 8 -cp "$platform:$work/stubs" -d "$work/probe-classes" "${probe_java[@]}"
 mapfile -t probe_classes < <(find "$work/probe-classes" -name '*.class' | sort)
 "$tools/d8" --min-api 24 --lib "$platform" --classpath "$work/stubs" --output "$work/probe-dex" "${probe_classes[@]}"
 unzip -p "$bundle" extensions/genv.mpe > "$work/probe-dex/classes2.dex"
