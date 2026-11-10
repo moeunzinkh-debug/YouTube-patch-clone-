@@ -7370,6 +7370,56 @@
         "Landroid/os/Parcelable;"
       ],
       "methods": []
+    },
+    {
+      "name": "Le6/a;",
+      "superclass": "Ljava/lang/Object;",
+      "interfaces": [
+        "Landroid/view/View$OnClickListener;"
+      ],
+      "methods": [
+        {
+          "name": "onClick",
+          "descriptor": "(Landroid/view/View;)V",
+          "access": "public final",
+          "instructions": [
+            "iget-object v0, v2, Le6/a;->a Lcom/aurelhubert/ahbottomnavigation/a;",
+            "iget v1, v2, Le6/a;->b I",
+            "invoke-static v0, v1, v3, Lcom/aurelhubert/ahbottomnavigation/a;->b(Lcom/aurelhubert/ahbottomnavigation/a; I Landroid/view/View;)V",
+            "return-void "
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lcom/reactnativenavigation/customrow/d;",
+      "superclass": "Ljava/lang/Object;",
+      "interfaces": [
+        "Landroid/view/View$OnClickListener;"
+      ],
+      "methods": [
+        {
+          "name": "onClick",
+          "descriptor": "(Landroid/view/View;)V",
+          "access": "public final",
+          "instructions": [
+            "iget v0, v2, Lcom/reactnativenavigation/customrow/d;->a I",
+            "packed-switch v0, +0000018h",
+            "iget-object v0, v2, Lcom/reactnativenavigation/customrow/d;->c Landroid/widget/FrameLayout;",
+            "check-cast v0, Lcom/aurelhubert/ahbottomnavigation/a;",
+            "iget v1, v2, Lcom/reactnativenavigation/customrow/d;->b I",
+            "invoke-static v0, v1, v3, Lcom/aurelhubert/ahbottomnavigation/a;->a(Lcom/aurelhubert/ahbottomnavigation/a; I Landroid/view/View;)V",
+            "return-void ",
+            "iget-object v0, v2, Lcom/reactnativenavigation/customrow/d;->c Landroid/widget/FrameLayout;",
+            "check-cast v0, Lcom/reactnativenavigation/customrow/BottomTabsCustomRow;",
+            "iget v1, v2, Lcom/reactnativenavigation/customrow/d;->b I",
+            "invoke-static v0, v1, v3, Lcom/reactnativenavigation/customrow/BottomTabsCustomRow;->c(Lcom/reactnativenavigation/customrow/BottomTabsCustomRow; I Landroid/view/View;)V",
+            "return-void ",
+            "nop ",
+            "packed-switch-payload 0"
+          ]
+        }
+      ]
     }
   ],
   "scope": "Read-only candidate mapping. A target is not accepted until exact transform and patched-output verification pass."
