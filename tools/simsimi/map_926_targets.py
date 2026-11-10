@@ -108,7 +108,7 @@ for dex_bytes in apk.get_all_dex():
         })
 
 extra_functions = []
-for fid in (21172, 25715, 31003):
+for fid in (21172, 25715, 31003, *range(22080, 22121)):
     header = reader.function_headers[fid]
     extra_functions.append({
         "function_id": fid, "name": reader.strings[header.functionName],
