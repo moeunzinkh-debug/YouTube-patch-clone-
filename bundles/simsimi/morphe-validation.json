@@ -12,7 +12,7 @@
   "target_version": "9.2.6",
   "hermes_payload_matches_tested_transform": true,
   "six_client_feature_gate_bytes_match": true,
-  "hermes_sha256": "d32b668ea35e853a7b4b109e31712e7101ba961a12f2979f7382f88331575576",
+  "hermes_sha256": "5807070b0b33b8c191d2a5537c1802f2612cc12b45a4296a5a24934ec836b1df",
   "injected_main_activity_dispatch_hook": true,
   "injected_pull_refresh_runtime": true,
   "pull_refresh_requires_move_and_two_delayed_stability_checks": true,
