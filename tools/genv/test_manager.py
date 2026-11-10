@@ -170,6 +170,15 @@ def main() -> None:
     LAST_STAGE = 'enable experimental target'
     tap('Sources', exact=True)
     nodes, _ = wait_for('GenV patches (experimental)', 45)
+    # Manager can expose the imported source card before its asynchronous
+    # metadata refresh finishes. Opening the card during that state can omit
+    # the experimental-version toggle on slower emulator jobs.
+    deadline = time.monotonic() + 90
+    while any(matches(node, 'Updating sources') for node in nodes) and time.monotonic() < deadline:
+        time.sleep(2)
+        nodes = dump()
+    if any(matches(node, 'Updating sources') for node in nodes):
+        raise RuntimeError('Imported patch source did not finish updating')
     announce('source list', nodes)
     tap('GenV patches (experimental)')
     nodes, _ = wait_for('Experimental app versions', 45)
