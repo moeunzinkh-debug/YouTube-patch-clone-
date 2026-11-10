@@ -81,7 +81,9 @@ nav_classes = []
 for dex_bytes in apk.get_all_dex():
     for cls in DEX(dex_bytes).get_classes():
         name = cls.get_name()
-        if not name.startswith("Lcom/aurelhubert/ahbottomnavigation/"):
+        if not (name.startswith("Lcom/aurelhubert/ahbottomnavigation/") or name in (
+            "Lcom/reactnativenavigation/customrow/d;", "Le6/a;"
+        )):
             continue
         methods = []
         for method in cls.get_methods():
