@@ -14,6 +14,10 @@ from inspect_google_auth import extract_route, identifier
 SELECTED = {
     'Li3/f;->b(Landroid/content/Context;I)I',
     'Li3/k;->c(Landroid/content/pm/PackageInfo;Z)Z',
+    # Google Sign-In client mode detection and interactive intent creation:
+    # identify whether the checked availability method is actually on-path.
+    'Lf3/a;->h()I',
+    'Lf3/a;->e()Landroid/content/Intent;',
     'Lg3/j;->a(Landroid/content/Context;Lcom/google/android/gms/auth/api/signin/GoogleSignInOptions;)Landroid/content/Intent;',
     'Lg3/e;->getStartServiceAction()Ljava/lang/String;',
     'Ll3/f;->getStartServicePackage()Ljava/lang/String;',
