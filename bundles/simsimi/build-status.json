@@ -1,10 +1,10 @@
 {
-  "version": "0.5.0-dev.1",
+  "version": "0.5.0-dev.2",
   "status": "experimental_actual_mpp_applied_static_output_verified",
   "package": "com.ismaker.android.simsimi",
-  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42832870604",
-  "bundle_sha256": "93385e279830f668b2034efcfac005b7b10233cdeafb63c8130e6c7cfab2ddc8",
-  "bundle_bytes": 79213,
+  "ci_run": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42921204683",
+  "bundle_sha256": "dfef79c404db387921e08fa53e794192b4768f2f911e97a42204a786a0377ba0",
+  "bundle_bytes": 79324,
   "implemented_patches": [
     "Disable ad eligibility (experimental)",
     "Unlock membership UI (client only, experimental)",
@@ -41,7 +41,7 @@
     "quick_return_morphe_application_matrix": "passed_combined_quick_only_pull_only_static_output",
     "quick_return_device_runtime": "not_run",
     "pull_reload_apk_guard_sequence": "passed_move_and_two_delayed_stability_checks",
-    "simsimi_9.2.6_actual_apk_application": "passed_combined_quick_only_pull_only_static_output"
+    "simsimi_9.2.6_actual_apk_application": "passed_combined_with_persisted_daily_bonus_safe_noop_plus_quick_only_pull_only_static_output"
   },
   "pending_features": [
     "device_runtime_testing_of_six_feature_selectors",
@@ -78,5 +78,5 @@
     "9.2.3": "1119001",
     "9.2.6": "1125001"
   },
-  "compatibility_note": "9.2.6 has a separately reviewed Hermes/native profile and is applied by CI to the exact uploaded APK. Daily bonus remains 9.2.3-only because its 9.2.6 flow changed."
+  "compatibility_note": "9.2.6 has a separately reviewed Hermes/native profile and is applied by CI to the exact uploaded APK. Daily bonus remains 9.2.3-only because its 9.2.6 flow changed; a persisted selection is verified as a safe no-op on 9.2.6."
 }
