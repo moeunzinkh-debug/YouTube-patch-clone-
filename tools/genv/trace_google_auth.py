@@ -10,6 +10,12 @@ import zipfile
 from pathlib import Path
 from inspect_genv import DEX_NAME, check_asset
 from inspect_google_auth import extract_route, identifier
+from inspect_account_login import safe_trace_reference
+
+FLOW_SELECTED = {
+    'Lf3/a;->h()I',
+    'Lf3/a;->e()Landroid/content/Intent;',
+}
 
 SELECTED = {
     'Li3/f;->b(Landroid/content/Context;I)I',
@@ -28,6 +34,52 @@ SELECTED = {
     'Lv6/b;->d(Lv6/e;)V',
 }
 ANCHORS = {'MetadataValueReader', 'This should never happen.', 'Google Play Services not available'}
+
+
+def sanitized_flow(instructions) -> list[dict]:
+    """Emit only control flow, register names, small integers and safe references.
+
+    This is limited to two fixed, short SDK methods. Arbitrary string literals,
+    URLs, client IDs and account data are never included in the output.
+    """
+    offsets = {}
+    offset = 0
+    for index, ins in enumerate(instructions):
+        offsets[offset] = index
+        offset += ins.get_length()
+    result = []
+    offset = 0
+    for index, ins in enumerate(instructions):
+        opcode = ins.get_name()
+        operand = ins.get_output()
+        # Registers are emitted as generated labels, never as raw operand text.
+        operand_prefix = operand.split('"', 1)[0].split('L', 1)[0]
+        registers = re.findall(r'\bv\d{1,3}\b', operand_prefix)
+        item = {'index': index, 'opcode': opcode}
+        if registers:
+            item['registers'] = registers
+        if opcode.startswith(('if-', 'goto')) and hasattr(ins, 'get_ref_off'):
+            target = offsets.get(offset + 2 * ins.get_ref_off())
+            if target is not None:
+                item['target_index'] = target
+        if opcode.startswith('const') and not opcode.startswith(('const-string', 'const-class')):
+            match = re.fullmatch(r'v\d+,\s*(-?(?:0x[\da-f]+|\d+))', operand, re.I)
+            if match:
+                literal = match.group(1)
+                number = int(literal, 16 if literal.lstrip('-').lower().startswith('0x') else 10)
+                if -16 <= number <= 16:
+                    item['small_integer'] = number
+        if opcode.startswith('const-string'):
+            route = extract_route(operand)
+            if route:
+                item['route'] = route
+        elif opcode.startswith(('invoke-', 'sget', 'sput', 'iget', 'iput')):
+            reference = safe_trace_reference(operand)
+            if reference:
+                item['reference'] = reference
+        result.append(item)
+        offset += ins.get_length()
+    return result
 
 
 def parse_certificate_digests(text: str) -> list[dict[str, str]]:
@@ -105,6 +157,8 @@ def trace(apk: Path, apksigner: str) -> dict:
                         found[name] = {'dex': info.filename, 'flags': method.get_access_flags_string(),
                                        'registers': method.get_code().get_registers_size(),
                                        'instruction_count': len(ops), 'opcodes': ops, 'references': references[:180]}
+                        if name in FLOW_SELECTED:
+                            found[name]['sanitized_control_flow'] = sanitized_flow(list(method.get_instructions()))
             del dex
             gc.collect()
     if set(found) != SELECTED: raise ValueError('Selected GenV methods missing: ' + ', '.join(sorted(SELECTED-set(found))))

@@ -1,6 +1,6 @@
 import unittest
 from inspect_google_auth import extract_route, identifier, route_literal, JS_INDICATORS
-from trace_google_auth import parse_certificate_digests
+from trace_google_auth import parse_certificate_digests, sanitized_flow
 
 class AuthInspectionGuards(unittest.TestCase):
     def test_only_fixed_routing_literals(self):
@@ -37,5 +37,29 @@ class AuthInspectionGuards(unittest.TestCase):
         counts = {key: sample.count(needle) for key, needle in JS_INDICATORS.items()}
         self.assertEqual(counts['native_google_signin'], 1)
         self.assertTrue(all(isinstance(value, int) for value in counts.values()))
+
+    def test_control_flow_never_emits_raw_values(self):
+        class Instruction:
+            def __init__(self, name, output, length=2, branch=0):
+                self.name, self.output, self.length, self.branch = name, output, length, branch
+            def get_name(self): return self.name
+            def get_output(self): return self.output
+            def get_length(self): return self.length
+            def get_ref_off(self): return self.branch
+
+        rows = sanitized_flow([
+            Instruction('const-string', 'v0, "password=private@example.org"'),
+            Instruction('const-string', 'v0, "com.google.android.gms"'),
+            Instruction('const/4', 'v1, 3'),
+            Instruction('if-eqz', 'v1, +2h', branch=2),
+            Instruction('const/16', 'v2, 100000'),
+            Instruction('return', 'v1'),
+        ])
+        self.assertNotIn('password', str(rows))
+        self.assertNotIn('example.org', str(rows))
+        self.assertEqual(rows[1]['route'], 'com.google.android.gms')
+        self.assertEqual(rows[2]['small_integer'], 3)
+        self.assertEqual(rows[3]['target_index'], 5)
+        self.assertNotIn('small_integer', rows[4])
 
 if __name__ == '__main__': unittest.main()
