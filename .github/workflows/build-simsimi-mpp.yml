@@ -59,7 +59,7 @@ jobs:
           grep -E -A 5 'What went wrong|Execution failed|Unsupported|mismatch' /tmp/simsimi-build.log | head -25 | while IFS= read -r line; do echo "::error::$line"; done || true
           python3 - <<'PY'
           import pathlib, xml.etree.ElementTree as ET
-          for path in pathlib.Path('/tmp/simsimi-build/patches/build/test-results/test').glob('*.xml'):
+          for path in pathlib.Path('/tmp/simsimi-build').glob('**/test-results/**/*.xml'):
               root = ET.parse(path).getroot()
               for case in root.iter('testcase'):
                   failure = case.find('failure')
