@@ -51,7 +51,9 @@ def read_screen() -> list[dict[str, str]]:
 
 
 def probe(expected: str) -> None:
-    expected += ';NETWORK:OFF'
+    guarded = expected.startswith('GUARD:YES;')
+    expected += ';PREPARE:' + ('YES' if guarded else 'NO')
+    expected += ';MODE:' + ('4' if guarded else '2') + ';NETWORK:OFF'
     disable_network()
     adb('shell', 'am', 'force-stop', PROBE)
     adb('shell', 'am', 'start', '-n', PROBE + '/test.genv.microg.ProbeActivity')
@@ -177,6 +179,8 @@ def main() -> None:
         'official_morphe_microg_7_3_0_universal_accepted': True,
         'official_signin_service_and_activity_selected': True,
         'disabled_official_package_rejected_then_enabled': True,
+        'synthetic_stale_mode_refreshed_only_with_actual_guard_acceptance': True,
+        'synthetic_mode_note': 'synthetic fixture mirrors the injected decision; it is not GenV code',
         'synthetic_mismatched_caller_rejected': True,
         'synthetic_caller_reached_microg_empty_account_activity': True,
         'synthetic_handoff_scope': 'null-options test parcel, no account, no authentication; not the GenV app or its code',

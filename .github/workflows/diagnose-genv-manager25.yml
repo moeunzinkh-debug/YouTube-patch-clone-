@@ -27,6 +27,8 @@ jobs:
       GENV_MODE: ${{ matrix.mode }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -34,13 +36,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download original input and exact Manager; use the delivered MPP
+      - name: Download source-matched bundle, original input and exact Manager
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/genv-manager
-          cp bundles/genv/bundle.mpp bundles/genv/bundle.mpp.sha256 /tmp/genv-manager/
-          echo '7a9d5a91a68f310f7b2afe8a899f4073d7159727c383ffd6987124d10172039d  /tmp/genv-manager/bundle.mpp' | sha256sum --check
+          run="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py tools/genv/verify_patched.py \
+            tools/genv/verify_microg_patched.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
+          gh run download "$run" --name genv-morphe-bundle-static-only --dir /tmp/genv-manager
+          python3 tools/genv/verify_bundle.py --mpp /tmp/genv-manager/bundle.mpp --listing /tmp/genv-manager/patches.txt
           gh release download v2.5.0 --repo MorpheApp/morphe-manager --pattern morphe-manager-2.5.0.apk --dir /tmp/genv-manager
           gh release download GenV --pattern GenV_3.7.2.apk --dir /tmp/genv-manager
           echo '681a1c179b9e8698c857a092df0ca9a91e294a103743107f4fe96da20cb42ddc  /tmp/genv-manager/morphe-manager-2.5.0.apk' | sha256sum --check

@@ -15,7 +15,7 @@ from inspect_genv import ASSET_SHA256, check_asset
 from verify_bundle import verify_bundle
 from verify_microg_patched import (
     ANDROID, EXPECTED_METADATA, ROUTES, inspect_dex, manifest,
-    verify_availability, verify_manifest,
+    verify_availability, verify_sign_in_intent, verify_manifest,
 )
 from verify_patched import read_methods
 
@@ -25,13 +25,14 @@ def verify(source: Path, output: Path, bundle: Path, mode: str, report: Path) ->
         raise ValueError('Unexpected diagnostic input mode')
     check_asset(source)
     bundle_info = verify_bundle(bundle)
-    before, counts, old_availability, old_guard = inspect_dex(source, original=True)
-    after, _, new_availability, guard = inspect_dex(output, original=False)
+    before, counts, old_availability, old_sign_in, old_guard = inspect_dex(source, original=True)
+    after, _, new_availability, new_sign_in, guard = inspect_dex(output, original=False)
     if dict(counts) != ROUTES or old_guard or not guard:
         raise ValueError('Unexpected routing fingerprint or missing MicroG extension')
     if any(after.get(key) != values for key, values in before.items()):
         raise ValueError('Unreviewed DEX string changes')
     verify_availability(old_availability, new_availability)
+    verify_sign_in_intent(old_sign_in, new_sign_in)
     if read_methods(source) != read_methods(output):
         raise ValueError('MicroG-only selection changed a reviewed PairIP or billing method')
     document = manifest(output)

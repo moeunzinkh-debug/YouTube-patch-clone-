@@ -25,9 +25,17 @@ public final class ProbeActivity extends Activity {
         ConnectivityManager connectivity = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         @SuppressWarnings("deprecation") NetworkInfo active = connectivity == null ? null : connectivity.getActiveNetworkInfo();
         String network = active != null && active.isConnected() ? "ON" : "OFF";
+        boolean available = MicroGGuard.isAvailable(this);
+        boolean prepared = MicroGGuard.prepareSignIn(this);
+        // Simulate the injected cache-write decision with the exact MPP guard;
+        // this is not the real GenV class or a successful authentication.
+        int syntheticStaleMode = 2;
+        if (prepared) syntheticStaleMode = 4;
         TextView result = new TextView(this);
-        result.setText("GUARD:" + (MicroGGuard.isAvailable(this) ? "YES" : "NO")
-                + ";SERVICE:" + serviceName + ";ACTIVITY:" + activityName + ";NETWORK:" + network);
+        result.setText("GUARD:" + (available ? "YES" : "NO")
+                + ";SERVICE:" + serviceName + ";ACTIVITY:" + activityName
+                + ";PREPARE:" + (prepared ? "YES" : "NO") + ";MODE:" + syntheticStaleMode
+                + ";NETWORK:" + network);
         result.setTextSize(20);
         setContentView(result);
     }

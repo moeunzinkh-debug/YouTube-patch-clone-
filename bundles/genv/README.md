@@ -1,6 +1,6 @@
 # GenV — Morphe patches សាកល្បង
 
-នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Bundle ក្នុង repository ជា **0.2.0-dev.1**; asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។ មិនបានប្ដូរ release ឬ APK ដើមទេ។
+នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Bundle ក្នុង repository ជា **0.2.0-dev.2**; asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។ មិនបានប្ដូរ release ឬ APK ដើមទេ។
 
 <details>
 <summary>🎬 GenV • 2 experimental patches</summary>
@@ -31,11 +31,13 @@
 4. បើក **Morphe MicroG Google sign-in support (experimental)**; អាចជ្រើស ឬដក `Remove license check` ដោយឡែក។ ចុច **Patch**។ ប្រើ MicroG ដែលមានគណនីរួច; មិនចាំបាច់លុប MicroG ឬ YouTube ដែលកំពុងដំណើរការ។
 5. Manager ចុះហត្ថលេខា APK ឡើងវិញ ដូច្នេះវាអាចមិនអាច update លើ app ដើមដែលមាន key ផ្សេង។ បម្រុងទុកទិន្នន័យមុននឹងពិចារណាលុប app ចាស់ ព្រោះការលុបអាចធ្វើឱ្យបាត់ទិន្នន័យ។
 
-បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ សារ error របស់ bundle `0.2.0-dev.1` មិនអាចបែងចែកថា certificate បាត់ ឬខុសទេ ដូច្នេះវាមិនបញ្ជាក់ថា input របស់អ្នកត្រូវបាន sign ឡើងវិញជាក់លាក់ទេ។
+បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ Bundle `0.2.0-dev.2` បែងចែកសារ **certificate metadata បាត់/អានមិនបាន** និង **certificate មិនត្រូវ** ប៉ុន្តែវានៅតែបដិសេធទាំងពីរ—មិនបានបន្ធូរ signer safeguard ទេ។
 
 ## ផ្លូវ Google Sign-In ទៅ MicroG RE
 
-ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE; វាមិនមែនជាភស្តុតាងថា guard បានជោគជ័យលើឧបករណ៍របស់អ្នក ឬថា GenV បានទទួល session ទេ។ បើ guard មិនទទួល package, signer ឬ sign-in components វាត្រឡប់ទៅ availability control flow ដើម ដែល routing literals ត្រូវបានប្ដូររួច។
+ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE។ Bundle `0.2.0-dev.2` ពិនិត្យ guard ម្ដងទៀតភ្លាមៗមុនបង្កើត sign-in intent ហើយ refresh cached mode ទៅផ្លូវ interactive mode 4 **តែនៅពេល** package, signer និង sign-in components របស់ MicroG ត្រូវ។ បើ guard បរាជ័យ វាមិនសរសេរ mode ហើយទុក control flow ដើមដំណើរការ។
+
+ពេលចុច Google Login វាបង្ហាញសារ local ថេរ ដែលមិនមាន email/token៖ `MG00 (check passed)` មានន័យតែ guard ខាងលើបានជោគជ័យ; `MG01 (check failed)` មានន័យថា guard មិនទទួល MicroG នៅពេលនោះ។ `MG00` **មិនមែន** មានន័យថា account chooser, OAuth ឬ GenV server login បានជោគជ័យទេ។
 
 ការសាកបន្ថែមលើ Android emulator API 24, 29 និង 35 ប្រើ **synthetic caller** និង parcel គ្មាន options/គណនី៖ caller ដែល package មិនត្រូវត្រូវបាន MicroG បដិសេធ ហើយ caller ដែលត្រូវបានបញ្ជូនទៅផ្ទាំងបន្ថែមគណនីរបស់ MicroG នៅពេលគ្មានគណនី។ វាប្រើ guard ពី MPP ពិត ប៉ុន្តែមិនបានរត់ GenV ឬសាក account chooser, OAuth, server និង Huawei ពិតទេ។ [របាយការណ៍សង្ខេប](microg-handoff.json)។
 

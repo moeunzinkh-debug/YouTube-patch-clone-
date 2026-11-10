@@ -5,6 +5,10 @@ on:
   push:
     branches: [arena/3655779f-youtube-patch-clone]
     paths:
+      - 'tools/genv/project/**'
+      - 'tools/genv/prepare_build.py'
+      - 'tools/genv/verify_bundle.py'
+      - 'tools/genv/verify_microg_patched.py'
       - 'tools/genv/test_manager.py'
       - 'tools/genv/verify_manager_output.py'
       - '.github/workflows/test-genv-manager.yml'
