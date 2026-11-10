@@ -1,6 +1,9 @@
 name: Inspect uploaded SimSimi 9.2.6
 on:
   workflow_dispatch:
+  push:
+    branches: [arena/2d29b958-youtube-patch-clone]
+    paths: ['.github/workflows/inspect-simsimi-926.yml', 'tools/simsimi/inspect_926.py']
 permissions:
   contents: read
 jobs:
