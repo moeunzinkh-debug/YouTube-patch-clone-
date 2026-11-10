@@ -28,7 +28,10 @@ if report_path.exists():
         },
         "documented_app_classes": {
             "unchanged": [item["name"] for item in classes if item["status"] == "unchanged_signatures"],
-            "changed_or_missing": [item for item in classes if item["status"] != "unchanged_signatures"],
+            "changed_or_missing": [
+                {"name": item["name"], "status": item["status"]}
+                for item in classes if item["status"] != "unchanged_signatures"
+            ],
         },
         "main_activity": report["main_activity"],
         "navigation": report["navigation_comparison"],

@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [arena/2d29b958-youtube-patch-clone]
-    paths: ['.github/workflows/inspect-simsimi-926.yml', 'tools/simsimi/inspect_926.py']
+    paths: ['.github/workflows/inspect-simsimi-926.yml', 'tools/simsimi/inspect_926.py', 'tools/simsimi/publish_926_findings.py']
 permissions:
   contents: read
 jobs:
