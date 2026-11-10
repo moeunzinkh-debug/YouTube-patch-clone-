@@ -51,11 +51,11 @@ jobs:
         run: |
           set -o pipefail
           cd /tmp/simsimi-build
-          ./gradlew :patches:test :patches:buildAndroid --no-daemon --stacktrace 2>&1 | tee /tmp/simsimi-build.log
+          ./gradlew :patches:test :patches:buildAndroid --no-daemon --stacktrace --info 2>&1 | tee /tmp/simsimi-build.log
       - name: Report errors
         if: failure()
         run: |
-          grep -E '^e:|^error:|Unresolved reference|Cannot infer|Overload resolution ambiguity' /tmp/simsimi-build.log | head -35 | while IFS= read -r line; do echo "::error::$line"; done || true
+          grep -E '^e:|^error:|Unresolved reference|Cannot infer|Overload resolution ambiguity|AdGateTransformTest|AssertionError|IllegalArgumentException|IllegalStateException' /tmp/simsimi-build.log | head -60 | while IFS= read -r line; do echo "::error::$line"; done || true
           grep -E -A 5 'What went wrong|Execution failed|Unsupported|mismatch' /tmp/simsimi-build.log | head -25 | while IFS= read -r line; do echo "::error::$line"; done || true
           python3 - <<'PY'
           import pathlib, xml.etree.ElementTree as ET
