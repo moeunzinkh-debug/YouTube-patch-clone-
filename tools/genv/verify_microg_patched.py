@@ -22,6 +22,7 @@ from verify_bundle import MICROG, NAME, PACKAGE
 
 VERSION, CODE = '3.7.2', '163'
 AVAILABILITY = 'Li3/f;->b(Landroid/content/Context;I)I'
+SIGN_IN_INTENT = 'Lf3/a;->e()Landroid/content/Intent;'
 GUARD = 'Lapp/morphe/extension/genv/MicroGGuard;'
 ANDROID = '{http://schemas.android.com/apk/res/android}'
 EXPECTED_METADATA = {
@@ -55,7 +56,7 @@ def digest(value: str) -> bytes:
     return hashlib.sha256(value.encode('utf-8')).digest()
 
 
-def inspect_dex(path: Path, original: bool) -> tuple[dict, Counter, list, bool]:
+def inspect_dex(path: Path, original: bool) -> tuple[dict, Counter, list, list, bool]:
     from androguard.core.apk import APK
     from androguard.core.dex import DEX
     from loguru import logger
@@ -63,7 +64,7 @@ def inspect_dex(path: Path, original: bool) -> tuple[dict, Counter, list, bool]:
     apk = APK(str(path))
     if not apk.is_valid_APK() or apk.get_package() != PACKAGE or apk.get_androidversion_name() != VERSION or apk.get_androidversion_code() != CODE:
         raise ValueError('Unexpected GenV APK identity')
-    methods, counts, availability, guard = {}, Counter(), [], False
+    methods, counts, availability, sign_in_intent, guard = {}, Counter(), [], [], False
     with zipfile.ZipFile(path) as archive:
         for info in archive.infolist():
             if not DEX_NAME.fullmatch(info.filename): continue
@@ -83,15 +84,16 @@ def inspect_dex(path: Path, original: bool) -> tuple[dict, Counter, list, bool]:
                                 counts[route] += 1
                                 operand = operand.replace('"' + route + '"', '"' + route.replace('com.google', 'app.revanced', 1) + '"')
                             consts.append(digest(op + '\0' + operand))
-                        if key == AVAILABILITY:
+                        if key in (AVAILABILITY, SIGN_IN_INTENT):
                             ref_off = instruction.get_ref_off() if op == 'if-eqz' and hasattr(instruction, 'get_ref_off') else None
-                            availability.append((op, operand, instruction.get_length(), ref_off))
+                            target = availability if key == AVAILABILITY else sign_in_intent
+                            target.append((op, operand, instruction.get_length(), ref_off))
                     if consts:
                         if key in methods: raise ValueError('Duplicate method in DEX')
                         methods[key] = consts
             del dex
             gc.collect()
-    return methods, counts, availability, guard
+    return methods, counts, availability, sign_in_intent, guard
 
 
 def verify_availability(before: list, after: list) -> None:
@@ -112,6 +114,31 @@ def verify_availability(before: list, after: list) -> None:
         raise ValueError('Availability guard does not fall back to the original method')
     if not re.fullmatch(r'v0,\s*(?:0|0x0)', after[3][1]):
         raise ValueError('Availability success is not zero')
+
+
+def verify_sign_in_intent(before: list, after: list) -> None:
+    # Both selectors use the same reviewed GenV path: prepareSignIn performs
+    # the original pinned guard, then mode 4 is written only on true. Failure
+    # branches directly to the unchanged original body without writing mode.
+    if len(before) != 37 or len(after) != 44:
+        raise ValueError('Unexpected interactive sign-in method shape')
+    prefix = ['iget-object', 'invoke-static', 'move-result', 'if-eqz', 'const/4', 'sput', 'nop']
+    if [x[0] for x in after[:7]] != prefix or [x[0] for x in before] != [x[0] for x in after[7:]]:
+        raise ValueError('Unexpected interactive sign-in guard or changed original opcode sequence')
+    compact = lambda value: ''.join(value.split())
+    if compact(after[0][1]) != 'v0,v5,Lj3/f;->aLandroid/content/Context;':
+        raise ValueError('Unexpected sign-in context field or registers')
+    if compact(after[1][1]) != 'v0,' + GUARD + '->prepareSignIn(Landroid/content/Context;)Z':
+        raise ValueError('Interactive sign-in does not call the pinned guard')
+    if after[2][1].strip() != 'v0' or not re.fullmatch(r'v0,\s*(?:4|0x4)', after[4][1]):
+        raise ValueError('Unexpected guarded sign-in mode')
+    if compact(after[5][1]) != 'v0,Lf3/a;->lI':
+        raise ValueError('Unexpected interactive sign-in mode field')
+    branch, target = sum(row[2] for row in after[:3]), sum(row[2] for row in after[:6])
+    if not re.match(r'^v0,', after[3][1]) or after[3][3] is None or branch + 2 * after[3][3] != target:
+        raise ValueError('Sign-in guard failure must skip the mode write')
+    if 'Lf3/a;->h()I' not in compact(after[7][1]):
+        raise ValueError('Original interactive sign-in mode check missing')
 
 
 def _normal_tree(node: ET.Element, patched: bool = False):
@@ -175,15 +202,16 @@ def verify_report(path: Path, output: Path, selectors: set[str]) -> None:
 
 def verify_contents(source: Path, outputs: list[Path]) -> dict:
     check_asset(source)
-    original_methods, counts, old_availability, old_guard = inspect_dex(source, original=True)
+    original_methods, counts, old_availability, old_sign_in, old_guard = inspect_dex(source, original=True)
     if dict(counts) != ROUTES or old_guard: raise ValueError('Source APK does not match the reviewed routing fingerprint')
     source_manifest = manifest(source)
     for output in outputs:
-        methods, _, availability, guard = inspect_dex(output, original=False)
+        methods, _, availability, sign_in, guard = inspect_dex(output, original=False)
         if not guard: raise ValueError('Compiled MicroG verifier extension missing from output')
         if any(methods.get(key) != values for key, values in original_methods.items()):
             raise ValueError('A DEX string differs beyond the reviewed route substitutions')
         verify_availability(old_availability, availability)
+        verify_sign_in_intent(old_sign_in, sign_in)
         verify_manifest(source_manifest, manifest(output))
     check_asset(source)
     return {
@@ -193,6 +221,7 @@ def verify_contents(source: Path, outputs: list[Path]) -> dict:
         'other_original_dex_strings_unchanged': True, 'binder_descriptors_unchanged': True,
         'microg_signer_and_signin_components_guarded': True,
         'original_availability_control_flow_retained_with_routed_literals': True,
+        'interactive_guard_and_mode_instruction_sequence_verified': True,
         'original_genv_signer_metadata_sha1': EXPECTED_METADATA['app.revanced.android.gms.SPOOFED_PACKAGE_SIGNATURE'],
         'source_signer_certificate_checked_before_metadata': True,
         'manifest_only_reviewed_metadata_queries_and_c2dm': True,

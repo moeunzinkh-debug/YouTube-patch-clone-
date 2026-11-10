@@ -7,6 +7,9 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.Signature;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
 
 import java.security.MessageDigest;
 
@@ -29,6 +32,33 @@ public final class MicroGGuard {
     };
 
     private MicroGGuard() { }
+
+    /**
+     * Called only when GenV builds its interactive sign-in intent. The fixed
+     * local status toast contains no account, credential, token or exception
+     * information. A successful guard check does not mean login succeeded.
+     */
+    public static boolean prepareSignIn(Context context) {
+        final boolean trusted = isAvailable(context);
+        if (context != null) {
+            try {
+                Context app = context.getApplicationContext();
+                final Context toastContext = app == null ? context : app;
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    try {
+                        Toast.makeText(toastContext,
+                                trusted ? "GenV MicroG: MG00 (check passed)" : "GenV MicroG: MG01 (check failed)",
+                                Toast.LENGTH_LONG).show();
+                    } catch (Exception | LinkageError ignored) {
+                        // Showing a diagnostic must not crash GenV.
+                    }
+                });
+            } catch (Exception | LinkageError ignored) {
+                // A diagnostic display must never change the guard's decision.
+            }
+        }
+        return trusted;
+    }
 
     @SuppressWarnings("deprecation") // GET_SIGNATURES is also available on Android 7-8.
     public static boolean isAvailable(Context context) {

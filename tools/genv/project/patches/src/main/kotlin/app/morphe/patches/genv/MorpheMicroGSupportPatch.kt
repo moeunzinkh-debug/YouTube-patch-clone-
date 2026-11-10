@@ -41,8 +41,16 @@ private fun verifyGenVSource(metadata: PackageMetadata) {
         MessageDigest.getInstance("SHA-256").digest(certificate.encoded)
             .joinToString("") { "%02x".format(it.toInt() and 0xff) }
     }.toSet()
+    verifyReviewedGenVSigners(digests)
+}
+
+/** Distinguish missing metadata from a different signer without accepting either. */
+internal fun verifyReviewedGenVSigners(digests: Set<String>) {
+    require(digests.isNotEmpty()) {
+        "GenV input signing certificate metadata is missing or unreadable; use the original signed APK or complete original split archive"
+    }
     require(digests == setOf(ORIGINAL_GENV_SIGNER_SHA256)) {
-        "GenV input signing certificate is absent or does not match the reviewed base APK"
+        "GenV input signing certificate does not match the reviewed base APK"
     }
 }
 
@@ -186,6 +194,20 @@ val morpheMicroGSupportPatch = bytecodePatch(
             references(hub).any { it.definingClass == "Landroid/content/Intent;" && it.name == "setPackage" }
         ) { "Reviewed Google sign-in activity route changed" }
 
+        // This is the reviewed interactive getSignInIntent path. Mode 4 is
+        // exactly the mode selected by GenV's own availability code when our
+        // signer-pinned MicroG guard succeeds. Only refresh a stale cached mode
+        // immediately before this path, never change Binder or token contents.
+        val signInIntent = reviewedMethod("Lf3/a;", "e", emptyList(), "Landroid/content/Intent;")
+        val signInBody = requireNotNull(signInIntent.implementation)
+        val modeField = mutableClassDefBy("Lf3/a;").fields.singleOrNull { it.name == "l" && it.type == "I" }
+        require(AccessFlags.PUBLIC.isSet(signInIntent.accessFlags) && !AccessFlags.STATIC.isSet(signInIntent.accessFlags) &&
+            signInBody.registerCount == 6 && signInBody.instructions.size == 37 &&
+            signInBody.instructions.take(2).map { it.opcode } == listOf(Opcode.INVOKE_VIRTUAL, Opcode.MOVE_RESULT) &&
+            references(signInIntent).firstOrNull()?.let { it.definingClass == "Lf3/a;" && it.name == "h" && it.returnType == "I" } == true &&
+            modeField != null && AccessFlags.STATIC.isSet(modeField.accessFlags)
+        ) { "Reviewed interactive Google sign-in mode implementation changed" }
+
         val sites = mutableListOf<RouteSite>()
         routeCounts.forEach { (original, expectedCount) ->
             val matches = mutableListOf<RouteSite>()
@@ -222,6 +244,20 @@ val morpheMicroGSupportPatch = bytecodePatch(
             const/4 v0, 0x0
             return v0
             :original_availability
+            nop
+        """.trimIndent())
+        // If MicroG is trusted and its sign-in components resolve *now*, avoid
+        // reusing a previously cached unavailable mode. If the guard fails,
+        // leave the cache and the original intent control flow untouched.
+        // The fixed MG00/MG01 toast is local only and contains no account data.
+        signInIntent.addInstructionsWithLabels(0, """
+            iget-object v0, p0, Lj3/f;->a:Landroid/content/Context;
+            invoke-static {v0}, $GUARD->prepareSignIn(Landroid/content/Context;)Z
+            move-result v0
+            if-eqz v0, :original_intent
+            const/4 v0, 0x4
+            sput v0, Lf3/a;->l:I
+            :original_intent
             nop
         """.trimIndent())
     }

@@ -5,7 +5,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from verify_microg_patched import ANDROID, EXPECTED_METADATA, GUARD, ROUTES, verify_availability, verify_manifest
+from verify_microg_patched import ANDROID, EXPECTED_METADATA, GUARD, ROUTES, verify_availability, verify_sign_in_intent, verify_manifest
 
 
 class MicroGVerifierTests(unittest.TestCase):
@@ -25,6 +25,24 @@ class MicroGVerifierTests(unittest.TestCase):
         for bad in (prefix[:2] + [('if-eqz', 'v0, +3', 4, 3)] + prefix[3:],
                     prefix[:3] + [('const/4', 'v0, 1', 2, None)] + prefix[4:]):
             with self.assertRaises(ValueError): verify_availability(original, bad + original)
+
+    def test_interactive_mode_is_refreshed_only_if_guard_passes(self):
+        original = [('invoke-virtual', 'v5, Lf3/a;->h()I', 6, None)] + [('nop', '', 2, None)] * 36
+        prefix = [
+            ('iget-object', 'v0, v5, Lj3/f;->a Landroid/content/Context;', 4, None),
+            ('invoke-static', 'v0, ' + GUARD + '->prepareSignIn(Landroid/content/Context;)Z', 6, None),
+            ('move-result', 'v0', 2, None), ('if-eqz', 'v0, +5', 4, 5),
+            ('const/4', 'v0, 4', 2, None), ('sput', 'v0, Lf3/a;->l I', 4, None), ('nop', '', 2, None),
+        ]
+        verify_sign_in_intent(original, prefix + original)
+        bad_prefixes = [
+            prefix[:3] + [('if-eqz', 'v0, +3', 4, 3)] + prefix[4:],
+            prefix[:4] + [('const/4', 'v0, 1', 2, None)] + prefix[5:],
+            prefix[:5] + [('sput', 'v0, Lf3/a;->other I', 4, None)] + prefix[6:],
+            prefix[:1] + [('invoke-static', 'v0, Ltest/Bad;->b(Landroid/content/Context;)Z', 6, None)] + prefix[2:],
+        ]
+        for bad in bad_prefixes:
+            with self.assertRaises(ValueError): verify_sign_in_intent(original, bad + original)
 
     def test_manifest_only_expected_changes(self):
         base = ET.fromstring('''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ainate.ai.video.generate">

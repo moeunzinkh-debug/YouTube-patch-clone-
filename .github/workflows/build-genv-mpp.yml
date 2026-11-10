@@ -147,7 +147,7 @@ jobs:
             echo '::error::MicroG selector accepted an APK signed with a different certificate'
             exit 1
           fi
-          if ! grep -q 'GenV input signing certificate is absent or does not match the reviewed base APK' "$RUNNER_TEMP/genv-tools/wrong-signer.log"; then
+          if ! grep -q 'GenV input signing certificate does not match the reviewed base APK' "$RUNNER_TEMP/genv-tools/wrong-signer.log"; then
             tail -n 40 "$RUNNER_TEMP/genv-tools/wrong-signer.log" | while IFS= read -r line; do echo "::error::$line"; done
             exit 1
           fi

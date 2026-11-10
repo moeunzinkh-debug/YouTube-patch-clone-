@@ -43,6 +43,17 @@ class MicroGManifestTest {
         assertEquals("app.revanced.android.c2dm.intent.RECEIVE", (doc.getElementsByTagName("action").item(0) as Element).attr("name"))
     }
 
+    @Test fun rejectsMissingOrDifferentSourceSignerWithDistinctMessages() {
+        val reviewed = "1a0e59b153bb4ece8744b01850dea4f614e3f42106b65684668eccd5d7cc2f42"
+        verifyReviewedGenVSigners(setOf(reviewed))
+        val missing = assertFailsWith<IllegalArgumentException> { verifyReviewedGenVSigners(emptySet()) }
+        val wrong = assertFailsWith<IllegalArgumentException> { verifyReviewedGenVSigners(setOf("different")) }
+        val mixed = assertFailsWith<IllegalArgumentException> { verifyReviewedGenVSigners(setOf(reviewed, "different")) }
+        kotlin.test.assertTrue(missing.message.orEmpty().contains("metadata is missing"))
+        kotlin.test.assertTrue(wrong.message.orEmpty().contains("does not match"))
+        kotlin.test.assertTrue(mixed.message.orEmpty().contains("does not match"))
+    }
+
     @Test fun rejectsWrongPackageOrConflictingMetadata() {
         val wrong = base().apply { documentElement.setAttribute("package", "com.example.other") }
         assertFailsWith<IllegalArgumentException> { addMorpheMicroGManifestEntries(wrong) }
