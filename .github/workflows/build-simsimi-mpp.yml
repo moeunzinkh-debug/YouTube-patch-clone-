@@ -1,7 +1,7 @@
 name: Build experimental SimSimi-only patch bundle
 on:
   push:
-    branches: [arena/0b9fd265-youtube-patch-clone]
+    branches: [arena/2d29b958-youtube-patch-clone]
     paths: ['tools/simsimi/project/**', 'tools/simsimi/tests/**', 'tools/simsimi/prepare_build.py', 'tools/simsimi/verify_bundle.py', 'tools/simsimi/verify_listing.py', 'tools/simsimi/verify_feature_hbc.py', 'tools/simsimi/verify_patched_apk.py', 'tools/simsimi/verify_quick_apk.py', 'tools/simsimi/write_build_status.py', 'docs/simsimi/feature-gates.json', '.github/workflows/build-simsimi-mpp.yml']
 concurrency:
   group: simsimi-build-${{ github.ref }}

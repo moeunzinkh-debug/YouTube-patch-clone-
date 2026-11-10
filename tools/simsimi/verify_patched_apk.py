@@ -29,6 +29,8 @@ with zipfile.ZipFile(patched) as z:
     report['six_client_feature_gate_bytes_match'] = True
     report['hermes_sha256'] = hashlib.sha256(actual).hexdigest()
     hook_found = runtime_found = False
+    pull_move_guard_found = False
+    pull_delayed_checks = 0
     quick_hooks_found = set()
     quick_runtime_found = quick_timing_found = False
     routes = 0
@@ -48,6 +50,9 @@ with zipfile.ZipFile(patched) as z:
                     continue
                 for instruction in method.get_instructions():
                     text = instruction.get_output()
+                    if cls.get_name() == 'Lapp/morphe/extension/simsimi/PullRefresh;':
+                        pull_move_guard_found |= 'Lapp/morphe/extension/simsimi/PullGesture;->move(' in text
+                        pull_delayed_checks += int('Landroid/view/View;->postDelayed(' in text)
                     if instruction.get_name().startswith('const-string') and '"app.revanced.android.gms"' in text:
                         routes += 1
                     if cls.get_name() == 'Lcom/ismaker/android/simsimi/MainActivity;' and method.get_name() == 'dispatchTouchEvent':
@@ -57,9 +62,11 @@ with zipfile.ZipFile(patched) as z:
                         if 'Lapp/morphe/extension/simsimi/QuickReturn;->onTabClicked(' in text:
                             quick_hooks_found.add(method.get_name())
     assert hook_found and runtime_found, 'Missing native touch hook or runtime extension'
+    assert pull_move_guard_found and pull_delayed_checks == 2, 'Missing move requirement or two-stage navigation settling guard'
     assert quick_hooks_found == {'lambda$createClassicItems$5', 'lambda$createSmallItems$6'} and quick_runtime_found and quick_timing_found, 'Missing optional Quick Return click hooks or runtime'
     assert routes > 0, 'No GMS package literals routed to MicroG RE'
     report.update(injected_main_activity_dispatch_hook=True, injected_pull_refresh_runtime=True,
+                  pull_refresh_requires_move_and_two_delayed_stability_checks=True,
                   injected_quick_return_click_hooks=True, quick_return_runtime_present=True,
                   native_microg_routed_literals=routes)
 output.write_text(json.dumps(report, indent=2)+'\n')

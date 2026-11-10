@@ -1,6 +1,6 @@
 # SimSimi patches — កំណែសាកល្បង ដាច់ដោយឡែកពី YouTube
 
-**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.4.0-dev.1**។ សម្រាប់ **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, version code `1119001`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
+**Morphe bundle:** [`bundle.mpp`](bundle.mpp), **0.4.0-dev.2**។ សម្រាប់ **SimSimi 9.2.3** (`com.ismaker.android.simsimi`, version code `1119001`, Android API 24+)។ នេះជា `.mpp` សម្រាប់ Morphe Manager មិនមែន Python APK patcher ទេ។ កុំយកវាទៅជំនួស `patch.mpp` របស់ YouTube។
 
 **ស្ថានភាពសំខាន់៖** បានកែផ្លូវកូដក្នុងកម្មវិធីសម្រាប់មុខងារទាំង ៦ ខាងក្រោម ប៉ុន្តែ **មិនទាន់សាកល្បងកំណែថ្មីលើទូរសព្ទ ឬបញ្ជាក់ការអនុញ្ញាតពីម៉ាស៊ីនមេទេ**។ ជាពិសេស patch Items មិនផ្ដល់ stock ឬសិទ្ធិប្រើ Items គ្មានកំណត់នៅលើម៉ាស៊ីនមេឡើយ។
 
@@ -19,7 +19,7 @@
 |---|---|---|
 | Disable ad eligibility (experimental) | On | បិទ shared `canShowAds` gate; មិនទាន់បញ្ជាក់ថាលុប ads SDK ទាំងអស់។ |
 | Unlock membership UI (client only, experimental) | On | ផ្ដល់ `hasMembership=true` ក្នុង client UI និង listener ដោយ clone ស្ថានភាព។ មិនបង្កើតការជាវ ឬសិទ្ធិនៅម៉ាស៊ីនមេ។ |
-| Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ មិនមែនក្នុងបន្ទប់ឆាត។ វា reload React runtime ទាំងមូល មិនសម្លាប់ app និងមិនមែន refresh តែទិន្នន័យបញ្ជីទេ។ |
+| Pull down to restart chat (experimental) | On | អូសចុះនៅបញ្ជី **Conversation ភាសាអង់គ្លេស** ប៉ុណ្ណោះ។ កំណែ dev.2 តម្រូវឱ្យមាន `ACTION_MOVE` ពិត និងពិនិត្យថាអេក្រង់នៅតែជា Conversation ពីរដងក្រោយ navigation settle ដូច្នេះការចូលបន្ទប់ chat មិនត្រូវ reload។ វា reload React runtime ទាំងមូលដោយមិនសម្លាប់ app។ |
 | Quick return: double-tap Chat (experimental) | Off | ចុច Chat ខាងក្រោមពីរដង នៅបញ្ជី Conversation ដើម្បីអូសបញ្ជីទៅដើមភ្លាមៗ ដោយមិន reload។ ចុចតែមួយនៅតែប្រើផ្លូវដើម; ការប្រើលើទូរសព្ទមិនទាន់សាកល្បង។ |
 | MicroG RE service routing (experimental) | Off | ប្ដូរផ្លូវ native GMS ទៅ `app.revanced.android.gms`; ត្រូវដំឡើង MicroG RE ដាច់ដោយឡែក។ វា **មិនជួសជុល FCM push ទេ**៖ action និង permission មិនត្រូវនឹង RE 7.3.0-dev.2 ដែលបានពិនិត្យ។ [ព័ត៌មានលម្អិត](../../docs/simsimi/huawei-notifications.md)។ |
 | Daily bonus without video (client path, experimental) | Off | ជ្រើសផ្លូវ membership ដែលមានស្រាប់ដោយមិនផ្ទុកវីដេអូ។ Server reward និង error នៅដដែល; មិនធានាការទទួលរង្វាន់។ |
