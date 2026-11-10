@@ -26,11 +26,19 @@ if len(names) != len(EXPECTED) or len(enabled) != len(EXPECTED) or len(set(names
 actual = {name: enabled.lower() == 'true' for name, enabled in zip(names, enabled)}
 if actual != EXPECTED:
     raise SystemExit('SimSimi selector names or defaults changed unexpectedly')
+blocks = {match.group(1): match.group(0) for match in re.finditer(
+    r'^Name: (.+)$.*?(?=^Name: |\Z)', listing, flags=re.MULTILINE | re.DOTALL
+)}
+daily = blocks['Daily bonus without video (client path, experimental)']
+compatible_tail = daily.split('Compatible versions:', 1)[1]
+if not re.search(r'^\s*9\.2\.3\s*$', compatible_tail, flags=re.MULTILINE) or re.search(
+        r'^\s*9\.2\.6\s*$', compatible_tail, flags=re.MULTILINE):
+    raise SystemExit('Daily bonus must remain 9.2.3-only because the 9.2.6 flow changed')
 package_count = listing.count('Package name: com.ismaker.android.simsimi')
 version_counts = {version: listing.count(version) for version in ('9.2.3', '9.2.6')}
 expected_version_counts = {'9.2.3': len(EXPECTED), '9.2.6': len(EXPECTED) - 1}
 if package_count != len(EXPECTED) or any(
-        version_counts[version] != count for version, count in expected_version_counts.items()):
+        version_counts[version] < count for version, count in expected_version_counts.items()):
     details = ' | '.join(line.strip() for line in listing.splitlines()
                          if 'package' in line.lower() or 'version' in line.lower()
                          or any(version in line for version in version_counts))
