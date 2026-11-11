@@ -33,7 +33,7 @@ with zipfile.ZipFile(source) as archive:
     dex = DEX(archive.read("classes.dex"))
     classes = list(dex.get_classes())
     by_name = {c.get_name(): c for c in classes}
-    roots = {"Lcom/app/bigtree/App;", "Lcom/app/bigtree/MainActivity;", "LG1/I;"}
+    roots = {"Lcom/app/bigtree/App;", "Lcom/app/bigtree/MainActivity;", "LG1/I;", "LB/n;"}
     # Include obfuscated first-party classes directly referenced by root bytecode.
     reference_pattern = re.compile(r"L(?:G1|com/app/bigtree)/[^;]+;")
     referenced = set()
