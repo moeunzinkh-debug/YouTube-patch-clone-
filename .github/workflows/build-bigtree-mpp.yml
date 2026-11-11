@@ -73,7 +73,8 @@ jobs:
             if ! java -Xmx4g -jar "$desktop" patch "$input/bigtree.apk" -p "$output/bundle.mpp" \
               --exclusive "${selectors[@]}" --unsigned -o "$input/$mode.apk" -r "$input/$mode-result.json" \
               > "$RUNNER_TEMP/bigtree-$mode.log" 2>&1; then
-              tail -n 24 "$RUNNER_TEMP/bigtree-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
+              grep -E -i -m 30 'exception|error|invalid|failed|morphe|register|label' "$RUNNER_TEMP/bigtree-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done || true
+              tail -n 80 "$RUNNER_TEMP/bigtree-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
               return 1
             fi
             python3 tools/bigtree/verify_patched.py "$input/bigtree.apk" "$input/$mode.apk" \
