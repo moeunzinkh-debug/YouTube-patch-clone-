@@ -12,6 +12,7 @@
     "window.__morpheSnapMedia"
   ],
   "native_cross_origin_request_capture": "verified",
+  "native_exoplayer_json_capture": "verified",
   "original_hook_preserved_outside_injections": true,
   "runtime_download_translation_network_csp_and_ui_behavior": "not tested"
 }
