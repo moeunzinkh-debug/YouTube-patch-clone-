@@ -1,0 +1,113 @@
+name: Build BigTree feature patches
+on:
+  push:
+    branches: [arena/870bf1a6-youtube-patch-clone]
+    paths:
+      - 'tools/bigtree/project/**'
+      - 'tools/bigtree/prepare_build.py'
+      - 'tools/bigtree/verify_bundle.py'
+      - 'tools/bigtree/verify_patched.py'
+      - 'tools/bigtree/test_patch_tools.py'
+      - '.github/workflows/build-bigtree-mpp.yml'
+permissions:
+  contents: write
+  packages: read
+concurrency:
+  group: bigtree-build-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Test guards and prepare isolated project
+        run: |
+          set -euo pipefail
+          python3 tools/bigtree/test_patch_tools.py -v
+          python3 tools/bigtree/prepare_build.py "$RUNNER_TEMP/bigtree-build"
+      - name: Build standalone BigTree bundle
+        run: |
+          set -o pipefail
+          cd "$RUNNER_TEMP/bigtree-build"
+          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/bigtree-build.log"
+      - name: Surface compilation diagnostics
+        if: failure()
+        run: |
+          grep -E -A 5 '^e:|^error:|Unresolved reference|What went wrong|Execution failed|FAILURE:' "$RUNNER_TEMP/bigtree-build.log" | tail -40 | while IFS= read -r line; do echo "::error::$line"; done || true
+      - name: List and apply each independent selector and both together
+        run: |
+          set -euo pipefail
+          input="$RUNNER_TEMP/bigtree-input"
+          output="$RUNNER_TEMP/bigtree-output"
+          mkdir -p "$input" "$output"
+          mapfile -t candidates < <(find "$RUNNER_TEMP/bigtree-build/patches/build/libs" -maxdepth 1 -name '*.mpp' -type f)
+          test "${#candidates[@]}" -eq 1
+          cp "${candidates[0]}" "$output/bundle.mpp"
+          (cd "$output" && sha256sum bundle.mpp > bundle.mpp.sha256)
+          gh release download BigTree --pattern bigtree.apk --dir "$input"
+          echo '51b7b05b0171d0f242b37933af8c570dae50b6da3b33a0bfa7dce5814c08977a  '"$input/bigtree.apk" | sha256sum --check
+          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$input"
+          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$input/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
+          desktop="$input/morphe-desktop-1.20.0-dev.1-all.jar"
+          java -Xmx2g -jar "$desktop" list-patches --patches "$output/bundle.mpp" --with-packages --with-versions --include-experimental --out "$output/patches.txt"
+          python3 tools/bigtree/verify_bundle.py --mpp "$output/bundle.mpp" --listing "$output/patches.txt"
+          apply_and_check() {
+            local mode="$1"; shift
+            local selectors=()
+            local verify_modes=()
+            case "$mode" in
+              snap) selectors=(-e 'Snap Media'); verify_modes=(snap) ;;
+              translation) selectors=(-e 'Translation to English'); verify_modes=(translation) ;;
+              combined) selectors=(-e 'Snap Media' -e 'Translation to English'); verify_modes=(snap translation) ;;
+              *) return 2 ;;
+            esac
+            if ! java -Xmx4g -jar "$desktop" patch "$input/bigtree.apk" -p "$output/bundle.mpp" \
+              --exclusive "${selectors[@]}" --unsigned -o "$input/$mode.apk" -r "$input/$mode-result.json" \
+              > "$RUNNER_TEMP/bigtree-$mode.log" 2>&1; then
+              tail -n 24 "$RUNNER_TEMP/bigtree-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done
+              return 1
+            fi
+            python3 tools/bigtree/verify_patched.py "$input/bigtree.apk" "$input/$mode.apk" \
+              "$input/$mode-result.json" "$output/$mode-validation.json" "${verify_modes[@]}"
+          }
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          apply_and_check snap
+          apply_and_check translation
+          apply_and_check combined
+          echo '::notice::Exact BigTree APK accepted each selector independently and both together; injected DEX hooks were verified.'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bigtree-morphe-bundle
+          path: |
+            ${{ runner.temp }}/bigtree-output/bundle.mpp
+            ${{ runner.temp }}/bigtree-output/bundle.mpp.sha256
+            ${{ runner.temp }}/bigtree-output/patches.txt
+            ${{ runner.temp }}/bigtree-output/*-validation.json
+      - name: Save standalone bundle and validation
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          for source in tools/bigtree/project tools/bigtree/prepare_build.py tools/bigtree/verify_bundle.py tools/bigtree/verify_patched.py tools/bigtree/test_patch_tools.py .github/workflows/build-bigtree-mpp.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
+              echo '::warning::BigTree build sources changed; refusing stale artifacts.'
+              exit 0
+            fi
+          done
+          mkdir -p bundles/bigtree
+          cp "$RUNNER_TEMP/bigtree-output/"{bundle.mpp,bundle.mpp.sha256,snap-validation.json,translation-validation.json,combined-validation.json} bundles/bigtree/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f bundles/bigtree/
+          git diff --cached --quiet && exit 0
+          git commit -m 'build: standalone BigTree bundle [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
