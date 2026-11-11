@@ -18,7 +18,7 @@ Both selectors are disabled by default and may be selected separately or togethe
 
 ## Validation
 
-GitHub Actions run `42948601571` built the updated standalone MPP, listed exactly the two selectors, and applied:
+GitHub Actions run `42949563019` built the updated standalone MPP, listed exactly the two selectors, and applied:
 
 1. Snap Media alone;
 2. Translation to English alone; and
