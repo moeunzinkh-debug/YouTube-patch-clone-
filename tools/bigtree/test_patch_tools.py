@@ -28,7 +28,8 @@ class BigTreeToolsTest(unittest.TestCase):
     def test_snap_uses_layered_capture_without_page_control_clicks(self):
         source = (Path(__file__).parent / 'project/patches/src/main/kotlin/app/morphe/patches/bigtree/BigTreePatches.kt').read_text()
         for evidence in ('XMLHttpRequest.prototype.open', 'PerformanceObserver', 'iframe,frame',
-                         'shouldInterceptRequest', 'morphe-snap-media-url', 'Android.saveFile', 'Video captured'):
+                         'shouldInterceptRequest', 'morphe-snap-media-url', 'nativePlayerOpen',
+                         'morphe-snap-player-json', 'Android.saveFile', 'Video captured'):
             self.assertIn(evidence, source)
         for unsafe in ('geometricDownloadControl', 'downloadControl()', 'control.click()',
                        'openAppDownload', 'morphe-snap-manifest-url'):

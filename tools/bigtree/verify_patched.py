@@ -64,6 +64,27 @@ def snap_capture_marker_count(path: Path) -> int:
         raise ValueError(f'Exact BigTree resource interceptor count was {len(found)}')
     return found[0]
 
+def player_capture_marker_count(path: Path) -> int:
+    """Count the native-player JSON capture key in the exact bridge method."""
+    from androguard.core.dex import DEX
+    marker = 'morphe-snap-player-json'
+    found = []
+    with zipfile.ZipFile(path) as archive:
+        for name in archive.namelist():
+            if not re.fullmatch(r'classes\d*\.dex', name):
+                continue
+            dex = DEX(archive.read(name))
+            for cls in dex.get_classes():
+                if cls.get_name() != 'LG1/I;':
+                    continue
+                for method in cls.get_methods():
+                    descriptor = ''.join(method.get_descriptor().split())
+                    if method.get_name() == 'nativePlayerOpen' and descriptor == '(Ljava/lang/String;)V':
+                        found.append(sum(marker in ins.get_output() for ins in method.get_instructions()))
+    if len(found) != 1:
+        raise ValueError(f'Exact BigTree native-player bridge count was {len(found)}')
+    return found[0]
+
 def normalized(instruction: tuple[str, str]) -> tuple[str, str]:
     opcode, output = instruction
     if opcode.startswith('if-') or opcode.startswith('goto'):
@@ -124,12 +145,17 @@ def main() -> None:
     patched_capture_count = snap_capture_marker_count(args.patched)
     if base_capture_count != 0 or patched_capture_count != (2 if 'snap' in args.modes else 0):
         raise ValueError('Native cross-origin media capture injection was absent or unexpected')
+    base_player_count = player_capture_marker_count(args.base)
+    patched_player_count = player_capture_marker_count(args.patched)
+    if base_player_count != 0 or patched_player_count != (1 if 'snap' in args.modes else 0):
+        raise ValueError('Native ExoPlayer JSON capture injection was absent or unexpected')
     result = {
         'status': 'passed_actual_mpp_application_and_dex_inspection',
         'input_sha256': BASE_SHA256, 'package': PACKAGE, 'version': VERSION, 'version_code': CODE,
         'selectors': expected, 'injection_target': CLASS + '->' + METHOD,
         'injected_markers': [MARKERS[mode] for mode in args.modes],
         'native_cross_origin_request_capture': 'verified' if 'snap' in args.modes else 'not_selected',
+        'native_exoplayer_json_capture': 'verified' if 'snap' in args.modes else 'not_selected',
         'original_hook_preserved_outside_injections': True,
         'runtime_download_translation_network_csp_and_ui_behavior': 'not tested',
     }

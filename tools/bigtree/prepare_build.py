@@ -5,7 +5,7 @@ import shutil, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = '0.1.0-dev.10'
+VERSION = '0.1.0-dev.11'
 
 def prepare(dest: Path) -> None:
     dest = dest.resolve()

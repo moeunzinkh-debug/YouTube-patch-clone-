@@ -20,7 +20,7 @@ private val snapMediaScript = """
 (function(){
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
-  var nativeKey='morphe-snap-media-url',found={},sequence=0;
+  var nativeKey='morphe-snap-media-url',playerKey='morphe-snap-player-json',found={},sequence=0;
   var snappedUrl='',capturing=false,captureTimeout=0,button=null;
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
@@ -36,11 +36,18 @@ private val snapMediaScript = """
     if(/download|attachment|original|source|下载|下載/.test(info))score+=4000;
     return score;
   }
-  function remember(url,hint,base){
-    var value=absolute(url,base),score=mediaScore(value,hint);
-    if(!score)return;
+  function remember(url,hint,base,forceDirect){
+    var value=absolute(url,base),score=forceDirect?26000:mediaScore(value,hint);
+    if(!score||blocked(value))return;
     var old=found[value];
-    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence};
+    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence,direct:!!forceDirect||!!(old&&old.direct)};
+  }
+  function rememberNativePlayer(raw){
+    try{
+      var data=JSON.parse(raw||'{}'),type=String(data.type||'mp4').toLowerCase(),url=data.url||'';
+      var directType=/^(?:mp4|progressive|clearkey_mp4)$/.test(type);
+      remember(url,'video native player '+type,document.baseURI,directType);
+    }catch(e){}
   }
   function metadata(element){
     var values=[];
@@ -105,7 +112,10 @@ private val snapMediaScript = """
         });
       }catch(e){}
     });
-    try{if(window.Android&&Android.getData)remember(Android.getData(nativeKey),'native direct-video request',document.baseURI);}catch(e){}
+    try{if(window.Android&&Android.getData){
+      remember(Android.getData(nativeKey),'native direct-video request',document.baseURI);
+      rememberNativePlayer(Android.getData(playerKey));
+    }}catch(e){}
     if(capturing){var ready=bestDirectMediaUrl(false);if(ready)finishSnap(ready);}
   }
   function rankedCandidates(){
@@ -120,7 +130,7 @@ private val snapMediaScript = """
   function bestDirectMediaUrl(rescan){
     if(rescan!==false)scan();
     var candidates=rankedCandidates();
-    for(var index=0;index<candidates.length;index++)if(directFile(candidates[index].url))return candidates[index].url;
+    for(var index=0;index<candidates.length;index++)if(candidates[index].direct||directFile(candidates[index].url))return candidates[index].url;
     return '';
   }
   function setSnapState(state){
@@ -322,6 +332,9 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         const-string v9, ""
         invoke-interface {v7, v8, v9}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
         move-result-object v7
+        const-string v8, "morphe-snap-player-json"
+        invoke-interface {v7, v8, v9}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
+        move-result-object v7
         invoke-interface {v7}, Landroid/content/SharedPreferences${'$'}Editor;->apply()V
         goto :morphe_capture_done
         :morphe_capture_request
@@ -386,6 +399,35 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
     """.trimIndent())
 }
 
+private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativePlayerCapture() {
+    val bridge = mutableClassDefBy("LG1/I;")
+    val method = bridge.methods.singleOrNull { candidate ->
+        candidate.name == "nativePlayerOpen" && candidate.returnType == "V" &&
+            candidate.parameterTypes.map { it.toString() } == listOf("Ljava/lang/String;") &&
+            AccessFlags.PUBLIC.isSet(candidate.accessFlags) && !AccessFlags.STATIC.isSet(candidate.accessFlags)
+    } ?: error("Reviewed BigTree native-player bridge is unavailable")
+    val implementation = requireNotNull(method.implementation) { "BigTree native-player bridge has no implementation" }
+    require(implementation.registerCount == 3) { "BigTree native-player register layout changed" }
+    val instructions = implementation.instructions.toList()
+    require(instructions.size == 12 && instructions.first().opcode == Opcode.CONST_STRING &&
+        instructions.last().opcode == Opcode.RETURN_VOID) {
+        "BigTree native-player bridge control flow changed"
+    }
+    val strings = instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? StringReference }.map { it.string }
+    require(strings == listOf("json") && "morphe-snap-player-json" !in strings) {
+        "BigTree native-player bridge fingerprint changed"
+    }
+
+    // BigTree does not necessarily play through a webpage <video>. The site can
+    // send a JSON payload directly to Android.nativePlayerOpen(), after which
+    // ExoPlayer owns the URL. Preserve that exact payload before the app passes
+    // it into LG1/l1 so the two-step Snap UI can read the real player source.
+    method.addInstructions(0, """
+        const-string v0, "morphe-snap-player-json"
+        invoke-virtual {p0, v0, p1}, LG1/I;->saveData(Ljava/lang/String;Ljava/lang/String;)V
+    """.trimIndent())
+}
+
 private fun compatibility() = Compatibility(
     name = "BigTree",
     packageName = "com.app.bigtree",
@@ -395,13 +437,14 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Uses only the two-step direct-file flow: the first tap captures and locks a full video URL from page, network, and iframe requests; after the button turns green, the second tap downloads that captured file to the device through BigTree's native saveFile bridge. Legacy manifest and external-downloader routes are removed, and individual segments are rejected.",
+    description = "Uses the two-step direct-file flow and captures the JSON passed to BigTree's native ExoPlayer bridge, in addition to page and request discovery. The first tap locks a full progressive/MP4 URL; after the button turns green, the second tap downloads it through BigTree's native saveFile bridge. Manifest streams and individual segments are rejected.",
     default = false,
 ) {
     compatibleWith(compatibility())
     execute {
         injectPageScript(SNAP_MARKER, snapMediaScript)
         injectNativeMediaCapture()
+        injectNativePlayerCapture()
     }
 }
 
