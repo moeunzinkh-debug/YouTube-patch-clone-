@@ -1,0 +1,16 @@
+{
+  "status": "passed_actual_mpp_application_and_dex_inspection",
+  "input_sha256": "51b7b05b0171d0f242b37933af8c570dae50b6da3b33a0bfa7dce5814c08977a",
+  "package": "com.app.bigtree",
+  "version": "1.14",
+  "version_code": "10",
+  "selectors": [
+    "Snap Media"
+  ],
+  "injection_target": "LG1/m0;->onPageFinished",
+  "injected_markers": [
+    "window.__morpheSnapMedia"
+  ],
+  "original_hook_preserved_outside_injections": true,
+  "runtime_download_translation_network_csp_and_ui_behavior": "not tested"
+}
