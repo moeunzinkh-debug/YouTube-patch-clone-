@@ -1,6 +1,7 @@
 package app.morphe.patches.bigtree
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
@@ -260,7 +261,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
     // JavaScript cannot inspect. Clear the saved candidate for each main-frame
     // navigation, then retain only likely full media/manifest requests. v7-v11
     // are overwritten by the original method before their original values are read.
-    method.addInstructions(9, """
+    method.addInstructionsWithLabels(9, """
         invoke-interface {v2}, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
         move-result v7
         if-eqz v7, :morphe_capture_request
