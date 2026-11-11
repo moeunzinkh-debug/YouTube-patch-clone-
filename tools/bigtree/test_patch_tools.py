@@ -25,6 +25,14 @@ class BigTreeToolsTest(unittest.TestCase):
                     text.replace('com.app.bigtree', 'com.example.bad', 1)):
             with self.assertRaises(ValueError): verify_listing(bad)
 
+    def test_snap_uses_layered_capture_without_page_control_clicks(self):
+        source = (Path(__file__).parent / 'project/patches/src/main/kotlin/app/morphe/patches/bigtree/BigTreePatches.kt').read_text()
+        for evidence in ('XMLHttpRequest.prototype.open', 'PerformanceObserver', 'iframe,frame',
+                         'shouldInterceptRequest', 'morphe-snap-manifest-url', 'Android.openAppDownload'):
+            self.assertIn(evidence, source)
+        for unsafe in ('geometricDownloadControl', 'downloadControl()', 'control.click()'):
+            self.assertNotIn(unsafe, source)
+
     def test_independent_injection_shapes(self):
         original = [('invoke-super', 'v0'), *([('nop', '')] * 20), ('return-void', '')]
         def block(marker):

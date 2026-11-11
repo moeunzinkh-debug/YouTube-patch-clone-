@@ -11,7 +11,7 @@ Standalone Morphe bundle for the reviewed BigTree APK only.
 
 ## Independent selectors
 
-- **Snap Media** — adds a movable round download icon. A tap prioritizes full HLS/DASH manifests or full media/download URLs, rejects individual stream segments, and sends the result through BigTree's reviewed `openAppDownload` Android `ACTION_VIEW` path for an external downloader such as IDM. If no verified media URL exists, it shows an instruction instead of clicking an unrelated page control. Dragging moves the icon without starting a download and remembers its position.
+- **Snap Media** — adds a movable round download icon and layered detection for media elements, links/data attributes, Fetch/XHR, resource timing, dynamically added content, embedded script URLs, and accessible frames. A native `shouldInterceptRequest` hook also records likely full media/manifest requests from cross-origin iframes that webpage JavaScript cannot inspect. A tap prioritizes HLS/DASH manifests, rejects individual stream segments, and sends the best candidate through BigTree's reviewed `openAppDownload` Android `ACTION_VIEW` path so IDM or another compatible downloader can handle it. It never guesses or clicks webpage controls. Dragging moves the icon without starting a download and remembers its position.
 - **Translation to English** — adds an English webpage-translation control and loads Google's hosted Translate Element. Page content is therefore sent to an external Google translation service.
 
 Both selectors are disabled by default and may be selected separately or together.

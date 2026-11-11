@@ -43,6 +43,27 @@ def read_hook(path: Path) -> list[tuple[str, str]]:
         raise ValueError(f'Exact BigTree WebView hook count was {len(found)} across {dex_names}')
     return found[0]
 
+def snap_capture_marker_count(path: Path) -> int:
+    """Count the native cross-origin media capture key in the exact interceptor."""
+    from androguard.core.dex import DEX
+    marker = 'morphe-snap-media-url'
+    found = []
+    with zipfile.ZipFile(path) as archive:
+        for name in archive.namelist():
+            if not re.fullmatch(r'classes\d*\.dex', name):
+                continue
+            dex = DEX(archive.read(name))
+            for cls in dex.get_classes():
+                if cls.get_name() != CLASS:
+                    continue
+                for method in cls.get_methods():
+                    descriptor = ''.join(method.get_descriptor().split())
+                    if method.get_name() == 'shouldInterceptRequest' and descriptor == '(Landroid/webkit/WebView;Landroid/webkit/WebResourceRequest;)Landroid/webkit/WebResourceResponse;':
+                        found.append(sum(marker in ins.get_output() for ins in method.get_instructions()))
+    if len(found) != 1:
+        raise ValueError(f'Exact BigTree resource interceptor count was {len(found)}')
+    return found[0]
+
 def normalized(instruction: tuple[str, str]) -> tuple[str, str]:
     opcode, output = instruction
     if opcode.startswith('if-') or opcode.startswith('goto'):
@@ -99,11 +120,16 @@ def main() -> None:
     expected = [SELECTORS[mode] for mode in args.modes]
     verify_report(args.report, args.patched, expected)
     verify_injection(read_hook(args.base), read_hook(args.patched), args.modes)
+    base_capture_count = snap_capture_marker_count(args.base)
+    patched_capture_count = snap_capture_marker_count(args.patched)
+    if base_capture_count != 0 or patched_capture_count != (2 if 'snap' in args.modes else 0):
+        raise ValueError('Native cross-origin media capture injection was absent or unexpected')
     result = {
         'status': 'passed_actual_mpp_application_and_dex_inspection',
         'input_sha256': BASE_SHA256, 'package': PACKAGE, 'version': VERSION, 'version_code': CODE,
         'selectors': expected, 'injection_target': CLASS + '->' + METHOD,
         'injected_markers': [MARKERS[mode] for mode in args.modes],
+        'native_cross_origin_request_capture': 'verified' if 'snap' in args.modes else 'not_selected',
         'original_hook_preserved_outside_injections': True,
         'runtime_download_translation_network_csp_and_ui_behavior': 'not tested',
     }

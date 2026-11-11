@@ -19,221 +19,139 @@ private val snapMediaScript = """
 (function(){
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
+  var nativeKeys=['morphe-snap-manifest-url','morphe-snap-media-url'],found={},sequence=0;
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
+  function absolute(url,base){
+    try{return new URL(String(url||''),base||document.baseURI).href;}catch(e){return '';}
+  }
+  function blocked(url){return /\.(?:ts|m4s|cmfv|cmfa|aac)(?:[?#]|$)/i.test(url)||/^blob:|^data:/i.test(url);}
+  function mediaScore(url,hint){
+    var value=String(url||''),info=String(hint||'').toLowerCase(),score=0;
+    if(!/^https?:/i.test(value)||blocked(value))return 0;
+    if(/\.m3u8(?:[?#]|$)/i.test(value))score=30000;
+    else if(/\.mpd(?:[?#]|$)/i.test(value))score=29000;
+    else if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|$)/i.test(value))score=22000;
+    else if(/(?:manifest|playlist|master|videoplayback|playurl|video_url|stream_url)/i.test(value))score=16000;
+    else if(/video|media|stream|source|download|attachment|original|播放|下载|下載/.test(info))score=9000;
+    if(/download|attachment|original|source|下载|下載/.test(info))score+=4000;
+    return score;
+  }
+  function remember(url,hint,base){
+    var value=absolute(url,base),score=mediaScore(value,hint);
+    if(!score)return;
+    var old=found[value];
+    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence};
+  }
+  function metadata(element){
+    var values=[];
+    ['id','class','title','aria-label','name','type','data-action','data-command','data-role','data-title'].forEach(function(name){
+      try{values.push(element.getAttribute(name)||'');}catch(e){}
+    });
+    try{var text=(element.textContent||'').trim();if(text.length<120)values.push(text);}catch(e){}
+    return values.join(' ').toLowerCase();
+  }
+  function install(win){
+    try{
+      if(!win||win.__morpheMediaCapture)return;
+      win.__morpheMediaCapture=true;
+      var originalFetch=win.fetch;
+      if(originalFetch)win.fetch=function(input){
+        try{remember(typeof input==='string'?input:input&&input.url,'fetch',win.document.baseURI);}catch(e){}
+        return originalFetch.apply(this,arguments);
+      };
+      var originalOpen=win.XMLHttpRequest&&win.XMLHttpRequest.prototype.open;
+      if(originalOpen)win.XMLHttpRequest.prototype.open=function(method,url){
+        try{remember(url,'xhr '+method,win.document.baseURI);}catch(e){}
+        return originalOpen.apply(this,arguments);
+      };
+      if(win.PerformanceObserver){
+        var observer=new win.PerformanceObserver(function(list){
+          list.getEntries().forEach(function(entry){remember(entry.name,'performance '+(entry.initiatorType||''),win.document.baseURI);});
+        });
+        observer.observe({entryTypes:['resource']});
+      }
+    }catch(e){}
+  }
   function documents(){
     var result=[document],seen=[document];
     for(var index=0;index<result.length;index++){
-      var frames=[];
+      var frames=[];install(result[index].defaultView);
       try{frames=result[index].querySelectorAll('iframe,frame');}catch(e){}
       Array.prototype.forEach.call(frames,function(frame){
+        try{remember(frame.src,metadata(frame),result[index].baseURI);}catch(e){}
         try{var child=frame.contentDocument;if(child&&seen.indexOf(child)<0){seen.push(child);result.push(child);}}catch(e){}
       });
     }
     return result;
   }
-  function direct(url){return url&&/^https?:/i.test(url);}
-  function externalMediaUrl(){
-    var candidates=[];
-    function add(url,score){
-      if(!direct(url))return;
-      if(/\.(?:ts|m4s|cmfv|cmfa)(?:[?#]|${'$'})/i.test(url))return;
-      candidates.push({url:String(url),score:score});
-    }
+  function scan(){
     documents().forEach(function(doc){
-      var links=[];
-      try{links=doc.querySelectorAll('[href],[data-url],[data-download],[data-download-url],[data-video-url],[src]');}catch(e){}
-      Array.prototype.forEach.call(links,function(element){
+      var nodes=[];
+      try{nodes=doc.querySelectorAll('video,audio,source,track,iframe,frame,embed,object,[href],[src],[srcset],[data-url],[data-src],[data-file],[data-download],[data-download-url],[data-video-url],[data-stream-url]');}catch(e){}
+      Array.prototype.forEach.call(nodes,function(element){
         try{
-          var info=metadata(element),values=[element.href,element.currentSrc,element.src];
-          ['data-url','data-download','data-download-url','data-video-url'].forEach(function(name){values.push(element.getAttribute(name));});
-          values.forEach(function(url){
-            var score=/download|下载|下載/.test(info)?15000:0;
-            if(/\.m3u8(?:[?#]|${'$'})/i.test(url||''))score+=12000;
-            else if(/\.mpd(?:[?#]|${'$'})/i.test(url||''))score+=11000;
-            else if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|${'$'})/i.test(url||''))score+=7000;
-            if(score)add(url,score);
-          });
+          var info=metadata(element),values=[element.currentSrc,element.src,element.href,element.data];
+          ['data-url','data-src','data-file','data-download','data-download-url','data-video-url','data-stream-url'].forEach(function(name){values.push(element.getAttribute(name));});
+          var srcset=element.getAttribute&&element.getAttribute('srcset');
+          if(srcset)srcset.split(',').forEach(function(item){values.push(item.trim().split(/\s+/)[0]);});
+          values.forEach(function(value){remember(value,info,doc.baseURI);});
         }catch(e){}
       });
+      try{doc.defaultView.performance.getEntriesByType('resource').forEach(function(entry){remember(entry.name,'performance '+(entry.initiatorType||''),doc.baseURI);});}catch(e){}
       try{
-        doc.defaultView.performance.getEntriesByType('resource').forEach(function(entry){
-          var url=entry.name||'',score=0;
-          if(/\.m3u8(?:[?#]|${'$'})/i.test(url))score=12000;
-          else if(/\.mpd(?:[?#]|${'$'})/i.test(url))score=11000;
-          else if(/download|attachment|original|source/i.test(url))score=9000;
-          else if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|${'$'})/i.test(url))score=7000;
-          if(entry.initiatorType==='video')score+=1000;
-          if(score)add(url,score+(entry.startTime||0)/1000000);
+        doc.querySelectorAll('script:not([src])').forEach(function(script){
+          var text=script.textContent||'',matches=text.match(/https?:\\?\/\\?\/[^\s"'<>]+/g)||[];
+          matches.forEach(function(value){remember(value.replace(/\\\//g,'/'),'script media url',doc.baseURI);});
         });
       }catch(e){}
     });
-    candidates.sort(function(a,b){return b.score-a.score;});
+    try{if(window.Android&&Android.getData)nativeKeys.forEach(function(key){remember(Android.getData(key),'native iframe/resource request',document.baseURI);});}catch(e){}
+  }
+  function bestMediaUrl(){
+    scan();
+    var candidates=Object.keys(found).map(function(key){return found[key];});
+    candidates.sort(function(a,b){return b.score-a.score||b.order-a.order;});
     return candidates.length?candidates[0].url:'';
   }
-  function metadata(element){
-    var values=[];
-    ['id','class','title','aria-label','name','data-action','data-command','data-role','data-title'].forEach(function(name){
-      try{values.push(element.getAttribute(name)||'');}catch(e){}
-    });
-    try{var text=(element.textContent||'').trim();if(text.length<80)values.push(text);}catch(e){}
-    return values.join(' ').toLowerCase();
-  }
-  function playerAncestor(element){
-    var parent=element;
-    for(var depth=0;parent&&depth<7;depth++,parent=parent.parentElement){
-      try{
-        var info=metadata(parent);
-        if(/player|video|media/.test(info)||parent.querySelector('video,iframe,[class*="player"],[class*="video"]'))return true;
-      }catch(e){}
-    }
-    return false;
-  }
-  function downloadControl(){
-    var matches=[];
-    documents().forEach(function(doc){
-      var nodes=[];
-      try{nodes=doc.querySelectorAll('button,a,[role="button"],[data-action],[data-command],[onclick]');}catch(e){}
-      Array.prototype.forEach.call(nodes,function(element){
-        try{
-          if(element.id==='morphe-snap-media'||element.closest('#morphe-google-translate'))return;
-          var box=element.getBoundingClientRect(),info=metadata(element);
-          if(box.width<20||box.height<20||box.bottom<0||box.top>(doc.defaultView.innerHeight||10000))return;
-          var keyword=/download|save.?video|下载|下載|缓存|緩存|离线|離線/.test(info);
-          if(!keyword)return;
-          var score=(playerAncestor(element)?1000:0)+(info.indexOf('download')>=0?100:0)+(box.width*box.height<20000?20:0);
-          matches.push({element:element,score:score});
-        }catch(e){}
-      });
-    });
-    matches.sort(function(a,b){return b.score-a.score;});
-    return matches.length?matches[0].element:null;
-  }
-  function geometricDownloadControl(){
-    var best=null;
-    documents().forEach(function(doc){
-      var nodes=[];
-      try{nodes=doc.querySelectorAll('button,a,[role="button"],[onclick],div,span');}catch(e){}
-      var items=[];
-      Array.prototype.forEach.call(nodes,function(element){
-        try{
-          if(element.id==='morphe-snap-media'||element.closest('#morphe-google-translate'))return;
-          var box=element.getBoundingClientRect(),style=doc.defaultView.getComputedStyle(element);
-          var explicit=element.tagName==='BUTTON'||element.tagName==='A'||element.hasAttribute('role')||element.hasAttribute('onclick');
-          var icon=!!element.querySelector('svg,img')||element.tagName==='svg';
-          if((!explicit&&style.cursor!=='pointer')||(!icon&&!explicit))return;
-          if(box.width<24||box.height<24||box.width>180||box.height>140||box.bottom<0||box.top>(doc.defaultView.innerHeight||10000))return;
-          var centerX=box.left+box.width/2,centerY=box.top+box.height/2;
-          if(items.some(function(item){return Math.abs(item.x-centerX)<5&&Math.abs(item.y-centerY)<5;}))return;
-          items.push({element:element,x:centerX,y:centerY,player:playerAncestor(element),icon:icon});
-        }catch(e){}
-      });
-      var rows=[];
-      items.sort(function(a,b){return a.y-b.y;}).forEach(function(item){
-        var row=rows.filter(function(value){return Math.abs(value.y-item.y)<28;})[0];
-        if(!row){row={y:item.y,items:[]};rows.push(row);}
-        row.items.push(item);
-      });
-      rows.forEach(function(row){
-        row.items.sort(function(a,b){return a.x-b.x;});
-        if(row.items.length<4||row.items.length>7)return;
-        var width=row.items[row.items.length-1].x-row.items[0].x;
-        if(width<(doc.defaultView.innerWidth||700)*0.45)return;
-        var score=(row.items.length===5?300:0)+width+row.items.filter(function(item){return item.player;}).length*80+row.items.filter(function(item){return item.icon;}).length*20;
-        var center=(doc.defaultView.innerWidth||700)/2;
-        var choice=row.items.slice().sort(function(a,b){return Math.abs(a.x-center)-Math.abs(b.x-center);})[0];
-        if(!best||score>best.score)best={element:choice.element,score:score};
-      });
-    });
-    return best&&best.element;
-  }
-  function revealPlayerControls(){
-    var best=null,area=0;
-    documents().forEach(function(doc){
-      var nodes=[];
-      try{nodes=doc.querySelectorAll('video,[class*="player"],[class*="video"]');}catch(e){}
-      Array.prototype.forEach.call(nodes,function(element){
-        try{var box=element.getBoundingClientRect(),value=box.width*box.height;if(value>area&&box.bottom>0){best=element;area=value;}}catch(e){}
-      });
-    });
-    try{if(best){best.dispatchEvent(new MouseEvent('mousemove',{bubbles:true}));best.click();}}catch(e){}
-  }
-  function activate(control){
+  install(window);
+  try{new MutationObserver(function(){scan();}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src','href','srcset','data-url','data-src','data-file','data-download','data-download-url','data-video-url','data-stream-url']});}catch(e){}
+  setInterval(scan,1500);scan();
+  function openDownload(){
+    var url=bestMediaUrl();
+    if(!url){toast('Video not found yet. Start playback, wait a few seconds, then tap again.');return;}
     try{
-      control.scrollIntoView({block:'center',inline:'center'});
-      control.click();
-      toast('Opening the original download panel...');
-      return true;
-    }catch(e){return false;}
-  }
-  function openOriginalDownload(){
-    var url=externalMediaUrl();
-    if(!url){
-      toast('Play the video for a few seconds, then tap the download icon again.');
-      return;
-    }
-    try{
-      if(window.Android&&Android.openAppDownload){
-        Android.openAppDownload(url);
-        toast('Sending the video stream to the external downloader...');
-        return;
-      }
+      if(window.Android&&Android.openAppDownload){Android.openAppDownload(url);toast('Choose a downloader to save the detected video.');return;}
     }catch(e){}
-    toast('External downloader is unavailable.');
+    toast('No external downloader is available.');
   }
   var button=document.createElement('button');
   button.id='morphe-snap-media';
   button.innerHTML='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M5 20h14v-2H5v2zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1z"/></svg>';
-  button.setAttribute('aria-label','Download media');
-  button.setAttribute('title','Download media');
-  button.setAttribute('translate','no');
-  button.className='notranslate';
+  button.setAttribute('aria-label','Download media');button.setAttribute('title','Download media');button.setAttribute('translate','no');button.className='notranslate';
   button.style.cssText='position:fixed;right:14px;bottom:74px;z-index:2147483647;width:54px;height:54px;padding:0;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#1769e0;color:white;box-shadow:0 3px 10px #0009;touch-action:none;user-select:none;-webkit-user-select:none';
-  try{
-    var saved=JSON.parse(localStorage.getItem('morphe-snap-position')||'null');
-    if(saved&&isFinite(saved.x)&&isFinite(saved.y)){
-      button.style.left=Math.max(0,Math.min(innerWidth-54,saved.x))+'px';
-      button.style.top=Math.max(0,Math.min(innerHeight-54,saved.y))+'px';
-      button.style.right='auto';button.style.bottom='auto';
-    }
-  }catch(e){}
+  try{var saved=JSON.parse(localStorage.getItem('morphe-snap-position')||'null');if(saved&&isFinite(saved.x)&&isFinite(saved.y)){button.style.left=Math.max(0,Math.min(innerWidth-54,saved.x))+'px';button.style.top=Math.max(0,Math.min(innerHeight-54,saved.y))+'px';button.style.right='auto';button.style.bottom='auto';}}catch(e){}
   var drag=null,suppressClick=false;
   button.addEventListener('pointerdown',function(event){
     if(event.button!==undefined&&event.button!==0)return;
-    var box=button.getBoundingClientRect();
-    button.style.left=box.left+'px';button.style.top=box.top+'px';button.style.right='auto';button.style.bottom='auto';
+    var box=button.getBoundingClientRect();button.style.left=box.left+'px';button.style.top=box.top+'px';button.style.right='auto';button.style.bottom='auto';
     drag={id:event.pointerId,startX:event.clientX,startY:event.clientY,left:box.left,top:box.top,moved:false};
-    try{button.setPointerCapture(event.pointerId);}catch(e){}
-    event.preventDefault();
+    try{button.setPointerCapture(event.pointerId);}catch(e){}event.preventDefault();
   });
   button.addEventListener('pointermove',function(event){
     if(!drag||drag.id!==event.pointerId)return;
-    var dx=event.clientX-drag.startX,dy=event.clientY-drag.startY;
-    if(Math.abs(dx)>5||Math.abs(dy)>5)drag.moved=true;
-    button.style.left=Math.max(0,Math.min(innerWidth-button.offsetWidth,drag.left+dx))+'px';
-    button.style.top=Math.max(0,Math.min(innerHeight-button.offsetHeight,drag.top+dy))+'px';
-    event.preventDefault();
+    var dx=event.clientX-drag.startX,dy=event.clientY-drag.startY;if(Math.abs(dx)>5||Math.abs(dy)>5)drag.moved=true;
+    button.style.left=Math.max(0,Math.min(innerWidth-button.offsetWidth,drag.left+dx))+'px';button.style.top=Math.max(0,Math.min(innerHeight-button.offsetHeight,drag.top+dy))+'px';event.preventDefault();
   });
   function finishDrag(event){
-    if(!drag||drag.id!==event.pointerId)return;
-    suppressClick=drag.moved;
-    if(drag.moved){
-      try{localStorage.setItem('morphe-snap-position',JSON.stringify({x:button.offsetLeft,y:button.offsetTop}));}catch(e){}
-    }
-    drag=null;
-    try{button.releasePointerCapture(event.pointerId);}catch(e){}
-    setTimeout(function(){suppressClick=false;},0);
-    event.preventDefault();
+    if(!drag||drag.id!==event.pointerId)return;suppressClick=drag.moved;
+    if(drag.moved){try{localStorage.setItem('morphe-snap-position',JSON.stringify({x:button.offsetLeft,y:button.offsetTop}));}catch(e){}}
+    drag=null;try{button.releasePointerCapture(event.pointerId);}catch(e){}setTimeout(function(){suppressClick=false;},0);event.preventDefault();
   }
-  button.addEventListener('pointerup',finishDrag);
-  button.addEventListener('pointercancel',finishDrag);
-  button.addEventListener('click',function(event){
-    if(suppressClick){event.preventDefault();event.stopPropagation();return;}
-    openOriginalDownload();
-  });
+  button.addEventListener('pointerup',finishDrag);button.addEventListener('pointercancel',finishDrag);
+  button.addEventListener('click',function(event){if(suppressClick){event.preventDefault();event.stopPropagation();return;}openDownload();});
   (document.body||document.documentElement).appendChild(button);
 })();
 """.trimIndent()
-
 private val translateEnglishScript = """
 (function(){
   if(window.__morpheEnglishTranslation)return;
@@ -317,6 +235,124 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectPageScript(marke
     """.trimIndent())
 }
 
+private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCapture() {
+    val client = mutableClassDefBy(WEB_CLIENT)
+    val method = client.methods.singleOrNull { candidate ->
+        candidate.name == "shouldInterceptRequest" &&
+            candidate.returnType == "Landroid/webkit/WebResourceResponse;" &&
+            candidate.parameterTypes.map { it.toString() } == listOf(
+                "Landroid/webkit/WebView;", "Landroid/webkit/WebResourceRequest;",
+            ) && AccessFlags.PUBLIC.isSet(candidate.accessFlags) && !AccessFlags.STATIC.isSet(candidate.accessFlags)
+    } ?: error("Reviewed BigTree resource-request hook is unavailable")
+    val implementation = requireNotNull(method.implementation) { "BigTree resource-request hook has no implementation" }
+    require(implementation.registerCount == 43) { "BigTree resource-request register layout changed" }
+    val instructions = implementation.instructions.toList()
+    require(instructions.size == 917 && instructions[0].opcode == Opcode.MOVE_OBJECT_FROM16 &&
+        instructions[1].opcode == Opcode.MOVE_OBJECT_FROM16) {
+        "BigTree resource-request control flow changed"
+    }
+    val strings = instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? StringReference }.map { it.string }
+    require("transfer-encoding" in strings && "requestHeaders" in strings && "morphe-snap-media-url" !in strings) {
+        "BigTree resource-request fingerprint changed"
+    }
+
+    // The WebViewClient sees requests made by cross-origin iframes that page
+    // JavaScript cannot inspect. Clear the saved candidate for each main-frame
+    // navigation, then retain only likely full media/manifest requests. v7-v11
+    // are overwritten by the original method before their original values are read.
+    method.addInstructions(9, """
+        invoke-interface {v2}, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
+        move-result v7
+        if-eqz v7, :morphe_capture_request
+        iget-object v7, v1, LG1/m0;->a Lcom/app/bigtree/MainActivity;
+        const-string v8, "js_store"
+        const/4 v9, 0x0
+        invoke-virtual {v7, v8, v9}, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+        move-result-object v7
+        invoke-interface {v7}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences${'$'}Editor;
+        move-result-object v7
+        const-string v8, "morphe-snap-media-url"
+        const-string v9, ""
+        invoke-interface {v7, v8, v9}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
+        move-result-object v7
+        const-string v8, "morphe-snap-manifest-url"
+        invoke-interface {v7, v8, v9}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
+        move-result-object v7
+        invoke-interface {v7}, Landroid/content/SharedPreferences${'$'}Editor;->apply()V
+        goto :morphe_capture_done
+        :morphe_capture_request
+        invoke-interface {v2}, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
+        move-result-object v7
+        invoke-virtual {v7}, Landroid/net/Uri;->toString()Ljava/lang/String;
+        move-result-object v7
+        const-string v8, ".ts"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_done
+        const-string v8, ".m4s"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_done
+        const-string v8, ".cmfv"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_done
+        const-string v8, ".cmfa"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_done
+        const-string v8, "init.mp4"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_done
+        const-string v8, ".m3u8"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_manifest
+        const-string v8, ".mpd"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_manifest
+        const-string v8, "manifest"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_manifest
+        const-string v8, "playlist"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_manifest
+        const-string v8, ".mp4"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_media
+        const-string v8, ".webm"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_media
+        const-string v8, "videoplayback"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-eqz v8, :morphe_capture_done
+        :morphe_capture_media
+        const-string v10, "morphe-snap-media-url"
+        goto :morphe_capture_write
+        :morphe_capture_manifest
+        const-string v10, "morphe-snap-manifest-url"
+        :morphe_capture_write
+        iget-object v8, v1, LG1/m0;->a Lcom/app/bigtree/MainActivity;
+        const-string v9, "js_store"
+        const/4 v11, 0x0
+        invoke-virtual {v8, v9, v11}, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+        move-result-object v8
+        invoke-interface {v8}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences${'$'}Editor;
+        move-result-object v8
+        invoke-interface {v8, v10, v7}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
+        move-result-object v8
+        invoke-interface {v8}, Landroid/content/SharedPreferences${'$'}Editor;->apply()V
+        :morphe_capture_done
+    """.trimIndent())
+}
+
 private fun compatibility() = Compatibility(
     name = "BigTree",
     packageName = "com.app.bigtree",
@@ -326,11 +362,14 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Sends the best full video or stream-manifest URL to Android ACTION_VIEW through BigTree's openAppDownload bridge for an external downloader such as IDM. Segment URLs are rejected, and no unrelated page control is clicked when a video URL is unavailable.",
+    description = "Detects full video and stream-manifest URLs from page elements, fetch/XHR, same-origin frames, and native cross-origin iframe requests, then sends the best result through Android ACTION_VIEW so any compatible downloader can handle it. Individual stream segments are rejected.",
     default = false,
 ) {
     compatibleWith(compatibility())
-    execute { injectPageScript(SNAP_MARKER, snapMediaScript) }
+    execute {
+        injectPageScript(SNAP_MARKER, snapMediaScript)
+        injectNativeMediaCapture()
+    }
 }
 
 @Suppress("unused")
