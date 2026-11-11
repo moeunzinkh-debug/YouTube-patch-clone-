@@ -20,7 +20,7 @@ private val snapMediaScript = """
 (function(){
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
-  var nativeKeys=['morphe-snap-manifest-url','morphe-snap-media-url'],found={},sequence=0;
+  var nativeKey='morphe-snap-media-url',found={},sequence=0;
   var snappedUrl='',capturing=false,captureTimeout=0,button=null;
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
@@ -30,11 +30,9 @@ private val snapMediaScript = """
   function mediaScore(url,hint){
     var value=String(url||''),info=String(hint||'').toLowerCase(),score=0;
     if(!/^https?:/i.test(value)||blocked(value))return 0;
-    if(/\.m3u8(?:[?#]|$)/i.test(value))score=30000;
-    else if(/\.mpd(?:[?#]|$)/i.test(value))score=29000;
-    else if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|$)/i.test(value))score=22000;
-    else if(/(?:manifest|playlist|master|videoplayback|playurl|video_url|stream_url)/i.test(value))score=16000;
-    else if(/video|media|stream|source|download|attachment|original|播放|下载|下載/.test(info))score=9000;
+    if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|$)/i.test(value))score=22000;
+    else if(/(?:videoplayback|video_url|download|attachment|original)/i.test(value))score=16000;
+    else if(/video|media|source|download|attachment|original|播放|下载|下載/.test(info))score=9000;
     if(/download|attachment|original|source|下载|下載/.test(info))score+=4000;
     return score;
   }
@@ -107,7 +105,7 @@ private val snapMediaScript = """
         });
       }catch(e){}
     });
-    try{if(window.Android&&Android.getData)nativeKeys.forEach(function(key){remember(Android.getData(key),'native iframe/resource request',document.baseURI);});}catch(e){}
+    try{if(window.Android&&Android.getData)remember(Android.getData(nativeKey),'native direct-video request',document.baseURI);}catch(e){}
     if(capturing){var ready=bestDirectMediaUrl(false);if(ready)finishSnap(ready);}
   }
   function rankedCandidates(){
@@ -116,7 +114,7 @@ private val snapMediaScript = """
     return candidates;
   }
   function directFile(url){
-    if(!url||blocked(url)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url))return false;
+    if(!url||blocked(url))return false;
     return /\.(?:mp4|m4v|webm|mov)(?:[?#]|$)/i.test(url)||/(?:videoplayback|video_url|download|attachment|original)/i.test(url);
   }
   function bestDirectMediaUrl(rescan){
@@ -307,7 +305,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
 
     // The WebViewClient sees requests made by cross-origin iframes that page
     // JavaScript cannot inspect. Clear the saved candidate for each main-frame
-    // navigation, then retain only likely full media/manifest requests. v7-v11
+    // navigation, then retain only likely full direct-video requests. v7-v11
     // are overwritten by the original method before their original values are read.
     method.addInstructionsWithLabels(9, """
         invoke-interface {v2}, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
@@ -322,9 +320,6 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         move-result-object v7
         const-string v8, "morphe-snap-media-url"
         const-string v9, ""
-        invoke-interface {v7, v8, v9}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
-        move-result-object v7
-        const-string v8, "morphe-snap-manifest-url"
         invoke-interface {v7, v8, v9}, Landroid/content/SharedPreferences${'$'}Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences${'$'}Editor;
         move-result-object v7
         invoke-interface {v7}, Landroid/content/SharedPreferences${'$'}Editor;->apply()V
@@ -354,27 +349,19 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
         move-result v8
         if-nez v8, :morphe_capture_done
-        const-string v8, ".m3u8"
-        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-        move-result v8
-        if-nez v8, :morphe_capture_manifest
-        const-string v8, ".mpd"
-        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-        move-result v8
-        if-nez v8, :morphe_capture_manifest
-        const-string v8, "manifest"
-        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-        move-result v8
-        if-nez v8, :morphe_capture_manifest
-        const-string v8, "playlist"
-        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-        move-result v8
-        if-nez v8, :morphe_capture_manifest
         const-string v8, ".mp4"
         invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
         move-result v8
         if-nez v8, :morphe_capture_media
+        const-string v8, ".m4v"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_media
         const-string v8, ".webm"
+        invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+        move-result v8
+        if-nez v8, :morphe_capture_media
+        const-string v8, ".mov"
         invoke-virtual {v7, v8}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
         move-result v8
         if-nez v8, :morphe_capture_media
@@ -384,10 +371,6 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         if-eqz v8, :morphe_capture_done
         :morphe_capture_media
         const-string v10, "morphe-snap-media-url"
-        goto :morphe_capture_write
-        :morphe_capture_manifest
-        const-string v10, "morphe-snap-manifest-url"
-        :morphe_capture_write
         iget-object v8, v1, LG1/m0;->a:Lcom/app/bigtree/MainActivity;
         const-string v9, "js_store"
         const/4 v11, 0x0
@@ -412,7 +395,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Uses a two-step flow: the first tap captures and locks a full direct video URL from page, network, and iframe requests; after the button turns green, the second tap downloads that captured file directly to the device through BigTree's native saveFile bridge. Stream manifests and individual segments are never saved as fake MP4 files.",
+    description = "Uses only the two-step direct-file flow: the first tap captures and locks a full video URL from page, network, and iframe requests; after the button turns green, the second tap downloads that captured file to the device through BigTree's native saveFile bridge. Legacy manifest and external-downloader routes are removed, and individual segments are rejected.",
     default = false,
 ) {
     compatibleWith(compatibility())
