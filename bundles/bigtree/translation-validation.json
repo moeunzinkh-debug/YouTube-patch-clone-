@@ -11,6 +11,7 @@
   "injected_markers": [
     "window.__morpheEnglishTranslation"
   ],
+  "native_cross_origin_request_capture": "not_selected",
   "original_hook_preserved_outside_injections": true,
   "runtime_download_translation_network_csp_and_ui_behavior": "not tested"
 }
