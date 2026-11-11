@@ -26,16 +26,21 @@ def read_hook(path: Path) -> list[tuple[str, str]]:
             apk.get_androidversion_name() != VERSION or apk.get_androidversion_code() != CODE):
         raise ValueError('Unexpected BigTree APK identity')
     found = []
+    dex_names = []
     with zipfile.ZipFile(path) as archive:
-        dex = DEX(archive.read('classes.dex'))
-        for cls in dex.get_classes():
-            if cls.get_name() != CLASS:
+        for name in archive.namelist():
+            if not re.fullmatch(r'classes\d*\.dex', name):
                 continue
-            for method in cls.get_methods():
-                if method.get_name() == METHOD and ''.join(method.get_descriptor().split()) == '(Landroid/webkit/WebView;Ljava/lang/String;)V':
-                    found.append([(ins.get_name(), ins.get_output()) for ins in method.get_instructions()])
+            dex_names.append(name)
+            dex = DEX(archive.read(name))
+            for cls in dex.get_classes():
+                if cls.get_name() != CLASS:
+                    continue
+                for method in cls.get_methods():
+                    if method.get_name() == METHOD and ''.join(method.get_descriptor().split()) == '(Landroid/webkit/WebView;Ljava/lang/String;)V':
+                        found.append([(ins.get_name(), ins.get_output()) for ins in method.get_instructions()])
     if len(found) != 1:
-        raise ValueError('Exact BigTree WebView hook was not found once')
+        raise ValueError(f'Exact BigTree WebView hook count was {len(found)} across {dex_names}')
     return found[0]
 
 def normalized(instruction: tuple[str, str]) -> tuple[str, str]:
