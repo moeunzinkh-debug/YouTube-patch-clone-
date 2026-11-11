@@ -132,11 +132,13 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectPageScript(marke
     val strings = instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? StringReference }.map { it.string }
     require(strings.count { URL_WATCHER_MARKER in it } == 1) { "BigTree URL watcher fingerprint changed" }
     require(strings.none { marker in it }) { "Requested BigTree feature is already installed" }
+    val installedFeatureCount = strings.count { SNAP_MARKER in it || TRANSLATE_MARKER in it }
+    require(installedFeatureCount in 0..1) { "Unexpected BigTree feature injection state" }
     val calls = instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
     require(calls.count {
         it.definingClass == "Landroid/webkit/WebView;" && it.name == "evaluateJavascript" &&
             it.parameterTypes.map { type -> type.toString() } == listOf("Ljava/lang/String;", "Landroid/webkit/ValueCallback;")
-    } == 1) { "BigTree page JavaScript hook fingerprint changed" }
+    } == 1 + installedFeatureCount) { "BigTree page JavaScript hook fingerprint changed" }
 
     // p1 is the WebView. v0 and v1 are the two existing local registers and
     // are overwritten by the original body immediately after this injection.
