@@ -167,24 +167,18 @@ private val snapMediaScript = """
   }
   function openOriginalDownload(){
     var url=externalMediaUrl();
-    if(url){
-      try{
-        if(window.Android&&Android.openAppDownload){
-          Android.openAppDownload(url);
-          toast('Sending full video stream to the external downloader...');
-          return;
-        }
-      }catch(e){}
+    if(!url){
+      toast('Play the video for a few seconds, then tap the download icon again.');
+      return;
     }
-    var control=downloadControl();
-    if(control&&activate(control))return;
-    revealPlayerControls();
-    setTimeout(function(){
-      var retryUrl=externalMediaUrl();
-      if(retryUrl){try{Android.openAppDownload(retryUrl);toast('Sending video to the external downloader...');return;}catch(e){}}
-      var delayed=downloadControl()||geometricDownloadControl();
-      if(!delayed||!activate(delayed))toast('Play the video briefly, then tap Save media again.');
-    },700);
+    try{
+      if(window.Android&&Android.openAppDownload){
+        Android.openAppDownload(url);
+        toast('Sending the video stream to the external downloader...');
+        return;
+      }
+    }catch(e){}
+    toast('External downloader is unavailable.');
   }
   var button=document.createElement('button');
   button.id='morphe-snap-media';
@@ -332,7 +326,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Sends the best full video or stream-manifest URL to Android ACTION_VIEW through BigTree's openAppDownload bridge for an external downloader such as IDM. Segment URLs are rejected; the webpage's original download control remains a fallback.",
+    description = "Sends the best full video or stream-manifest URL to Android ACTION_VIEW through BigTree's openAppDownload bridge for an external downloader such as IDM. Segment URLs are rejected, and no unrelated page control is clicked when a video URL is unavailable.",
     default = false,
 ) {
     compatibleWith(compatibility())
