@@ -20,8 +20,8 @@ private val snapMediaScript = """
 (function(){
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
-  var nativeKey='morphe-snap-media-url',playerKey='morphe-snap-player-json',found={},sequence=0;
-  var snappedUrl='',capturing=false,captureTimeout=0,button=null;
+  var nativeKey='morphe-snap-media-url',playerKey='morphe-snap-player-json',found={},blockedUrls={},sequence=0;
+  var snappedUrl='',capturing=false,captureTimeout=0,button=null,playerBlockReason='';
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
     try{return new URL(String(url||''),base||document.baseURI).href;}catch(e){return '';}
@@ -38,15 +38,23 @@ private val snapMediaScript = """
   }
   function remember(url,hint,base,forceDirect){
     var value=absolute(url,base),score=forceDirect?26000:mediaScore(value,hint);
-    if(!score||blocked(value))return;
+    if(!score||blocked(value)||blockedUrls[value])return;
     var old=found[value];
     found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence,direct:!!forceDirect||!!(old&&old.direct)};
   }
   function rememberNativePlayer(raw){
     try{
-      var data=JSON.parse(raw||'{}'),type=String(data.type||'mp4').toLowerCase(),url=data.url||'';
-      var directType=/^(?:mp4|progressive|clearkey_mp4)$/.test(type);
-      remember(url,'video native player '+type,document.baseURI,directType);
+      var data=JSON.parse(raw||'{}'),type=String(data.type||'mp4').toLowerCase(),url=absolute(data.url||'',document.baseURI);
+      if(!url)return;
+      var hasClearKeys=data.clearKeys&&Object.keys(data.clearKeys).length>0;
+      var encrypted=!!data.drm||hasClearKeys||(data.ykKey&&data.ykKey.length)||(data.bbtsKey&&String(data.bbtsKey).length);
+      var streamed=!!data.manifest||/^(?:hls|m3u8|dash|mpd|ss|smoothstreaming|rtsp|auto|clearkey_mp4)$/.test(type)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url);
+      if(encrypted||streamed){
+        blockedUrls[url]=true;delete found[url];
+        playerBlockReason=encrypted?'encrypted native player source':'segmented native player stream';
+        return;
+      }
+      if(/^(?:mp4|progressive)$/.test(type)){playerBlockReason='';remember(url,'video native player '+type,document.baseURI,true);}
     }catch(e){}
   }
   function metadata(element){
@@ -166,12 +174,17 @@ private val snapMediaScript = """
       toast('Capturing the full video URL. Keep the video playing...');
       captureTimeout=setTimeout(function(){
         if(!capturing)return;capturing=false;setSnapState('idle');
-        toast('A direct video file was not found. Play the video and tap Snap again.');
+        toast(playerBlockReason?'Direct download blocked: '+playerBlockReason+'. Raw saving would create a corrupt file.':'A safe direct video file was not found. Play the video and tap Snap again.');
       },20000);
     }
   }
   function downloadSnappedVideo(){
     if(!snappedUrl){startSnap();return;}
+    try{if(window.Android&&Android.getData)rememberNativePlayer(Android.getData(playerKey));}catch(e){}
+    if(blockedUrls[snappedUrl]){
+      snappedUrl='';setSnapState('idle');
+      toast('Download blocked: this playback source is encrypted or segmented and raw saving would corrupt it.');return;
+    }
     var url=snappedUrl,info=fileInfo(url);snappedUrl='';setSnapState('idle');
     try{
       if(window.Android&&Android.saveFile){
@@ -437,7 +450,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Uses the two-step direct-file flow and captures the JSON passed to BigTree's native ExoPlayer bridge, in addition to page and request discovery. The first tap locks a full progressive/MP4 URL; after the button turns green, the second tap downloads it through BigTree's native saveFile bridge. Manifest streams and individual segments are rejected.",
+    description = "Uses the two-step direct-file flow and captures the JSON passed to BigTree's native ExoPlayer bridge. Only unencrypted progressive/MP4 sources may reach native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments are blocked because raw saving produces corrupt audio/video.",
     default = false,
 ) {
     compatibleWith(compatibility())
