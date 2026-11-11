@@ -265,7 +265,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         invoke-interface {v2}, Landroid/webkit/WebResourceRequest;->isForMainFrame()Z
         move-result v7
         if-eqz v7, :morphe_capture_request
-        iget-object v7, v1, LG1/m0;->a Lcom/app/bigtree/MainActivity;
+        iget-object v7, v1, LG1/m0;->a:Lcom/app/bigtree/MainActivity;
         const-string v8, "js_store"
         const/4 v9, 0x0
         invoke-virtual {v7, v8, v9}, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
@@ -340,7 +340,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         :morphe_capture_manifest
         const-string v10, "morphe-snap-manifest-url"
         :morphe_capture_write
-        iget-object v8, v1, LG1/m0;->a Lcom/app/bigtree/MainActivity;
+        iget-object v8, v1, LG1/m0;->a:Lcom/app/bigtree/MainActivity;
         const-string v9, "js_store"
         const/4 v11, 0x0
         invoke-virtual {v8, v9, v11}, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
