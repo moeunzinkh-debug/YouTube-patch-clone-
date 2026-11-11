@@ -21,6 +21,7 @@ private val snapMediaScript = """
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
   var nativeKeys=['morphe-snap-manifest-url','morphe-snap-media-url'],found={},sequence=0;
+  var snappedUrl='',capturing=false,captureTimeout=0,button=null;
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
     try{return new URL(String(url||''),base||document.baseURI).href;}catch(e){return '';}
@@ -107,28 +108,75 @@ private val snapMediaScript = """
       }catch(e){}
     });
     try{if(window.Android&&Android.getData)nativeKeys.forEach(function(key){remember(Android.getData(key),'native iframe/resource request',document.baseURI);});}catch(e){}
+    if(capturing){var ready=bestDirectMediaUrl(false);if(ready)finishSnap(ready);}
   }
-  function bestMediaUrl(){
-    scan();
+  function rankedCandidates(){
     var candidates=Object.keys(found).map(function(key){return found[key];});
     candidates.sort(function(a,b){return b.score-a.score||b.order-a.order;});
-    return candidates.length?candidates[0].url:'';
+    return candidates;
+  }
+  function directFile(url){
+    if(!url||blocked(url)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url))return false;
+    return /\.(?:mp4|m4v|webm|mov)(?:[?#]|$)/i.test(url)||/(?:videoplayback|video_url|download|attachment|original)/i.test(url);
+  }
+  function bestDirectMediaUrl(rescan){
+    if(rescan!==false)scan();
+    var candidates=rankedCandidates();
+    for(var index=0;index<candidates.length;index++)if(directFile(candidates[index].url))return candidates[index].url;
+    return '';
+  }
+  function setSnapState(state){
+    if(!button)return;
+    if(state==='capturing'){
+      button.style.background='#f59f00';button.setAttribute('title','Capturing video...');button.setAttribute('aria-label','Capturing video');
+    }else if(state==='ready'){
+      button.style.background='#138a36';button.setAttribute('title','Video ready — tap to download');button.setAttribute('aria-label','Download captured video');
+    }else{
+      button.style.background='#1769e0';button.setAttribute('title','Snap video');button.setAttribute('aria-label','Snap video');
+    }
+  }
+  function finishSnap(url){
+    if(!capturing||!url)return;
+    snappedUrl=url;capturing=false;clearTimeout(captureTimeout);setSnapState('ready');
+    toast('Video captured. Tap the green button to download it to this device.');
   }
   install(window);
   try{new MutationObserver(function(){scan();}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src','href','srcset','data-url','data-src','data-file','data-download','data-download-url','data-video-url','data-stream-url']});}catch(e){}
   setInterval(scan,1500);scan();
-  function openDownload(){
-    var url=bestMediaUrl();
-    if(!url){toast('Video not found yet. Start playback, wait a few seconds, then tap again.');return;}
-    try{
-      if(window.Android&&Android.openAppDownload){Android.openAppDownload(url);toast('Choose a downloader to save the detected video.');return;}
-    }catch(e){}
-    toast('No external downloader is available.');
+  function fileInfo(url){
+    var path='';try{path=decodeURIComponent(new URL(url).pathname.split('/').pop()||'');}catch(e){}
+    path=path.replace(/[^a-zA-Z0-9._ -]/g,'_');
+    var extension=(path.match(/\.(mp4|m4v|webm|mov)$/i)||[])[1]||'mp4';
+    if(!path||!new RegExp('\\.'+extension+'$','i').test(path))path='bigtree_video_'+Date.now()+'.'+extension;
+    var mime=extension.toLowerCase()==='webm'?'video/webm':extension.toLowerCase()==='mov'?'video/quicktime':'video/mp4';
+    return {name:path,mime:mime};
   }
-  var button=document.createElement('button');
+  function startSnap(){
+    if(capturing){toast('Still capturing. Keep the video playing...');return;}
+    snappedUrl='';capturing=true;setSnapState('capturing');scan();
+    if(capturing){
+      toast('Capturing the full video URL. Keep the video playing...');
+      captureTimeout=setTimeout(function(){
+        if(!capturing)return;capturing=false;setSnapState('idle');
+        toast('A direct video file was not found. Play the video and tap Snap again.');
+      },20000);
+    }
+  }
+  function downloadSnappedVideo(){
+    if(!snappedUrl){startSnap();return;}
+    var url=snappedUrl,info=fileInfo(url);snappedUrl='';setSnapState('idle');
+    try{
+      if(window.Android&&Android.saveFile){
+        Android.saveFile(url,info.name,info.mime,'morphe-snap-'+Date.now());
+        toast('Direct download started on this device.');return;
+      }
+    }catch(e){}
+    toast('Direct device download is unavailable.');
+  }
+  button=document.createElement('button');
   button.id='morphe-snap-media';
   button.innerHTML='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M5 20h14v-2H5v2zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1z"/></svg>';
-  button.setAttribute('aria-label','Download media');button.setAttribute('title','Download media');button.setAttribute('translate','no');button.className='notranslate';
+  button.setAttribute('aria-label','Snap video');button.setAttribute('title','Snap video');button.setAttribute('translate','no');button.className='notranslate';
   button.style.cssText='position:fixed;right:14px;bottom:74px;z-index:2147483647;width:54px;height:54px;padding:0;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#1769e0;color:white;box-shadow:0 3px 10px #0009;touch-action:none;user-select:none;-webkit-user-select:none';
   try{var saved=JSON.parse(localStorage.getItem('morphe-snap-position')||'null');if(saved&&isFinite(saved.x)&&isFinite(saved.y)){button.style.left=Math.max(0,Math.min(innerWidth-54,saved.x))+'px';button.style.top=Math.max(0,Math.min(innerHeight-54,saved.y))+'px';button.style.right='auto';button.style.bottom='auto';}}catch(e){}
   var drag=null,suppressClick=false;
@@ -149,7 +197,7 @@ private val snapMediaScript = """
     drag=null;try{button.releasePointerCapture(event.pointerId);}catch(e){}setTimeout(function(){suppressClick=false;},0);event.preventDefault();
   }
   button.addEventListener('pointerup',finishDrag);button.addEventListener('pointercancel',finishDrag);
-  button.addEventListener('click',function(event){if(suppressClick){event.preventDefault();event.stopPropagation();return;}openDownload();});
+  button.addEventListener('click',function(event){if(suppressClick){event.preventDefault();event.stopPropagation();return;}downloadSnappedVideo();});
   (document.body||document.documentElement).appendChild(button);
 })();
 """.trimIndent()
@@ -364,7 +412,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Detects full video and stream-manifest URLs from page elements, fetch/XHR, same-origin frames, and native cross-origin iframe requests, then sends the best result through Android ACTION_VIEW so any compatible downloader can handle it. Individual stream segments are rejected.",
+    description = "Uses a two-step flow: the first tap captures and locks a full direct video URL from page, network, and iframe requests; after the button turns green, the second tap downloads that captured file directly to the device through BigTree's native saveFile bridge. Stream manifests and individual segments are never saved as fake MP4 files.",
     default = false,
 ) {
     compatibleWith(compatibility())
