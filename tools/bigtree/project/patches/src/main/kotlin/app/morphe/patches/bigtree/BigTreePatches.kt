@@ -351,6 +351,7 @@ private fun app.morphe.patcher.patch.BytecodePatchContext.injectNativeMediaCaptu
         move-result-object v8
         invoke-interface {v8}, Landroid/content/SharedPreferences${'$'}Editor;->apply()V
         :morphe_capture_done
+        nop
     """.trimIndent())
 }
 
