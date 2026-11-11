@@ -11,14 +11,14 @@ Standalone Morphe bundle for the reviewed BigTree APK only.
 
 ## Independent selectors
 
-- **Snap Media** — adds a **Save media** control and long-press handling for visible images/videos. It passes direct media URLs to BigTree's existing native `Android.saveFile` bridge. Blob/data URLs are intentionally rejected because the native downloader cannot fetch them directly.
+- **Snap Media** — adds a **Save media** control and long-press handling for visible images/videos. It searches the top page, accessible nested frames, `<source>` and lazy-load attributes, CSS backgrounds, and recent direct media resources, then passes the selected URL to BigTree's existing native `Android.saveFile` bridge. Blob/data URLs are not passed directly because the native downloader cannot fetch them.
 - **Translation to English** — adds an English webpage-translation control and loads Google's hosted Translate Element. Page content is therefore sent to an external Google translation service.
 
 Both selectors are disabled by default and may be selected separately or together.
 
 ## Validation
 
-GitHub Actions run `42944070175` built this standalone MPP, listed exactly the two selectors, and applied:
+GitHub Actions run `42946002087` built the updated standalone MPP, listed exactly the two selectors, and applied:
 
 1. Snap Media alone;
 2. Translation to English alone; and
