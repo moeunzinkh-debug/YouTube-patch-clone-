@@ -31,6 +31,45 @@ private val snapMediaScript = """
     }
     return result;
   }
+  function direct(url){return url&&/^https?:/i.test(url);}
+  function externalMediaUrl(){
+    var candidates=[];
+    function add(url,score){
+      if(!direct(url))return;
+      if(/\.(?:ts|m4s|cmfv|cmfa)(?:[?#]|${'$'})/i.test(url))return;
+      candidates.push({url:String(url),score:score});
+    }
+    documents().forEach(function(doc){
+      var links=[];
+      try{links=doc.querySelectorAll('[href],[data-url],[data-download],[data-download-url],[data-video-url],[src]');}catch(e){}
+      Array.prototype.forEach.call(links,function(element){
+        try{
+          var info=metadata(element),values=[element.href,element.currentSrc,element.src];
+          ['data-url','data-download','data-download-url','data-video-url'].forEach(function(name){values.push(element.getAttribute(name));});
+          values.forEach(function(url){
+            var score=/download|下载|下載/.test(info)?15000:0;
+            if(/\.m3u8(?:[?#]|${'$'})/i.test(url||''))score+=12000;
+            else if(/\.mpd(?:[?#]|${'$'})/i.test(url||''))score+=11000;
+            else if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|${'$'})/i.test(url||''))score+=7000;
+            if(score)add(url,score);
+          });
+        }catch(e){}
+      });
+      try{
+        doc.defaultView.performance.getEntriesByType('resource').forEach(function(entry){
+          var url=entry.name||'',score=0;
+          if(/\.m3u8(?:[?#]|${'$'})/i.test(url))score=12000;
+          else if(/\.mpd(?:[?#]|${'$'})/i.test(url))score=11000;
+          else if(/download|attachment|original|source/i.test(url))score=9000;
+          else if(/\.(?:mp4|m4v|webm|mov)(?:[?#]|${'$'})/i.test(url))score=7000;
+          if(entry.initiatorType==='video')score+=1000;
+          if(score)add(url,score+(entry.startTime||0)/1000000);
+        });
+      }catch(e){}
+    });
+    candidates.sort(function(a,b){return b.score-a.score;});
+    return candidates.length?candidates[0].url:'';
+  }
   function metadata(element){
     var values=[];
     ['id','class','title','aria-label','name','data-action','data-command','data-role','data-title'].forEach(function(name){
@@ -127,13 +166,25 @@ private val snapMediaScript = """
     }catch(e){return false;}
   }
   function openOriginalDownload(){
+    var url=externalMediaUrl();
+    if(url){
+      try{
+        if(window.Android&&Android.openAppDownload){
+          Android.openAppDownload(url);
+          toast('Sending full video stream to the external downloader...');
+          return;
+        }
+      }catch(e){}
+    }
     var control=downloadControl();
     if(control&&activate(control))return;
     revealPlayerControls();
     setTimeout(function(){
+      var retryUrl=externalMediaUrl();
+      if(retryUrl){try{Android.openAppDownload(retryUrl);toast('Sending video to the external downloader...');return;}catch(e){}}
       var delayed=downloadControl()||geometricDownloadControl();
-      if(!delayed||!activate(delayed))toast('Download icon not found. Open the player controls and try again.');
-    },500);
+      if(!delayed||!activate(delayed))toast('Play the video briefly, then tap Save media again.');
+    },700);
   }
   var button=document.createElement('button');
   button.id='morphe-snap-media';
@@ -237,7 +288,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Adds a Save media shortcut that opens the webpage player's original download control, preserving its full-file URL and configured external downloader such as IDM. It does not save preview or partial playback resources.",
+    description = "Sends the best full video or stream-manifest URL to Android ACTION_VIEW through BigTree's openAppDownload bridge for an external downloader such as IDM. Segment URLs are rejected; the webpage's original download control remains a fallback.",
     default = false,
 ) {
     compatibleWith(compatibility())
