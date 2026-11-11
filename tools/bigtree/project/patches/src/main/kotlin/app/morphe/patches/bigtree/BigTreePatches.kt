@@ -31,88 +31,60 @@ private val snapMediaScript = """
     }
     return result;
   }
-  function attributeSource(element){
-    if(!element)return '';
-    var values=[element.currentSrc,element.src,element.poster,element.href];
-    ['data-src','data-original','data-url','data-video','data-video-url','data-file','data-poster'].forEach(function(name){
-      try{values.push(element.getAttribute(name));}catch(e){}
+  function metadata(element){
+    var values=[];
+    ['id','class','title','aria-label','name','data-action','data-command','data-role','data-title'].forEach(function(name){
+      try{values.push(element.getAttribute(name)||'');}catch(e){}
     });
-    try{
-      var nested=element.querySelector('source[src]');
-      if(nested)values.unshift(nested.src||nested.getAttribute('src'));
-    }catch(e){}
-    try{
-      var background=getComputedStyle(element).backgroundImage;
-      var match=background&&background.match(/url\(["']?([^"')]+)["']?\)/);
-      if(match)values.push(match[1]);
-    }catch(e){}
-    for(var index=0;index<values.length;index++)if(values[index])return String(values[index]);
-    return '';
+    try{var text=(element.textContent||'').trim();if(text.length<80)values.push(text);}catch(e){}
+    return values.join(' ').toLowerCase();
   }
-  function direct(url){return url&&url.indexOf('blob:')!==0&&url.indexOf('data:')!==0;}
-  function videoUrl(url){return /\.(?:mp4|m4v|webm|mov|3gp)(?:[?#]|${'$'})/i.test(url||'');}
-  function mediaUrl(url){return videoUrl(url)||/\.(?:jpg|jpeg|png|webp|gif)(?:[?#]|${'$'})/i.test(url||'');}
-  function resourceFallback(videoOnly){
-    var entries=[];
-    documents().forEach(function(doc){
-      try{entries=entries.concat(doc.defaultView.performance.getEntriesByType('resource'));}catch(e){}
-    });
-    for(var index=entries.length-1;index>=0;index--){
-      var url=entries[index]&&entries[index].name;
-      if(direct(url)&&(videoOnly?videoUrl(url):mediaUrl(url)))return url;
+  function playerAncestor(element){
+    var parent=element;
+    for(var depth=0;parent&&depth<7;depth++,parent=parent.parentElement){
+      try{
+        var info=metadata(parent);
+        if(/player|video|media/.test(info)||parent.querySelector('video,iframe,[class*="player"],[class*="video"]'))return true;
+      }catch(e){}
     }
-    return '';
+    return false;
   }
-  function filename(url,video){
-    try{
-      var value=new URL(url,location.href).pathname.split('/').pop();
-      if(value&&value.indexOf('.')>0)return decodeURIComponent(value);
-    }catch(e){}
-    return 'bigtree-media-'+Date.now()+'.'+(video?'mp4':'jpg');
-  }
-  function saveTarget(target){
-    var url=typeof target==='string'?target:attributeSource(target);
-    var expectsVideo=target&&target.tagName==='VIDEO';
-    if(!direct(url))url=resourceFallback(expectsVideo);
-    if(!url){toast('No direct media URL found. Start the video and try again.');return;}
-    try{
-      if(!window.Android||!Android.saveFile){toast('Android media saver is unavailable');return;}
-      var video=expectsVideo||videoUrl(url);
-      Android.saveFile(url,filename(url,video),video?'video/mp4':'image/jpeg','morphe-snap-'+Date.now());
-      toast('Saving media...');
-    }catch(e){toast('Unable to save media');}
-  }
-  function candidates(){
-    var result=[];
+  function downloadControl(){
+    var matches=[];
     documents().forEach(function(doc){
       var nodes=[];
-      try{nodes=doc.querySelectorAll('video,img,picture,source,[data-src],[data-video],[data-video-url],[style*="background-image"]');}catch(e){}
+      try{nodes=doc.querySelectorAll('button,a,[role="button"],[data-action],[data-command],[onclick]');}catch(e){}
       Array.prototype.forEach.call(nodes,function(element){
         try{
-          var box=element.getBoundingClientRect(),url=attributeSource(element);
-          if(direct(url)&&box.width>40&&box.height>40&&box.bottom>0)result.push({element:element,area:box.width*box.height});
+          if(element.id==='morphe-snap-media'||element.closest('#morphe-google-translate'))return;
+          var box=element.getBoundingClientRect(),info=metadata(element);
+          if(box.width<20||box.height<20||box.bottom<0||box.top>(doc.defaultView.innerHeight||10000))return;
+          var keyword=/download|save.?video|下载|下載|缓存|緩存|离线|離線/.test(info);
+          if(!keyword)return;
+          var score=(playerAncestor(element)?1000:0)+(info.indexOf('download')>=0?100:0)+(box.width*box.height<20000?20:0);
+          matches.push({element:element,score:score});
         }catch(e){}
       });
     });
-    result.sort(function(a,b){return b.area-a.area;});
-    return result;
+    matches.sort(function(a,b){return b.score-a.score;});
+    return matches.length?matches[0].element:null;
   }
-  documents().forEach(function(doc){
-    try{doc.addEventListener('contextmenu',function(event){
-      var element=event.target&&event.target.closest&&event.target.closest('video,img,picture,[data-src],[data-video],[data-video-url]');
-      if(element){event.preventDefault();saveTarget(element);}
-    },true);}catch(e){}
-  });
+  function openOriginalDownload(){
+    var control=downloadControl();
+    if(!control){toast('Open the video player controls, then tap Save media again.');return false;}
+    try{
+      control.scrollIntoView({block:'center',inline:'center'});
+      control.click();
+      toast('Opening the original download panel...');
+      return true;
+    }catch(e){toast('Unable to open the original download panel');return false;}
+  }
   var button=document.createElement('button');
   button.id='morphe-snap-media';
   button.textContent='Save media';
-  button.setAttribute('aria-label','Save visible photo or video');
+  button.setAttribute('aria-label','Open original media download');
   button.style.cssText='position:fixed;right:14px;bottom:74px;z-index:2147483647;padding:10px 14px;border:0;border-radius:22px;background:#1769e0;color:white;font:600 14px sans-serif;box-shadow:0 2px 8px #0008';
-  button.addEventListener('click',function(){
-    var list=candidates(),video=list.filter(function(item){return item.element.tagName==='VIDEO'||videoUrl(attributeSource(item.element));})[0];
-    if(video)saveTarget(video.element);
-    else{var recentVideo=resourceFallback(true);if(recentVideo)saveTarget(recentVideo);else if(list.length)saveTarget(list[0].element);else saveTarget(resourceFallback(false));}
-  });
+  button.addEventListener('click',openOriginalDownload);
   (document.body||document.documentElement).appendChild(button);
 })();
 """.trimIndent()
@@ -209,7 +181,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Adds a Save media control and long-press media saving to BigTree pages using the app's reviewed native saveFile bridge. Direct image/video URLs only; blob/data media and runtime site compatibility are not guaranteed.",
+    description = "Adds a Save media shortcut that opens the webpage player's original download control, preserving its full-file URL and configured external downloader such as IDM. It does not save preview or partial playback resources.",
     default = false,
 ) {
     compatibleWith(compatibility())
