@@ -18,6 +18,10 @@ EXPECTED_SHA256 = "1ef37fd47d97dae52318ea0a084652d375bccc277e394ab298ab9014234a1
 EXPECTED_SIZE = 72566868
 DEX_NAME = re.compile(r"classes(?:[2-9]|[1-9][0-9]+)?\.dex\Z")
 PAIRIP = re.compile(r"Lcom/pairip/(?:application|licensecheck)/")
+UNLOCK_GATE_CLASS = re.compile(
+    r"Lcom/(?:superwall/(?:reactnative|sdk/(?:Superwall|models/entitlements|delegate/subscription_controller))|revenuecat/purchases)",
+    re.I,
+)
 ENTITLEMENT = re.compile(
     r"premium|subscription|subscribe|paywall|purchase|billing|entitle|pro(?:$|[^a-z])|vip|trial|credit|quota|limit|unlock|feature.?flag",
     re.I,
@@ -58,6 +62,7 @@ def inspect(source: Path) -> dict:
     if not apk.is_valid_APK():
         raise ValueError("Invalid Pingo APK")
     pairip_classes = []
+    unlock_gate_classes = []
     candidates = []
     safe_entitlement_strings = set()
     dex_files = []
@@ -87,6 +92,15 @@ def inspect(source: Path) -> dict:
                         "methods": [method_record(m) for m in methods],
                     })
                     continue
+                if UNLOCK_GATE_CLASS.search(class_name):
+                    unlock_gate_classes.append({
+                        "dex": info.filename,
+                        "name": class_name,
+                        "superclass": cls.get_superclassname(),
+                        "fields": [{"name": f.get_name(), "type": f.get_descriptor(),
+                                    "access": f.get_access_flags_string()} for f in cls.get_fields()],
+                        "methods": [method_record(m) for m in methods],
+                    })
                 class_signal = bool(ENTITLEMENT.search(class_name))
                 for method in methods:
                     code = method.get_code()
@@ -144,6 +158,7 @@ def inspect(source: Path) -> dict:
         },
         "dex": {"class_count": class_count, "method_count": method_count},
         "pairip_classes": pairip_classes,
+        "unlock_gate_classes": unlock_gate_classes,
         "entitlement_candidate_count": len(candidates),
         "entitlement_candidates": candidates[:500],
         "safe_entitlement_strings": sorted(safe_entitlement_strings)[:500],
@@ -165,6 +180,7 @@ def main() -> None:
     print(json.dumps({
         "metadata": report["metadata"], "framework": report["archive"]["framework"],
         "pairip_classes": len(report["pairip_classes"]),
+        "unlock_gate_classes": len(report["unlock_gate_classes"]),
         "entitlement_candidates": report["entitlement_candidate_count"],
     }, ensure_ascii=False))
 
