@@ -1,0 +1,54 @@
+name: Publish Pingo AI pre-release bundle
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/269504a5-youtube-patch-clone]
+    paths: ['.github/workflows/publish-pingo-prerelease-bundle.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify exact validated bundle
+        run: |
+          set -euo pipefail
+          (cd bundles/pingo && sha256sum -c bundle.mpp.sha256)
+          test "$(stat -c %s bundles/pingo/bundle.mpp)" = 16014
+          test "$(cut -d' ' -f1 bundles/pingo/bundle.mpp.sha256)" = 4e4dcb9b1e3c6e864134cf005279f3247586b787d5fc99cc69f20e4df7526b14
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for mode in ('license', 'unlock', 'combined'):
+              data = json.loads(Path(f'bundles/pingo/{mode}-validation.json').read_text())
+              assert data['status'] == 'passed_actual_mpp_application_and_dex_inspection'
+              assert data['input_sha256'] == '1ef37fd47d97dae52318ea0a084652d375bccc277e394ab298ab9014234a1c57'
+          PY
+      - name: Add bundle to Pingo AI pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload Pingo \
+            bundles/pingo/bundle.mpp \
+            bundles/pingo/bundle.mpp.sha256 \
+            --clobber
+      - name: Verify published assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view Pingo --json isPrerelease,assets > /tmp/release.json
+          python3 - <<'PY'
+          import json
+          release = json.load(open('/tmp/release.json'))
+          assert release['isPrerelease'] is True
+          assets = {item['name']: item['size'] for item in release['assets']}
+          assert assets['Pingo_5.4.8.apk'] == 72566868
+          assert assets['bundle.mpp'] == 16014
+          assert assets['bundle.mpp.sha256'] > 64
+          print(assets)
+          PY
