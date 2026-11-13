@@ -57,12 +57,51 @@
     ],
     "native_libraries": [],
     "asset_count": 20,
+    "asset_names": [
+      "assets/app.config",
+      "assets/app.manifest",
+      "assets/com/appsflyer/internal/28445207a6f5af97c-",
+      "assets/com/appsflyer/internal/2b7867f15e66c02ea-",
+      "assets/com/appsflyer/internal/d1bb394ba89138f2d-",
+      "assets/com/appsflyer/internal/eebc3677933725bab-",
+      "assets/dexopt/baseline.prof",
+      "assets/dexopt/baseline.profm",
+      "assets/expo-root.pem",
+      "assets/fonts/Lexend-Black.ttf",
+      "assets/fonts/Lexend-Bold.ttf",
+      "assets/fonts/Lexend-ExtraBold.ttf",
+      "assets/fonts/Lexend-ExtraLight.ttf",
+      "assets/fonts/Lexend-Light.ttf",
+      "assets/fonts/Lexend-Medium.ttf",
+      "assets/fonts/Lexend-Regular.ttf",
+      "assets/fonts/Lexend-SemiBold.ttf",
+      "assets/fonts/Lexend-Thin.ttf",
+      "assets/index.android.bundle",
+      "assets/sentry-external-modules.txt"
+    ],
     "framework": {
       "flutter_assets": false,
       "flutter_engine": false,
       "flutter_app_aot": false,
       "react_native_bundle": true
-    }
+    },
+    "react_bundles": [
+      {
+        "name": "assets/index.android.bundle",
+        "bytes": 8572008,
+        "sha256": "3e6c9c70bb8ef4902fe63feea09d5bc39adc2cb8ccab8b8d4e399c2c109ce412",
+        "magic_hex": "c61fbc03c103191f",
+        "plain_javascript_prefix": false,
+        "safe_entitlement_ascii_strings": [
+          "\"ONLY PRESENT ONE PAYWALL AT A TIME",
+          "CTIONativeWind verifyInstallation() found no errors occurred during unsubscription:",
+          "Not Before: - max retries exceeded limit of 200]",
+          "ationFrameasurementRowillPresentPaywallowDiscrete_DisabledNativeErroreplaceEqualDeep & calmy47v=0",
+          "pRo'x",
+          "subscription"
+        ]
+      }
+    ]
   },
   "dex": {
     "class_count": 52369,
