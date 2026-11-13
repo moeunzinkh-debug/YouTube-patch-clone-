@@ -65,6 +65,20 @@ Morphe Manager 2.3.0-dev.3 បានរួម និង patch `.apks` នេះ�
 
 </details>
 
+<details>
+<summary>🤖 Pingo AI • 2 experimental patches (bundle ដាច់ដោយឡែក)</summary>
+
+គោលដៅដែលបានពិនិត្យ៖ `com.picoai.languageapp.android` **5.4.8 (941)**, Android 8.0+។ Bundle នេះគាំទ្រតែ APK ដែលបានពិនិត្យជាក់លាក់ប៉ុណ្ណោះ។ Patches ទាំងពីរ **បិទជាមុន** ហើយអាចជ្រើសដាច់ដោយឡែក ឬជ្រើសទាំងពីរជាមួយគ្នា៖
+
+- `Remove license check` — បិទ PairIP license entry points ពីរដែលបានពិនិត្យនៅខាង client។ វាមិនបង្កើត purchase, subscription, credits ឬ server entitlement ទេ។
+- `Unlock all feature` — បង្ខំ local Superwall `SubscriptionStatus.isActive()` និង `Entitlement.isActive()` predicates ដែលបានពិនិត្យឲ្យ active។ វាអាចបើកតែ local paywall/UI gates ប៉ុណ្ណោះ; មិនអាចបង្កើត purchase, credits, backend authorization ឬធានាបើក AI features ដែល server គ្រប់គ្រងទេ។
+
+MPP ត្រូវបានសាកអនុវត្តលើ APK **5.4.8 (941)** ពិត ដោយជ្រើស license-only, unlock-only និងជ្រើសទាំងពីរ; rebuilt DEX ត្រូវបានពិនិត្យថា injection ត្រឹមត្រូវ។ ប៉ុន្តែ app មិនទាន់បាន device/runtime test ទេ ហើយ server-controlled features មិនទាន់បញ្ជាក់។
+
+[ទាញយក Pingo AI `bundle.mpp` ពី pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/download/Pingo/bundle.mpp) · [Pingo AI pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Pingo) · [Bundle ក្នុង repository](bundles/pingo/bundle.mpp) · [SHA-256](bundles/pingo/bundle.mpp.sha256) · [របៀបប្រើ និងដែនកំណត់](bundles/pingo/README.md)
+
+</details>
+
 <!-- GBOARD-PATCH-LIST:START -->
 <a id="gboard-patches"></a>
 <details>
