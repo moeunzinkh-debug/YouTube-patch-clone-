@@ -1,0 +1,14 @@
+{
+  "status": "passed_actual_mpp_application_and_dex_inspection",
+  "input_sha256": "1ef37fd47d97dae52318ea0a084652d375bccc277e394ab298ab9014234a1c57",
+  "package": "com.picoai.languageapp.android",
+  "version": "5.4.8",
+  "version_code": "941",
+  "selectors": [
+    "Remove license check",
+    "Unlock all feature"
+  ],
+  "pairip_early_returns_verified": true,
+  "superwall_local_active_predicates_verified": true,
+  "server_entitlements_purchases_credits_and_runtime_behavior": "not tested or granted"
+}
