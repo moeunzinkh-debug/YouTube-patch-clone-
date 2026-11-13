@@ -107,11 +107,22 @@ def inspect(source: Path) -> dict:
                             "signals": string_hits[:20],
                             "instruction_count": sum(1 for _ in method.get_instructions()),
                         })
+        react_bundle_names = [n for n in names if n.endswith("index.android.bundle")]
+        react_bundles = []
+        for name in react_bundle_names:
+            raw = archive.read(name)
+            ascii_values = {m.group(0).decode("utf-8", "replace") for m in re.finditer(rb"[ -~]{4,160}", raw)}
+            entitlement_values = sorted(value for value in ascii_values if ENTITLEMENT.search(value) and safe_string(value))
+            react_bundles.append({
+                "name": name, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+                "magic_hex": raw[:8].hex(), "plain_javascript_prefix": raw.lstrip()[:16].startswith((b"var ", b"(function", b"global", b"__d(")),
+                "safe_entitlement_ascii_strings": entitlement_values[:1000],
+            })
         framework = {
             "flutter_assets": any(n.startswith("assets/flutter_assets/") for n in names),
             "flutter_engine": any(n.endswith("/libflutter.so") for n in native_libraries),
             "flutter_app_aot": any(n.endswith("/libapp.so") for n in native_libraries),
-            "react_native_bundle": any(n.endswith("index.android.bundle") for n in names),
+            "react_native_bundle": bool(react_bundle_names),
         }
     return {
         "source": {
@@ -128,7 +139,8 @@ def inspect(source: Path) -> dict:
         },
         "archive": {
             "entry_count": len(names), "dex_files": dex_files, "native_libraries": native_libraries,
-            "asset_count": len(assets), "framework": framework,
+            "asset_count": len(assets), "asset_names": assets[:200], "framework": framework,
+            "react_bundles": react_bundles,
         },
         "dex": {"class_count": class_count, "method_count": method_count},
         "pairip_classes": pairip_classes,
