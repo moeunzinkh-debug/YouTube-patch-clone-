@@ -1,0 +1,116 @@
+name: Build Pingo AI feature patches
+
+on:
+  push:
+    branches: [arena/269504a5-youtube-patch-clone]
+    paths:
+      - 'tools/pingo/project/**'
+      - 'tools/pingo/prepare_build.py'
+      - 'tools/pingo/verify_bundle.py'
+      - 'tools/pingo/verify_patched.py'
+      - 'tools/pingo/test_patch_tools.py'
+      - '.github/workflows/build-pingo-mpp.yml'
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: pingo-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-java@v5
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Test guards and prepare isolated project
+        run: |
+          set -euo pipefail
+          python3 tools/pingo/test_patch_tools.py -v
+          python3 tools/pingo/prepare_build.py "$RUNNER_TEMP/pingo-build"
+      - name: Build standalone Pingo bundle
+        run: |
+          set -o pipefail
+          cd "$RUNNER_TEMP/pingo-build"
+          ./gradlew :patches:buildAndroid --no-daemon --max-workers=2 --stacktrace 2>&1 | tee "$RUNNER_TEMP/pingo-build.log"
+      - name: Surface compilation diagnostics
+        if: failure()
+        run: |
+          grep -E -A 5 '^e:|^error:|Unresolved reference|What went wrong|Execution failed|FAILURE:' "$RUNNER_TEMP/pingo-build.log" | tail -50 | while IFS= read -r line; do echo "::error::$line"; done || true
+      - name: List and apply independent selectors and both together
+        run: |
+          set -euo pipefail
+          input="$RUNNER_TEMP/pingo-input"
+          output="$RUNNER_TEMP/pingo-output"
+          mkdir -p "$input" "$output"
+          mapfile -t candidates < <(find "$RUNNER_TEMP/pingo-build/patches/build/libs" -maxdepth 1 -name '*.mpp' -type f)
+          test "${#candidates[@]}" -eq 1
+          cp "${candidates[0]}" "$output/bundle.mpp"
+          (cd "$output" && sha256sum bundle.mpp > bundle.mpp.sha256)
+          gh release download Pingo --pattern 'Pingo_5.4.8.apk' --dir "$input"
+          echo '1ef37fd47d97dae52318ea0a084652d375bccc277e394ab298ab9014234a1c57  '"$input/Pingo_5.4.8.apk" | sha256sum --check
+          gh release download v1.20.0-dev.1 --repo MorpheApp/morphe-desktop --pattern morphe-desktop-1.20.0-dev.1-all.jar --dir "$input"
+          echo '20c2cf951373f4e47092a7c9312519ecfd4b2826ddc114b134e0ad503af53fdb  '"$input/morphe-desktop-1.20.0-dev.1-all.jar" | sha256sum --check
+          desktop="$input/morphe-desktop-1.20.0-dev.1-all.jar"
+          java -Xmx3g -jar "$desktop" list-patches --patches "$output/bundle.mpp" --with-packages --with-versions --include-experimental --out "$output/patches.txt"
+          python3 tools/pingo/verify_bundle.py --mpp "$output/bundle.mpp" --listing "$output/patches.txt"
+          python3 -m pip install --disable-pip-version-check 'androguard==4.1.3'
+          apply_and_check() {
+            local mode="$1"; shift
+            local selectors=() verify_modes=()
+            case "$mode" in
+              license) selectors=(-e 'Remove license check'); verify_modes=(license) ;;
+              unlock) selectors=(-e 'Unlock all feature'); verify_modes=(unlock) ;;
+              combined) selectors=(-e 'Remove license check' -e 'Unlock all feature'); verify_modes=(license unlock) ;;
+              *) return 2 ;;
+            esac
+            if ! java -Xmx6g -jar "$desktop" patch "$input/Pingo_5.4.8.apk" -p "$output/bundle.mpp" \
+              --exclusive "${selectors[@]}" --unsigned -o "$input/$mode.apk" -r "$input/$mode-result.json" \
+              > "$RUNNER_TEMP/pingo-$mode.log" 2>&1; then
+              grep -E -i -m 10 '^ERROR:|^FAILED:|exception:|invalid register|verification failed' "$RUNNER_TEMP/pingo-$mode.log" | while IFS= read -r line; do echo "::error::$line"; done || true
+              exit 1
+            fi
+            python3 tools/pingo/verify_patched.py "$input/Pingo_5.4.8.apk" "$input/$mode.apk" \
+              "$input/$mode-result.json" "$output/$mode-validation.json" "${verify_modes[@]}"
+          }
+          apply_and_check license
+          apply_and_check unlock
+          apply_and_check combined
+          echo '::notice::Exact Pingo APK accepted both selectors independently and together; reviewed DEX injections verified.'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pingo-morphe-bundle
+          path: |
+            ${{ runner.temp }}/pingo-output/bundle.mpp
+            ${{ runner.temp }}/pingo-output/bundle.mpp.sha256
+            ${{ runner.temp }}/pingo-output/patches.txt
+            ${{ runner.temp }}/pingo-output/*-validation.json
+      - name: Save standalone bundle and validation
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          for source in tools/pingo/project tools/pingo/prepare_build.py tools/pingo/verify_bundle.py tools/pingo/verify_patched.py tools/pingo/test_patch_tools.py .github/workflows/build-pingo-mpp.yml; do
+            if [ "$(git rev-parse "$GITHUB_SHA:$source")" != "$(git rev-parse "HEAD:$source")" ]; then
+              echo '::warning::Pingo build sources changed; refusing stale artifacts.'
+              exit 0
+            fi
+          done
+          mkdir -p bundles/pingo
+          cp "$RUNNER_TEMP/pingo-output/"{bundle.mpp,bundle.mpp.sha256,license-validation.json,unlock-validation.json,combined-validation.json} bundles/pingo/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f bundles/pingo/
+          git diff --cached --quiet && exit 0
+          git commit -m 'build: standalone Pingo AI bundle [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
