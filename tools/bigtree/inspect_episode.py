@@ -18,7 +18,7 @@ from selenium.webdriver.chrome.options import Options
 
 TARGET = "https://xstree.com/vplay/35835512.html"
 MEDIA_RE = re.compile(r"(?:\.m3u8|\.mpd|\.mp4|\.m4v|\.webm|\.mov|\.ts|\.m4s|videoplayback|video|media|play)", re.I)
-CONTEXT_RE = re.compile(r"nativePlayerOpen|setMediaInfo|\.m3u8|\.mpd|\.mp4|clearKeys|bbtsKey|ykKey|manifest", re.I)
+CONTEXT_RE = re.compile(r"nativePlayerOpen|nativePlayerCapabilities|nativePlayerSubscribe|openAppDownload|saveFile|download|video/vinfo|torrent/play|m3u8_protocol|setMediaInfo|\.m3u8|\.mpd|\.mp4|clearKeys|bbtsKey|ykKey|manifest|backup", re.I)
 
 
 def safe_url(value: str) -> dict[str, object]:
@@ -83,7 +83,10 @@ def main() -> None:
       window.__bigtreeBridgeCalls=[];
       const bridgeDefaults={
         getData:'', readClipboard:'', takeSharedText:'', getAudioRoute:'{}', listLocalMedia:'{"items":[]}',
-        speechAvailable:false, pickMedia:false, getAppInfo:'{"version":"1.14","versionCode":10,"platform":"android"}'
+        speechAvailable:false, pickMedia:false,
+        getAppInfo:'{"version":"1.14","versionCode":10,"platform":"android"}',
+        getDeviceInfo:'{"platform":"android","appVersion":"1.14","versionCode":10,"webview":true}',
+        nativePlayerCapabilities:'{"available":true,"hls":true,"dash":true,"mp4":true}'
       };
       window.Android=new Proxy({}, {get:function(target,name){
         if(name==='then')return undefined;
