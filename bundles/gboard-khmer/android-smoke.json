@@ -718,12 +718,12 @@
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,435][315,588]"
+          "bounds": "[5,459][315,612]"
         },
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,473][315,511]"
+          "bounds": "[5,497][315,535]"
         },
         {
           "class": "android.widget.TextView",
@@ -775,12 +775,12 @@
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,435][315,588]"
+          "bounds": "[5,459][315,612]"
         },
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,511][315,549]"
+          "bounds": "[5,535][315,573]"
         },
         {
           "class": "android.widget.TextView",
@@ -832,12 +832,12 @@
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,435][315,588]"
+          "bounds": "[5,459][315,612]"
         },
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,549][315,588]"
+          "bounds": "[5,573][315,612]"
         },
         {
           "class": "android.widget.TextView",
@@ -858,27 +858,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -889,27 +889,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -920,27 +920,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -951,27 +951,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -982,27 +982,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       }
@@ -1016,6 +1016,32 @@
     "close_commits": "passed",
     "reopen_output": "នៅណាកម្ពុជា",
     "reopen": "passed",
+    "predictions": {
+      "men": {
+        "expected_candidates": [
+          "មែន",
+          "មេន"
+        ],
+        "selected": "មេន",
+        "visible": true,
+        "tapped": true,
+        "lower_input": "មេន",
+        "actual": "មេន",
+        "passed": true
+      },
+      "man": {
+        "expected_candidates": [
+          "ម៉ាន",
+          "មែន"
+        ],
+        "selected": "ម៉ាន",
+        "visible": true,
+        "tapped": true,
+        "lower_input": "ម៉ាន",
+        "actual": "ម៉ាន",
+        "passed": true
+      }
+    },
     "examples": {
       "nv na": {
         "expected": "នៅណា",
@@ -1550,10 +1576,10 @@
       "Downloads",
       "khmerlish-smoke-valid.csv",
       "155 B",
-      "10:26 AM",
+      "11:40 AM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "10:26 AM",
+      "11:40 AM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -1633,7 +1659,7 @@
     "symbol_after_restart": "passed",
     "restart_and_delete_fallback": "passed"
   },
-  "bundle_sha256": "4b3b04f39ae4633136665dfaf46a9f2f9661a46f7a88bbc0fe49b621db8bca64",
+  "bundle_sha256": "3d206ea28a0f68d9af6583606458db99e623dcd20ee771b837d1e55a1e0c0c34",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/43584564875"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/43590384977"
 }
