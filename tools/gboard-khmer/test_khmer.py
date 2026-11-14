@@ -72,7 +72,7 @@ class DictionaryTests(unittest.TestCase):
             self.assertIn('gboardDirectGoogleTranslatePatch,', registry)
             self.assertIn('gboardGeminiChatRouterPatch,', registry)
             self.assertIn('gboardKhmerlishPatch,', registry)
-            self.assertIn('version = 4.0.7-khmerlish-dev.1', (dest / 'gradle.properties').read_text())
+            self.assertIn('version = 4.0.8-khmerlish-dev.1', (dest / 'gradle.properties').read_text())
             group = (dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/keyboard/GboardKeyboardToolsSettingsGroupFeature.java').read_text()
             self.assertIn('new GboardCalculatorSettingsFeature(context)', group)
             patch = (dest / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/features/khmerlish/GboardKhmerlishPatch.kt').read_text()
@@ -88,6 +88,9 @@ class DictionaryTests(unittest.TestCase):
             for network in ('HttpURLConnection', 'OkHttp', 'java.net.', 'android.util.Log'):
                 self.assertNotIn(network, runtime)
             self.assertTrue((dest / 'patches/src/main/resources/gboard-khmer/dictionary.tsv').exists())
+            predictions = (dest / 'patches/src/main/resources/gboard-khmer/predictions.tsv').read_text()
+            self.assertIn('men\tមែន\nmen\tមេន', predictions)
+            self.assertIn('man\tម៉ាន\nman\tមែន', predictions)
             self.assertTrue((dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/directtranslate/GtxClient.java').exists())
             gemini = (dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/geminirouter/GeminiChatRouter.java').read_text()
             self.assertIn('https://gemini.google.com/app', gemini)

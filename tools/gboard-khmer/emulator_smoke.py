@@ -677,6 +677,30 @@ def panel_smoke(report: dict) -> bool:
         result['reopen'] = 'passed' if after_reopen == 'នៅណាកម្ពុជា' else 'failed'
         new_keys = panel_key_positions(common.inspect_ime_windows())
         common.run('adb', 'shell', 'input', 'tap', *map(str, new_keys['done khmerlish']))
+        predictions = {}
+        for source, expected_candidates, selected in (
+                ('men', ('មែន', 'មេន'), 'មេន'), ('man', ('ម៉ាន', 'មែន'), 'ម៉ាន')):
+            open_editor()
+            if not tap_panel_icon(result):
+                raise RuntimeError('Khmerlish panel failed to reopen for a prediction')
+            panel_press(source)
+            prediction_windows = common.inspect_ime_windows()
+            labels = ime_labels(prediction_windows)
+            visible = all(any(('khmerlish suggestion ' + value).lower() in label.lower()
+                              for label in labels) for value in expected_candidates)
+            tapped = common.tap_ime_label(prediction_windows, 'khmerlish suggestion ' + selected)
+            time.sleep(1)
+            snapshot = panel_snapshot()
+            predictions[source] = {
+                'expected_candidates': list(expected_candidates), 'selected': selected,
+                'visible': visible, 'tapped': tapped, 'lower_input': snapshot['lower_input'],
+                'actual': snapshot['host_output'],
+                'passed': visible and tapped and snapshot['lower_input'] == selected
+                          and snapshot['host_output'] == selected,
+            }
+            prediction_keys = panel_key_positions(common.inspect_ime_windows())
+            common.run('adb', 'shell', 'input', 'tap', *map(str, prediction_keys['done khmerlish']))
+        result['predictions'] = predictions
         examples = {'nv na': 'នៅណា', 'Kampuchea': 'កម្ពុជា', 'kampuchea': 'កម្ពុជា',
                     'kampu': 'កម្ពុជា', 'nak na': 'អ្នកណា', 'srey sart': 'ស្រីស្អាត', 'Nik o': 'នឹកអូន'}
         tested = {}
@@ -695,7 +719,9 @@ def panel_smoke(report: dict) -> bool:
         passed = (result['visible_in_toolbar'] == 'passed' and after_nv == 'នៅ'
                   and after_phrase == 'នៅណា' and after_delete == 'នៅ n'
                   and after_restore == 'នៅណា' and result['close_commits'] == 'passed'
-                  and result['reopen'] == 'passed' and all(item['passed'] for item in tested.values()))
+                  and result['reopen'] == 'passed'
+                  and all(item['passed'] for item in predictions.values())
+                  and all(item['passed'] for item in tested.values()))
         result['status'] = 'passed' if passed else 'failed'
         return passed
     except (RuntimeError, ValueError, KeyError, OSError, subprocess.TimeoutExpired, ET.ParseError) as error:

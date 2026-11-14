@@ -10,7 +10,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERLAY = ROOT / 'tools/gboard-khmer/overlay'
-VERSION = '4.0.7-khmerlish-dev.1'
+VERSION = '4.0.8-khmerlish-dev.1'
 PATCH_NAME = 'Khmerlish to Khmer (experimental)'
 GEMINI_PATCH_NAME = 'Gemini Chat translation router (experimental)'
 SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/arena/f2e6d8d1-youtube-patch-clone/tools/gboard-khmer'

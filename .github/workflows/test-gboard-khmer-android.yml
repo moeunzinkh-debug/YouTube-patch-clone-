@@ -38,7 +38,7 @@ jobs:
           metadata = json.loads((root / 'validation.json').read_text())
           bundle = root / 'gboard-khmerlish-experimental.mpp'
           digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
-          assert (metadata['version'] == '4.0.7-khmerlish-dev.1' and metadata['sha256'] == digest
+          assert (metadata['version'] == '4.0.8-khmerlish-dev.1' and metadata['sha256'] == digest
                   and metadata['size'] == bundle.stat().st_size)
           counts = metadata['checks']['khmerlish_and_gemini_unit_tests']
           assert counts['tests'] >= 49 and not (counts['failures'] or counts['errors'] or counts['skipped'])

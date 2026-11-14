@@ -10,7 +10,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-VERSION = '4.0.7-khmerlish-dev.1'
+VERSION = '4.0.8-khmerlish-dev.1'
 NAME = 'Khmerlish to Khmer (experimental)'
 GEMINI_NAME = 'Gemini Chat translation router (experimental)'
 PACKAGE = 'com.google.android.inputmethod.latin'
@@ -47,12 +47,12 @@ def verify(bundle: Path, metadata: Path, listing: Path) -> str:
         if archive.testzip() is not None:
             raise ValueError('Corrupted MPP')
         required = {'META-INF/MANIFEST.MF', 'classes.dex', 'extensions/gboard-patches.rve',
-                    'gboard-khmer/dictionary.tsv', 'gboard-khmer/LICENSE.txt',
-                    'gboard-khmer/gboard_khmerlish_panel.xml',
+                    'gboard-khmer/dictionary.tsv', 'gboard-khmer/predictions.tsv',
+                    'gboard-khmer/LICENSE.txt', 'gboard-khmer/gboard_khmerlish_panel.xml',
                     'gboard-gemini/gboard_gemini_chat.xml'}
         if not required.issubset(archive.namelist()):
             raise ValueError(f'Missing MPP files: {required - set(archive.namelist())}')
-        for filename in ('dictionary.tsv', 'LICENSE.txt', 'gboard_khmerlish_panel.xml'):
+        for filename in ('dictionary.tsv', 'predictions.tsv', 'LICENSE.txt', 'gboard_khmerlish_panel.xml'):
             if archive.read(f'gboard-khmer/{filename}') != (resource / filename).read_bytes():
                 raise ValueError(f'MPP resource differs from checked-in source: {filename}')
         gemini_icon = ROOT / 'tools/gboard-khmer/overlay/patches/src/main/resources/gboard-gemini/gboard_gemini_chat.xml'

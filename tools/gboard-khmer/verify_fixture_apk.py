@@ -72,9 +72,9 @@ def main() -> None:
         raise SystemExit('Expected one non-exported Khmerlish dictionary activity with no intent filter')
     source = ROOT / 'tools/gboard-khmer/overlay/patches/src/main/resources/gboard-khmer'
     with zipfile.ZipFile(args.apk) as archive:
-        for name in ('dictionary.tsv', 'LICENSE.txt'):
+        for name in ('dictionary.tsv', 'predictions.tsv', 'LICENSE.txt'):
             if archive.read('assets/gboard-khmer/' + name) != (source / name).read_bytes():
-                raise SystemExit('Wrong or missing offline dictionary asset: ' + name)
+                raise SystemExit('Wrong or missing offline dictionary/prediction asset: ' + name)
         # Androguard 4.1.3 cannot parse all of this Gboard's complex resource
         # table entries. Check the binary string pool and packaged drawable;
         # Android's own resource lookup is additionally exercised in the smoke.

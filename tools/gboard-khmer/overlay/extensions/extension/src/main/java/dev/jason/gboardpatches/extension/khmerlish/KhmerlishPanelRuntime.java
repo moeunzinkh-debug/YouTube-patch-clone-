@@ -23,6 +23,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -191,8 +192,11 @@ public final class KhmerlishPanelRuntime {
         final EditorInfo editor;
         final FrameLayout parent;
         final View holder;
+        final KhmerlishDictionary dictionary;
         final LinearLayout root;
         final EditText input;
+        final HorizontalScrollView suggestionScroll;
+        final LinearLayout suggestionRow;
         final KhmerlishPanelSession session;
         final TextWatcher watcher;
         final View.OnLayoutChangeListener layoutListener;
@@ -214,6 +218,7 @@ public final class KhmerlishPanelRuntime {
             this.editor = editor;
             this.parent = parent;
             this.holder = holder;
+            this.dictionary = dictionary;
             layoutListener = (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom)
                     -> updatePosition();
             dark = (service.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
@@ -253,6 +258,18 @@ public final class KhmerlishPanelRuntime {
             input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(KhmerlishPanelConverter.MAX_LENGTH)});
             root.addView(input, new LinearLayout.LayoutParams(-1, dp(40)));
 
+            suggestionScroll = new HorizontalScrollView(service);
+            suggestionScroll.setHorizontalScrollBarEnabled(false);
+            suggestionScroll.setFillViewport(false);
+            suggestionScroll.setContentDescription("Khmerlish predictions");
+            suggestionScroll.setVisibility(View.GONE);
+            suggestionRow = new LinearLayout(service);
+            suggestionRow.setOrientation(LinearLayout.HORIZONTAL);
+            suggestionRow.setGravity(Gravity.CENTER_VERTICAL);
+            suggestionScroll.addView(suggestionRow, new HorizontalScrollView.LayoutParams(
+                    -2, HorizontalScrollView.LayoutParams.MATCH_PARENT));
+            root.addView(suggestionScroll, new LinearLayout.LayoutParams(-1, dp(38)));
+
             KhmerlishPanelCommitter.Host host = new KhmerlishPanelCommitter.Host() {
                 @Override public boolean isCurrent() {
                     return panel == Panel.this && service.getCurrentInputConnection() == connection
@@ -289,6 +306,7 @@ public final class KhmerlishPanelRuntime {
                         root.post(KhmerlishPanelRuntime::dismiss);
                     } else {
                         written = true;
+                        updateSuggestions(editable, input.getSelectionStart());
                     }
                 }
             };
@@ -445,6 +463,49 @@ public final class KhmerlishPanelRuntime {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -1, weight);
             params.setMargins(dp(2), dp(2), dp(2), dp(2));
             return params;
+        }
+
+        void updateSuggestions(CharSequence text, int cursor) {
+            suggestionRow.removeAllViews();
+            int start = predictionStart(text, cursor);
+            if (start < 0) {
+                suggestionScroll.setVisibility(View.GONE);
+                return;
+            }
+            List<String> values = dictionary.suggest(text.subSequence(start, cursor).toString(), 5);
+            for (String value : values) {
+                TextView candidate = plainButton(value, "Khmerlish suggestion " + value);
+                candidate.setTextSize(18);
+                candidate.setPadding(dp(14), 0, dp(14), 0);
+                candidate.setBackground(background(dark ? 0xff484b51 : Color.WHITE, 12));
+                candidate.setOnClickListener(view -> chooseSuggestion(value));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, -1);
+                params.setMargins(dp(2), dp(2), dp(2), dp(2));
+                suggestionRow.addView(candidate, params);
+            }
+            suggestionScroll.setVisibility(values.isEmpty() ? View.GONE : View.VISIBLE);
+            suggestionScroll.scrollTo(0, 0);
+        }
+
+        void chooseSuggestion(String value) {
+            Editable text = input.getText();
+            int cursor = input.getSelectionStart();
+            int start = predictionStart(text, cursor);
+            if (start < 0 || !dictionary.suggest(text.subSequence(start, cursor).toString(), 5)
+                    .contains(value)) return;
+            text.replace(start, cursor, value);
+            input.setSelection(Math.min(start + value.length(), text.length()));
+        }
+
+        static int predictionStart(CharSequence text, int cursor) {
+            if (text == null || cursor <= 0 || cursor > text.length()) return -1;
+            int start = cursor;
+            while (start > 0) {
+                char value = text.charAt(start - 1);
+                if (Character.isWhitespace(value) || value < 0x21 || value > 0x7e) break;
+                start--;
+            }
+            return start == cursor ? -1 : start;
         }
 
         void insert(String value) {
