@@ -1,0 +1,52 @@
+name: Inspect BigTree episode playback
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/ec48a056-youtube-patch-clone]
+    paths:
+      - 'tools/bigtree/inspect_episode.py'
+      - '.github/workflows/inspect-bigtree-episode.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: inspect-bigtree-episode-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Inspect playback through Chrome DevTools Protocol
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check 'selenium==4.38.0'
+          google-chrome --version
+          python3 tools/bigtree/inspect_episode.py docs/bigtree/episode-35835512-inspection.json
+          python3 -m json.tool docs/bigtree/episode-35835512-inspection.json >/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bigtree-episode-35835512-inspection
+          path: docs/bigtree/episode-35835512-inspection.json
+      - name: Save sanitized evidence
+        run: |
+          set -euo pipefail
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          if [ "$(git rev-parse "$GITHUB_SHA:tools/bigtree/inspect_episode.py")" != "$(git rev-parse "HEAD:tools/bigtree/inspect_episode.py")" ]; then
+            echo '::warning::Inspector changed; refusing stale evidence.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/bigtree/episode-35835512-inspection.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'analysis: inspect BigTree episode playback [skip ci]'
+          git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
