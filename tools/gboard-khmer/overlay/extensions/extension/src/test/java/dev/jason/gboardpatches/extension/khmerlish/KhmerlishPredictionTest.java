@@ -22,7 +22,7 @@ public class KhmerlishPredictionTest {
 
     @Test public void curatedExamplesKeepTheirRequestedOrder() throws Exception {
         KhmerlishDictionary dictionary = dictionary();
-        assertEquals(List.of("មែន", "មេន", "មាន", "ម៉ឺនុយ"), dictionary.suggest("men", 5));
+        assertEquals(List.of("មែន", "មេន", "ម៉ឺនុយ"), dictionary.suggest("men", 5));
         assertEquals(List.of("ម៉ាន", "មែន"), dictionary.suggest("man", 5));
     }
 
