@@ -1,14 +1,15 @@
 {
-  "version": "4.0.6-khmerlish-dev.1",
+  "version": "4.0.7-khmerlish-dev.1",
   "experimental": true,
-  "sha256": "9d6d6d9cba8902cd63356b0ecb19c3092e9846e1b2036e98da800ca854ddb443",
-  "size": 8429075,
+  "sha256": "4b3b04f39ae4633136665dfaf46a9f2f9661a46f7a88bbc0fe49b621db8bca64",
+  "size": 8442317,
   "target": "18.5.4.993608717-release-arm64-v8a / 176049702",
   "checks": {
     "existing_43_and_direct_translate_metadata": "passed",
+    "gemini_router_registration_and_privacy_guards": "passed",
     "morphe_desktop_listing": "passed",
-    "khmerlish_unit_tests": {
-      "tests": 49,
+    "khmerlish_and_gemini_unit_tests": {
+      "tests": 52,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -18,5 +19,5 @@
     "actual_gboard_typing_on_device": "not tested"
   },
   "fixture_sha256": "1d9260f74430265bcf4087ae45d6a22f688d907fd5ed84998ea15d4eac4e93ea",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42329450561"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/43584188203"
 }

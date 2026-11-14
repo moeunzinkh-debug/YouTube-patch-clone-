@@ -1,5 +1,5 @@
 {
-  "version": "4.0.6-khmerlish-dev.1",
+  "version": "4.0.7-khmerlish-dev.1",
   "patches": [
     {
       "name": "AI Writing Tools",
@@ -281,6 +281,18 @@
       "name": "G Logo on Spacebar",
       "description": "在空白鍵顯示 G Logo，並隱藏語言名稱\nShow the G Logo on the spacebar and hide the language label.",
       "use": true,
+      "dependencies": [],
+      "compatiblePackages": {
+        "com.google.android.inputmethod.latin": [
+          "18.5.4.993608717-release-arm64-v8a"
+        ]
+      },
+      "options": []
+    },
+    {
+      "name": "Gemini Chat translation router (experimental)",
+      "description": "Adds a Gmn toolbar icon. An explicit tap copies a translation prompt for selected, non-sensitive editor text and opens https://gemini.google.com/app. The user must paste/send it and copy the result back; no API key, automatic submission, or automatic result insertion is claimed.",
+      "use": false,
       "dependencies": [],
       "compatiblePackages": {
         "com.google.android.inputmethod.latin": [
