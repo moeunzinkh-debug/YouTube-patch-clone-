@@ -32,7 +32,6 @@
       "Open features menu",
       "Khmerlish → ខ្មែរ",
       "Sticker Keyboard, This app does not support images here",
-      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -309,13 +308,18 @@
         }
       ]
     },
-    "initial_unlabelled_clickable_nodes": [],
+    "initial_unlabelled_clickable_nodes": [
+      {
+        "class": "android.widget.Button",
+        "id": "",
+        "bounds": "[128,381][192,419]"
+      }
+    ],
     "visible_in_toolbar": "passed",
     "labels_after_tap": [
       "Open features menu",
       "Khmerlish → ខ្មែរ",
       "Sticker Keyboard, This app does not support images here",
-      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -714,12 +718,12 @@
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,459][315,612]"
+          "bounds": "[5,435][315,588]"
         },
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,497][315,535]"
+          "bounds": "[5,473][315,511]"
         },
         {
           "class": "android.widget.TextView",
@@ -771,12 +775,12 @@
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,459][315,612]"
+          "bounds": "[5,435][315,588]"
         },
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,535][315,573]"
+          "bounds": "[5,511][315,549]"
         },
         {
           "class": "android.widget.TextView",
@@ -828,12 +832,12 @@
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,459][315,612]"
+          "bounds": "[5,435][315,588]"
         },
         {
           "class": "android.widget.LinearLayout",
           "id": "",
-          "bounds": "[5,573][315,612]"
+          "bounds": "[5,549][315,588]"
         },
         {
           "class": "android.widget.TextView",
@@ -1546,10 +1550,10 @@
       "Downloads",
       "khmerlish-smoke-valid.csv",
       "155 B",
-      "3:04 AM",
+      "10:26 AM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "3:04 AM",
+      "10:26 AM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -1576,7 +1580,6 @@
       "Open features menu",
       "Khmerlish → ខ្មែរ",
       "Sticker Keyboard, This app does not support images here",
-      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -1630,7 +1633,7 @@
     "symbol_after_restart": "passed",
     "restart_and_delete_fallback": "passed"
   },
-  "bundle_sha256": "9d6d6d9cba8902cd63356b0ecb19c3092e9846e1b2036e98da800ca854ddb443",
+  "bundle_sha256": "4b3b04f39ae4633136665dfaf46a9f2f9661a46f7a88bbc0fe49b621db8bca64",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42331556221"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/43584564875"
 }
