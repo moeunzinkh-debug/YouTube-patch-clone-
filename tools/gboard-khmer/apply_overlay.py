@@ -10,9 +10,10 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 OVERLAY = ROOT / 'tools/gboard-khmer/overlay'
-VERSION = '4.0.6-khmerlish-dev.1'
+VERSION = '4.0.7-khmerlish-dev.1'
 PATCH_NAME = 'Khmerlish to Khmer (experimental)'
-SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/arena/86d53cf2-youtube-patch-clone/tools/gboard-khmer'
+GEMINI_PATCH_NAME = 'Gemini Chat translation router (experimental)'
+SOURCE = 'https://github.com/moeunzinkh-debug/YouTube-patch-clone-/tree/arena/f2e6d8d1-youtube-patch-clone/tools/gboard-khmer'
 
 
 def replace_once(path: Path, old: str, new: str) -> None:
@@ -56,22 +57,26 @@ def main() -> None:
     replace_once(registry,
                  'import dev.jason.gboardpatches.patches.gboard.features.directtranslate.gboardDirectGoogleTranslatePatch\n',
                  'import dev.jason.gboardpatches.patches.gboard.features.directtranslate.gboardDirectGoogleTranslatePatch\n'
+                 'import dev.jason.gboardpatches.patches.gboard.features.geminirouter.gboardGeminiChatRouterPatch\n'
                  'import dev.jason.gboardpatches.patches.gboard.features.khmerlish.gboardKhmerlishPatch\n')
     replace_once(registry, '        gboardDirectGoogleTranslatePatch,\n    ).filterTo',
-                 '        gboardDirectGoogleTranslatePatch,\n        gboardKhmerlishPatch,\n    ).filterTo')
+                 '        gboardDirectGoogleTranslatePatch,\n        gboardGeminiChatRouterPatch,\n'
+                 '        gboardKhmerlishPatch,\n    ).filterTo')
     verifier = destination / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/registry/GboardCapabilityWiringVerifier.kt'
     replace_once(verifier, '}.toSet() + "Direct Google Translate (experimental)"',
-                 f'}}.toSet() + "Direct Google Translate (experimental)" + "{PATCH_NAME}"')
+                 f'}}.toSet() + "Direct Google Translate (experimental)" + "{GEMINI_PATCH_NAME}" + "{PATCH_NAME}"')
     abi = destination / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/shared/runtimeabi/RuntimeAbi.kt'
     replace_once(abi, 'internal enum class RuntimeCallId(internal val encodedAbi: String) {\n',
                  'internal enum class RuntimeCallId(internal val encodedAbi: String) {\n'
+                 '    GEMINI_ROUTER_ACCESS_POINT_CATALOG("Ldev/jason/gboardpatches/extension/geminirouter/GeminiAccessPoint;->extendOrderCatalog(Landroid/content/Context;Ljava/lang/Object;)Ljava/lang/Object;"),\n'
+                 '    GEMINI_ROUTER_ACCESS_POINT_REGISTER("Ldev/jason/gboardpatches/extension/geminirouter/GeminiAccessPoint;->register(Ljava/lang/Object;Landroid/content/Context;)V"),\n'
                  '    KHMERLISH_ON_SELECTION("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;->onSelection(Landroid/inputmethodservice/InputMethodService;IIIIII)V"),\n'
                  '    KHMERLISH_ON_INPUT_VIEW_STARTED("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;->onInputViewStarted(Landroid/inputmethodservice/InputMethodService;)V"),\n'
                  '    KHMERLISH_RESET("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;->reset(Landroid/inputmethodservice/InputMethodService;)V"),\n'
                  '    KHMERLISH_ACCESS_POINT_CATALOG("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishAccessPoint;->extendOrderCatalog(Landroid/content/Context;Ljava/lang/Object;)Ljava/lang/Object;"),\n'
                  '    KHMERLISH_ACCESS_POINT_REGISTER("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishAccessPoint;->register(Ljava/lang/Object;Landroid/content/Context;)V"),\n'
                  '    KHMERLISH_ADD_SETTINGS("Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishSettingsFeature;->append(Landroid/content/Context;Ljava/util/List;)V"),\n')
-    print(f'Created {VERSION} with upstream, Direct Translate and Khmerlish at {destination}.')
+    print(f'Created {VERSION} with upstream, Direct Translate, Gemini router and Khmerlish at {destination}.')
 
 
 if __name__ == '__main__':

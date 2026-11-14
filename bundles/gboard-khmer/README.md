@@ -1,13 +1,13 @@
 # Gboard Khmerlish → ខ្មែរ (experimental)
 
-មុខងារថ្មីសម្រាប់ [Morphe Manager](https://github.com/MorpheApp/morphe-manager) និង Gboard `18.5.4.993608717-release-arm64-v8a` / code `176049702`។ នេះជា fork សាកល្បង version `4.0.6-khmerlish-dev.1` ផ្អែកលើ upstream Gboard patches `v4.0.0`៖ រក្សា upstream patches 43 និង patch `Direct Google Translate (experimental)` មុន។ Pre-release `4.0.5` ចាស់មិនត្រូវបានជំនួសទេ និងមិនទាន់មានការកែសញ្ញាថ្មីនេះ។
+មុខងារថ្មីសម្រាប់ [Morphe Manager](https://github.com/MorpheApp/morphe-manager) និង Gboard `18.5.4.993608717-release-arm64-v8a` / code `176049702`។ នេះជា fork សាកល្បង version `4.0.7-khmerlish-dev.1` ផ្អែកលើ upstream Gboard patches `v4.0.0`៖ រក្សា upstream patches 43 និង patch `Direct Google Translate (experimental)` មុន ហើយបន្ថែម selectors `Khmerlish to Khmer` និង `Gemini Chat translation router` ដែលបិទជាមុន។ Pre-release `4.0.5` ចាស់មិនត្រូវបានជំនួសទេ និងមិនទាន់មានការកែសញ្ញាថ្មីនេះ។
 
 [ទាញយក `.mpp` សាកល្បងថ្មី](gboard-khmerlish-experimental.mpp) · [SHA-256](gboard-khmerlish-experimental.mpp.sha256) · [លទ្ធផល build](validation.json) · [ការសាក Android](android-smoke.json) · [Pre-release 4.0.5 ចាស់](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/Gboard-v4.0.5)
 
 ## របៀបប្រើ
 
 1. ក្នុង Morphe Manager បន្ថែម `gboard-khmerlish-experimental.mpp` ជា **Sources → Add patch source → Local**។ កុំបើក Gboard source ចាស់ និង fork នេះជាមួយគ្នា ព្រោះ patches ដដែលអាចស្ទួន។
-2. ជ្រើស **Khmerlish to Khmer (experimental)** ក្នុងបញ្ជី patches ហើយ patch APK Gboard ដើមកំណែដែលបានរាយខាងលើ។ Patch និង setting សម្រាប់បម្លែងស្វ័យប្រវត្តិមិនបើកជាមុនទេ។
+2. ជ្រើស **Khmerlish to Khmer (experimental)** និង/ឬ **Gemini Chat translation router (experimental)** ក្នុងបញ្ជី ហើយ patch APK Gboard ដើមកំណែដែលបានរាយខាងលើ។ Selectors ថ្មីទាំងពីរមិនបើកជាមុនទេ។
 3. ក្នុង toolbar របស់ Gboard ចុចរូបតំណាង **Khmerlish → ខ្មែរ**។ វាយ Khmerlish នៅប្រអប់ក្នុង panel ខាងក្រោម ហើយអត្ថបទខ្មែរនឹងបង្ហាញក្នុងប្រអប់របស់កម្មវិធីខាងលើភ្លាមៗ។ ចុច **✓** ឬ **×** ដើម្បីត្រឡប់ទៅ keyboard ធម្មតា។ Panel ប្រើបានដោយមិនចាំបាច់បើក switch ខាងក្រោម; ប្រសិនបើមិនឃើញ icon សាកមើលម៉ឺនុយ features។
 4. ប្រសិនបើចង់បម្លែងពេលវាយលើ keyboard ធម្មតា សូមចូល **Settings → Patches → Khmerlish → ខ្មែរ (experimental)** ហើយបើក switch។ វាយជាអក្សរឡាតាំង រួចចុច **space ឬសញ្ញាខណ្ឌ** ដើម្បីបម្លែងពាក្យដែលស្គាល់៖
 
@@ -20,6 +20,10 @@
    | `Nik o` | `នឹកអូន` |
 
 5. ប្រសិនបើ Gboard English autocorrect កែពាក្យ Latin មុនពេលបម្លែងស្វ័យប្រវត្តិ សាកបិទ autocorrect ក្នុង Gboard។ ដើម្បីសាកដំបូង ប្រើអត្ថបទមិនសម្ងាត់ និងរក្សា keyboard បម្រុងដែលដំណើរការ។
+
+## Gmn — Gemini Chat translation router
+
+បើជ្រើស selector នេះ Gboard toolbar នឹងមាន icon **Gmn**។ ជ្រើសអត្ថបទដែលមិនមែនជាពាក្យសម្ងាត់ រួចចុច Gmn៖ patch នឹងបង្កើត translation prompt ទៅភាសារបស់ឧបករណ៍ ចម្លង prompt ទៅ clipboard ហើយបើកតែ `https://gemini.google.com/app`។ បន្ទាប់មកអ្នកត្រូវ **Paste និង Send ក្នុង Gemini ដោយខ្លួនឯង** ហើយ copy លទ្ធផលត្រឡប់មកវិញ។ វាមិនដាក់ API key, មិនហៅ Gemini API, មិនចុច Send ស្វ័យប្រវត្តិ និងមិនអាចយកចម្លើយ Gemini មកបញ្ចូលក្នុង Gboard ស្វ័យប្រវត្តិបានទេ។ បើមិនបាន select អត្ថបទ ឬនៅក្នុង password/private field វាបើក Gemini ប៉ុណ្ណោះ ដោយមិន copy editor text។
 
 ## វចនានុក្រមផ្ទាល់ខ្លួន និងឯកសារពាក្យ
 
@@ -46,11 +50,12 @@
 
 ## លទ្ធផលសាកល្បង
 
-Bundle `4.0.6-khmerlish-dev.1` ឆ្លងកាត់ [build និង unit tests 49/49](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42329450561) និង [Android 15 emulator](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42331556221) ដោយ SHA ត្រូវគ្នា។ ការសាករួមមាន `p'o`, `_ - +` ទាំងចុចគ្រាប់ Gboard លើអេក្រង់ក្នុង automatic និងប្រើ panel, ឃ្លា, រក្សាទុកក្រោយ restart និង import/export ដែលមានសញ្ញា។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឱ្យត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
+Bundle `4.0.7-khmerlish-dev.1` ត្រូវឆ្លងកាត់ build, Gemini prompt/privacy unit tests, Morphe listing និងការអនុវត្ត MPP ទៅ exact-version fixture មុនពេលទទួលយក artifact ថ្មី។ លទ្ធផល Android 15 emulator [ចាស់](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42331556221) គឺសម្រាប់ `4.0.6-khmerlish-dev.1`; Gmn router និង bundle 4.0.7 មិនទាន់បានបញ្ជាក់ runtime នៅពេលសរសេរឯកសារនេះទេ។ ការសាករួមមាន `p'o`, `_ - +` ទាំងចុចគ្រាប់ Gboard លើអេក្រង់ក្នុង automatic និងប្រើ panel, ឃ្លា, រក្សាទុកក្រោយ restart និង import/export ដែលមានសញ្ញា។ សូមពិនិត្យ [របាយការណ៍ Android](android-smoke.json) និង SHA ឱ្យត្រូវគ្នានឹង bundle។ Fixture ជា Gboard ដែលបាន patch រួចពីភាគីទីបី និងចុះហត្ថលេខាថ្មីសម្រាប់តេស្តប៉ុណ្ណោះ — **មិនមែន stock Gboard**។ ការអនុវត្ត patch លើ stock APK, Morphe Manager UI និងទូរស័ព្ទពិតនៅមិនទាន់បានសាក។
 
 ## ឯកជនភាព និងកម្រិត
 
-- ការបម្លែងនេះប្រើវចនានុក្រម **offline** ប្រហែល 24,506 spellings និងមិនផ្ញើអត្ថបទទៅ server។ `Direct Google Translate` ជា patch ផ្សេង៖ បើអ្នកជ្រើសប្រើវា អត្ថបទក្នុង Translate UI ត្រូវផ្ញើទៅ Google ដូចការព្រមានរបស់វា។
+- ការបម្លែង Khmerlish ប្រើវចនានុក្រម **offline** ប្រហែល 24,506 spellings និងមិនផ្ញើអត្ថបទទៅ server។ `Direct Google Translate` ជា patch ផ្សេង៖ បើអ្នកជ្រើសប្រើវា អត្ថបទក្នុង Translate UI ត្រូវផ្ញើទៅ Google ដូចការព្រមានរបស់វា។
+- Gmn router ចម្លងតែអត្ថបទដែលអ្នកបាន select ដោយចេតនាជាមួយ prompt ទៅ Android clipboard ហើយបើក Gemini web។ Android, browser និង Google/Gemini អាចមើលទិន្នន័យដែលអ្នក paste/submit តាម behavior និងគោលការណ៍របស់ពួកគេ។ កុំប្រើជាមួយទិន្នន័យសម្ងាត់។
 - នេះជា exact dictionary lookup មិនមែន AI ឬការយល់បរិបទទេ។ អក្ខរាវិរុទ្ធមិនស្គាល់ និងពាក្យមានច្រើនន័យដែលមិនទាន់កំណត់ទុកជាអក្សរដើម។ ពាក្យអង់គ្លេសខ្លះអាចដូច Khmerlish ដូច្នេះសូមបិទ switch ពេលសរសេរអង់គ្លេស។
 - Password, email, URL, លេខ/ទូរស័ព្ទ, no-suggestions និង private/no-personalized-learning fields ត្រូវបានរំលង។ Editors ដែលមិនផ្តល់ cursor ឬមិនគាំទ្រ batch edit ក៏ត្រូវបានរំលង។
 - Panel មាន keyboard QWERTY និងសញ្ញាជាមូលដ្ឋានផ្ទាល់ខ្លួន; suggestions, voice និងមុខងារផ្សេងៗរបស់ Gboard ប្រើតាម keyboard ធម្មតាបន្ទាប់ពីបិទ panel។ ការកែ cursor ឬជ្រើសអត្ថបទក្នុង app អាចបញ្ឈប់ panel ដើម្បីជៀសវាងលុបអត្ថបទដែលមិនពាក់ព័ន្ធ។

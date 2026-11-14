@@ -70,8 +70,9 @@ class DictionaryTests(unittest.TestCase):
                            stdout=subprocess.DEVNULL)
             registry = (dest / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/registry/GboardPatchRegistry.kt').read_text()
             self.assertIn('gboardDirectGoogleTranslatePatch,', registry)
+            self.assertIn('gboardGeminiChatRouterPatch,', registry)
             self.assertIn('gboardKhmerlishPatch,', registry)
-            self.assertIn('version = 4.0.6-khmerlish-dev.1', (dest / 'gradle.properties').read_text())
+            self.assertIn('version = 4.0.7-khmerlish-dev.1', (dest / 'gradle.properties').read_text())
             group = (dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/keyboard/GboardKeyboardToolsSettingsGroupFeature.java').read_text()
             self.assertIn('new GboardCalculatorSettingsFeature(context)', group)
             patch = (dest / 'patches/src/main/kotlin/dev/jason/gboardpatches/patches/gboard/features/khmerlish/GboardKhmerlishPatch.kt').read_text()
@@ -88,6 +89,12 @@ class DictionaryTests(unittest.TestCase):
                 self.assertNotIn(network, runtime)
             self.assertTrue((dest / 'patches/src/main/resources/gboard-khmer/dictionary.tsv').exists())
             self.assertTrue((dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/directtranslate/GtxClient.java').exists())
+            gemini = (dest / 'extensions/extension/src/main/java/dev/jason/gboardpatches/extension/geminirouter/GeminiChatRouter.java').read_text()
+            self.assertIn('https://gemini.google.com/app', gemini)
+            self.assertIn('getSelectedText(0)', gemini)
+            self.assertIn('IME_FLAG_NO_PERSONALIZED_LEARNING', gemini)
+            for forbidden in ('api_key', 'generativelanguage.googleapis.com', 'HttpURLConnection', 'OkHttp'):
+                self.assertNotIn(forbidden, gemini)
 
 
 if __name__ == '__main__':

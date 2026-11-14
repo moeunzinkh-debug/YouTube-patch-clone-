@@ -3,7 +3,7 @@ name: Experimental Gboard Khmerlish Android smoke
 on:
   workflow_dispatch:
   push:
-    branches: [arena/86d53cf2-youtube-patch-clone]
+    branches: [arena/f2e6d8d1-youtube-patch-clone]
     paths:
       - 'tools/gboard-khmer/**'
       - '.github/workflows/test-gboard-khmer-android.yml'
@@ -38,9 +38,9 @@ jobs:
           metadata = json.loads((root / 'validation.json').read_text())
           bundle = root / 'gboard-khmerlish-experimental.mpp'
           digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
-          assert (metadata['version'] == '4.0.6-khmerlish-dev.1' and metadata['sha256'] == digest
+          assert (metadata['version'] == '4.0.7-khmerlish-dev.1' and metadata['sha256'] == digest
                   and metadata['size'] == bundle.stat().st_size)
-          counts = metadata['checks']['khmerlish_unit_tests']
+          counts = metadata['checks']['khmerlish_and_gemini_unit_tests']
           assert counts['tests'] >= 49 and not (counts['failures'] or counts['errors'] or counts['skipped'])
           PY
           python3 tools/gboard-khmer/test_emulator_fixture.py -v
@@ -61,7 +61,8 @@ jobs:
           python3 tools/gboard-khmer/make_fixture.py "$input" /tmp/gboard-khmer-android/input.apk
           java -Xmx3g -jar /tmp/gboard-khmer-android/morphe-desktop-1.19.1-all.jar patch \
             --patches bundles/gboard-khmer/gboard-khmerlish-experimental.mpp --exclusive \
-            --enable 'Direct Google Translate (experimental)' --enable 'Khmerlish to Khmer (experimental)' \
+            --enable 'Direct Google Translate (experimental)' \
+            --enable 'Gemini Chat translation router (experimental)' --enable 'Khmerlish to Khmer (experimental)' \
             --bytecode-mode FULL --out /tmp/gboard-khmer-android/patched.apk \
             --result-file /tmp/gboard-khmer-android/patch-result.json \
             /tmp/gboard-khmer-android/input.apk 2>&1 | tee /tmp/gboard-khmer-android/apply.log
@@ -69,7 +70,7 @@ jobs:
           import json
           result = json.load(open('/tmp/gboard-khmer-android/patch-result.json'))
           assert result['success'] and not result['failedPatches']
-          assert {'Direct Google Translate (experimental)', 'Khmerlish to Khmer (experimental)'} <= set(result['appliedPatches'])
+          assert {'Direct Google Translate (experimental)', 'Gemini Chat translation router (experimental)', 'Khmerlish to Khmer (experimental)'} <= set(result['appliedPatches'])
           PY
           python3 tools/gboard-khmer/make_emulator_fixture.py "$input" \
             /tmp/gboard-khmer-android/patched.apk /tmp/gboard-khmer-android/hybrid.apk
@@ -123,7 +124,7 @@ jobs:
           print(json.dumps(data, ensure_ascii=False, indent=2))
           PY
       - name: Save only the sanitized report to this branch
-        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/86d53cf2-youtube-patch-clone'
+        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/arena/f2e6d8d1-youtube-patch-clone'
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
