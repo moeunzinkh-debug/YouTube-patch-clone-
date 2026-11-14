@@ -1,0 +1,46 @@
+name: Publish BigTree pre-release bundle
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/ec48a056-youtube-patch-clone]
+    paths: ['.github/workflows/publish-bigtree-prerelease-bundle.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify exact dev.15 bundle
+        run: |
+          set -euo pipefail
+          (cd bundles/bigtree && sha256sum -c bundle.mpp.sha256)
+          test "$(stat -c %s bundles/bigtree/bundle.mpp)" = 34022
+          test "$(cut -d' ' -f1 bundles/bigtree/bundle.mpp.sha256)" = 33aea9f9d91b675b7accde8d1130ec2fcb7c99cb2cfe2234cd4f2de94debdd2a
+      - name: Add bundle to BigTree pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload BigTree \
+            bundles/bigtree/bundle.mpp \
+            bundles/bigtree/bundle.mpp.sha256 \
+            --clobber
+      - name: Verify published assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view BigTree --json isPrerelease,assets > /tmp/release.json
+          python3 - <<'PY'
+          import json
+          release = json.load(open('/tmp/release.json'))
+          assert release['isPrerelease'] is True
+          assets = {item['name']: item['size'] for item in release['assets']}
+          assert assets['bigtree.apk'] == 21354658
+          assert assets['bundle.mpp'] == 34022
+          assert assets['bundle.mpp.sha256'] > 64
+          print(assets)
+          PY

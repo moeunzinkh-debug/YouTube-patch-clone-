@@ -11,14 +11,14 @@ Standalone Morphe bundle for the reviewed BigTree APK only.
 
 ## Independent selectors
 
-- **Snap Media** — uses the two-step direct-file flow. Static reinspection of the exact pre-release APK showed that playback can bypass webpage `<video>` entirely: the site passes JSON (`id`, `url`, `type`, optional `manifest`/DRM/decryption fields) to `Android.nativePlayerOpen`, and BigTree forwards it to its native Media3/ExoPlayer manager. Saving that playback transport URL as raw MP4 can preserve encrypted or segmented payload bytes, producing invalid NAL units and invalid AAC band/reserved-bit errors. Snap therefore permits native `saveFile` only for an unencrypted `mp4` or `progressive` source with no inline manifest, DRM, ClearKey, Youku key, or BBTS key. Adaptive streams, encrypted sources, initialization fragments, individual segments, external-downloader routes, and webpage-control activation are blocked. This fail-closed behavior prevents another knowingly corrupt file; it does not convert protected/adaptive streams into a downloadable MP4. Dragging moves the button without activating it and remembers its position.
+- **Snap Media** — uses the two-step direct-file flow. Chrome DevTools inspection of the supplied episode URL confirmed that the current site bundle resolves playback through `Android.nativePlayerOpen(JSON.stringify(...))`; its payload contains `url`, `type`, `manifest`, DRM/decryption fields, `backup`, title and quality. The unauthenticated inspection was redirected to `/login`, so it did not expose that episode's signed media response. dev.15 treats the native-player payload as authoritative on `/vplay/` pages, ignores unrelated webpage/tutorial MP4s, evaluates both primary and nested backup candidates, and uses the episode title as the downloaded filename. Tapping Snap changes the floating button into a visible spinner while it searches. Once a safe direct file is found, the spinner stops and a download card shows the video filename with explicit **Download** and **Cancel** actions. If the complete native payload proves the source is encrypted, segmented, or has no safe direct file, dev.15 stops immediately instead of waiting for the timeout and shows an unavailable card with **Retry** and **Close**. It permits native `saveFile` only for an unencrypted `mp4` or `progressive` source with no inline manifest, DRM, ClearKey, Youku key, or BBTS key. Adaptive streams, encrypted sources, initialization fragments, individual segments, external-downloader routes, and webpage-control activation remain blocked. This fail-closed behavior prevents another knowingly corrupt file; it does not convert protected/adaptive streams into a downloadable MP4. Dragging moves the button without activating it and remembers its position.
 - **Translation to English** — adds an English webpage-translation control and loads Google's hosted Translate Element. Page content is therefore sent to an external Google translation service.
 
 Both selectors are disabled by default and may be selected separately or together.
 
 ## Validation
 
-GitHub Actions run `42995492790` built the dev.12 standalone MPP, listed exactly the two selectors, and applied:
+GitHub Actions run `43581136874` built the dev.15 standalone MPP, listed exactly the two selectors, and applied:
 
 1. Snap Media alone;
 2. Translation to English alone; and

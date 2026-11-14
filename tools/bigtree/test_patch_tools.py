@@ -29,8 +29,13 @@ class BigTreeToolsTest(unittest.TestCase):
         source = (Path(__file__).parent / 'project/patches/src/main/kotlin/app/morphe/patches/bigtree/BigTreePatches.kt').read_text()
         for evidence in ('XMLHttpRequest.prototype.open', 'PerformanceObserver', 'iframe,frame',
                          'shouldInterceptRequest', 'morphe-snap-media-url', 'nativePlayerOpen',
-                         'morphe-snap-player-json', 'Android.saveFile', 'Video captured',
-                         'raw saving would corrupt it', 'data.clearKeys', 'data.bbtsKey'):
+                         'morphe-snap-player-json', 'Android.saveFile', 'Video found',
+                         'raw saving would corrupt it', 'data.clearKeys', 'data.bbtsKey',
+                         "walk(data.backup,'backup','')", "nativeOnly=/\\/vplay\\//",
+                         "true,'native-player'", 'playerTitle', 'morpheSnapSpin',
+                         "heading.textContent='Video found'", "download.textContent='Download'",
+                         "if(snappedUrl){showReadyCard();return;}startSnap()", 'finishBlocked(playerBlockReason)',
+                         "heading.textContent='Direct download unavailable'", "retry.textContent='Retry'"):
             self.assertIn(evidence, source)
         for unsafe in ('geometricDownloadControl', 'downloadControl()', 'control.click()',
                        'openAppDownload', 'morphe-snap-manifest-url'):

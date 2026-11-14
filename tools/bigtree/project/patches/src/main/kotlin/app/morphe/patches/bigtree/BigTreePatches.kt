@@ -21,7 +21,10 @@ private val snapMediaScript = """
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
   var nativeKey='morphe-snap-media-url',playerKey='morphe-snap-player-json',found={},blockedUrls={},sequence=0;
-  var snappedUrl='',capturing=false,captureTimeout=0,button=null,playerBlockReason='';
+  var snappedUrl='',capturing=false,captureTimeout=0,button=null,card=null,playerBlockReason='',playerSeen=false,playerTitle='';
+  var downloadIcon='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M5 20h14v-2H5v2zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1z"/></svg>';
+  var blockedIcon='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c1.85 0 3.55.63 4.9 1.69L5.69 16.9A8 8 0 0 1 12 4zm0 16a7.96 7.96 0 0 1-4.9-1.69L18.31 7.1A8 8 0 0 1 12 20z"/></svg>';
+  var spinnerIcon='<span aria-hidden="true" style="display:block;width:25px;height:25px;border:3px solid #fff7;border-top-color:#fff;border-radius:50%;animation:morpheSnapSpin .75s linear infinite"></span>';
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
     try{return new URL(String(url||''),base||document.baseURI).href;}catch(e){return '';}
@@ -36,25 +39,60 @@ private val snapMediaScript = """
     if(/download|attachment|original|source|下载|下載/.test(info))score+=4000;
     return score;
   }
-  function remember(url,hint,base,forceDirect){
+  function remember(url,hint,base,forceDirect,origin){
+    if(url===undefined||url===null||String(url).trim()==='')return;
     var value=absolute(url,base),score=forceDirect?26000:mediaScore(value,hint);
     if(!score||blocked(value)||blockedUrls[value])return;
     var old=found[value];
-    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence,direct:!!forceDirect||!!(old&&old.direct)};
+    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence,direct:!!forceDirect||!!(old&&old.direct),origin:origin||(old&&old.origin)||'page'};
   }
   function rememberNativePlayer(raw){
     try{
-      var data=JSON.parse(raw||'{}'),type=String(data.type||'mp4').toLowerCase(),url=absolute(data.url||'',document.baseURI);
-      if(!url)return;
-      var hasClearKeys=data.clearKeys&&Object.keys(data.clearKeys).length>0;
-      var encrypted=!!data.drm||hasClearKeys||(data.ykKey&&data.ykKey.length)||(data.bbtsKey&&String(data.bbtsKey).length);
-      var streamed=!!data.manifest||/^(?:hls|m3u8|dash|mpd|ss|smoothstreaming|rtsp|auto|clearkey_mp4)$/.test(type)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url);
-      if(encrypted||streamed){
-        blockedUrls[url]=true;delete found[url];
-        playerBlockReason=encrypted?'encrypted native player source':'segmented native player stream';
-        return;
+      var data=JSON.parse(raw||'{}');if(!data||typeof data!=='object')return;
+      playerSeen=true;
+      playerTitle=String(data.title||playerTitle||'').trim();
+      var inheritedEncrypted=!!data.drm||(data.clearKeys&&Object.keys(data.clearKeys).length>0)||(data.ykKey&&String(data.ykKey).length)||(data.bbtsKey&&String(data.bbtsKey).length);
+      var accepted=false,rejectedEncrypted=false,rejectedStream=false;
+      function option(value,label,defaultType,inheritedManifest){
+        if(!value)return;
+        if(typeof value==='string'){
+          var text=value.trim();if(!text)return;
+          if((text.charAt(0)==='{'||text.charAt(0)==='[')){try{walk(JSON.parse(text),label,defaultType);}catch(e){}return;}
+          value={url:text};
+        }
+        if(typeof value!=='object'||Array.isArray(value))return;
+        var url=absolute(value.url||value.src||value.file||'',document.baseURI);if(!url)return;
+        var explicitType=String(value.type||'').toLowerCase();
+        var type=explicitType||(directFile(url)?'mp4':String(defaultType||'').toLowerCase());
+        var localKeys=value.clearKeys&&Object.keys(value.clearKeys).length>0;
+        var encrypted=inheritedEncrypted||!!value.drm||localKeys||(value.ykKey&&String(value.ykKey).length)||(value.bbtsKey&&String(value.bbtsKey).length);
+        var manifest=!!inheritedManifest||!!value.manifest;
+        var streamed=manifest||/^(?:hls|m3u8|dash|mpd|ss|smoothstreaming|rtsp|auto|clearkey_mp4)$/.test(type)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url);
+        if(encrypted||streamed){blockedUrls[url]=true;delete found[url];rejectedEncrypted=rejectedEncrypted||encrypted;rejectedStream=rejectedStream||streamed;return;}
+        if(/^(?:mp4|progressive)$/.test(type)||directFile(url)){
+          accepted=true;remember(url,'native player '+label+' '+type,document.baseURI,true,'native-player');
+        }
       }
-      if(/^(?:mp4|progressive)$/.test(type)){playerBlockReason='';remember(url,'video native player '+type,document.baseURI,true);}
+      function walk(value,label,defaultType){
+        if(!value)return;
+        if(Array.isArray(value)){value.forEach(function(item,index){walk(item,label+' '+index,defaultType);});return;}
+        if(typeof value==='string'){
+          var text=value.trim();if(!text)return;
+          if(text.charAt(0)==='{'||text.charAt(0)==='['){try{walk(JSON.parse(text),label,defaultType);}catch(e){option(text,label,defaultType,false);}}
+          else option(text,label,defaultType,false);
+          return;
+        }
+        if(typeof value!=='object')return;
+        option(value,label,defaultType,false);
+        ['backup','backups','sources','items','urls'].forEach(function(key){if(value[key]&&value[key]!==value)walk(value[key],label+' '+key,value.type||defaultType);});
+      }
+      option(data,'primary',data.type||'mp4',!!data.manifest);
+      walk(data.backup,'backup','');
+      if(accepted)playerBlockReason='';
+      else if(rejectedEncrypted)playerBlockReason='encrypted native player source';
+      else if(rejectedStream)playerBlockReason='segmented native player stream';
+      else playerBlockReason='native player did not expose a direct file';
+      if(capturing&&!accepted&&playerBlockReason)finishBlocked(playerBlockReason);
     }catch(e){}
   }
   function metadata(element){
@@ -121,7 +159,7 @@ private val snapMediaScript = """
       }catch(e){}
     });
     try{if(window.Android&&Android.getData){
-      remember(Android.getData(nativeKey),'native direct-video request',document.baseURI);
+      remember(Android.getData(nativeKey),'native direct-video request',document.baseURI,true,'native-request');
       rememberNativePlayer(Android.getData(playerKey));
     }}catch(e){}
     if(capturing){var ready=bestDirectMediaUrl(false);if(ready)finishSnap(ready);}
@@ -137,44 +175,91 @@ private val snapMediaScript = """
   }
   function bestDirectMediaUrl(rescan){
     if(rescan!==false)scan();
-    var candidates=rankedCandidates();
-    for(var index=0;index<candidates.length;index++)if(candidates[index].direct||directFile(candidates[index].url))return candidates[index].url;
+    var candidates=rankedCandidates(),nativeOnly=/\/vplay\//i.test(location.pathname);
+    for(var index=0;index<candidates.length;index++){
+      var candidate=candidates[index];
+      if(nativeOnly&&!/^native-/.test(candidate.origin||''))continue;
+      if(candidate.direct||directFile(candidate.url))return candidate.url;
+    }
     return '';
   }
   function setSnapState(state){
     if(!button)return;
     if(state==='capturing'){
-      button.style.background='#f59f00';button.setAttribute('title','Capturing video...');button.setAttribute('aria-label','Capturing video');
+      button.innerHTML=spinnerIcon;button.style.background='#f59f00';button.setAttribute('title','Searching for video...');button.setAttribute('aria-label','Searching for video');
     }else if(state==='ready'){
-      button.style.background='#138a36';button.setAttribute('title','Video ready — tap to download');button.setAttribute('aria-label','Download captured video');
+      button.innerHTML=downloadIcon;button.style.background='#138a36';button.setAttribute('title','Video found — download options shown');button.setAttribute('aria-label','Show captured video download');
+    }else if(state==='blocked'){
+      button.innerHTML=blockedIcon;button.style.background='#c62828';button.setAttribute('title','Direct download unavailable');button.setAttribute('aria-label','Direct download unavailable');
     }else{
-      button.style.background='#1769e0';button.setAttribute('title','Snap video');button.setAttribute('aria-label','Snap video');
+      button.innerHTML=downloadIcon;button.style.background='#1769e0';button.setAttribute('title','Snap video');button.setAttribute('aria-label','Snap video');
     }
+  }
+  function hideReadyCard(clear){
+    if(card&&card.parentNode)card.parentNode.removeChild(card);card=null;
+    if(clear){snappedUrl='';setSnapState('idle');}
+  }
+  function showReadyCard(){
+    if(!snappedUrl)return;
+    hideReadyCard(false);
+    var info=fileInfo(snappedUrl);
+    card=document.createElement('div');card.id='morphe-snap-ready';card.className='notranslate';card.setAttribute('translate','no');
+    card.style.cssText='position:fixed;left:12px;right:12px;bottom:16px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:12px;background:#15171a;color:#fff;border:1px solid #ffffff2e;border-radius:14px;box-shadow:0 5px 22px #000b;font:14px sans-serif';
+    var text=document.createElement('div');text.style.cssText='min-width:0;flex:1';
+    var heading=document.createElement('div');heading.textContent='Video found';heading.style.cssText='font-weight:700;color:#65d487;margin-bottom:3px';
+    var filename=document.createElement('div');filename.textContent=info.name;filename.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#eee';
+    text.appendChild(heading);text.appendChild(filename);
+    var download=document.createElement('button');download.type='button';download.textContent='Download';download.style.cssText='border:0;border-radius:10px;padding:10px 13px;background:#138a36;color:#fff;font-weight:700';
+    download.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();downloadSnappedVideo();});
+    var cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.setAttribute('aria-label','Cancel captured video');cancel.style.cssText='border:0;border-radius:10px;padding:10px;background:#34383d;color:#fff';
+    cancel.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();hideReadyCard(true);});
+    card.appendChild(text);card.appendChild(download);card.appendChild(cancel);(document.body||document.documentElement).appendChild(card);
+  }
+  function showBlockedCard(reason){
+    hideReadyCard(false);
+    card=document.createElement('div');card.id='morphe-snap-blocked';card.className='notranslate';card.setAttribute('translate','no');
+    card.style.cssText='position:fixed;left:12px;right:12px;bottom:16px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:12px;background:#251719;color:#fff;border:1px solid #ff6b6b55;border-radius:14px;box-shadow:0 5px 22px #000b;font:14px sans-serif';
+    var text=document.createElement('div');text.style.cssText='min-width:0;flex:1';
+    var heading=document.createElement('div');heading.textContent='Direct download unavailable';heading.style.cssText='font-weight:700;color:#ff8a80;margin-bottom:3px';
+    var detail=document.createElement('div');detail.textContent=reason==='encrypted native player source'?'This video source is encrypted. Raw saving would create a corrupt file.':reason==='segmented native player stream'?'This video uses a segmented stream, not one complete video file.':'No safe direct video file was exposed by the player.';detail.style.cssText='color:#eee;line-height:1.35';
+    text.appendChild(heading);text.appendChild(detail);
+    var retry=document.createElement('button');retry.type='button';retry.textContent='Retry';retry.style.cssText='border:0;border-radius:10px;padding:10px 13px;background:#1769e0;color:#fff;font-weight:700';
+    retry.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();hideReadyCard(true);startSnap();});
+    var close=document.createElement('button');close.type='button';close.textContent='Close';close.style.cssText='border:0;border-radius:10px;padding:10px;background:#34383d;color:#fff';
+    close.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();hideReadyCard(true);});
+    card.appendChild(text);card.appendChild(retry);card.appendChild(close);(document.body||document.documentElement).appendChild(card);
+  }
+  function finishBlocked(reason){
+    if(!capturing)return;
+    capturing=false;clearTimeout(captureTimeout);snappedUrl='';setSnapState('blocked');showBlockedCard(reason);
+    toast('Direct download unavailable: '+reason+'.');
   }
   function finishSnap(url){
     if(!capturing||!url)return;
-    snappedUrl=url;capturing=false;clearTimeout(captureTimeout);setSnapState('ready');
-    toast('Video captured. Tap the green button to download it to this device.');
+    snappedUrl=url;capturing=false;clearTimeout(captureTimeout);setSnapState('ready');showReadyCard();
+    toast('Video found. Choose Download to save it to this device.');
   }
   install(window);
   try{new MutationObserver(function(){scan();}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src','href','srcset','data-url','data-src','data-file','data-download','data-download-url','data-video-url','data-stream-url']});}catch(e){}
   setInterval(scan,1500);scan();
   function fileInfo(url){
     var path='';try{path=decodeURIComponent(new URL(url).pathname.split('/').pop()||'');}catch(e){}
-    path=path.replace(/[^a-zA-Z0-9._ -]/g,'_');
+    path=path.replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim();
     var extension=(path.match(/\.(mp4|m4v|webm|mov)$/i)||[])[1]||'mp4';
-    if(!path||!new RegExp('\\.'+extension+'$','i').test(path))path='bigtree_video_'+Date.now()+'.'+extension;
+    var title=String(playerTitle||'').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().slice(0,120);
+    if(title)path=title+(new RegExp('\\.'+extension+'$','i').test(title)?'':'.'+extension);
+    else if(!path||!new RegExp('\\.'+extension+'$','i').test(path))path='bigtree_video_'+Date.now()+'.'+extension;
     var mime=extension.toLowerCase()==='webm'?'video/webm':extension.toLowerCase()==='mov'?'video/quicktime':'video/mp4';
     return {name:path,mime:mime};
   }
   function startSnap(){
-    if(capturing){toast('Still capturing. Keep the video playing...');return;}
-    snappedUrl='';capturing=true;setSnapState('capturing');scan();
+    if(capturing){toast('Still searching. Keep the video playing...');return;}
+    hideReadyCard(false);snappedUrl='';found={};blockedUrls={};sequence=0;playerSeen=false;playerTitle='';playerBlockReason='';capturing=true;setSnapState('capturing');scan();
     if(capturing){
       toast('Capturing the full video URL. Keep the video playing...');
       captureTimeout=setTimeout(function(){
         if(!capturing)return;capturing=false;setSnapState('idle');
-        toast(playerBlockReason?'Direct download blocked: '+playerBlockReason+'. Raw saving would create a corrupt file.':'A safe direct video file was not found. Play the video and tap Snap again.');
+        toast(playerBlockReason?'Direct download blocked: '+playerBlockReason+'. Raw saving would create a corrupt file.':(/\/vplay\//i.test(location.pathname)&&!playerSeen?'The native player source was not received. Start this episode, then tap Snap again.':'A safe direct video file was not found. Play the video and tap Snap again.'));
       },20000);
     }
   }
@@ -182,10 +267,10 @@ private val snapMediaScript = """
     if(!snappedUrl){startSnap();return;}
     try{if(window.Android&&Android.getData)rememberNativePlayer(Android.getData(playerKey));}catch(e){}
     if(blockedUrls[snappedUrl]){
-      snappedUrl='';setSnapState('idle');
+      hideReadyCard(false);snappedUrl='';setSnapState('idle');
       toast('Download blocked: this playback source is encrypted or segmented and raw saving would corrupt it.');return;
     }
-    var url=snappedUrl,info=fileInfo(url);snappedUrl='';setSnapState('idle');
+    var url=snappedUrl,info=fileInfo(url);hideReadyCard(false);snappedUrl='';setSnapState('idle');
     try{
       if(window.Android&&Android.saveFile){
         Android.saveFile(url,info.name,info.mime,'morphe-snap-'+Date.now());
@@ -194,9 +279,10 @@ private val snapMediaScript = """
     }catch(e){}
     toast('Direct device download is unavailable.');
   }
+  try{var style=document.createElement('style');style.id='morphe-snap-style';style.textContent='@keyframes morpheSnapSpin{to{transform:rotate(360deg)}}';(document.head||document.documentElement).appendChild(style);}catch(e){}
   button=document.createElement('button');
   button.id='morphe-snap-media';
-  button.innerHTML='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M5 20h14v-2H5v2zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1z"/></svg>';
+  button.innerHTML=downloadIcon;
   button.setAttribute('aria-label','Snap video');button.setAttribute('title','Snap video');button.setAttribute('translate','no');button.className='notranslate';
   button.style.cssText='position:fixed;right:14px;bottom:74px;z-index:2147483647;width:54px;height:54px;padding:0;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:#1769e0;color:white;box-shadow:0 3px 10px #0009;touch-action:none;user-select:none;-webkit-user-select:none';
   try{var saved=JSON.parse(localStorage.getItem('morphe-snap-position')||'null');if(saved&&isFinite(saved.x)&&isFinite(saved.y)){button.style.left=Math.max(0,Math.min(innerWidth-54,saved.x))+'px';button.style.top=Math.max(0,Math.min(innerHeight-54,saved.y))+'px';button.style.right='auto';button.style.bottom='auto';}}catch(e){}
@@ -218,7 +304,10 @@ private val snapMediaScript = """
     drag=null;try{button.releasePointerCapture(event.pointerId);}catch(e){}setTimeout(function(){suppressClick=false;},0);event.preventDefault();
   }
   button.addEventListener('pointerup',finishDrag);button.addEventListener('pointercancel',finishDrag);
-  button.addEventListener('click',function(event){if(suppressClick){event.preventDefault();event.stopPropagation();return;}downloadSnappedVideo();});
+  button.addEventListener('click',function(event){
+    if(suppressClick){event.preventDefault();event.stopPropagation();return;}
+    if(snappedUrl){showReadyCard();return;}startSnap();
+  });
   (document.body||document.documentElement).appendChild(button);
 })();
 """.trimIndent()
@@ -450,7 +539,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Uses the two-step direct-file flow and captures the JSON passed to BigTree's native ExoPlayer bridge. Only unencrypted progressive/MP4 sources may reach native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments are blocked because raw saving produces corrupt audio/video.",
+    description = "Shows a spinner while searching, then immediately shows either a filename card with Download/Cancel actions or a clear unavailable card for encrypted/segmented sources instead of waiting for the search timeout. It uses the exact JSON passed to BigTree's native ExoPlayer bridge; on /vplay pages it ignores unrelated webpage/tutorial media, considers the native primary and backup sources, and sends only unencrypted progressive/MP4 files to native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments remain blocked because raw saving produces corrupt audio/video.",
     default = false,
 ) {
     compatibleWith(compatibility())
