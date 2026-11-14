@@ -23,6 +23,7 @@ private val snapMediaScript = """
   var nativeKey='morphe-snap-media-url',playerKey='morphe-snap-player-json',found={},blockedUrls={},sequence=0;
   var snappedUrl='',capturing=false,captureTimeout=0,button=null,card=null,playerBlockReason='',playerSeen=false,playerTitle='';
   var downloadIcon='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M5 20h14v-2H5v2zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1z"/></svg>';
+  var blockedIcon='<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c1.85 0 3.55.63 4.9 1.69L5.69 16.9A8 8 0 0 1 12 4zm0 16a7.96 7.96 0 0 1-4.9-1.69L18.31 7.1A8 8 0 0 1 12 20z"/></svg>';
   var spinnerIcon='<span aria-hidden="true" style="display:block;width:25px;height:25px;border:3px solid #fff7;border-top-color:#fff;border-radius:50%;animation:morpheSnapSpin .75s linear infinite"></span>';
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
@@ -91,6 +92,7 @@ private val snapMediaScript = """
       else if(rejectedEncrypted)playerBlockReason='encrypted native player source';
       else if(rejectedStream)playerBlockReason='segmented native player stream';
       else playerBlockReason='native player did not expose a direct file';
+      if(capturing&&!accepted&&playerBlockReason)finishBlocked(playerBlockReason);
     }catch(e){}
   }
   function metadata(element){
@@ -187,6 +189,8 @@ private val snapMediaScript = """
       button.innerHTML=spinnerIcon;button.style.background='#f59f00';button.setAttribute('title','Searching for video...');button.setAttribute('aria-label','Searching for video');
     }else if(state==='ready'){
       button.innerHTML=downloadIcon;button.style.background='#138a36';button.setAttribute('title','Video found — download options shown');button.setAttribute('aria-label','Show captured video download');
+    }else if(state==='blocked'){
+      button.innerHTML=blockedIcon;button.style.background='#c62828';button.setAttribute('title','Direct download unavailable');button.setAttribute('aria-label','Direct download unavailable');
     }else{
       button.innerHTML=downloadIcon;button.style.background='#1769e0';button.setAttribute('title','Snap video');button.setAttribute('aria-label','Snap video');
     }
@@ -210,6 +214,25 @@ private val snapMediaScript = """
     var cancel=document.createElement('button');cancel.type='button';cancel.textContent='Cancel';cancel.setAttribute('aria-label','Cancel captured video');cancel.style.cssText='border:0;border-radius:10px;padding:10px;background:#34383d;color:#fff';
     cancel.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();hideReadyCard(true);});
     card.appendChild(text);card.appendChild(download);card.appendChild(cancel);(document.body||document.documentElement).appendChild(card);
+  }
+  function showBlockedCard(reason){
+    hideReadyCard(false);
+    card=document.createElement('div');card.id='morphe-snap-blocked';card.className='notranslate';card.setAttribute('translate','no');
+    card.style.cssText='position:fixed;left:12px;right:12px;bottom:16px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:12px;background:#251719;color:#fff;border:1px solid #ff6b6b55;border-radius:14px;box-shadow:0 5px 22px #000b;font:14px sans-serif';
+    var text=document.createElement('div');text.style.cssText='min-width:0;flex:1';
+    var heading=document.createElement('div');heading.textContent='Direct download unavailable';heading.style.cssText='font-weight:700;color:#ff8a80;margin-bottom:3px';
+    var detail=document.createElement('div');detail.textContent=reason==='encrypted native player source'?'This video source is encrypted. Raw saving would create a corrupt file.':reason==='segmented native player stream'?'This video uses a segmented stream, not one complete video file.':'No safe direct video file was exposed by the player.';detail.style.cssText='color:#eee;line-height:1.35';
+    text.appendChild(heading);text.appendChild(detail);
+    var retry=document.createElement('button');retry.type='button';retry.textContent='Retry';retry.style.cssText='border:0;border-radius:10px;padding:10px 13px;background:#1769e0;color:#fff;font-weight:700';
+    retry.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();hideReadyCard(true);startSnap();});
+    var close=document.createElement('button');close.type='button';close.textContent='Close';close.style.cssText='border:0;border-radius:10px;padding:10px;background:#34383d;color:#fff';
+    close.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();hideReadyCard(true);});
+    card.appendChild(text);card.appendChild(retry);card.appendChild(close);(document.body||document.documentElement).appendChild(card);
+  }
+  function finishBlocked(reason){
+    if(!capturing)return;
+    capturing=false;clearTimeout(captureTimeout);snappedUrl='';setSnapState('blocked');showBlockedCard(reason);
+    toast('Direct download unavailable: '+reason+'.');
   }
   function finishSnap(url){
     if(!capturing||!url)return;
@@ -516,7 +539,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Shows a spinner while searching, then a filename card with explicit Download/Cancel actions. It uses the exact JSON passed to BigTree's native ExoPlayer bridge; on /vplay pages it ignores unrelated webpage/tutorial media, considers the native primary and backup sources, and sends only unencrypted progressive/MP4 files to native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments remain blocked because raw saving produces corrupt audio/video.",
+    description = "Shows a spinner while searching, then immediately shows either a filename card with Download/Cancel actions or a clear unavailable card for encrypted/segmented sources instead of waiting for the search timeout. It uses the exact JSON passed to BigTree's native ExoPlayer bridge; on /vplay pages it ignores unrelated webpage/tutorial media, considers the native primary and backup sources, and sends only unencrypted progressive/MP4 files to native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments remain blocked because raw saving produces corrupt audio/video.",
     default = false,
 ) {
     compatibleWith(compatibility())
