@@ -18,7 +18,7 @@ Both selectors are disabled by default and may be selected separately or togethe
 
 ## Validation
 
-GitHub Actions run `43579532792` built the dev.14 standalone MPP, listed exactly the two selectors, and applied:
+GitHub Actions run `43581136874` built the dev.15 standalone MPP, listed exactly the two selectors, and applied:
 
 1. Snap Media alone;
 2. Translation to English alone; and
