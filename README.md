@@ -172,7 +172,7 @@ OCR មិនរាយភាសាខ្មែរ ហើយមុខងារភ
 <details>
 <summary>🧪 Gboard Khmerlish → ខ្មែរ (bundle សាកល្បង)</summary>
 
-Fork សាកល្បងនេះបន្ថែម toolbar panel សម្រាប់វាយ Khmerlish ខាងក្រោម និងបង្ហាញអក្សរខ្មែរក្នុង app ខាងលើ ព្រមទាំង setting សម្រាប់បម្លែងពេលវាយធម្មតា។ វាមានវចនានុក្រម offline ផ្ទាល់ខ្លួនដែលគាំទ្រឃ្លាមានដកឃ្លា ដូចជា `min dg del` និងសញ្ញា ដូចជា `p'o`, `p_o`, `p-o`, `p+o`; បញ្ជីពាក្យអាចស្វែងរកជាមួយរូបកែនៅចុងជួរនីមួយៗ និងនាំចូល/នាំចេញឯកសារអត្ថបទ CSV/TSV។ វាមិនជំនួស Gboard bundle upstream 43 patches ខាងលើទេ។
+Fork សាកល្បងនេះបន្ថែម toolbar panel សម្រាប់វាយ Khmerlish ខាងក្រោម និងបង្ហាញអក្សរខ្មែរក្នុង app ខាងលើ ព្រមទាំង setting សម្រាប់បម្លែងពេលវាយធម្មតា។ វាមានវចនានុក្រម offline ផ្ទាល់ខ្លួនដែលគាំទ្រឃ្លាមានដកឃ្លា ដូចជា `min dg del` និងសញ្ញា ដូចជា `p'o`, `p_o`, `p-o`, `p+o`; បញ្ជីពាក្យអាចស្វែងរកជាមួយរូបកែនៅចុងជួរនីមួយៗ និងនាំចូល/នាំចេញឯកសារអត្ថបទ CSV/TSV។ Panel មានជួរទស្សទាយ offline ដែលរួមបញ្ចូលពាក្យដើមនិងពាក្យផ្ទាល់ខ្លួន ដូចជា `men → មែន, មេន` និង `man → ម៉ាន, មែន`; ចុច candidate ដើម្បីជ្រើស។ Version `4.0.8-khmerlish-dev.1` ក៏មាន selector **Gemini Chat translation router (experimental)** ដែលបន្ថែម icon `Gmn`: វាចម្លង prompt សម្រាប់ selected text ហើយបើក `https://gemini.google.com/app`; អ្នកត្រូវ paste/send និង copy លទ្ធផលដោយខ្លួនឯង។ វាមិនមាន API key ឬបញ្ចូលចម្លើយស្វ័យប្រវត្តិទេ។ Fork នេះមិនជំនួស Gboard bundle upstream 43 patches ខាងលើទេ។
 
 [ឯកសារ `.mpp`](bundles/gboard-khmer/gboard-khmerlish-experimental.mpp) · [របៀបប្រើ និងកម្រិត](bundles/gboard-khmer/README.md) · [លទ្ធផល build](bundles/gboard-khmer/validation.json) · [លទ្ធផល Android ចុងក្រោយ](bundles/gboard-khmer/android-smoke.json)
 

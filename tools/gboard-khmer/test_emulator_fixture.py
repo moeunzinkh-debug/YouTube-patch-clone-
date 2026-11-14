@@ -31,7 +31,7 @@ class EmulatorFixtureTests(unittest.TestCase):
         for utf8 in (True, False):
             original = xml_with_pool(utf8, [fixture.binary_xml.NEW,
                                            fixture.binary_xml.NEW + fixture.PROVIDER_SUFFIX,
-                                           fixture.CALCULATOR, fixture.KHMERLISH,
+                                           fixture.CALCULATOR, fixture.KHMERLISH, fixture.GEMINI,
                                            fixture.DICTIONARY_ACTIVITY])
             changed = fixture.rewrite_test_manifest(original)
             encoding = 'utf-8' if utf8 else 'utf-16le'
@@ -39,6 +39,7 @@ class EmulatorFixtureTests(unittest.TestCase):
             self.assertIn(fixture.binary_xml.OLD.encode(encoding), changed)
             self.assertIn((fixture.binary_xml.OLD + fixture.PROVIDER_SUFFIX).encode(encoding), changed)
             self.assertIn(fixture.KHMERLISH.encode(encoding), changed)
+            self.assertIn(fixture.GEMINI.encode(encoding), changed)
             self.assertIn(fixture.CALCULATOR.encode(encoding), changed)
             self.assertIn(fixture.DICTIONARY_ACTIVITY.encode(encoding), changed)
 
@@ -68,7 +69,7 @@ class EmulatorFixtureTests(unittest.TestCase):
             with zipfile.ZipFile(patched, 'w') as archive:
                 archive.writestr('AndroidManifest.xml', xml_with_pool(True, [
                     fixture.binary_xml.NEW, fixture.binary_xml.NEW + fixture.PROVIDER_SUFFIX,
-                    fixture.CALCULATOR, fixture.KHMERLISH, fixture.DICTIONARY_ACTIVITY]))
+                    fixture.CALCULATOR, fixture.KHMERLISH, fixture.GEMINI, fixture.DICTIONARY_ACTIVITY]))
                 archive.writestr('classes.dex', b'patched dex')
                 archive.writestr('classes2.dex', b'extension dex')
                 archive.writestr('resources.arsc', resource_table(fixture.binary_xml.NEW))
@@ -81,6 +82,7 @@ class EmulatorFixtureTests(unittest.TestCase):
             self.assertEqual(2, fixture.build(original, patched, output))
             with zipfile.ZipFile(output) as archive:
                 self.assertIn(fixture.KHMERLISH.encode(), archive.read('AndroidManifest.xml'))
+                self.assertIn(fixture.GEMINI.encode(), archive.read('AndroidManifest.xml'))
                 self.assertIn(fixture.binary_xml.OLD.encode('utf-16le'), archive.read('resources.arsc'))
                 for path, encoding in [('res/xml/settings.xml', 'utf-8'), ('res/xml/settings_legacy.xml', 'utf-16le')]:
                     settings = archive.read(path)
@@ -97,7 +99,7 @@ class EmulatorFixtureTests(unittest.TestCase):
             fixture.rewrite_test_manifest(xml_with_pool(True, ['unrelated']))
         with self.assertRaises(ValueError):
             fixture.rewrite_test_manifest(xml_with_pool(True, [fixture.binary_xml.NEW,
-                fixture.CALCULATOR, fixture.KHMERLISH, fixture.DICTIONARY_ACTIVITY]))
+                fixture.CALCULATOR, fixture.KHMERLISH, fixture.GEMINI, fixture.DICTIONARY_ACTIVITY]))
 
 
 class DocumentPickerTests(unittest.TestCase):

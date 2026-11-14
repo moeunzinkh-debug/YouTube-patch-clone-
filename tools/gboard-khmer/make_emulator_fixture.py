@@ -23,6 +23,7 @@ from axml_fixture import rewrite_pool_string  # noqa: E402
 
 CALCULATOR = 'dev.jason.gboardpatches.feature.simple_calculator'
 KHMERLISH = 'dev.jason.gboardpatches.feature.khmerlish'
+GEMINI = 'dev.jason.gboardpatches.feature.gemini_router'
 DICTIONARY_ACTIVITY = 'dev.jason.gboardpatches.extension.khmerlish.KhmerlishDictionaryActivity'
 PROVIDER_SUFFIX = '.gboard_patches'
 DEX = re.compile(r'classes(?:[2-9]|[1-9][0-9]+)?\.dex\Z')
@@ -33,7 +34,7 @@ ASSETS = ('assets/gboard-khmer/dictionary.tsv', 'assets/gboard-khmer/LICENSE.txt
 def rewrite_test_manifest(manifest: bytes) -> bytes:
     """Restore only test package strings while retaining actual patched components."""
     contains = lambda value: any(value.encode(enc) in manifest for enc in ('utf-8', 'utf-16le'))
-    if not all(contains(value) for value in (KHMERLISH, DICTIONARY_ACTIVITY, CALCULATOR)):
+    if not all(contains(value) for value in (KHMERLISH, GEMINI, DICTIONARY_ACTIVITY, CALCULATOR)):
         raise ValueError('Patched manifest is missing a required activity or feature marker')
     manifest = rewrite_pool_string(manifest, binary_xml.NEW, binary_xml.OLD)
     return rewrite_pool_string(manifest, binary_xml.NEW + PROVIDER_SUFFIX, binary_xml.OLD + PROVIDER_SUFFIX)

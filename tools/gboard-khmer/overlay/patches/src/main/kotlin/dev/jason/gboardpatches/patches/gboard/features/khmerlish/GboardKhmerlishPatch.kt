@@ -37,7 +37,7 @@ private val gboardKhmerlishAssetsPatch = resourcePatch(
 context(context: ResourcePatchContext)
 private fun copyKhmerlishAssets() = with(context) {
     val loader = object {}.javaClass.classLoader
-    listOf("dictionary.tsv", "LICENSE.txt").forEach { name ->
+    listOf("dictionary.tsv", "predictions.tsv", "LICENSE.txt").forEach { name ->
         val bytes = loader.getResourceAsStream("$RESOURCE_ROOT/$name")?.use { it.readBytes() }
             ?: error("Missing Khmerlish dictionary resource: $name")
         val target = this["assets/$RESOURCE_ROOT/$name", false]
@@ -78,9 +78,9 @@ private val gboardKhmerlishMarkerPatch = resourcePatch(
 /** Explicitly opt-in; exact obfuscated lifecycle targets are reviewed only for this APK version. */
 internal val gboardKhmerlishPatch = bytecodePatch(
     name = "Khmerlish to Khmer (experimental)",
-    description = "Adds an offline Khmerlish toolbar panel, optional automatic setting, " +
-        "personal dictionary and searchable word guide with text import/export. " +
-        "Known Romanized words are converted to Khmer; unknown and ambiguous spellings stay unchanged.",
+    description = "Adds an offline Khmerlish toolbar panel with tappable word predictions, " +
+        "optional automatic setting, personal dictionary and searchable word guide with text import/export. " +
+        "Known Romanized words are converted to Khmer; ambiguous spellings can be selected in the panel.",
     default = false,
 ) {
     compatibleWith(COMPATIBILITY_GBOARD)

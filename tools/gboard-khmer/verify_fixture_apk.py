@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 RUNTIME = 'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishRuntime;'
 SETTINGS = 'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishSettingsFeature;'
 ACCESS = 'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishAccessPoint;'
+GEMINI_ACCESS = 'Ldev/jason/gboardpatches/extension/geminirouter/GeminiAccessPoint;'
+GEMINI_ROUTER = 'Ldev/jason/gboardpatches/extension/geminirouter/GeminiChatRouter;'
 REGISTRY = 'Ldev/jason/gboardpatches/extension/settings/GboardPatchesSettingsFeatureRegistry;'
 TARGETS = {
     ('Lphr;', 'onUpdateSelection', '(IIIIII)V'): RUNTIME + '->onSelection(',
@@ -24,10 +26,14 @@ TARGETS = {
     ('Lphr;', 'onFinishInput', '()V'): RUNTIME + '->reset(',
     ('Lphr;', 'onWindowHidden', '()V'): RUNTIME + '->reset(',
     (REGISTRY, 'features', '(Landroid/content/Context;)Ljava/util/List;'): SETTINGS + '->append(',
-    ('Lmvg;', 'm', '(Landroid/content/Context;Lniv;Lnyt;Lwpa;Lwpa;)Lmvg;'): ACCESS + '->extendOrderCatalog(',
-    ('Lmwv;', '<init>', '(Landroid/content/Context;Lmyc;)V'): ACCESS + '->register(',
+    ('Lmvg;', 'm', '(Landroid/content/Context;Lniv;Lnyt;Lwpa;Lwpa;)Lmvg;'): (
+        ACCESS + '->extendOrderCatalog(', GEMINI_ACCESS + '->extendOrderCatalog(',
+    ),
+    ('Lmwv;', '<init>', '(Landroid/content/Context;Lmyc;)V'): (
+        ACCESS + '->register(', GEMINI_ACCESS + '->register(',
+    ),
 }
-CLASSES = {RUNTIME, SETTINGS, ACCESS,
+CLASSES = {RUNTIME, SETTINGS, ACCESS, GEMINI_ACCESS, GEMINI_ROUTER,
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelRuntime;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelSession;',
            'Ldev/jason/gboardpatches/extension/khmerlish/KhmerlishPanelConverter;',
@@ -55,6 +61,10 @@ def main() -> None:
                if node.get(android + 'name') == 'dev.jason.gboardpatches.feature.khmerlish']
     if len(markers) != 1 or markers[0].get(android + 'value') != 'true':
         raise SystemExit('Khmerlish settings availability marker missing')
+    gemini_markers = [node for node in manifest.iter('meta-data')
+                      if node.get(android + 'name') == 'dev.jason.gboardpatches.feature.gemini_router']
+    if len(gemini_markers) != 1 or gemini_markers[0].get(android + 'value') != 'true':
+        raise SystemExit('Gemini router availability marker missing')
     activities = [node for node in manifest.iter('activity') if node.get(android + 'name')
                   == 'dev.jason.gboardpatches.extension.khmerlish.KhmerlishDictionaryActivity']
     if (len(activities) != 1 or activities[0].get(android + 'exported') != 'false'
@@ -62,19 +72,19 @@ def main() -> None:
         raise SystemExit('Expected one non-exported Khmerlish dictionary activity with no intent filter')
     source = ROOT / 'tools/gboard-khmer/overlay/patches/src/main/resources/gboard-khmer'
     with zipfile.ZipFile(args.apk) as archive:
-        for name in ('dictionary.tsv', 'LICENSE.txt'):
+        for name in ('dictionary.tsv', 'predictions.tsv', 'LICENSE.txt'):
             if archive.read('assets/gboard-khmer/' + name) != (source / name).read_bytes():
-                raise SystemExit('Wrong or missing offline dictionary asset: ' + name)
+                raise SystemExit('Wrong or missing offline dictionary/prediction asset: ' + name)
         # Androguard 4.1.3 cannot parse all of this Gboard's complex resource
         # table entries. Check the binary string pool and packaged drawable;
         # Android's own resource lookup is additionally exercised in the smoke.
         table = archive.read('resources.arsc')
-        resource_name = 'gboard_khmerlish_panel'
-        if not any(resource_name.encode(enc) in table for enc in ('utf-8', 'utf-16le')):
-            raise SystemExit('Khmerlish toolbar name missing from compiled resource table')
-        if not any(name.startswith('res/') and name.endswith('/' + resource_name + '.xml')
-                   for name in archive.namelist()):
-            raise SystemExit('Compiled Khmerlish toolbar drawable is missing')
+        for resource_name in ('gboard_khmerlish_panel', 'gboard_gemini_chat'):
+            if not any(resource_name.encode(enc) in table for enc in ('utf-8', 'utf-16le')):
+                raise SystemExit(resource_name + ' missing from compiled resource table')
+            if not any(name.startswith('res/') and name.endswith('/' + resource_name + '.xml')
+                       for name in archive.namelist()):
+                raise SystemExit('Compiled toolbar drawable is missing: ' + resource_name)
     bodies: dict[tuple[str, str, str], str] = {}
     found = set()
     for data in apk.get_all_dex():
@@ -96,16 +106,19 @@ def main() -> None:
                                             for ins in method.get_code().get_bc().get_instructions())
     if found != CLASSES or set(bodies) != set(TARGETS):
         raise SystemExit(f'Missing extension classes or native method bodies: {CLASSES - found}, {set(TARGETS) - set(bodies)}')
-    for key, marker in TARGETS.items():
-        if bodies[key].count(marker) != 1:
-            raise SystemExit('Missing/duplicate runtime delegate: ' + repr(key))
+    for key, markers_for_method in TARGETS.items():
+        if isinstance(markers_for_method, str):
+            markers_for_method = (markers_for_method,)
+        for marker in markers_for_method:
+            if bodies[key].count(marker) != 1:
+                raise SystemExit('Missing/duplicate runtime delegate: ' + repr((key, marker)))
     selection = bodies[('Lphr;', 'onUpdateSelection', '(IIIIII)V')]
     if 'gboardPatchesCalculatorSelection' not in selection:
         raise SystemExit('Existing calculator selection hook was not preserved in the fixture')
     registry = bodies[(REGISTRY, 'features', '(Landroid/content/Context;)Ljava/util/List;')]
     if registry.index(SETTINGS + '->append(') > registry.index('Ljava/util/Collections;->unmodifiableList('):
         raise SystemExit('Khmerlish settings must be registered before the list is frozen')
-    print('Verified Khmerlish settings, lifecycle delegates, dictionary, license and existing calculator hook.')
+    print('Verified Khmerlish and Gemini toolbar delegates, settings, resources and existing calculator hook.')
     print('Fixture is third-party and already patched, not original stock Gboard or a runtime test.')
     print('Fixture output SHA-256:', hashlib.sha256(args.apk.read_bytes()).hexdigest())
 

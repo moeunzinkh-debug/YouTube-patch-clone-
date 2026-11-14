@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Compact block-letter “Gmn” toolbar mark requested for the Gemini router. -->
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M1,5 H8 V7 H3 V17 H6 V13 H5 V11 H9 V19 H1 Z" />
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M10,10 H12 V11 C13,9.5 14.5,9.5 15.2,11 C16.2,9.5 17,10 17,12 V19 H15 V12 C15,11.5 14,11.5 14,12 V19 H12 V12 C12,11.5 12,11.5 12,12 V19 H10 Z" />
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M18,10 H20 V11 C21,9.5 23,10 23,12 V19 H21 V12 C21,11.5 20,11.5 20,12 V19 H18 Z" />
+</vector>

@@ -1,0 +1,135 @@
+name: Add Gboard Khmerlish 4.0.8 bundle to pre-release
+
+on:
+  push:
+    branches:
+      - arena/f2e6d8d1-youtube-patch-clone
+    paths:
+      - .github/workflows/publish-gboard-khmer-408-prerelease.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-gboard-khmer-408-prerelease
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: contains(github.event.head_commit.message, '[publish-gboard-khmer-408]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: '437238495'
+      RELEASE_TAG: Gboard-v4.0.5
+      VERSION: 4.0.8-khmerlish-dev.1
+      EXPECTED_SHA256: 3d206ea28a0f68d9af6583606458db99e623dcd20ee771b837d1e55a1e0c0c34
+      EXPECTED_SIZE: '8444287'
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify exact build and Android reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd bundles/gboard-khmer && sha256sum --check gboard-khmerlish-experimental.mpp.sha256)
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path('bundles/gboard-khmer')
+          bundle = root / 'gboard-khmerlish-experimental.mpp'
+          digest = hashlib.sha256(bundle.read_bytes()).hexdigest()
+          build = json.loads((root / 'validation.json').read_text())
+          android = json.loads((root / 'android-smoke.json').read_text())
+          tests = build['checks']['khmerlish_and_gemini_unit_tests']
+          predictions = android.get('toolbar_panel', {}).get('predictions', {})
+          if digest != os.environ['EXPECTED_SHA256'] or bundle.stat().st_size != int(os.environ['EXPECTED_SIZE']):
+              raise SystemExit('Bundle bytes differ from the approved artifact')
+          if (build['version'] != os.environ['VERSION'] or build['sha256'] != digest
+                  or tests != {'tests': 55, 'failures': 0, 'errors': 0, 'skipped': 0}
+                  or build['checks']['morphe_desktop_listing'] != 'passed'
+                  or build['checks']['third_party_prepatched_fixture_application_and_dex_inspection'] != 'passed'):
+              raise SystemExit('Build report does not approve this bundle')
+          if (android.get('bundle_sha256') != digest or android.get('emulator_action_outcome') != 'success'
+                  or android.get('actual_gboard_typing') != 'passed'
+                  or android.get('toolbar_panel', {}).get('status') != 'passed'
+                  or any(not predictions.get(key, {}).get('passed') for key in ('men', 'man'))):
+              raise SystemExit('Android report does not approve prediction behavior')
+          print('Verified approved bundle', digest)
+          PY
+      - name: Verify target pre-release and stage uniquely named assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_sha="$(gh api "repos/$GITHUB_REPOSITORY/branches/arena%2Ff2e6d8d1-youtube-patch-clone" --jq '.commit.sha')"
+          test "$remote_sha" = "$GITHUB_SHA" || { echo '::error::Branch advanced; refusing stale upload'; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-before.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = json.loads(Path(os.environ['RUNNER_TEMP'], 'release-before.json').read_text())
+          if (release['id'] != int(os.environ['RELEASE_ID']) or release['tag_name'] != os.environ['RELEASE_TAG']
+                  or release['name'] != 'Gboard Khmerlish v4.0.5 (experimental)'
+                  or release['draft'] or not release['prerelease']):
+              raise SystemExit('Expected Gboard Khmerlish pre-release is unavailable')
+          names = [asset['name'] for asset in release['assets']]
+          if len(names) != len(set(names)):
+              raise SystemExit('Target release has duplicate asset names')
+          prefix = 'gboard-khmerlish-' + os.environ['VERSION']
+          if any(name.startswith(prefix) for name in names):
+              raise SystemExit('4.0.8 asset already exists; refusing to replace it')
+          PY
+          stage="$RUNNER_TEMP/gboard-khmer-408"
+          mkdir -p "$stage"
+          prefix="gboard-khmerlish-$VERSION"
+          cp bundles/gboard-khmer/gboard-khmerlish-experimental.mpp "$stage/$prefix.mpp"
+          printf '%s  %s\n' "$EXPECTED_SHA256" "$prefix.mpp" > "$stage/$prefix.mpp.sha256"
+          cp bundles/gboard-khmer/validation.json "$stage/$prefix-validation.json"
+          cp bundles/gboard-khmer/android-smoke.json "$stage/$prefix-android-smoke.json"
+          cp bundles/gboard-khmer/README.md "$stage/$prefix-README.md"
+      - name: Upload new assets without replacing old versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/gboard-khmer-408"/*
+      - name: Verify uploaded bytes and update release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" > "$RUNNER_TEMP/release-after.json"
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          temp = Path(os.environ['RUNNER_TEMP'])
+          before = json.loads((temp / 'release-before.json').read_text())
+          after = json.loads((temp / 'release-after.json').read_text())
+          old = {asset['id']: asset for asset in before['assets']}
+          new = {asset['id']: asset for asset in after['assets']}
+          if not set(old).issubset(new):
+              raise SystemExit('An existing asset was removed')
+          for asset_id, original in old.items():
+              for key in ('name', 'size', 'state', 'digest'):
+                  if original.get(key) != new[asset_id].get(key):
+                      raise SystemExit('Existing asset changed: ' + original['name'])
+          by_name = {asset['name']: asset for asset in after['assets']}
+          for local in (temp / 'gboard-khmer-408').iterdir():
+              asset = by_name.get(local.name)
+              digest = 'sha256:' + hashlib.sha256(local.read_bytes()).hexdigest()
+              if (not asset or asset['state'] != 'uploaded' or asset['size'] != local.stat().st_size
+                      or asset.get('digest') != digest):
+                  raise SystemExit('Uploaded bytes differ: ' + local.name)
+          marker = '## Khmerlish 4.0.8-khmerlish-dev.1 update'
+          body = after['body'] or ''
+          if marker in body:
+              raise SystemExit('Release notes already contain this update')
+          body += f'''\n\n{marker}\n\nThis newer bundle is attached to the existing 4.0.5 pre-release without replacing older assets.\n\n- Download: **gboard-khmerlish-4.0.8-khmerlish-dev.1.mpp**\n- Adds the opt-in Gmn Gemini chat router and offline Khmerlish panel predictions.\n- Prediction examples: `men → មែន, មេន`; `man → ម៉ាន, មែន`. Personal dictionary candidates are ranked first.\n- Build: 55/55 JVM tests, Morphe listing and exact-version fixture application passed.\n- Android 15 smoke confirmed both candidate sets are visible, tappable and commit the selected Khmer output.\n- SHA-256: `{os.environ['EXPECTED_SHA256']}`\n- Build run: https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/43590086705\n- Android run: https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/43590384977\n- PR: https://github.com/{os.environ['GITHUB_REPOSITORY']}/pull/36\n'''
+          (temp / 'release-patch.json').write_text(json.dumps({'body': body}))
+          PY
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+            --input "$RUNNER_TEMP/release-patch.json" > "$RUNNER_TEMP/release-final.json"
+          test "$(jq -r .prerelease "$RUNNER_TEMP/release-final.json")" = true
+          mkdir -p "$RUNNER_TEMP/download-check"
+          prefix="gboard-khmerlish-$VERSION"
+          gh release download "$RELEASE_TAG" --pattern "$prefix.mpp" --pattern "$prefix.mpp.sha256" \
+            --dir "$RUNNER_TEMP/download-check"
+          (cd "$RUNNER_TEMP/download-check" && sha256sum --check "$prefix.mpp.sha256")

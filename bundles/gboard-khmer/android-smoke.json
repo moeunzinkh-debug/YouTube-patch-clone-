@@ -32,7 +32,6 @@
       "Open features menu",
       "Khmerlish → ខ្មែរ",
       "Sticker Keyboard, This app does not support images here",
-      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -309,13 +308,18 @@
         }
       ]
     },
-    "initial_unlabelled_clickable_nodes": [],
+    "initial_unlabelled_clickable_nodes": [
+      {
+        "class": "android.widget.Button",
+        "id": "",
+        "bounds": "[128,381][192,419]"
+      }
+    ],
     "visible_in_toolbar": "passed",
     "labels_after_tap": [
       "Open features menu",
       "Khmerlish → ខ្មែរ",
       "Sticker Keyboard, This app does not support images here",
-      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -854,27 +858,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -885,27 +889,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -916,27 +920,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -947,27 +951,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       },
@@ -978,27 +982,27 @@
         "key_positions": {
           "a": [
             22,
-            516
+            539
           ],
           "n": [
             223,
-            554
+            568
           ],
           "v": [
             158,
-            554
+            568
           ],
           "space": [
             159,
-            592
+            597
           ],
           "khmerlish backspace": [
             293,
-            554
+            568
           ],
           "done khmerlish": [
             292,
-            592
+            597
           ]
         }
       }
@@ -1012,6 +1016,32 @@
     "close_commits": "passed",
     "reopen_output": "នៅណាកម្ពុជា",
     "reopen": "passed",
+    "predictions": {
+      "men": {
+        "expected_candidates": [
+          "មែន",
+          "មេន"
+        ],
+        "selected": "មេន",
+        "visible": true,
+        "tapped": true,
+        "lower_input": "មេន",
+        "actual": "មេន",
+        "passed": true
+      },
+      "man": {
+        "expected_candidates": [
+          "ម៉ាន",
+          "មែន"
+        ],
+        "selected": "ម៉ាន",
+        "visible": true,
+        "tapped": true,
+        "lower_input": "ម៉ាន",
+        "actual": "ម៉ាន",
+        "passed": true
+      }
+    },
     "examples": {
       "nv na": {
         "expected": "នៅណា",
@@ -1546,10 +1576,10 @@
       "Downloads",
       "khmerlish-smoke-valid.csv",
       "155 B",
-      "3:04 AM",
+      "11:40 AM",
       "khmerlish-smoke-invalid.csv",
       "51 B",
-      "3:04 AM",
+      "11:40 AM",
       "khmerlish-personal.tsv",
       "SAVE"
     ],
@@ -1576,7 +1606,6 @@
       "Open features menu",
       "Khmerlish → ខ្មែរ",
       "Sticker Keyboard, This app does not support images here",
-      "GIF Keyboard, This app does not support images here",
       "Use voice typing",
       "q",
       "1",
@@ -1630,7 +1659,7 @@
     "symbol_after_restart": "passed",
     "restart_and_delete_fallback": "passed"
   },
-  "bundle_sha256": "9d6d6d9cba8902cd63356b0ecb19c3092e9846e1b2036e98da800ca854ddb443",
+  "bundle_sha256": "3d206ea28a0f68d9af6583606458db99e623dcd20ee771b837d1e55a1e0c0c34",
   "emulator_action_outcome": "success",
-  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/42331556221"
+  "run_url": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/43590384977"
 }

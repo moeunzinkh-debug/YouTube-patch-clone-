@@ -274,7 +274,8 @@ public final class KhmerlishRuntime {
             KhmerlishDictionary loaded = null;
             try {
                 loaded = KhmerlishDictionary.read(
-                        application.getAssets().open("gboard-khmer/dictionary.tsv"));
+                        application.getAssets().open("gboard-khmer/dictionary.tsv"),
+                        application.getAssets().open("gboard-khmer/predictions.tsv"));
             } catch (Throwable ignored) {
                 // Missing/corrupt assets fail closed; no typed content is logged.
             }
