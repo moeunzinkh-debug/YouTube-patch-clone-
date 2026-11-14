@@ -21,7 +21,7 @@ private val snapMediaScript = """
   if(window.__morpheSnapMedia)return;
   window.__morpheSnapMedia=true;
   var nativeKey='morphe-snap-media-url',playerKey='morphe-snap-player-json',found={},blockedUrls={},sequence=0;
-  var snappedUrl='',capturing=false,captureTimeout=0,button=null,playerBlockReason='';
+  var snappedUrl='',capturing=false,captureTimeout=0,button=null,playerBlockReason='',playerSeen=false,playerTitle='';
   function toast(message){try{if(window.Android&&Android.showToast)Android.showToast(message);}catch(e){}}
   function absolute(url,base){
     try{return new URL(String(url||''),base||document.baseURI).href;}catch(e){return '';}
@@ -36,25 +36,59 @@ private val snapMediaScript = """
     if(/download|attachment|original|source|下载|下載/.test(info))score+=4000;
     return score;
   }
-  function remember(url,hint,base,forceDirect){
+  function remember(url,hint,base,forceDirect,origin){
+    if(url===undefined||url===null||String(url).trim()==='')return;
     var value=absolute(url,base),score=forceDirect?26000:mediaScore(value,hint);
     if(!score||blocked(value)||blockedUrls[value])return;
     var old=found[value];
-    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence,direct:!!forceDirect||!!(old&&old.direct)};
+    found[value]={url:value,score:Math.max(score,old?old.score:0),order:++sequence,direct:!!forceDirect||!!(old&&old.direct),origin:origin||(old&&old.origin)||'page'};
   }
   function rememberNativePlayer(raw){
     try{
-      var data=JSON.parse(raw||'{}'),type=String(data.type||'mp4').toLowerCase(),url=absolute(data.url||'',document.baseURI);
-      if(!url)return;
-      var hasClearKeys=data.clearKeys&&Object.keys(data.clearKeys).length>0;
-      var encrypted=!!data.drm||hasClearKeys||(data.ykKey&&data.ykKey.length)||(data.bbtsKey&&String(data.bbtsKey).length);
-      var streamed=!!data.manifest||/^(?:hls|m3u8|dash|mpd|ss|smoothstreaming|rtsp|auto|clearkey_mp4)$/.test(type)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url);
-      if(encrypted||streamed){
-        blockedUrls[url]=true;delete found[url];
-        playerBlockReason=encrypted?'encrypted native player source':'segmented native player stream';
-        return;
+      var data=JSON.parse(raw||'{}');if(!data||typeof data!=='object')return;
+      playerSeen=true;
+      playerTitle=String(data.title||playerTitle||'').trim();
+      var inheritedEncrypted=!!data.drm||(data.clearKeys&&Object.keys(data.clearKeys).length>0)||(data.ykKey&&String(data.ykKey).length)||(data.bbtsKey&&String(data.bbtsKey).length);
+      var accepted=false,rejectedEncrypted=false,rejectedStream=false;
+      function option(value,label,defaultType,inheritedManifest){
+        if(!value)return;
+        if(typeof value==='string'){
+          var text=value.trim();if(!text)return;
+          if((text.charAt(0)==='{'||text.charAt(0)==='[')){try{walk(JSON.parse(text),label,defaultType);}catch(e){}return;}
+          value={url:text};
+        }
+        if(typeof value!=='object'||Array.isArray(value))return;
+        var url=absolute(value.url||value.src||value.file||'',document.baseURI);if(!url)return;
+        var explicitType=String(value.type||'').toLowerCase();
+        var type=explicitType||(directFile(url)?'mp4':String(defaultType||'').toLowerCase());
+        var localKeys=value.clearKeys&&Object.keys(value.clearKeys).length>0;
+        var encrypted=inheritedEncrypted||!!value.drm||localKeys||(value.ykKey&&String(value.ykKey).length)||(value.bbtsKey&&String(value.bbtsKey).length);
+        var manifest=!!inheritedManifest||!!value.manifest;
+        var streamed=manifest||/^(?:hls|m3u8|dash|mpd|ss|smoothstreaming|rtsp|auto|clearkey_mp4)$/.test(type)||/\.(?:m3u8|mpd)(?:[?#]|$)/i.test(url);
+        if(encrypted||streamed){blockedUrls[url]=true;delete found[url];rejectedEncrypted=rejectedEncrypted||encrypted;rejectedStream=rejectedStream||streamed;return;}
+        if(/^(?:mp4|progressive)$/.test(type)||directFile(url)){
+          accepted=true;remember(url,'native player '+label+' '+type,document.baseURI,true,'native-player');
+        }
       }
-      if(/^(?:mp4|progressive)$/.test(type)){playerBlockReason='';remember(url,'video native player '+type,document.baseURI,true);}
+      function walk(value,label,defaultType){
+        if(!value)return;
+        if(Array.isArray(value)){value.forEach(function(item,index){walk(item,label+' '+index,defaultType);});return;}
+        if(typeof value==='string'){
+          var text=value.trim();if(!text)return;
+          if(text.charAt(0)==='{'||text.charAt(0)==='['){try{walk(JSON.parse(text),label,defaultType);}catch(e){option(text,label,defaultType,false);}}
+          else option(text,label,defaultType,false);
+          return;
+        }
+        if(typeof value!=='object')return;
+        option(value,label,defaultType,false);
+        ['backup','backups','sources','items','urls'].forEach(function(key){if(value[key]&&value[key]!==value)walk(value[key],label+' '+key,value.type||defaultType);});
+      }
+      option(data,'primary',data.type||'mp4',!!data.manifest);
+      walk(data.backup,'backup','');
+      if(accepted)playerBlockReason='';
+      else if(rejectedEncrypted)playerBlockReason='encrypted native player source';
+      else if(rejectedStream)playerBlockReason='segmented native player stream';
+      else playerBlockReason='native player did not expose a direct file';
     }catch(e){}
   }
   function metadata(element){
@@ -121,7 +155,7 @@ private val snapMediaScript = """
       }catch(e){}
     });
     try{if(window.Android&&Android.getData){
-      remember(Android.getData(nativeKey),'native direct-video request',document.baseURI);
+      remember(Android.getData(nativeKey),'native direct-video request',document.baseURI,true,'native-request');
       rememberNativePlayer(Android.getData(playerKey));
     }}catch(e){}
     if(capturing){var ready=bestDirectMediaUrl(false);if(ready)finishSnap(ready);}
@@ -137,8 +171,12 @@ private val snapMediaScript = """
   }
   function bestDirectMediaUrl(rescan){
     if(rescan!==false)scan();
-    var candidates=rankedCandidates();
-    for(var index=0;index<candidates.length;index++)if(candidates[index].direct||directFile(candidates[index].url))return candidates[index].url;
+    var candidates=rankedCandidates(),nativeOnly=/\/vplay\//i.test(location.pathname);
+    for(var index=0;index<candidates.length;index++){
+      var candidate=candidates[index];
+      if(nativeOnly&&!/^native-/.test(candidate.origin||''))continue;
+      if(candidate.direct||directFile(candidate.url))return candidate.url;
+    }
     return '';
   }
   function setSnapState(state){
@@ -161,20 +199,22 @@ private val snapMediaScript = """
   setInterval(scan,1500);scan();
   function fileInfo(url){
     var path='';try{path=decodeURIComponent(new URL(url).pathname.split('/').pop()||'');}catch(e){}
-    path=path.replace(/[^a-zA-Z0-9._ -]/g,'_');
+    path=path.replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim();
     var extension=(path.match(/\.(mp4|m4v|webm|mov)$/i)||[])[1]||'mp4';
-    if(!path||!new RegExp('\\.'+extension+'$','i').test(path))path='bigtree_video_'+Date.now()+'.'+extension;
+    var title=String(playerTitle||'').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().slice(0,120);
+    if(title)path=title+(new RegExp('\\.'+extension+'$','i').test(title)?'':'.'+extension);
+    else if(!path||!new RegExp('\\.'+extension+'$','i').test(path))path='bigtree_video_'+Date.now()+'.'+extension;
     var mime=extension.toLowerCase()==='webm'?'video/webm':extension.toLowerCase()==='mov'?'video/quicktime':'video/mp4';
     return {name:path,mime:mime};
   }
   function startSnap(){
     if(capturing){toast('Still capturing. Keep the video playing...');return;}
-    snappedUrl='';capturing=true;setSnapState('capturing');scan();
+    snappedUrl='';found={};blockedUrls={};sequence=0;playerSeen=false;playerTitle='';playerBlockReason='';capturing=true;setSnapState('capturing');scan();
     if(capturing){
       toast('Capturing the full video URL. Keep the video playing...');
       captureTimeout=setTimeout(function(){
         if(!capturing)return;capturing=false;setSnapState('idle');
-        toast(playerBlockReason?'Direct download blocked: '+playerBlockReason+'. Raw saving would create a corrupt file.':'A safe direct video file was not found. Play the video and tap Snap again.');
+        toast(playerBlockReason?'Direct download blocked: '+playerBlockReason+'. Raw saving would create a corrupt file.':(/\/vplay\//i.test(location.pathname)&&!playerSeen?'The native player source was not received. Start this episode, then tap Snap again.':'A safe direct video file was not found. Play the video and tap Snap again.'));
       },20000);
     }
   }
@@ -450,7 +490,7 @@ private fun compatibility() = Compatibility(
 @Suppress("unused")
 val snapMediaPatch = bytecodePatch(
     name = "Snap Media",
-    description = "Uses the two-step direct-file flow and captures the JSON passed to BigTree's native ExoPlayer bridge. Only unencrypted progressive/MP4 sources may reach native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments are blocked because raw saving produces corrupt audio/video.",
+    description = "Uses the two-step direct-file flow and the exact JSON passed to BigTree's native ExoPlayer bridge. On /vplay pages it ignores unrelated webpage/tutorial media, considers the native primary and backup sources, and sends only unencrypted progressive/MP4 files to native saveFile. DRM, ClearKey, Youku/BBTS keys, inline manifests, adaptive streams, initialization fragments, and individual segments remain blocked because raw saving produces corrupt audio/video.",
     default = false,
 ) {
     compatibleWith(compatibility())

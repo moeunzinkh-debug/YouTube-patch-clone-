@@ -30,7 +30,9 @@ class BigTreeToolsTest(unittest.TestCase):
         for evidence in ('XMLHttpRequest.prototype.open', 'PerformanceObserver', 'iframe,frame',
                          'shouldInterceptRequest', 'morphe-snap-media-url', 'nativePlayerOpen',
                          'morphe-snap-player-json', 'Android.saveFile', 'Video captured',
-                         'raw saving would corrupt it', 'data.clearKeys', 'data.bbtsKey'):
+                         'raw saving would corrupt it', 'data.clearKeys', 'data.bbtsKey',
+                         "walk(data.backup,'backup','')", "nativeOnly=/\\/vplay\\//",
+                         "true,'native-player'", 'playerTitle'):
             self.assertIn(evidence, source)
         for unsafe in ('geometricDownloadControl', 'downloadControl()', 'control.click()',
                        'openAppDownload', 'morphe-snap-manifest-url'):

@@ -1,7 +1,7 @@
 name: Build BigTree feature patches
 on:
   push:
-    branches: [arena/870bf1a6-youtube-patch-clone]
+    branches: [arena/ec48a056-youtube-patch-clone]
     paths:
       - 'tools/bigtree/project/**'
       - 'tools/bigtree/prepare_build.py'
