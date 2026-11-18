@@ -1,13 +1,11 @@
 package app.morphe.patches.genv
 
-import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.resourcePatch
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 
 private const val ANDROID_NS_ADS = "http://schemas.android.com/apk/res/android"
-private const val GENV_PACKAGE_ADS = "com.ainate.ai.video.generate"
 internal const val REMOVE_ADS_NAME = "Remove ads (experimental)"
 
 private val adIdPermissions = setOf(
@@ -21,7 +19,7 @@ private fun Element.androidName(): String =
 /** Remove only reviewed AdMob configuration and advertising-ID access. */
 internal fun removeAdvertisingManifestEntries(document: Document) {
     val root = document.documentElement
-    require(root.tagName == "manifest" && root.getAttribute("package") == GENV_PACKAGE_ADS) {
+    require(root.tagName == "manifest" && root.getAttribute("package") == GENV_PACKAGE) {
         "Unexpected GenV manifest package"
     }
     val applications = root.getElementsByTagName("application")
@@ -49,13 +47,13 @@ internal fun removeAdvertisingManifestEntries(document: Document) {
 @Suppress("unused")
 val removeAdsPatch = resourcePatch(
     name = REMOVE_ADS_NAME,
-    description = "Remove the reviewed AdMob application configuration and advertising-ID permissions from GenV 3.7.2. Does not change premium status, billing, credits, rewards or server entitlements. Flutter placeholders may remain; complete splits and device testing are required.",
+    description = "Remove reviewed AdMob configuration and advertising-ID permissions from GenV 3.7.2; 3.7.4 support is provisional and fails closed if its manifest differs. Does not change premium status, billing, credits, rewards or server entitlements.",
     default = false,
 ) {
     compatibleWith(Compatibility(
         name = "GenV",
-        packageName = GENV_PACKAGE_ADS,
-        targets = listOf(AppTarget(version = "3.7.2", minSdk = 24, isExperimental = true)),
+        packageName = GENV_PACKAGE,
+        targets = GENV_TARGETS,
     ))
     execute {
         verifyGenVSource(packageMetadata)

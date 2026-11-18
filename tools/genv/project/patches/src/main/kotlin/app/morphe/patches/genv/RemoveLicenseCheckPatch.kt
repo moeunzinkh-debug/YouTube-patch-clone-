@@ -1,7 +1,6 @@
 package app.morphe.patches.genv
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
-import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.AccessFlags
@@ -15,24 +14,21 @@ private const val PROVIDER = "Lcom/pairip/licensecheck/LicenseContentProvider;"
 private const val RESPONSE = "Lcom/pairip/licensecheck/LicenseResponseHelper;"
 private const val CONTEXT = "Landroid/content/Context;"
 
-/** Scoped to the reviewed GenV 3.7.2 (163) PairIP client-side methods. */
+/** Reviewed on 3.7.2 (163); 3.7.4 is provisional and must match the same exact method shapes. */
 @Suppress("unused")
 val removeLicenseCheckPatch = bytecodePatch(
     name = "Remove license check",
-    description = "Disable the reviewed PairIP client-side Play license and installer entry points in GenV 3.7.2 (163). Does not grant purchases, subscriptions, server entitlements or bypass server attestation. Experimental; complete APK splits and device testing are required.",
+    description = "Disable exact reviewed PairIP client-side entry points in GenV 3.7.2 (163); 3.7.4 is provisional and fails closed if those methods differ. Does not grant purchases, subscriptions, server entitlements or bypass server attestation.",
     default = true,
 ) {
     compatibleWith(Compatibility(
         name = "GenV",
-        packageName = "com.ainate.ai.video.generate",
-        targets = listOf(AppTarget(version = "3.7.2", minSdk = 24, isExperimental = true)),
+        packageName = GENV_PACKAGE,
+        targets = GENV_TARGETS,
     ))
 
     execute {
-        require(packageMetadata.packageName == "com.ainate.ai.video.generate" &&
-            packageMetadata.versionName == "3.7.2" && packageMetadata.versionCode == "163") {
-            "Remove license check supports only the reviewed GenV package, version 3.7.2 and build 163"
-        }
+        requireSupportedGenVIdentity(packageMetadata, "Remove license check")
         fun refs(method: com.android.tools.smali.dexlib2.iface.Method) = requireNotNull(method.implementation).instructions
             .mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
         fun MethodReference.isMethod(owner: String, method: String, parameters: List<String>, result: String) =

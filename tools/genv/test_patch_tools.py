@@ -17,7 +17,8 @@ class GenVToolTests(unittest.TestCase):
             prepare(dest)
             patch_dir = dest / 'patches/src/main/kotlin/app/morphe/patches/genv'
             self.assertEqual({p.name for p in patch_dir.glob('*.kt')},
-                             {'RemoveLicenseCheckPatch.kt', 'MorpheMicroGSupportPatch.kt', 'RemoveAdsPatch.kt'})
+                             {'GenVCompatibility.kt', 'RemoveLicenseCheckPatch.kt',
+                              'MorpheMicroGSupportPatch.kt', 'RemoveAdsPatch.kt'})
             self.assertTrue((dest / 'extensions/genv/src/main/java/app/morphe/extension/genv/MicroGGuard.java').is_file())
             self.assertFalse((dest / 'patches/src/main/kotlin/app/morphe/patches/youtube').exists())
             self.assertIn('genv-patches', (dest / 'settings.gradle.kts').read_text())
@@ -26,11 +27,11 @@ class GenVToolTests(unittest.TestCase):
 
     def test_exact_listing(self):
         text = ('Name: Remove license check\nEnabled: true\nCompatible packages:\n'
-                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n'
+                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n    3.7.4\n'
                 f'Name: {MICROG}\nEnabled: false\nCompatible packages:\n'
-                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n'
+                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n    3.7.4\n'
                 f'Name: {ADS}\nEnabled: false\nCompatible packages:\n'
-                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n')
+                '  Package name: com.ainate.ai.video.generate\n  Compatible versions:\n    3.7.2\n    3.7.4\n')
         verify_listing(text)
         for altered in (text.replace('Enabled: true', 'Enabled: false'),
                         text.replace('Enabled: false', 'Enabled: true'),

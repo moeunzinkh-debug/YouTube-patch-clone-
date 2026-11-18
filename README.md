@@ -23,7 +23,7 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 <details>
 <summary>🎬 GenV • 3 experimental patches (bundle ដាច់ដោយឡែក)</summary>
 
-គោលដៅដែលបានពិនិត្យ៖ `com.ainate.ai.video.generate` **3.7.2 (163)**, Android 7.0+។
+គោលដៅដែលបានពិនិត្យ៖ `com.ainate.ai.video.generate` **3.7.2 (163)**, Android 7.0+។ Selectors ក៏បង្ហាញសម្រាប់ **3.7.4** ជា provisional compatibility ប៉ុន្តែមិនទាន់មាន APK 3.7.4 សម្រាប់ patch test; signer/method/manifest guards នឹងបដិសេធបើ implementation ខុស។
 
 - `Remove license check` — បិទ PairIP license entry points ពីរដែលបានពិនិត្យ **ខាង client**; បើកជាមុន។ វាមិនផ្ដល់ subscription, server entitlement ឬរំលង server/Play Integrity attestation ទេ។
 - `Morphe MicroG Google sign-in support (experimental)` — opt-in សម្រាប់ MorpheApp MicroG-RE; ប្ដូរតែផ្លូវសេវា/គណនីដែលបានពិនិត្យ និងមិនធានា Google login ឬ server acceptance។

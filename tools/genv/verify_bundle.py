@@ -23,7 +23,8 @@ def verify_listing(text: str) -> None:
         enabled = re.findall(r'^Enabled: (true|false)$', body, flags=re.MULTILINE | re.IGNORECASE)
         packages = re.findall(r'^\s*Package name: (\S+)', body, flags=re.MULTILINE)
         versions = re.findall(r'^[ \t]*(\d+\.\d+\.\d+)[ \t]*$', body, flags=re.MULTILINE)
-        if [v.lower() for v in enabled] != [str(PATCH_DEFAULTS[name]).lower()] or packages != [PACKAGE] or versions != ['3.7.2']:
+        if ([v.lower() for v in enabled] != [str(PATCH_DEFAULTS[name]).lower()]
+                or packages != [PACKAGE] or versions != ['3.7.2', '3.7.4']):
             raise ValueError('Unexpected selector default or compatibility: ' + name)
 
 
