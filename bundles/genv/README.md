@@ -1,6 +1,6 @@
 # GenV — Morphe patches សាកល្បង
 
-នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Source បច្ចុប្បន្នជា **0.3.0-dev.1** និងបន្ថែម selector Remove ads ដែលមិនប្ដូរ plan/credits; bundle ត្រូវ build និង verify ឡើងវិញមុនចែកចាយ។ Asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។
+នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Bundle បច្ចុប្បន្នជា **0.3.0-dev.1** និងបន្ថែម selector Remove ads ដែលមិនប្ដូរ plan/credits។ [Build run 44246839217](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/44246839217) បាន build/list selectors និងអនុវត្ត MPP ពិតទៅ release base; verifier បញ្ជាក់ថា AdMob metadata និង advertising-ID permissions ត្រូវបានដក ខណៈ Billing permission និង DEX ទាំងអស់នៅដដែល។ SHA-256: `13755aa220feaeba3463c42c981c5b9a34f7998af07dbb9526fdf38dd51c2967`។ Asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។
 
 <details>
 <summary>🎬 GenV • 3 experimental patches</summary>

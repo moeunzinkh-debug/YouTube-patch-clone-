@@ -21,12 +21,13 @@ This repository contains a **YouTube-focused source subset** of [MorpheApp/morph
 [![Release patch.mpp](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml/badge.svg)](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/workflows/release-mpp.yml)
 
 <details>
-<summary>🎬 GenV • 2 experimental patches (bundle ដាច់ដោយឡែក)</summary>
+<summary>🎬 GenV • 3 experimental patches (bundle ដាច់ដោយឡែក)</summary>
 
 គោលដៅដែលបានពិនិត្យ៖ `com.ainate.ai.video.generate` **3.7.2 (163)**, Android 7.0+។
 
 - `Remove license check` — បិទ PairIP license entry points ពីរដែលបានពិនិត្យ **ខាង client**; បើកជាមុន។ វាមិនផ្ដល់ subscription, server entitlement ឬរំលង server/Play Integrity attestation ទេ។
 - `Morphe MicroG Google sign-in support (experimental)` — opt-in សម្រាប់ MorpheApp MicroG-RE; ប្ដូរតែផ្លូវសេវា/គណនីដែលបានពិនិត្យ និងមិនធានា Google login ឬ server acceptance។
+- `Remove ads (experimental)` — opt-in ដក AdMob application ID និង advertising-ID permissions ដែលបានពិនិត្យ ដោយរក្សា Billing, plan, credits, purchases និង server entitlements ដដែល។
 
 **Release មានតែ base ដែលត្រូវការ splits និងគ្មាន native libraries**; app GenV ពិត, login និងការរួម splits ពេញមិនទាន់បានសាក។ Browser Google login មិនទាន់មាន patch ទេ៖ [ការពិនិត្យ base និងដែនកំណត់ OAuth](bundles/genv/README.md#browser-sign-in)។ Bundle ថ្មីនៅ repository; asset v0.1.0 ក្នុង pre-release នៅតែមានតែ license patch។ [របៀបប្រើ និងលទ្ធផល](bundles/genv/README.md) · [Bundle ក្នុង repository](bundles/genv/bundle.mpp) · [SHA-256](bundles/genv/bundle.mpp.sha256) · [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV)
 
