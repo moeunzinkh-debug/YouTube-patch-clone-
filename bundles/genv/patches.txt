@@ -8,6 +8,15 @@ Compatible packages:
 		3.7.2
 
 Index: 1
+Name: Remove ads (experimental)
+Description: Remove the reviewed AdMob application configuration and advertising-ID permissions from GenV 3.7.2. Does not change premium status, billing, credits, rewards or server entitlements. Flutter placeholders may remain; complete splits and device testing are required.
+Enabled: false
+Compatible packages:
+	Package name: com.ainate.ai.video.generate
+	Compatible versions:
+		3.7.2
+
+Index: 2
 Name: Remove license check
 Description: Disable the reviewed PairIP client-side Play license and installer entry points in GenV 3.7.2 (163). Does not grant purchases, subscriptions, server entitlements or bypass server attestation. Experimental; complete APK splits and device testing are required.
 Enabled: true
