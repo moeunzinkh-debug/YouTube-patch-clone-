@@ -1,4 +1,4 @@
-name: Save tested GenV remove-ads bundle
+name: Save tested GenV remove-ads and compatibility bundle
 
 on:
   push:
