@@ -1,14 +1,15 @@
 # GenV — Morphe patches សាកល្បង
 
-នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Bundle ក្នុង repository ជា **0.2.0-dev.2**; asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។ មិនបានប្ដូរ release ឬ APK ដើមទេ។
+នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Source បច្ចុប្បន្នជា **0.3.0-dev.1** និងបន្ថែម selector Remove ads ដែលមិនប្ដូរ plan/credits; bundle ត្រូវ build និង verify ឡើងវិញមុនចែកចាយ។ Asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។
 
 <details>
-<summary>🎬 GenV • 2 experimental patches</summary>
+<summary>🎬 GenV • 3 experimental patches</summary>
 
 | ឈ្មោះក្នុង Manager | ជម្រើសដើម | មុខងារ និងដែនកំណត់ |
 |---|---|---|
 | `Remove license check` | បើក | បញ្ឈប់ PairIP client-side license entry points ពីរដែលបានពិនិត្យ។ វាមិនផ្ដល់ purchases, subscriptions, server entitlement ឬរំលង server/Play Integrity attestation ទេ។ |
 | `Morphe MicroG Google sign-in support (experimental)` | បិទ | បញ្ជូន Google Sign-In និងផ្លូវសេវាដែលបានពិនិត្យទៅ `app.revanced.android.gms` របស់ Morphe MicroG-RE ដោយរក្សា package GenV ដដែល។ វាជាការសាកល្បង មិនមែនការធានា login ទេ។ |
+| `Remove ads (experimental)` | បិទ | ដក AdMob application ID និង advertising-ID permissions ដែលបានពិនិត្យ។ វារក្សា Billing permission, plan, credits, purchases និង server entitlements ដដែល។ Flutter ad placeholders អាចនៅសល់ ហើយត្រូវការសាក full splits/device។ |
 
 </details>
 
@@ -21,21 +22,21 @@
 
 ## សំខាន់៖ APK ក្នុង release មិនទាន់ពេញលេញ
 
-[GenV release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) មានតែ `GenV_3.7.2.apk` base ដែលប្រកាសថា **ត្រូវការ splits** ហើយគ្មាន native libraries។ កុំរំពឹងថា base នោះអាចដំណើរការជា app ពេញដោយឯកឯង។ ត្រូវការ base និង splits ទាំងអស់ដែលត្រូវគ្នា (រួម ABI/device configuration) ពីប្រភពទុកចិត្ត មាន package/version និង signer ត្រឹមត្រូវ។ ការរួម splits ពេញមិនទាន់បានសាក; បើ Manager មិនអាចរក certificate ដើមក្រោយ merge patch នឹងបដិសេធជាជាងទាយ។ [ព័ត៌មានពិនិត្យ](release-inspection.json)។
+[GenV release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) មានតែ `GenV_3.7.2.apk` base ដែលប្រកាសថា **ត្រូវការ splits** ហើយគ្មាន native libraries។ ការពិនិត្យបានឃើញ AdMob metadata/advertising-ID permissions ប៉ុន្តែ Flutter app logic (`libapp.so`) ដែលអាចផ្ទុក free/device/region feature gates មិនមានក្នុង base នេះទេ។ ដូច្នេះមិនបន្ថែម selector “unlock all features” ដែលទាយឬអាចប៉ះ premium/server entitlement ឡើយ; Remove ads ប្ដូរតែ manifest entries ដែលបានបញ្ជាក់។ កុំរំពឹងថា base នោះអាចដំណើរការជា app ពេញដោយឯកឯង។ ត្រូវការ base និង splits ទាំងអស់ដែលត្រូវគ្នា (រួម ABI/device configuration) ពីប្រភពទុកចិត្ត មាន package/version និង signer ត្រឹមត្រូវ។ ការរួម splits ពេញមិនទាន់បានសាក; បើ Manager មិនអាចរក certificate ដើមក្រោយ merge patch នឹងបដិសេធជាជាងទាយ។ [ព័ត៌មានពិនិត្យ](release-inspection.json)។
 
 ## របៀបប្រើ
 
 1. ទាញយក [`bundle.mpp`](bundle.mpp) និង [checksum](bundle.mpp.sha256) ពី repository/ឯកសារដែលបានផ្ដល់ក្នុង session នេះ។ ក្នុង Manager ចូល **Sources → Add patch source → Local** ហើយជ្រើស bundle។ Local source មិន update ស្វ័យប្រវត្តិ។
 2. ជ្រើស **GenV patches (experimental)** ក្នុង Sources រួចបើក **Experimental app versions**។ បើចង់ជ្រើស patch ផ្ទាល់ បើក **Settings → Expert mode** ផង។
 3. នៅ **Apps → GenV → No, I already have it**, ជ្រើស APK/split archive ពេញលេញដែលត្រូវនឹងគោលដៅខាងលើ។ ការសាក patch base ដាច់ដោយឡែកមិនបំពេញ splits ដែលបាត់ទេ។
-4. បើក **Morphe MicroG Google sign-in support (experimental)**; អាចជ្រើស ឬដក `Remove license check` ដោយឡែក។ ចុច **Patch**។ ប្រើ MicroG ដែលមានគណនីរួច; មិនចាំបាច់លុប MicroG ឬ YouTube ដែលកំពុងដំណើរការ។
+4. ជ្រើស selectors ដែលចង់បានដោយឡែក៖ **Morphe MicroG Google sign-in support**, `Remove license check` និង/ឬ `Remove ads (experimental)`។ ចុច **Patch**។ ប្រើ MicroG ដែលមានគណនីរួច; មិនចាំបាច់លុប MicroG ឬ YouTube ដែលកំពុងដំណើរការ។
 5. Manager ចុះហត្ថលេខា APK ឡើងវិញ ដូច្នេះវាអាចមិនអាច update លើ app ដើមដែលមាន key ផ្សេង។ បម្រុងទុកទិន្នន័យមុននឹងពិចារណាលុប app ចាស់ ព្រោះការលុបអាចធ្វើឱ្យបាត់ទិន្នន័យ។
 
-បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ Bundle `0.2.0-dev.2` បែងចែកសារ **certificate metadata បាត់/អានមិនបាន** និង **certificate មិនត្រូវ** ប៉ុន្តែវានៅតែបដិសេធទាំងពីរ—មិនបានបន្ធូរ signer safeguard ទេ។
+បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ Bundle `0.3.0-dev.1` បែងចែកសារ **certificate metadata បាត់/អានមិនបាន** និង **certificate មិនត្រូវ** ប៉ុន្តែវានៅតែបដិសេធទាំងពីរ—មិនបានបន្ធូរ signer safeguard ទេ។
 
 ## ផ្លូវ Google Sign-In ទៅ MicroG RE
 
-ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE។ Bundle `0.2.0-dev.2` ពិនិត្យ guard ម្ដងទៀតភ្លាមៗមុនបង្កើត sign-in intent ហើយ refresh cached mode ទៅផ្លូវ interactive mode 4 **តែនៅពេល** package, signer និង sign-in components របស់ MicroG ត្រូវ។ បើ guard បរាជ័យ វាមិនសរសេរ mode ហើយទុក control flow ដើមដំណើរការ។
+ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE។ Bundle `0.3.0-dev.1` ពិនិត្យ guard ម្ដងទៀតភ្លាមៗមុនបង្កើត sign-in intent ហើយ refresh cached mode ទៅផ្លូវ interactive mode 4 **តែនៅពេល** package, signer និង sign-in components របស់ MicroG ត្រូវ។ បើ guard បរាជ័យ វាមិនសរសេរ mode ហើយទុក control flow ដើមដំណើរការ។
 
 ពេលចុច Google Login វាបង្ហាញសារ local ថេរ ដែលមិនមាន email/token៖ `MG00 (check passed)` មានន័យតែ guard ខាងលើបានជោគជ័យ; `MG01 (check failed)` មានន័យថា guard មិនទទួល MicroG នៅពេលនោះ។ `MG00` **មិនមែន** មានន័យថា account chooser, OAuth ឬ GenV server login បានជោគជ័យទេ។
 

@@ -31,7 +31,7 @@ private const val ORIGINAL_GENV_SIGNER_SHA1 = "be4c81d3869d726ea9f0229ab937f2e11
 private const val ORIGINAL_GENV_SIGNER_SHA256 = "1a0e59b153bb4ece8744b01850dea4f614e3f42106b65684668eccd5d7cc2f42"
 
 /** Refuse to advertise the reviewed original signer for a different input. */
-private fun verifyGenVSource(metadata: PackageMetadata) {
+internal fun verifyGenVSource(metadata: PackageMetadata) {
     require(metadata.packageName == GENV_PACKAGE && metadata.versionName == "3.7.2" && metadata.versionCode == "163") {
         "Morphe MicroG support requires the reviewed GenV package, version 3.7.2 and build 163"
     }

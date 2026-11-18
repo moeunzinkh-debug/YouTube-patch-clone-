@@ -10,8 +10,9 @@ from prepare_build import VERSION
 
 NAME = 'Remove license check'
 MICROG = 'Morphe MicroG Google sign-in support (experimental)'
+ADS = 'Remove ads (experimental)'
 PACKAGE = 'com.ainate.ai.video.generate'
-PATCH_DEFAULTS = {NAME: True, MICROG: False}
+PATCH_DEFAULTS = {NAME: True, MICROG: False, ADS: False}
 
 
 def verify_listing(text: str) -> None:
@@ -45,6 +46,9 @@ def verify_bundle(bundle: Path) -> dict:
         klass = archive.read('app/morphe/patches/genv/MorpheMicroGSupportPatchKt.class')
         if MICROG.encode() not in klass:
             raise ValueError('Morphe MicroG selector missing')
+        klass = archive.read('app/morphe/patches/genv/RemoveAdsPatchKt.class')
+        if ADS.encode() not in klass:
+            raise ValueError('Remove ads selector missing')
         extension = archive.read('extensions/genv.mpe')
         if 'classes.dex' not in names or not extension.startswith(b'dex\n') or b'Lapp/morphe/extension/genv/MicroGGuard;' not in extension:
             raise ValueError('Patch or MicroG guard extension DEX missing')
