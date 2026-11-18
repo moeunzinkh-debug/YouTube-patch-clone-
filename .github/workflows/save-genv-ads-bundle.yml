@@ -1,0 +1,82 @@
+name: Save tested GenV remove-ads bundle
+
+on:
+  push:
+    branches: [arena/56af8e2c-youtube-patch-clone]
+    paths:
+      - .github/workflows/save-genv-ads-bundle.yml
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  save:
+    if: contains(github.event.head_commit.message, '[genv-save-ads]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Retrieve and verify source-matched static build
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/genv-ads-delivery"
+          mkdir -p "$work"
+          run="$(python3 tools/king-patcher/find_successful_run.py "$GITHUB_REF_NAME" build-genv-mpp.yml \
+            tools/genv/project tools/genv/prepare_build.py tools/genv/verify_bundle.py \
+            tools/genv/verify_patched.py tools/genv/verify_microg_patched.py tools/genv/verify_ads_patched.py \
+            tools/genv/test_patch_tools.py tools/genv/inspect_genv.py .github/workflows/build-genv-mpp.yml)"
+          gh run download "$run" --name genv-morphe-bundle-static-only --dir "$work"
+          (cd "$work" && sha256sum --check bundle.mpp.sha256)
+          python3 tools/genv/verify_bundle.py --mpp "$work/bundle.mpp" --listing "$work/patches.txt"
+          python3 - "$work" "$run" <<'PY'
+          import hashlib, json, os, pathlib, sys
+          root=pathlib.Path(sys.argv[1]); run=sys.argv[2]
+          bundle=root/'bundle.mpp'; digest=hashlib.sha256(bundle.read_bytes()).hexdigest()
+          license_report=json.loads((root/'patch-validation.json').read_text())
+          microg=json.loads((root/'microg-static.json').read_text())
+          ads=json.loads((root/'ads-static.json').read_text())
+          assert license_report['status']=='passed_actual_mpp_patch_and_dex_inspection'
+          assert microg['status']=='passed_morphe_microg_static'
+          assert ads=={
+            'status':'passed_actual_mpp_remove_ads_manifest_inspection',
+            'selector':'Remove ads (experimental)',
+            'package':'com.ainate.ai.video.generate','version':'3.7.2','version_code':'163',
+            'admob_application_id_removed':True,
+            'advertising_id_permissions_removed':['android.permission.ACCESS_ADSERVICES_AD_ID','com.google.android.gms.permission.AD_ID'],
+            'billing_permission_preserved':True,'dex_files_unchanged':True,
+            'premium_plan_credits_purchases_entitlements':'unchanged by this selector',
+            'runtime_ad_delivery_and_flutter_placeholders':'not tested; complete splits unavailable',
+          }
+          result={
+            'bundle_version':'0.3.0-dev.1','bundle_sha256':digest,'bundle_bytes':bundle.stat().st_size,
+            'input_package':'com.ainate.ai.video.generate','version':'3.7.2','version_code':163,
+            'input_sha256':'f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e',
+            'patches':['Remove license check','Morphe MicroG Google sign-in support (experimental)','Remove ads (experimental)'],
+            'static_build':f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{run}",
+            'remove_ads_actual_mpp_manifest_verification':'passed',
+            'billing_dex_premium_plan_credits_purchases_entitlements':'unchanged',
+            'full_split_runtime_ad_delivery_flutter_placeholders':'not tested; release base is incomplete',
+            'free_device_region_feature_unlock':'not implemented; Dart AOT feature logic is absent from released base',
+          }
+          (root/'validation.json').write_text(json.dumps(result,indent=2)+'\n')
+          PY
+      - name: Save bundle and sanitized reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = arena/56af8e2c-youtube-patch-clone
+          git fetch origin "$GITHUB_REF_NAME"
+          git merge --ff-only FETCH_HEAD
+          work="$RUNNER_TEMP/genv-ads-delivery"
+          cp "$work"/{bundle.mpp,bundle.mpp.sha256,patches.txt,patch-validation.json,microg-static.json,ads-static.json,validation.json} bundles/genv/
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add bundles/genv/{bundle.mpp,bundle.mpp.sha256,patches.txt,patch-validation.json,microg-static.json,ads-static.json,validation.json}
+          git commit -m 'Save tested GenV remove-ads bundle [skip ci]'
+          git push origin "HEAD:$GITHUB_REF_NAME"
