@@ -4,7 +4,6 @@ import app.morphe.patcher.PackageMetadata
 import app.morphe.patcher.apk.ApkSignatureScheme
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
-import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
@@ -21,7 +20,6 @@ import java.security.MessageDigest
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 
-private const val GENV_PACKAGE = "com.ainate.ai.video.generate"
 private const val MICROG_PACKAGE = "app.revanced.android.gms"
 private const val ANDROID_NS = "http://schemas.android.com/apk/res/android"
 private const val GUARD = "Lapp/morphe/extension/genv/MicroGGuard;"
@@ -31,10 +29,8 @@ private const val ORIGINAL_GENV_SIGNER_SHA1 = "be4c81d3869d726ea9f0229ab937f2e11
 private const val ORIGINAL_GENV_SIGNER_SHA256 = "1a0e59b153bb4ece8744b01850dea4f614e3f42106b65684668eccd5d7cc2f42"
 
 /** Refuse to advertise the reviewed original signer for a different input. */
-private fun verifyGenVSource(metadata: PackageMetadata) {
-    require(metadata.packageName == GENV_PACKAGE && metadata.versionName == "3.7.2" && metadata.versionCode == "163") {
-        "Morphe MicroG support requires the reviewed GenV package, version 3.7.2 and build 163"
-    }
+internal fun verifyGenVSource(metadata: PackageMetadata) {
+    requireSupportedGenVIdentity(metadata, "Morphe MicroG support")
     val schemes = setOf(ApkSignatureScheme.V2, ApkSignatureScheme.V3, ApkSignatureScheme.V31)
     val certificates = metadata.signingCertificates.filterKeys { it in schemes }.values.flatten()
     val digests = certificates.map { certificate ->
@@ -152,13 +148,13 @@ private val routeCounts = linkedMapOf(
 @Suppress("unused")
 val morpheMicroGSupportPatch = bytecodePatch(
     name = "Morphe MicroG Google sign-in support (experimental)",
-    description = "Route the reviewed GenV Google sign-in service and account type to MorpheApp MicroG-RE (app.revanced.android.gms). Requires a separately installed, compatible Morphe MicroG and complete GenV splits. OAuth, Firebase, server acceptance and real-device login are not guaranteed.",
+    description = "Route reviewed GenV Google sign-in paths to MorpheApp MicroG-RE. Reviewed on 3.7.2 (163); 3.7.4 is provisional and fails closed unless signer, methods and route literals still match. OAuth and server acceptance are not guaranteed.",
     default = false,
 ) {
     dependsOn(genvExtension, microgManifest)
     compatibleWith(Compatibility(
         name = "GenV", packageName = GENV_PACKAGE,
-        targets = listOf(AppTarget(version = "3.7.2", minSdk = 24, isExperimental = true)),
+        targets = GENV_TARGETS,
     ))
     execute {
         verifyGenVSource(packageMetadata)

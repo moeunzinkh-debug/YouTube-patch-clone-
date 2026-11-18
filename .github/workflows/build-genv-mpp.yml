@@ -2,13 +2,14 @@ name: Build and validate the GenV Morphe bundle
 
 on:
   push:
-    branches: [arena/3655779f-youtube-patch-clone]
+    branches: [arena/56af8e2c-youtube-patch-clone]
     paths:
       - 'tools/genv/project/**'
       - 'tools/genv/prepare_build.py'
       - 'tools/genv/verify_bundle.py'
       - 'tools/genv/verify_patched.py'
       - 'tools/genv/verify_microg_patched.py'
+      - 'tools/genv/verify_ads_patched.py'
       - 'tools/genv/test_patch_tools.py'
       - 'tools/genv/test_microg_verifier.py'
       - 'tools/genv/inspect_genv.py'
@@ -106,15 +107,36 @@ jobs:
           echo '::notice::Fail-closed guard rejected an already modified GenV method.'
           echo '::notice::Both PairIP entry points were modified in a disposable base APK; selected controls and manifest were verified.'
           echo '::notice::The source APK requires splits. No APK was installed, uploaded or published.'
+      - name: Verify remove-ads selector without altering billing or DEX
+        shell: bash
+        run: |
+          set -euo pipefail
+          cli="$RUNNER_TEMP/genv-tools/morphe-desktop-1.20.0-dev.1-all.jar"
+          input="$RUNNER_TEMP/genv-tools/GenV_3.7.2.apk"
+          java -Xmx4g -jar "$cli" patch "$input" --patches "$RUNNER_TEMP/genv-output/bundle.mpp" \
+            --exclusive -e 'Remove ads (experimental)' --unsigned --bytecode-mode FULL \
+            --out "$RUNNER_TEMP/genv-tools/ads.apk" --result-file "$RUNNER_TEMP/genv-tools/ads.json" \
+            > "$RUNNER_TEMP/genv-tools/ads.log" 2>&1
+          python3 tools/genv/verify_ads_patched.py "$input" "$RUNNER_TEMP/genv-tools/ads.apk" \
+            "$RUNNER_TEMP/genv-tools/ads.json" "$RUNNER_TEMP/genv-output/ads-static.json"
+          if java -Xmx4g -jar "$cli" patch "$RUNNER_TEMP/genv-tools/ads.apk" \
+              --patches "$RUNNER_TEMP/genv-output/bundle.mpp" --exclusive -e 'Remove ads (experimental)' \
+              --unsigned --bytecode-mode FULL --out "$RUNNER_TEMP/genv-tools/ads-repatch.apk" \
+              > "$RUNNER_TEMP/genv-tools/ads-repatch.log" 2>&1; then
+            echo '::error::Remove ads accepted an already modified manifest'
+            exit 1
+          fi
+          grep -q 'Reviewed GenV advertising-ID permissions changed' "$RUNNER_TEMP/genv-tools/ads-repatch.log"
       - name: Verify MicroG alone and together with the license selector
         shell: bash
         run: |
           set -euo pipefail
           cli="$RUNNER_TEMP/genv-tools/morphe-desktop-1.20.0-dev.1-all.jar"
           input="$RUNNER_TEMP/genv-tools/GenV_3.7.2.apk"
-          for mode in microg both; do
+          for mode in microg both all; do
             selectors=(-e 'Morphe MicroG Google sign-in support (experimental)')
-            if [[ "$mode" == both ]]; then selectors+=(-e 'Remove license check'); fi
+            if [[ "$mode" == both || "$mode" == all ]]; then selectors+=(-e 'Remove license check'); fi
+            if [[ "$mode" == all ]]; then selectors+=(-e 'Remove ads (experimental)'); fi
             if ! java -Xmx4g -jar "$cli" patch "$input" --patches "$RUNNER_TEMP/genv-output/bundle.mpp" \
                 --exclusive "${selectors[@]}" --unsigned --bytecode-mode FULL \
                 --out "$RUNNER_TEMP/genv-tools/$mode.apk" --result-file "$RUNNER_TEMP/genv-tools/$mode.json" \
@@ -162,3 +184,4 @@ jobs:
             ${{ runner.temp }}/genv-output/patches.txt
             ${{ runner.temp }}/genv-output/patch-validation.json
             ${{ runner.temp }}/genv-output/microg-static.json
+            ${{ runner.temp }}/genv-output/ads-static.json

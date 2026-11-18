@@ -1,0 +1,16 @@
+{
+  "status": "passed_actual_mpp_remove_ads_manifest_inspection",
+  "selector": "Remove ads (experimental)",
+  "package": "com.ainate.ai.video.generate",
+  "version": "3.7.2",
+  "version_code": "163",
+  "admob_application_id_removed": true,
+  "advertising_id_permissions_removed": [
+    "android.permission.ACCESS_ADSERVICES_AD_ID",
+    "com.google.android.gms.permission.AD_ID"
+  ],
+  "billing_permission_preserved": true,
+  "dex_files_unchanged": true,
+  "premium_plan_credits_purchases_entitlements": "unchanged by this selector",
+  "runtime_ad_delivery_and_flutter_placeholders": "not tested; complete splits unavailable"
+}

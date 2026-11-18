@@ -1,41 +1,42 @@
 # GenV — Morphe patches សាកល្បង
 
-នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Bundle ក្នុង repository ជា **0.2.0-dev.2**; asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។ មិនបានប្ដូរ release ឬ APK ដើមទេ។
+នេះជា bundle `.mpp` ដាច់ដោយឡែកសម្រាប់ **Morphe Manager** មិនមែន APK សម្រាប់ដំឡើងផ្ទាល់ទេ។ Bundle បច្ចុប្បន្នជា **0.3.1-dev.1** ហើយរក្សា 3.7.2 ព្រមទាំងបន្ថែម selector metadata សម្រាប់ 3.7.4 ជា provisional compatibility។ APK 3.7.4 មិនមានសម្រាប់ test ដូច្នេះ patches នឹងពិនិត្យ signer និង exact method/manifest shapes ហើយបដិសេធបើខុស។ [Build run 44249401786](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/44249401786) បាន build/list 3.7.2 និង 3.7.4 ហើយអនុវត្ត MPP ពិតទៅ release base 3.7.2; verifier បញ្ជាក់ថា AdMob metadata និង advertising-ID permissions ត្រូវបានដក ខណៈ Billing permission និង DEX ទាំងអស់នៅដដែល។ SHA-256: `d6aa4bdc3704cbed9930d52ba17e6f16648bfc8f099123a07a16a99105a14884`។ Asset `GenV-patches-v0.1.0-dev.1.mpp` ដែលមានស្រាប់នៅ [GenV pre-release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) នៅតែជា **license patch ប៉ុណ្ណោះ**។
 
 <details>
-<summary>🎬 GenV • 2 experimental patches</summary>
+<summary>🎬 GenV • 3 experimental patches</summary>
 
 | ឈ្មោះក្នុង Manager | ជម្រើសដើម | មុខងារ និងដែនកំណត់ |
 |---|---|---|
 | `Remove license check` | បើក | បញ្ឈប់ PairIP client-side license entry points ពីរដែលបានពិនិត្យ។ វាមិនផ្ដល់ purchases, subscriptions, server entitlement ឬរំលង server/Play Integrity attestation ទេ។ |
 | `Morphe MicroG Google sign-in support (experimental)` | បិទ | បញ្ជូន Google Sign-In និងផ្លូវសេវាដែលបានពិនិត្យទៅ `app.revanced.android.gms` របស់ Morphe MicroG-RE ដោយរក្សា package GenV ដដែល។ វាជាការសាកល្បង មិនមែនការធានា login ទេ។ |
+| `Remove ads (experimental)` | បិទ | ដក AdMob application ID និង advertising-ID permissions ដែលបានពិនិត្យ។ វារក្សា Billing permission, plan, credits, purchases និង server entitlements ដដែល។ Flutter ad placeholders អាចនៅសល់ ហើយត្រូវការសាក full splits/device។ |
 
 </details>
 
 ## ភាពឆបគ្នា និងអ្វីដែលបានពិនិត្យ
 
-- គោលដៅតែមួយ៖ `com.ainate.ai.video.generate` **3.7.2**, version code **163**, Android 7.0+ (API 24)។ Selector MicroG ពិនិត្យ package/version, certificate ក្នុង signing block និងទម្រង់ methods/route literals មុនកែ។ វាបដិសេធ APK ដែល certificate ខុស ឬគ្មាន។ ការអាន certificate នេះមិនផ្ទៀងផ្ទាត់ signature គ្រីបតូរបស់ APK ទាំងមូលទេ ហើយក៏មិនមែនជាការផ្ទៀងផ្ទាត់ឯករាជ្យថាឯកសារមកពីអ្នកបង្កើតដែរ។
+- គោលដៅ៖ `com.ainate.ai.video.generate` **3.7.2 / code 163** ដែលបានពិនិត្យ និង **3.7.4 provisional** ដែលមិនទាន់បានសាក APK ពិត, Android 7.0+ (API 24)។ Selector MicroG ពិនិត្យ package/version, certificate ក្នុង signing block និងទម្រង់ methods/route literals មុនកែ។ វាបដិសេធ APK ដែល certificate ខុស ឬគ្មាន។ ការអាន certificate នេះមិនផ្ទៀងផ្ទាត់ signature គ្រីបតូរបស់ APK ទាំងមូលទេ ហើយក៏មិនមែនជាការផ្ទៀងផ្ទាត់ឯករាជ្យថាឯកសារមកពីអ្នកបង្កើតដែរ។
 - ពិនិត្យ release base ដែលមាន SHA-256 `f50a9d162a5802ce30ba842c09d08c8c2b2c816dc439eb1b8c0346aa71501d2e` និង APK signer SHA-1 `be4c81d3869d726ea9f0229ab937f2e11ab1ccc7` (មិនមែន source-stamp signer)។ MicroG អាចប្រើ package/ស្នាមហត្ថលេខា GenV ដើមដែលបានពិនិត្យសម្រាប់ OAuth ប៉ុន្តែ Google ឬ server អាចនៅតែបដិសេធ។
 - ត្រូវដំឡើង [MorpheApp MicroG-RE](https://github.com/MorpheApp/MicroG-RE) ដោយឡែក។ ការសាកប្រើ signer របស់ release **7.3.0**; certificate ដូចគ្នាក៏បានឃើញនៅ release arm64 **7.2.2**។ Availability guard ត្រួតពិនិត្យ package, signer និង sign-in components; វាមិនទទួលស្គាល់ MicroG build ដែលមាន signer ផ្សេង។ នៅ Android 9+ វាសួរ Package Manager អំពី signing lineage; Android 7–8 ប្រើ signature API ចាស់។ លទ្ធផលនៅតែអាស្រ័យលើ Package Manager និង signature spoofing របស់ឧបករណ៍។
 - Patch ប្ដូរតែ strings/action/account/provider ដែលបានពិនិត្យ និង package visibility ក្នុង manifest; មិនប្ដូរ Binder descriptors ឬ package GenV ទេ។ វាមិនបន្ថែម server របស់ patch ឬទទួល password/token ទេ; login ដំណើរការតាម MicroG និង Google។ ការគាំទ្រ Firebase, notifications និងសេវា GMS ផ្សេងៗមិនត្រូវបានធានា។
 
 ## សំខាន់៖ APK ក្នុង release មិនទាន់ពេញលេញ
 
-[GenV release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) មានតែ `GenV_3.7.2.apk` base ដែលប្រកាសថា **ត្រូវការ splits** ហើយគ្មាន native libraries។ កុំរំពឹងថា base នោះអាចដំណើរការជា app ពេញដោយឯកឯង។ ត្រូវការ base និង splits ទាំងអស់ដែលត្រូវគ្នា (រួម ABI/device configuration) ពីប្រភពទុកចិត្ត មាន package/version និង signer ត្រឹមត្រូវ។ ការរួម splits ពេញមិនទាន់បានសាក; បើ Manager មិនអាចរក certificate ដើមក្រោយ merge patch នឹងបដិសេធជាជាងទាយ។ [ព័ត៌មានពិនិត្យ](release-inspection.json)។
+[GenV release](https://github.com/moeunzinkh-debug/YouTube-patch-clone-/releases/tag/GenV) មានតែ `GenV_3.7.2.apk` base ដែលប្រកាសថា **ត្រូវការ splits** ហើយគ្មាន native libraries។ ការពិនិត្យបានឃើញ AdMob metadata/advertising-ID permissions ប៉ុន្តែ Flutter app logic (`libapp.so`) ដែលអាចផ្ទុក free/device/region feature gates មិនមានក្នុង base នេះទេ។ ដូច្នេះមិនបន្ថែម selector “unlock all features” ដែលទាយឬអាចប៉ះ premium/server entitlement ឡើយ; Remove ads ប្ដូរតែ manifest entries ដែលបានបញ្ជាក់។ កុំរំពឹងថា base នោះអាចដំណើរការជា app ពេញដោយឯកឯង។ ត្រូវការ base និង splits ទាំងអស់ដែលត្រូវគ្នា (រួម ABI/device configuration) ពីប្រភពទុកចិត្ត មាន package/version និង signer ត្រឹមត្រូវ។ ការរួម splits ពេញមិនទាន់បានសាក; បើ Manager មិនអាចរក certificate ដើមក្រោយ merge patch នឹងបដិសេធជាជាងទាយ។ [ព័ត៌មានពិនិត្យ](release-inspection.json)។
 
 ## របៀបប្រើ
 
 1. ទាញយក [`bundle.mpp`](bundle.mpp) និង [checksum](bundle.mpp.sha256) ពី repository/ឯកសារដែលបានផ្ដល់ក្នុង session នេះ។ ក្នុង Manager ចូល **Sources → Add patch source → Local** ហើយជ្រើស bundle។ Local source មិន update ស្វ័យប្រវត្តិ។
 2. ជ្រើស **GenV patches (experimental)** ក្នុង Sources រួចបើក **Experimental app versions**។ បើចង់ជ្រើស patch ផ្ទាល់ បើក **Settings → Expert mode** ផង។
 3. នៅ **Apps → GenV → No, I already have it**, ជ្រើស APK/split archive ពេញលេញដែលត្រូវនឹងគោលដៅខាងលើ។ ការសាក patch base ដាច់ដោយឡែកមិនបំពេញ splits ដែលបាត់ទេ។
-4. បើក **Morphe MicroG Google sign-in support (experimental)**; អាចជ្រើស ឬដក `Remove license check` ដោយឡែក។ ចុច **Patch**។ ប្រើ MicroG ដែលមានគណនីរួច; មិនចាំបាច់លុប MicroG ឬ YouTube ដែលកំពុងដំណើរការ។
+4. ជ្រើស selectors ដែលចង់បានដោយឡែក៖ **Morphe MicroG Google sign-in support**, `Remove license check` និង/ឬ `Remove ads (experimental)`។ ចុច **Patch**។ ប្រើ MicroG ដែលមានគណនីរួច; មិនចាំបាច់លុប MicroG ឬ YouTube ដែលកំពុងដំណើរការ។
 5. Manager ចុះហត្ថលេខា APK ឡើងវិញ ដូច្នេះវាអាចមិនអាច update លើ app ដើមដែលមាន key ផ្សេង។ បម្រុងទុកទិន្នន័យមុននឹងពិចារណាលុប app ចាស់ ព្រោះការលុបអាចធ្វើឱ្យបាត់ទិន្នន័យ។
 
-បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ Bundle `0.2.0-dev.2` បែងចែកសារ **certificate metadata បាត់/អានមិនបាន** និង **certificate មិនត្រូវ** ប៉ុន្តែវានៅតែបដិសេធទាំងពីរ—មិនបានបន្ធូរ signer safeguard ទេ។
+បើ input ជា APK ដែល Manager បាន patch និង sign ឡើងវិញរួច selector MicroG អាចបដិសេធ certificate ខុស។ ជ្រើស APK/split archive **ដើម** ហើយជ្រើស patches ដែលចង់បានទាំងពីរ ក្នុងការចុច Patch តែមួយ។ Bundle `0.3.0-dev.1` បែងចែកសារ **certificate metadata បាត់/អានមិនបាន** និង **certificate មិនត្រូវ** ប៉ុន្តែវានៅតែបដិសេធទាំងពីរ—មិនបានបន្ធូរ signer safeguard ទេ។
 
 ## ផ្លូវ Google Sign-In ទៅ MicroG RE
 
-ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE។ Bundle `0.2.0-dev.2` ពិនិត្យ guard ម្ដងទៀតភ្លាមៗមុនបង្កើត sign-in intent ហើយ refresh cached mode ទៅផ្លូវ interactive mode 4 **តែនៅពេល** package, signer និង sign-in components របស់ MicroG ត្រូវ។ បើ guard បរាជ័យ វាមិនសរសេរ mode ហើយទុក control flow ដើមដំណើរការ។
+ការតាមដាន code ក្នុង base បង្ហាញថា Google Sign-In client ហៅ method ពិនិត្យសេវាដែល selector MicroG បានកែ។ នៅលើផ្លូវ interactive ធម្មតា selector ប្ដូរ action និង package ទៅ MicroG RE។ Bundle `0.3.0-dev.1` ពិនិត្យ guard ម្ដងទៀតភ្លាមៗមុនបង្កើត sign-in intent ហើយ refresh cached mode ទៅផ្លូវ interactive mode 4 **តែនៅពេល** package, signer និង sign-in components របស់ MicroG ត្រូវ។ បើ guard បរាជ័យ វាមិនសរសេរ mode ហើយទុក control flow ដើមដំណើរការ។
 
 ពេលចុច Google Login វាបង្ហាញសារ local ថេរ ដែលមិនមាន email/token៖ `MG00 (check passed)` មានន័យតែ guard ខាងលើបានជោគជ័យ; `MG01 (check failed)` មានន័យថា guard មិនទទួល MicroG នៅពេលនោះ។ `MG00` **មិនមែន** មានន័យថា account chooser, OAuth ឬ GenV server login បានជោគជ័យទេ។
 
