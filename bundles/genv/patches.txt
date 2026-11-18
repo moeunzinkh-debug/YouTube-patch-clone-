@@ -1,26 +1,29 @@
 Index: 0
 Name: Morphe MicroG Google sign-in support (experimental)
-Description: Route the reviewed GenV Google sign-in service and account type to MorpheApp MicroG-RE (app.revanced.android.gms). Requires a separately installed, compatible Morphe MicroG and complete GenV splits. OAuth, Firebase, server acceptance and real-device login are not guaranteed.
+Description: Route reviewed GenV Google sign-in paths to MorpheApp MicroG-RE. Reviewed on 3.7.2 (163); 3.7.4 is provisional and fails closed unless signer, methods and route literals still match. OAuth and server acceptance are not guaranteed.
 Enabled: false
 Compatible packages:
 	Package name: com.ainate.ai.video.generate
 	Compatible versions:
 		3.7.2
+		3.7.4
 
 Index: 1
 Name: Remove ads (experimental)
-Description: Remove the reviewed AdMob application configuration and advertising-ID permissions from GenV 3.7.2. Does not change premium status, billing, credits, rewards or server entitlements. Flutter placeholders may remain; complete splits and device testing are required.
+Description: Remove reviewed AdMob configuration and advertising-ID permissions from GenV 3.7.2; 3.7.4 support is provisional and fails closed if its manifest differs. Does not change premium status, billing, credits, rewards or server entitlements.
 Enabled: false
 Compatible packages:
 	Package name: com.ainate.ai.video.generate
 	Compatible versions:
 		3.7.2
+		3.7.4
 
 Index: 2
 Name: Remove license check
-Description: Disable the reviewed PairIP client-side Play license and installer entry points in GenV 3.7.2 (163). Does not grant purchases, subscriptions, server entitlements or bypass server attestation. Experimental; complete APK splits and device testing are required.
+Description: Disable exact reviewed PairIP client-side entry points in GenV 3.7.2 (163); 3.7.4 is provisional and fails closed if those methods differ. Does not grant purchases, subscriptions, server entitlements or bypass server attestation.
 Enabled: true
 Compatible packages:
 	Package name: com.ainate.ai.video.generate
 	Compatible versions:
 		3.7.2
+		3.7.4

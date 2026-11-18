@@ -1,7 +1,7 @@
 {
-  "bundle_version": "0.3.0-dev.1",
-  "bundle_sha256": "13755aa220feaeba3463c42c981c5b9a34f7998af07dbb9526fdf38dd51c2967",
-  "bundle_bytes": 60985,
+  "bundle_version": "0.3.1-dev.1",
+  "bundle_sha256": "d6aa4bdc3704cbed9930d52ba17e6f16648bfc8f099123a07a16a99105a14884",
+  "bundle_bytes": 62505,
   "input_package": "com.ainate.ai.video.generate",
   "version": "3.7.2",
   "version_code": 163,
@@ -11,9 +11,10 @@
     "Morphe MicroG Google sign-in support (experimental)",
     "Remove ads (experimental)"
   ],
-  "static_build": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/44246839217",
+  "static_build": "https://github.com/moeunzinkh-debug/YouTube-patch-clone-/actions/runs/44249401786",
   "remove_ads_actual_mpp_manifest_verification": "passed",
   "billing_dex_premium_plan_credits_purchases_entitlements": "unchanged",
   "full_split_runtime_ad_delivery_flutter_placeholders": "not tested; release base is incomplete",
-  "free_device_region_feature_unlock": "not implemented; Dart AOT feature logic is absent from released base"
+  "free_device_region_feature_unlock": "not implemented; Dart AOT feature logic is absent from released base",
+  "compatibility_3_7_4": "provisional selector metadata only; exact APK unavailable; fail-closed guards remain required"
 }
